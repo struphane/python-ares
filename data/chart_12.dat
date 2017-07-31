@@ -1,0 +1,8 @@
+----------------- Python Object ----------------- 
+[('Super', 10), ('Olivier', 20), ('Aurelie', 20)]
+
+
+----------------- Javascript Object ----------------- 
+[{'size': 10, 'text': 'Super'},
+ {'size': 20, 'text': 'Olivier'},
+ {'size': 20, 'text': 'Aurelie'}]
