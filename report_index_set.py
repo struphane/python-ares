@@ -16,7 +16,7 @@ def call(aresObj):
       reportFile.write("AJAX_CALL = {'testAjax': 'MyRepotTestAjax.py'} # Ajax call definition\n")
       reportFile.write("CHILD_PAGES = {'test': 'MyRepotTestChild.py',} # Child pages call definition\n\n")
       reportFile.write("def report(aresObj, localPath=None):\n\n\n\n")
-      reportFile.write("  return aresObj.html(localPath")
+      reportFile.write("  return aresObj.html(localPath)")
       reportFile.close()
       return '%s - Report created %s' % aresObj.http['POST']['report']
 
