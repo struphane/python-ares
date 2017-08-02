@@ -64,10 +64,15 @@ class HtmlItem(object):
     """
     ajaxObject = AresJs.XsCall(scriptName)
     ajaxObject.success(jsDef)
+    vals = []
+    for key, val in data.items():
+      vals.append('"%s": %s' % (key, val))
+    vals = '{%s}' % ",".join(vals)
+    print (vals)
     if localPath is not None:
-      self.js(evenType, ajaxObject.ajaxLocal(data))
+      self.js(evenType, ajaxObject.ajaxLocal(vals))
     else:
-      self.js(evenType, ajaxObject.ajax(data))
+      self.js(evenType, ajaxObject.ajax(vals))
 
   def jsVal(self):
     """ Return the Javascript Value """
@@ -101,7 +106,7 @@ class Table(HtmlItem):
     self.headers = cols
     self.vals = values
 
-  def html(self):
+  def html(self, localPath):
     """ Return the HTML object for the table """
     item = ['<table class="table">']
     item.append('%s<thead><tr>' % INDENT)
@@ -128,7 +133,7 @@ class List(HtmlItem):
     super(List, self).__init__(htmlId) # To get the HTML Id
     self.val = values
 
-  def html(self):
+  def html(self, localPath):
     """
     """
     item = ['<ul class="list-group">']
@@ -153,7 +158,7 @@ class DropDown(HtmlItem):
     self.val = values
     self.title = title # The default value
 
-  def html(self):
+  def html(self, localPath):
     """
     """
     item = ['<div class="dropdown" id="%s">' % self.htmlId]
@@ -199,7 +204,7 @@ class Select(HtmlItem):
     super(Select, self).__init__(htmlId) # To get the HTML Id
     self.val = values
 
-  def html(self):
+  def html(self, localPath):
     """
     """
     item = ['<select class="selectpicker" id="%s">' % self.htmlId]
@@ -227,7 +232,7 @@ class Div(HtmlItem):
     self.val = value
     self.cls = cssCls
 
-  def html(self):
+  def html(self, localPath):
     """ Return the HMTL object of for div """
     if self.cls is not None:
       return '<div id="%s" class="%s">%s</div>' % (self.htmlId, self.cls, self.val)
@@ -253,7 +258,7 @@ class Container(Div):
     if cssCls is not None:
       self.cls = cssCls
 
-  def html(self):
+  def html(self, localPath):
     """ Return the HMTL object of for div """
     self.val = self.htmlObj.html()
     return super(Container, self).html()
@@ -272,7 +277,7 @@ class Split(Div):
     if cssCls is not None:
       self.cls = cssCls
 
-  def html(self):
+  def html(self, localPath):
     """ """
     res = ['<div id="%s" class="%s">' % (self.htmlId, self.cls)]
     res.append('%s<div class="row">' % INDENT)
@@ -297,7 +302,7 @@ class Graph(HtmlItem):
     if cssCls is not None:
       self.cssCls = cssCls
 
-  def html(self):
+  def html(self, localPath):
     """ Return the Graph container for D3 and DVD3 """
     if self.withSgv:
       return '<div id="chart%s" class="%s">\n<svg width="%s" height="%s"></svg>\n</div>\n' % (self.htmlId, self.cssCls, self.dim[0], self.dim[1])
@@ -316,7 +321,7 @@ class NestedTable(Table):
 
   """
 
-  def html(self):
+  def html(self, localPath):
     """ Return the HTML object for the table """
     item = ['<table class="table">']
     item.append('%s<thead><tr>' % INDENT)
@@ -349,7 +354,7 @@ class Button(HtmlItem):
     self.val = value
     self.cssCls = cssCls
 
-  def html(self):
+  def html(self, localPath):
     """
     """
     if self.cssCls is not None:
@@ -369,7 +374,7 @@ class A(HtmlItem):
     self.link = link
     self.cssCls = cssCls
 
-  def html(self):
+  def html(self, localPath):
     """ Return the HMTL object of for div """
 
 
@@ -394,7 +399,7 @@ class Text(HtmlItem):
     if cssCls is not None:
       self.cssCls = cssCls
 
-  def html(self):
+  def html(self, localPath):
     """ """
     if self.cssCls is not None:
       return '<font id="%s" class="%s">%s</font>' % (self.htmlId, self.cssCls, self.val)
@@ -406,7 +411,7 @@ class Code(Text):
   cssCls = ''
   alias = 'code'
 
-  def html(self):
+  def html(self, localPath):
     """ """
     if self.cssCls is not None:
       return '<pre><code id="%s" class="%s">%s</code></pre>' % (self.htmlId, self.cssCls, self.val)
@@ -428,7 +433,7 @@ class Paragraph(HtmlItem):
     self.cssCls = cssCls
     self.htmlObjs = htmlObjs
 
-  def html(self):
+  def html(self, localPath):
     """ Return the HTML string for a paragraph including or not some other html object """
     # For this object we can have a list of Text objects
     pVal = self.val
@@ -467,11 +472,33 @@ class Input(HtmlItem):
     else:
       self.jsEvent.append(('autocomplete', jsDef))
 
-  def html(self):
+  def html(self, localPath):
     """ """
     item = ['<div class="form-group">']
     item.append('%s<label for="pwd">%s:</label>' % (INDENT, self.name))
     item.append('%s<input type="text" class="form-control" id="%s" value="%s">' % (INDENT, self.htmlId, self.val))
+    item.append('</div>')
+    return "\n".join(item)
+
+class Comment(HtmlItem):
+  """
+  """
+  val = None
+  name = None
+  alias = 'comment'
+  jQueryEvent = ['blur']
+
+  def __init__(self, htmlId, name, value, cssCls=None):
+    """ Instanciate the object and store the name and the value of the input text """
+    super(Comment, self).__init__(htmlId, cssCls) # To get the HTML Id
+    self.name = name
+    self.val = value
+
+  def html(self, localPath):
+    """ """
+    item = ['<div class="form-group">']
+    item.append('%s<label for="pwd">%s:</label>' % (INDENT, self.name))
+    item.append('%s<textarea class="form-control" rows="5" id="%s">%s</textarea>' % (INDENT, self.htmlId, self.val))
     item.append('</div>')
     return "\n".join(item)
 
@@ -482,7 +509,7 @@ class TextArea(HtmlItem):
   alias = 'textarea'
   jsclick = False
 
-  def html(self):
+  def html(self, localPath):
     """ Return the item with a text area and a button """
     if not self.jsclick:
       print('The jsRef method will return the value of the textarea')
@@ -533,7 +560,7 @@ class Title(HtmlItem):
     self.dim = dim
     self.tooltips = tooltips
 
-  def html(self):
+  def html(self, localPath):
     """ Return a header HTML Tag """
     if self.cssCls is not None:
       return '<H%s id="%s" class="%s">%s</H%s>' % (self.dim, self.htmlId, self.cssCls, self.val, self.dim)
@@ -546,6 +573,35 @@ class Title(HtmlItem):
 
 class Modal(HtmlItem):
   """ Wrapper to a simple model view """
+  val = None
+  name = None
+  alias = 'modal'
+  modal_header = '' # The title for the modal popup
+
+  def __init__(self, htmlId, name, aresObj, cssCls=None):
+    """ Instanciate the object and store the name and the value of the input text """
+    super(Modal, self).__init__(htmlId, cssCls) # To get the HTML Id
+    self.name = name
+    self.aresObj = aresObj
+
+  def html(self, localPath):
+    """
+    """
+
+    item = ['<br /><a data-toggle="modal" data-target="#%s" style="cursor: pointer">%s</a>' % (self.htmlId, self.name )]
+    item.append('<div class="modal fade" id="%s" role="dialog">' % self.htmlId)
+    item.append('<div class="modal-dialog modal-sm">')
+    item.append('%s<div class="modal-content">' % INDENT)
+    item.append('%s%s<div class="modal-header">' % (INDENT, INDENT))
+    item.append('%s%s%s<button type="button" class="close" data-dismiss="modal">&times;</button>' % (INDENT, INDENT, INDENT))
+    item.append('%s%s%s<h4 class="modal-title">%s</h4' % (INDENT, INDENT, INDENT, self.modal_header))
+    item.append('%s%s</div>' % (INDENT, INDENT))
+    item.append('%s%s<div class="modal-body">' % (INDENT, INDENT))
+    item.append(self.aresObj.html(localPath))
+    item.append('%s%s</div>' % (INDENT, INDENT))
+    item.append('%s<div>' % INDENT)
+    item.append('<div><div>')
+    return "\n".join(item)
 
 class DatePicker(HtmlItem):
   """ Wrapper to a Jquery Date picker object

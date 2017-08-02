@@ -90,11 +90,12 @@ def addHtmlObject(func):
     htmlItems = getattr(self, '_%s__htmlItems' % self.__class__.__name__)
     content = getattr(self, '_%s__content' % self.__class__.__name__)
     countItems = getattr(self, '_%s__countItems' % self.__class__.__name__)
+    prefix = getattr(self, '_%s__prefix' % self.__class__.__name__)
     # print '_%s'
     for member in dir(AresHtml):
       funcName = func.__name__
       if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
-        htmlObj = getattr(AresHtml, member)(countItems, *args)
+        htmlObj = getattr(AresHtml, member)("%s%s" % (prefix, countItems), *args)
         htmlItems[htmlObj.htmlId] = htmlObj
         content.append(htmlObj.htmlId)
         countItems += 1
@@ -118,7 +119,7 @@ class Report(object):
 
   """
 
-  def __init__(self):
+  def __init__(self, prefix=''):
     """
     """
     global htmlFactory
@@ -126,6 +127,7 @@ class Report(object):
     # Internal variable that should not be used directly
     # Those variable will drive the report generation
     self.__countItems = 0
+    self.__prefix = prefix
     self.__content, self.__jsGraph, self.navTitle = [], [], []
     self.__htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
     if htmlFactory is None:
@@ -138,6 +140,7 @@ class Report(object):
 
   def item(self, itemId):
     """ Return the HTML object """
+    print(self.__htmlItems)
     return self.__htmlItems[itemId]
 
   @addHtmlObject
@@ -201,6 +204,11 @@ class Report(object):
     pass
 
   @addHtmlObject
+  def comment(self, name, value):
+    """ """
+    pass
+
+  @addHtmlObject
   def text(self, value, cssCls=None):
     """ """
     pass
@@ -216,6 +224,14 @@ class Report(object):
     if textObjsList is not None:
       for textObj in textObjsList:
         del self.__content[self.__content.index(textObj.htmlId)] # Is not defined in the root structure
+
+  def modal(self, value, cssCls=None):
+    """ """
+    htmlObject = AresHtml.Modal(self.__countItems, value, Report("modal_%s_" % self.__countItems), cssCls=cssCls)
+    self.__htmlItems[htmlObject.htmlId] = htmlObject
+    self.__content.append(htmlObject.htmlId)
+    self.__countItems += 1
+    return htmlObject.htmlId
 
   def title(self, dim, value, cssCls=None):
     """ """
@@ -331,11 +347,11 @@ class Report(object):
       results.append("</ul></nav></div>")
     if title is not None:
       titleObj = AresHtml.Title(self.__countItems, 1, title)
-      results.append(titleObj.html())
+      results.append(titleObj.html(localPath))
     results.append('</div></div></div></div>')
 
     for htmlId in self.__content:
-      results.append(self.__htmlItems[htmlId].html())
+      results.append(self.__htmlItems[htmlId].html(localPath))
       if self.__htmlItems[htmlId].jsEvent is not None:
         for fnc, fncDef in self.__htmlItems[htmlId].jsEvent:
           if fnc in ['drop', 'dragover']:
