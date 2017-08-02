@@ -338,6 +338,7 @@ class Report(object):
     results.append('</div></div></div></div>')
 
     for htmlId in self.content:
+      print (self.htmlItems[htmlId])
       results.append(self.htmlItems[htmlId].html(localPath))
       if self.htmlItems[htmlId].jsEvent is not None:
         for fnc, fncDef in self.htmlItems[htmlId].jsEvent:

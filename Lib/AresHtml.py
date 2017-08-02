@@ -34,7 +34,7 @@ class HtmlItem(object):
 
     return self.__htmlId
 
-  def html(self):
+  def html(self, localPath):
     """
     """
     raise NotImplementedError('subclasses must override html()!')
@@ -283,7 +283,7 @@ class Split(Div):
     res.append('%s<div class="row">' % INDENT)
     for htmObj in self.htmlObjs:
       res.append('%s%s<div class="col-lg-6">' % (INDENT, INDENT))
-      res.append('%s%s%s' % (INDENT, INDENT, htmObj.html()))
+      res.append('%s%s%s' % (INDENT, INDENT, htmObj.html(localPath)))
       res.append('%s%s</div>' % (INDENT, INDENT))
     res.append('%s</div>' % INDENT)
     res.append('</div>')
@@ -439,7 +439,7 @@ class Paragraph(HtmlItem):
     pVal = self.val
     if self.htmlObjs is not None:
       for i, htmlObj in enumerate(self.htmlObjs):
-        pVal = pVal.replace("{%s}" % i, htmlObj.html())
+        pVal = pVal.replace("{%s}" % i, htmlObj.html(localPath))
     if self.cssCls is not None:
       return '<p id="%s" class="%s">%s</p>' % (self.htmlId, self.cssCls, pVal)
 
@@ -645,7 +645,7 @@ class DropZone(HtmlItem):
                       '''),
              ]
 
-  def html(self):
+  def html(self, localPath):
     """ Return the Drop Zone component """
     item = ['<div id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
     return "\n".join(item)
