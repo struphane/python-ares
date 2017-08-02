@@ -89,7 +89,6 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
       paramArgs.update(kwargs)
       # for now this call to func is useless but I leave it for the day someone wants to do a special treatment in a new graph
       func(self, *args, **kwargs)
-
       if hasattr(AresGraph, chartName):
         graphContainer = AresHtml.Graph(self.countItems, paramArgs['width'], paramArgs['height'], withSvg=withSvg, cssCls=paramArgs['cssCls'])
         self.htmlItems[graphContainer.htmlId] = graphContainer
@@ -100,6 +99,7 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
         self.jsGraph.append(graphObject)
         return graphContainer.htmlId
     return wrapper
+
   return addChart
 
 def addHtmlObject(addNavBar=False):
@@ -111,7 +111,7 @@ def addHtmlObject(addNavBar=False):
       for member in dir(AresHtml):
         funcName = func.__name__
         if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
-          htmlObj = getattr(AresHtml, member)(self.countItems, *args)
+          htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args)
           self.htmlItems[htmlObj.htmlId] = htmlObj
           self.content.append(htmlObj.htmlId)
           if addNavBar:
@@ -121,6 +121,7 @@ def addHtmlObject(addNavBar=False):
       else:
         raise Exception("No object is configured yet for %s" % func.__name__)
     return wrapper
+
   return addHtml
 
 class Report(object):
@@ -338,7 +339,6 @@ class Report(object):
     results.append('</div></div></div></div>')
 
     for htmlId in self.content:
-      print (self.htmlItems[htmlId])
       results.append(self.htmlItems[htmlId].html(localPath))
       if self.htmlItems[htmlId].jsEvent is not None:
         for fnc, fncDef in self.htmlItems[htmlId].jsEvent:

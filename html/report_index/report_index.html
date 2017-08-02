@@ -60,16 +60,16 @@
 </div></div></div></div>
 <div class="form-group">
   <label for="pwd">Report Name:</label>
-  <input type="text" class="form-control" id="input_0" value="">
+  <input type="text" class="form-control" id="input_modal_2_0" value="">
 </div>
-<button id="button_1" type="button" class="btn btn-primary">Create the Report</button>
+<button id="button_modal_2_1" type="button" class="btn btn-primary">Create the Report</button>
 <script>
-$("#button_1").click(function(){
+$("#button_modal_2_1").click(function(){
 
               $.ajax({
                     url: "../reports_ajax/report_index_set", // 'http://192.168.9.30/test/suma.php',
                     method: "POST",
-                    data: {"report": $("#input_0").val()},
+                    data: {"report": $("#input_modal_2_0").val()},
                     dataType: "html"
                 }).done(function(data) {
                     // Locally the request will never succeed
