@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saturn - BDI</title>
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/jquery-ui.css') }}"  type="text/css" />  
+    <link href="{{ url_for('static',filename='css/bootstrap.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static',filename='css/bootstrap-theme.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static',filename='css/nv.d3.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static',filename='css/bootstrap-select.min.css') }}" rel="stylesheet" type="text/css">
+
+    <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/jquery-3.2.1.min.js') }}"></script>
+    <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/jquery-ui.min.js') }}"></script>
+    <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+    <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/bootstrap-select.min.js') }}"></script>
+	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/d3.v3.js') }}"></script>
+	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/nv.d3.js') }}"></script>
+	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/d3.layout.cloud.js') }}"></script>
+</head>
+<body oncontextmenu="return false;">
+<div class="container">	
+{{ content|safe }}
+</div>
+</body>
+</html>

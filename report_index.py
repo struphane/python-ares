@@ -29,5 +29,5 @@ def report(aresObj, localPath=None):
   bModal = modalAres.button("Create the Report", 'btn-primary')
   modalAres.item(bModal).jsAjax('click', 'alert(data) ; ',
                                 'report_index_set.py', localPath, {'report': modalAres.item(iReportName).jsVal(), 'serverPath': '"%s"' % localPath})
-  
+
   return aresObj.html(localPath, title='Select an existing report')
