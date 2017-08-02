@@ -57,12 +57,15 @@ class HtmlItem(object):
     if self.jsEvent is None:
       self.jsEvent = [(evenType, jsDef)]
 
-  def jsAjax(self, evenType, jsDef, scriptName, data=None):
+  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None):
     """
     """
     ajaxObject = AresJs.XsCall(scriptName)
     ajaxObject.success(jsDef)
-    self.js(evenType, ajaxObject.ajax(data))
+    if localPath is not None:
+      self.js(evenType, ajaxObject.ajaxLocal(data))
+    else:
+      self.js(evenType, ajaxObject.ajax(data))
 
   def jsVal(self):
     """ Return the Javascript Value """
@@ -475,6 +478,10 @@ class TextArea(HtmlItem):
   def jsVal(self):
     """ Return the Javascript Value """
     return '$("#%s").val()' % self.htmlId
+
+  def text(self, val):
+    """ Update the textarea value """
+    return '$("#%s").html(%s)' % (self.htmlId, val)
 
   def jsRef(self):
     """ Function to return the Jquery reference to the Html object """

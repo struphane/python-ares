@@ -42,9 +42,9 @@ def report(aresObj, localPath=None):
   aresObj.item(areaId).click('alert(%s) ; ' % aresObj.item(areaId).jsVal())
   dropId = aresObj.dropZone()
 
-
   spId = aresObj.select([('Node', ['GBC', 'BNPPAR'])])
-  aresObj.item(spId).jsAjax('change', 'alert(data) ;', 'MyRepotTestAjax.py', {})
+  aresObj.item(spId).jsAjax('change', aresObj.item(areaId).text('data'),
+                            'MyRepotTestAjax.py', localPath, {})
 
   bId =  aresObj.div("Olivier")
   aresObj.anchor('Great link to a new page', 'test', CHILD_PAGES, localPath)
