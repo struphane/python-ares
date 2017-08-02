@@ -30,9 +30,9 @@
       <div class="doc-sidebar hidden-xs">
         <nav id="doc-nav">
           <ul id="doc-menu" class="nav doc-menu" data-apy="affix">
-<li><a href="title_10">Test Report Header</a></li>
+<li><a href="title_2">Test Report Header</a></li>
 </ul></nav></div>
-<H1 id="title_19">Youpi</H1>
+<H1 id="title_6">Youpi</H1>
 </div></div></div></div>
 <div class="dropdown" id="dropDown_0">
 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Super<span class="caret"></span></button>
@@ -42,20 +42,20 @@
 </ul>
 </div>
 <div class="input-group">
-  <textarea class="form-control custom-control" rows="3" style="resize:none" id="textarea_1"></textarea>
-  <span class="input-group-btn"><button class="btn btn-primary" id="textarea_1_button"><span>Send</span></button></span>)
+  <textarea class="form-control custom-control" rows="3" style="resize:none" id="textarea_0"></textarea>
+  <span class="input-group-btn"><button class="btn btn-primary" id="textarea_0_button"><span>Send</span></button></span>)
 </div>
-<div id="dropZone_2">Drop files here</div><output id="list"></output>
-<select class="selectpicker" id="select_3">
+<div id="dropZone_0">Drop files here</div><output id="list"></output>
+<select class="selectpicker" id="select_0">
   <optgroup label="Node">
     <option>GBC</option>
     <option>BNPPAR</option>
   </optgroup>
 </select>
-<div id="div_4">Olivier</div>
+<div id="div_0">Olivier</div>
 <a href="MyRepotTestChild.html">Great link to a new page</a>
 <a href="MyRepotTestChild3.html">Great link to a new page, Again and Again</a>
-<div id="grid_9" class="container-fluid">
+<div id="grid_2" class="container-fluid">
   <div class="row">
     <div class="col-lg-6">
     <ul class="list-group">
@@ -84,38 +84,38 @@
     </div>
   </div>
 </div>
-<H1 id="title_10">Test Report Header</H1>
-<button id="button_11" type="button" class="btn btn-success">Youpi Test</button>
-<input id="input_12" type="text" name="test" value="Encore">
-<p id="paragraph_14">Voici mon result <font id="text_13" class="font-weight-bold">YYYYYYYYYYYYYYYYYYYYYYYYYYYYYOUPI</font></p>
-<div id="grid_17" class="container-fluid">
+<H1 id="title_2">Test Report Header</H1>
+<button id="button_3" type="button" class="btn btn-success">Youpi Test</button>
+<input id="input_3" type="text" name="test" value="Encore">
+<p id="paragraph_3">Voici mon result <font id="text_3" class="font-weight-bold">YYYYYYYYYYYYYYYYYYYYYYYYYYYYYOUPI</font></p>
+<div id="grid_5" class="container-fluid">
   <div class="row">
     <div class="col-lg-6">
-    <div id="chart15" class="None">
+    <div id="chart3" class="None">
 <svg width="960" height="500"></svg>
 </div>
 
     </div>
     <div class="col-lg-6">
-    <div id="chart16" class="None">
+    <div id="chart4" class="None">
 <svg width="960" height="500"></svg>
 </div>
 
     </div>
   </div>
 </div>
-<div id="chart18" class="None"></div>
+<div id="chart5" class="None"></div>
 
 <script>
 $("#dropDown_0 .dropdown-menu li").click(function(){
 alert($(this).text()) ; 
 });
 
-$("#textarea_1_button").click(function(){
-alert($("#textarea_1").val()) ; 
+$("#textarea_0_button").click(function(){
+alert($("#textarea_0").val()) ; 
 });
 
-$("#dropZone_2").bind("dragover", function (event){
+$("#dropZone_0").bind("dragover", function (event){
 
                           event.originalEvent.stopPropagation();
 							            event.originalEvent.preventDefault();
@@ -123,7 +123,7 @@ $("#dropZone_2").bind("dragover", function (event){
                           
 });
 
-$("#dropZone_2").bind("drop", function (event){
+$("#dropZone_0").bind("drop", function (event){
 
                           event.originalEvent.stopPropagation();
 						              event.originalEvent.preventDefault();
@@ -142,36 +142,51 @@ $("#dropZone_2").bind("drop", function (event){
                       
 });
 
-$("#select_3").change(function(){
+$("#select_0").change(function(){
 
               $.ajax({
-                    url: "testXs", // 'http://192.168.9.30/test/suma.php',
+                    url: "../reports_ajax/MyRepotTestAjax", // 'http://192.168.9.30/test/suma.php',
                     method: "POST",
                     data: {},
                     dataType: "html"
-                }).done(function() {
-                  alert("Youpi") ;
+                }).done(function(data) {
+                    // Locally the request will never succeed
                 }).fail(function( jqXHR, textStatus ) {
-                  alert( "Request failed: " + textStatus );
+
+                  var rawFile = new XMLHttpRequest();
+                  rawFile.open("GET", 'ajax_MyRepotTestAjax.json', false);
+                  rawFile.onreadystatechange = function ()
+                  {
+                    if(rawFile.readyState === 4)
+                    {
+                      if(rawFile.status === 200 || rawFile.status == 0)
+                      {
+                        var allText = rawFile.responseText;
+                        data = allText;
+                      }
+                    }
+                  }
+                  rawFile.send(null);
+                  $("#textarea_0").html(data)
                 });
            
 });
 
-$("#button_11").click(function(){
- $("#text_13").html($("#input_12").val());
+$("#button_3").click(function(){
+ $("#text_3").html($("#input_3").val());
 });
 
-$("#input_12").blur(function(){
+$("#input_3").blur(function(){
 alert("I can update the DB") ;
 });
 
 nv.addGraph(function() {
 
 var fill = d3.scale.category20();
-  var data_15 = [{'text': 'Super', 'size': 10}, {'text': 'Olivier', 'size': 20}, {'text': 'Aurelie', 'size': 20}] ;
+  var data_3 = [{'size': 10, 'text': 'Super'}, {'size': 20, 'text': 'Olivier'}, {'size': 20, 'text': 'Aurelie'}] ;
 
           d3.layout.cloud().size([960, 600])
-            .words(data_15) // Refer to the data variable
+            .words(data_3) // Refer to the data variable
             .rotate(function() { return ~~(Math.random() * 2) * 90; })
             .font("Impact")
             .fontSize(function(d) {  return d.size; })
@@ -180,7 +195,7 @@ var fill = d3.scale.category20();
           ;
 
           function draw(words) {
-            d3.select("#chart15 svg") // Refer to the chart variable
+            d3.select("#chart3 svg") // Refer to the chart variable
               .append("g")
               .attr("transform", "translate(150,150)")
               .selectAll("text")
@@ -222,7 +237,7 @@ var fill = d3.scale.category20();
 
 
 
-  var chart_16 = nv.models.pieChart()
+  var chart_4 = nv.models.pieChart()
                 .x(function(d){ return d.label })
                 .y(function(d){ return d.value })
                 .showLabels(1)
@@ -232,18 +247,18 @@ var fill = d3.scale.category20();
                 .donutRatio(0.35);
 
 
-// Data section for chart_16
-  var data_16 = [{'value': 29.765957771107, 'label': 'One'}, {'value': 32.807804682612, 'label': 'Two'}] ;
+// Data section for chart_4
+  var data_4 = [{'label': 'One', 'value': 29.765957771107}, {'label': 'Two', 'value': 32.807804682612}] ;
 
-  d3.select("#chart16 svg")
-                      .datum(data_16).transition()
+  d3.select("#chart4 svg")
+                      .datum(data_4).transition()
                       .duration(350)
-                      .call(chart_16);
+                      .call(chart_4);
                 
 
 
 
-  var chart_18 = nv.models.indentedTree()
+  var chart_5 = nv.models.indentedTree()
                 .tableClass('table table-striped') //for bootstrap styling
                 .columns([
                   {
@@ -266,13 +281,13 @@ var fill = d3.scale.category20();
                 ]);
 
 
-// Data section for chart_18
-  var data_18 = [{'url': 'http://novus.github.com/nvd3', 'values': [{'_values': [{'type': 'Historical', 'url': 'http://novus.github.com/nvd3/ghpages/line.html', 'key': 'Simple Line'}], 'key': 'Charts'}], 'key': 'NVD3'}] ;
+// Data section for chart_5
+  var data_5 = [{'url': 'http://novus.github.com/nvd3', 'key': 'NVD3', 'values': [{'key': 'Charts', '_values': [{'url': 'http://novus.github.com/nvd3/ghpages/line.html', 'key': 'Simple Line', 'type': 'Historical'}]}]}] ;
 
-  d3.select("#chart18")
-                      .datum(data_18).transition()
+  d3.select("#chart5")
+                      .datum(data_5).transition()
                       .duration(350)
-                      .call(chart_18);
+                      .call(chart_5);
                 
 
 

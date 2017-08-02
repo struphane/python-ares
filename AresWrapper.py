@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
   statisPath = r'' # the path with the CSS and JS folders (if current path please keep this empty
   directory = os.getcwd() # The path of this script by default
-  report = "MyRepotTest" # The name of the main script with the report
+  report = "report_index" # The name of the main script with the report
 
   # -----------------------------------------------------------------------------------------------
   # Test functions

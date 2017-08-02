@@ -330,6 +330,8 @@ class Report(object):
             jsResults.append('%s.bind("%s", function (event){' % (self.htmlItems[htmlId].jsRef(), fnc))
             jsResults.append(fncDef)
             jsResults.append('});\n')
+          elif fnc in ['autocomplete']:
+            jsResults.append(fncDef)
           else:
             jsResults.append('%s.%s(function(){' % (self.htmlItems[htmlId].jsRef(), fnc))
             jsResults.append(fncDef)

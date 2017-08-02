@@ -13,13 +13,6 @@ def report(aresObj, localPath=None):
 """
 import Lib.AresJs as AresJs
 
-# This list should reference all the Ajax calls
-# Not sure about the right strategy to be able to test locally the impacts of those calls
-# TODO: To be properly defined
-AJAX_CALLS = {
-  'testXs': AresJs.XsCall('testXs', 'MyRepotTestAjax.py', 'alert(data) ;')
-}
-
 # This list should contain the tuple (alias, scriptName
 # Thanks to this the script should behave the same locally and on the server.
 # The only different is that the wrapper will locally create the different child pages (in html) instead
@@ -49,9 +42,9 @@ def report(aresObj, localPath=None):
   aresObj.item(areaId).click('alert(%s) ; ' % aresObj.item(areaId).jsVal())
   dropId = aresObj.dropZone()
 
-
   spId = aresObj.select([('Node', ['GBC', 'BNPPAR'])])
-  aresObj.item(spId).js('change', AJAX_CALLS['testXs'].ajax({}))
+  aresObj.item(spId).jsAjax('change', aresObj.item(areaId).text('data'),
+                            'MyRepotTestAjax.py', localPath, {})
 
   bId =  aresObj.div("Olivier")
   aresObj.anchor('Great link to a new page', 'test', CHILD_PAGES, localPath)

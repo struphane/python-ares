@@ -7,6 +7,8 @@ Please make sure that all the CSS information are defined in a CSS class
 
 """
 
+import Lib.AresJs as AresJs
+
 INDENT = '  '
 
 class HtmlItem(object):
@@ -54,6 +56,18 @@ class HtmlItem(object):
 
     if self.jsEvent is None:
       self.jsEvent = [(evenType, jsDef)]
+    else:
+      self.jsEvent.append((evenType, jsDef))
+
+  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None):
+    """
+    """
+    ajaxObject = AresJs.XsCall(scriptName)
+    ajaxObject.success(jsDef)
+    if localPath is not None:
+      self.js(evenType, ajaxObject.ajaxLocal(data))
+    else:
+      self.js(evenType, ajaxObject.ajax(data))
 
   def jsVal(self):
     """ Return the Javascript Value """
@@ -434,15 +448,32 @@ class Input(HtmlItem):
   alias = 'input'
   jQueryEvent = ['blur']
 
-  def __init__(self, htmlId, name, value):
-    """ """
-    super(Input, self).__init__(htmlId) # To get the HTML Id
+  def __init__(self, htmlId, name, value, cssCls=None):
+    """ Instanciate the object and store the name and the value of the input text """
+    super(Input, self).__init__(htmlId, cssCls) # To get the HTML Id
     self.name = name
     self.val = value
 
+  def autocomplete(self, values):
+    """
+    """
+    jsDef= '''
+            %s.autocomplete({
+              source: %s
+            });
+           ''' % (self.jsRef(), values)
+    if self.jsEvent is None:
+      self.jsEvent = [('autocomplete', jsDef)]
+    else:
+      self.jsEvent.append(('autocomplete', jsDef))
+
   def html(self):
     """ """
-    return '<input id="%s" type="text" name="%s" value="%s">' % (self.htmlId, self.name, self.val)
+    item = ['<div class="form-group">']
+    item.append('%s<label for="pwd">%s:</label>' % (INDENT, self.name))
+    item.append('%s<input type="text" class="form-control" id="%s" value="%s">' % (INDENT, self.htmlId, self.val))
+    item.append('</div>')
+    return "\n".join(item)
 
 class TextArea(HtmlItem):
   """
@@ -467,6 +498,10 @@ class TextArea(HtmlItem):
     """ Return the Javascript Value """
     return '$("#%s").val()' % self.htmlId
 
+  def text(self, val):
+    """ Update the textarea value """
+    return '$("#%s").html(%s)' % (self.htmlId, val)
+
   def jsRef(self):
     """ Function to return the Jquery reference to the Html object """
     return '$("#%s_button")' % self.htmlId
@@ -479,6 +514,7 @@ class TextArea(HtmlItem):
     else:
       self.jsEvent.append(('click', jsAction))
     self.jsclick = True
+
 
 class Title(HtmlItem):
   """ Wrapper for the HTML header tags
