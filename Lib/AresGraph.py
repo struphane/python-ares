@@ -193,9 +193,7 @@ class StackedArea(JsGraph):
       else:
         raise Exception('No mock data defined for this chart')
 
-    import pprint
     jsData = '['
-    pprint.pprint(self.pyData)
     for rec in self.pyData:
       jsData = '%s {"key": "%s", "values" : [' % (jsData, rec['key'])
       for value in rec['values']:
