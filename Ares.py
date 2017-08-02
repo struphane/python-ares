@@ -65,6 +65,35 @@ def htmlLocalFooter(htmlFile):
   htmlFile.write('</html>\n')
   htmlFile.close()
 
+def addHtmlObject(func):
+  """ Simple decorator to add basic html objects """
+  functionMapping = {'grid': 'split', 'anchor': 'a'}
+  def addObject(self, *args):
+    func(self, *args)
+    #reset object attributes in here as self cannot be accessed directly in simple decorators (maybe use class decorators)
+    htmlItems = getattr(self, '_%s__htmlItems' % self.__class__.__name__)
+    content = getattr(self, '_%s__content' % self.__class__.__name__)
+    countItems = getattr(self, '_%s__countItems' % self.__class__.__name__)
+    # print '_%s'
+    for member in dir(AresHtml):
+      funcName = func.__name__
+      if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
+        htmlObj = getattr(AresHtml, member)(countItems, *args)
+        htmlItems[htmlObj.htmlId] = htmlObj
+        content.append(htmlObj.htmlId)
+        countItems += 1
+        return htmlObj.htmlId
+    else:
+      raise Exception("No object is configured yet for %s" % func.__name__)
+  return addObject
+
+def addChartObject(func):
+  """ Simple decorator for chart objects """
+  def addObject(self, *args):
+    func(self, *args)
+    """ do something"""
+
+
 class Report(object):
   """
   Ares Interface
@@ -88,10 +117,6 @@ class Report(object):
     #for name, htmlCls in htmlFactory.items():
     #  print(name)
 
-  def container(self):
-    """
-    """
-
   def structure(self):
     return self.content
 
@@ -99,128 +124,82 @@ class Report(object):
     """ Return the HTML object """
     return self.__htmlItems[itemId]
 
+  @addHtmlObject
   def div(self, value):
     """
 
     Return the object ID to help on getting the object back. In any time during the
     report generation. THis ID is not supposed to change and it will be the
     """
-    htmlObject = AresHtml.Div(self.__countItems, value)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def list(self, values):
     """ """
-    htmlObject = AresHtml.List(self.__countItems, values)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def table(self, cols, values):
     """ """
-    htmlObject = AresHtml.Table(self.__countItems, cols, values)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def dropDown(self, title, values):
     """ """
-    htmlObject = AresHtml.DropDown(self.__countItems, title, values)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def dropZone(self):
     """ """
-    htmlObject = AresHtml.DropZone(self.__countItems)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def textArea(self):
     """ """
-    htmlObject = AresHtml.TextArea(self.__countItems)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def select(self, values):
     """ """
-    htmlObject = AresHtml.Select(self.__countItems, values)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def container(self, htmlObj):
     """ """
     del self.__content[self.__content.index(htmlObj.htmlId)] # Is not defined in the root structure
-    htmlObject = AresHtml.Container(self.__countItems, htmlObj)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
 
+  @addHtmlObject
   def grid(self, htmlObjLeft, htmlObjRight):
     """ """
     del self.__content[self.__content.index(htmlObjLeft.htmlId)] # Is not defined in the root structure
     del self.__content[self.__content.index(htmlObjRight.htmlId)] # Is not defined in the root structure
 
-    htmlObject = AresHtml.Split(self.__countItems, htmlObjLeft, htmlObjRight)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
-
+  @addHtmlObject
   def button(self, value, cssCls=None):
-    htmlObject = AresHtml.Button(self.__countItems, value, cssCls=cssCls)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    """ """
+    pass
 
+  @addHtmlObject
   def input(self, name, value):
     """ """
-    htmlObject = AresHtml.Input(self.__countItems, name, value)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def text(self, value, cssCls=None):
     """ """
-    htmlObject = AresHtml.Text(self.__countItems, value, cssCls=cssCls)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def code(self, value, cssCls=None):
     """ """
-    htmlObject = AresHtml.Code(self.__countItems, value, cssCls=cssCls)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
+    pass
 
+  @addHtmlObject
   def paragraph(self, value, textObjsList=None, cssCls=None):
     """ """
     if textObjsList is not None:
       for textObj in textObjsList:
         del self.__content[self.__content.index(textObj.htmlId)] # Is not defined in the root structure
-
-    htmlObject = AresHtml.Paragraph(self.__countItems, value, textObjsList, cssCls=cssCls)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    return htmlObject.htmlId
 
   def title(self, dim, value, cssCls=None):
     """ """
