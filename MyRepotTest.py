@@ -17,7 +17,7 @@ import Lib.AresJs as AresJs
 # Not sure about the right strategy to be able to test locally the impacts of those calls
 # TODO: To be properly defined
 AJAX_CALLS = {
-  'testXs': AresJs.XsCall('test', 'MyRepotTestAjax.py', 'alert(data) ;')
+  'testXs': AresJs.XsCall('testXs', 'MyRepotTestAjax.py', 'alert(data) ;')
 }
 
 # This list should contain the tuple (alias, scriptName
@@ -51,7 +51,7 @@ def report(aresObj, localPath=None):
 
 
   spId = aresObj.select([('Node', ['GBC', 'BNPPAR'])])
-  aresObj.item(spId).js('change', 'alert($(this).val()) ; ')
+  aresObj.item(spId).js('change', AJAX_CALLS['testXs'].ajax({}))
 
   bId =  aresObj.div("Olivier")
   aresObj.anchor('Great link to a new page', 'test', CHILD_PAGES, localPath)

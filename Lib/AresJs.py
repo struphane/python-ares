@@ -24,20 +24,20 @@ class XsCall(object):
     self.ajaxMethod = ajaxMethod
     self.pythonModule = pythonModule.replace(".py", "")
 
-  def ajax(self):
+  def ajax(self, data):
     """ Generic Ajax callback method """
     return '''
               $.ajax({
-                    url: "%s", // 'http://192.168.9.30/test/suma.php',
+                    url: "../reports_ajax/%s", // 'http://192.168.9.30/test/suma.php',
                     method: "%s",
                     data: %s,
                     dataType: "html"
-                }).success(function() {
+                }).done(function(data) {
                   %s
                 }).fail(function( jqXHR, textStatus ) {
                   alert( "Request failed: " + textStatus );
                 });
-           ''' % (self.alias, self.ajaxMethod, self.data, self.jsSucessFnc)
+           ''' % (self.pythonModule, self.ajaxMethod, data, self.jsSucessFnc)
 
 class XSSave(AresHtml.Button):
   """

@@ -143,7 +143,18 @@ $("#dropZone_2").bind("drop", function (event){
 });
 
 $("#select_3").change(function(){
-alert($(this).val()) ; 
+
+              $.ajax({
+                    url: "testXs", // 'http://192.168.9.30/test/suma.php',
+                    method: "POST",
+                    data: {},
+                    dataType: "html"
+                }).done(function() {
+                  alert("Youpi") ;
+                }).fail(function( jqXHR, textStatus ) {
+                  alert( "Request failed: " + textStatus );
+                });
+           
 });
 
 $("#button_11").click(function(){
@@ -256,7 +267,7 @@ var fill = d3.scale.category20();
 
 
 // Data section for chart_18
-  var data_18 = [{'values': [{'key': 'Charts', '_values': [{'key': 'Simple Line', 'type': 'Historical', 'url': 'http://novus.github.com/nvd3/ghpages/line.html'}]}], 'key': 'NVD3', 'url': 'http://novus.github.com/nvd3'}] ;
+  var data_18 = [{'url': 'http://novus.github.com/nvd3', 'values': [{'_values': [{'type': 'Historical', 'url': 'http://novus.github.com/nvd3/ghpages/line.html', 'key': 'Simple Line'}], 'key': 'Charts'}], 'key': 'NVD3'}] ;
 
   d3.select("#chart18")
                       .datum(data_18).transition()
