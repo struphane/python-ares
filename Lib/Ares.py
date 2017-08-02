@@ -95,8 +95,8 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
         self.htmlItems[graphContainer.htmlId] = graphContainer
         self.content.append(graphContainer.htmlId)
         self.countItems += 1
+        graphObject = getattr(AresGraph, chartName)(graphContainer.htmlId, *args, useMockData=kwargs.get('useMockData', False))
 
-        graphObject = getattr(AresGraph, chartName)(graphContainer.htmlId, *args)
         self.jsGraph.append(graphObject)
         return graphContainer.htmlId
     return wrapper
@@ -254,6 +254,12 @@ class Report(object):
   def comboLineBar(self, values, width=960, height=500, cssCls=None):
     """ Construct a Pie Chart in the HTML page """
     pass
+
+  @addGraphObject('StackedArea')
+  def stackedAreaChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
+    """ """
+    pass
+
 
   #don't use the decorator as this function needs to change the value of some parameters before doing the generic processing
   def anchor(self, value, link, structure, localPath, cssCls=None):

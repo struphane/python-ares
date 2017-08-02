@@ -23,10 +23,11 @@ class JsGraph(object):
   duration = 350
   pyData = None
 
-  def __init__(self, htmlId, data):
+  def __init__(self, htmlId, data, useMockData=False):
     """ """
     self.__htmlId = htmlId
     self.pyData = data
+    self.useMocked = useMockData
 
   @property
   def htmlId(self):
@@ -173,6 +174,56 @@ class Line(JsGraph):
               %s
            ''' % (self.jsxAxix().strip(), self.jsyAxix().strip())
 
+class StackedArea(JsGraph):
+  """ This object will output a simple stacked area chart
+
+  Reference website: http://nvd3.org/examples/stackedArea.html
+  """
+
+  mockData = r'json\stackedAreaData.json'
+
+  def pyDataToJs(self, localPath=None):
+    """
+    """
+    if self.useMocked:
+      if hasattr(self, 'mockData'):
+        mockFile = open(self.mockData, 'r')
+        self.pyData = eval(mockFile.read())
+
+      else:
+        raise Exception('No mock data defined for this chart')
+
+    import pprint
+    jsData = '['
+    pprint.pprint(self.pyData)
+    for rec in self.pyData:
+      jsData = '%s {"key": "%s", "values" : [' % (jsData, rec['key'])
+      for value in rec['values']:
+        jsData = '%s [%s, %s], ' % (jsData, str(value[0]), str(value[1]))
+      jsData = '%s ] },' % jsData
+    jsData = '%s ]' % jsData
+    return jsData
+
+  def jsChart(self):
+    """ """
+    return ''' 
+            nv.models.stackedAreaChart()
+                .x(function(d) { return d[0] })
+                .y(function(d) { return d[1] })
+                .clipEdge(true)
+                .useInteractiveGuideline(true)
+                ;
+
+            chart_%s.xAxis
+                .showMaxMin(false)
+                .tickFormat(function(d) { return d3.time.format('%%x')(new Date(d)) });
+          
+            chart_%s.yAxis
+                .tickFormat(d3.format(',.2f'));
+          ''' % (self.htmlId, self.htmlId)
+
+
+
 class ComboLineBar(JsGraph):
   """
   This object will combine a line and a bar chart.
@@ -230,7 +281,7 @@ class IndentedTree(JsGraph):
   """
   showCount = 1
 
-  def __init__(self, htmlId, cols, data):
+  def __init__(self, htmlId, cols, data, useMockData=False):
     """
 
     cols should be a list of col and the col object should be defined like a dictionary with the below properties
