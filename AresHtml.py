@@ -284,7 +284,7 @@ class Graph(HtmlItem):
       self.cssCls = cssCls
 
   def html(self):
-    """ Return the Graph container for D£ and DVD3 """
+    """ Return the Graph container for D3 and DVD3 """
     if self.withSgv:
       return '<div id="chart%s" class="%s">\n<svg width="%s" height="%s"></svg>\n</div>\n' % (self.htmlId, self.cssCls, self.dim[0], self.dim[1])
 
