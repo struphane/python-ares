@@ -11,19 +11,21 @@ def report(aresObj, localPath=None):
   return aresObj.html(localPath, title='Report Title')
 
 """
-import Lib.AresJs as AresJs
 
 # This list should contain the tuple (alias, scriptName
 # Thanks to this the script should behave the same locally and on the server.
 # The only different is that the wrapper will locally create the different child pages (in html) instead
 # of generating them on the fly from Flask
+AJAX_CALL = {
+  'testAjax': 'MyRepotTestAjax.py'
+  }
 
 # Currently this is only supported by the anchor balises
 # If there is button and actions we will assume that this will be sent via Ajax calls
 CHILD_PAGES = {
 	'test': 'MyRepotTestChild.py',
   'test3': 'MyRepotTestChild3.py',
-}
+  }
 
 def report(aresObj, localPath=None):
   """ Main function to build the reports

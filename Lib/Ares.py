@@ -89,7 +89,6 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
       paramArgs.update(kwargs)
       # for now this call to func is useless but I leave it for the day someone wants to do a special treatment in a new graph
       func(self, *args, **kwargs)
-
       if hasattr(AresGraph, chartName):
         graphContainer = AresHtml.Graph(self.countItems, paramArgs['width'], paramArgs['height'], withSvg=withSvg, cssCls=paramArgs['cssCls'])
         self.htmlItems[graphContainer.htmlId] = graphContainer
@@ -100,6 +99,7 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
         self.jsGraph.append(graphObject)
         return graphContainer.htmlId
     return wrapper
+
   return addChart
 
 def addHtmlObject(addNavBar=False):
@@ -111,7 +111,7 @@ def addHtmlObject(addNavBar=False):
       for member in dir(AresHtml):
         funcName = func.__name__
         if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
-          htmlObj = getattr(AresHtml, member)(self.countItems, *args)
+          htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args)
           self.htmlItems[htmlObj.htmlId] = htmlObj
           self.content.append(htmlObj.htmlId)
           if addNavBar:
@@ -121,6 +121,7 @@ def addHtmlObject(addNavBar=False):
       else:
         raise Exception("No object is configured yet for %s" % func.__name__)
     return wrapper
+
   return addHtml
 
 class Report(object):
@@ -131,7 +132,7 @@ class Report(object):
 
   """
 
-  def __init__(self):
+  def __init__(self, prefix=''):
     """
     """
     global htmlFactory
@@ -139,8 +140,10 @@ class Report(object):
     # Internal variable that should not be used directly
     # Those variable will drive the report generation
     self.countItems = 0
+    self.prefix = prefix
     self.content, self.jsGraph, self.navTitle = [], [], []
     self.htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
+
     if htmlFactory is None:
       htmlFactory = mapHtmlItems()
     #for name, htmlCls in htmlFactory.items():
@@ -213,6 +216,11 @@ class Report(object):
     """ """
     pass
 
+  @addHtmlObject
+  def comment(self, name, value):
+    """ """
+    pass
+
   @addHtmlObject()
   def text(self, value, cssCls=None):
     """ """
@@ -229,6 +237,14 @@ class Report(object):
     if textObjsList is not None:
       for textObj in textObjsList:
         del self.content[self.content.index(textObj.htmlId)] # Is not defined in the root structure
+
+  def modal(self, value, cssCls=None):
+    """ """
+    htmlObject = AresHtml.Modal(self.countItems, value, Report("modal_%s_" % self.countItems), cssCls=cssCls)
+    self.htmlItems[htmlObject.htmlId] = htmlObject
+    self.content.append(htmlObject.htmlId)
+    self.countItems += 1
+    return htmlObject.htmlId
 
   @addHtmlObject(addNavBar=True)
   def title(self, dim, value, cssCls=None):
@@ -325,11 +341,11 @@ class Report(object):
       results.append("</ul></nav></div>")
     if title is not None:
       titleObj = AresHtml.Title(self.countItems, 1, title)
-      results.append(titleObj.html())
+      results.append(titleObj.html(localPath))
     results.append('</div></div></div></div>')
 
     for htmlId in self.content:
-      results.append(self.htmlItems[htmlId].html())
+      results.append(self.htmlItems[htmlId].html(localPath))
       if self.htmlItems[htmlId].jsEvent is not None:
         for fnc, fncDef in self.htmlItems[htmlId].jsEvent:
           if fnc in ['drop', 'dragover']:
