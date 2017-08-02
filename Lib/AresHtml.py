@@ -647,5 +647,5 @@ class DropZone(HtmlItem):
 
   def html(self, localPath):
     """ Return the Drop Zone component """
-    item = ['<div id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
+    item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
     return "\n".join(item)
