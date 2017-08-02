@@ -21,13 +21,15 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 # TODO: To use it to replace the redondant functions calls
 # TODO: implement a decorator to wrap the current part in the functions
 
+import os
 import inspect
-import AresHtml
-import AresGraph
+import Lib.AresHtml as AresHtml
+import Lib.AresGraph as AresGraph
 
 htmlFactory = None # This is the factory with all the alias and HTML classes
 # the below global variables are only used locally to generate the secondary pages and Ajax calls
 LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES = None, None, None, None
+RESULT_FOLDER = 'html' # This is the folder with all the HTML files, it is only used locally
 
 def mapHtmlItems():
   """ Map the aliases to the HTML objects """
@@ -41,6 +43,20 @@ def htmlLocalHeader(directory, report, statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
   global LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES
 
+  if RESULT_FOLDER and LOCAL_DIRECTORY is None:
+    # This will move all the results in a html folder
+    # It only work locally
+    directory = os.path.join(directory, RESULT_FOLDER, report)
+    if not os.path.exists(directory):
+      os.makedirs(directory)
+
+    if not statisPath:
+      localPathSize = len(os.path.split(directory))
+      if os.path.split(directory)[0] == '':
+        localPathSize -= 1
+
+      statisPath = os.path.join(*[".." for i in range(localPathSize)])
+
   LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES = directory, statisPath, cssFiles, javascriptFiles
   htmlFile = open(r"%s\%s.html" % (directory, report), "w")
   htmlFile.write('<!DOCTYPE html>\n')
@@ -51,9 +67,9 @@ def htmlLocalHeader(directory, report, statisPath, cssFiles, javascriptFiles):
   htmlFile.write('%s<meta name="viewport" content="width=device-width, initial-scale=1">\n' % AresHtml.INDENT)
   htmlFile.write('%s<title>Local HTML Report</title>\n' % AresHtml.INDENT)
   for style in cssFiles:
-    htmlFile.write('%s<link rel="stylesheet" href="%scss/%s" type="text/css">\n' % (AresHtml.INDENT, statisPath, style))
+    htmlFile.write('%s<link rel="stylesheet" href="%s" type="text/css">\n' % (AresHtml.INDENT, os.path.join(statisPath, 'css', style)))
   for javascript in javascriptFiles:
-    htmlFile.write('%s<script src="%sjs/%s"></script>\n' % (AresHtml.INDENT, statisPath, javascript))
+    htmlFile.write('%s<script src="%s"></script>\n' % (AresHtml.INDENT, os.path.join(statisPath, 'js', javascript)))
   htmlFile.write('</head>\n')
   htmlFile.write('<body><div class="container">\n\n')
 
@@ -111,7 +127,7 @@ class Report(object):
     # Those variable will drive the report generation
     self.__countItems = 0
     self.__content, self.__jsGraph, self.navTitle = [], [], []
-    self.__htmlItems, self.jsOnLoad = {}, {}
+    self.__htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
     if htmlFactory is None:
       htmlFactory = mapHtmlItems()
     #for name, htmlCls in htmlFactory.items():
@@ -258,13 +274,26 @@ class Report(object):
     """ Add an anchor HTML tag to the report """
     if localPath is not None:
       # There is a child and we need to produce the sub Report attached to it
-      #
-      childReport = structure[link].replace(".py", "")
+      # The below part allow also to test locally the get and post method that we put in the URL
+      # Basically the Wrapper will create all tehe secondary pages using all the different parameters
+      splitUrl  = link.split("?")
+      childReport = structure[splitUrl[0]].replace(".py", "")
       htmlPage = htmlLocalHeader(LOCAL_DIRECTORY, childReport, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES)
-      htmlPage.write(__import__(childReport).report(Report(), localPath=LOCAL_DIRECTORY))
+      aresObj = Report()
+      if len(splitUrl) > 1:
+        aresObj.http['GET'] = {}
+        for urlVar in splitUrl[1].split('&'):
+          varName, varVal = urlVar.split("=")
+          aresObj.http['GET'][varName] = varVal
+      htmlPage.write(__import__(childReport).report(aresObj, localPath=LOCAL_DIRECTORY))
       htmlLocalFooter(htmlPage)
-
       link = "%s.html" % childReport
+    else:
+      splitUrl  = link.split("?")
+      if len(splitUrl) > 1:
+        link = "../reports_child/%s?%s" % (structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
+      else:
+        link = "../reports_child/%s" % (structure[splitUrl[0]].replace(".py", ""))
     htmlObject = AresHtml.A(self.__countItems, value, link, cssCls=cssCls)
     self.__htmlItems[htmlObject.htmlId] = htmlObject
     self.__content.append(htmlObject.htmlId)

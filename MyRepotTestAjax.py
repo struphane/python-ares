@@ -2,7 +2,7 @@
 
 """
 
-def call():
+def call(aresObj):
   """
   """
 

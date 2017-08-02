@@ -1,0 +1,24 @@
+----------------- Python Object ----------------- 
+[('WVFZC5', 35),
+ ('8YTB56', 22),
+ ('F5Q1Q4', 16),
+ ('VC9VNQ', 6),
+ ('SXKLZW', 26),
+ ('T12G6F', 25),
+ ('7RMGK6', 17),
+ ('6A9I5P', 18),
+ ('005MAQ', 19),
+ ('0XL3O6', 32)]
+
+
+----------------- Javascript Object ----------------- 
+[{'size': 35, 'text': 'WVFZC5'},
+ {'size': 22, 'text': '8YTB56'},
+ {'size': 16, 'text': 'F5Q1Q4'},
+ {'size': 6, 'text': 'VC9VNQ'},
+ {'size': 26, 'text': 'SXKLZW'},
+ {'size': 25, 'text': 'T12G6F'},
+ {'size': 17, 'text': '7RMGK6'},
+ {'size': 18, 'text': '6A9I5P'},
+ {'size': 19, 'text': '005MAQ'},
+ {'size': 32, 'text': '0XL3O6'}]
