@@ -17,7 +17,7 @@ import Lib.AresJs as AresJs
 # Not sure about the right strategy to be able to test locally the impacts of those calls
 # TODO: To be properly defined
 AJAX_CALLS = {
-  'test': AresJs.XsCall('test', 'MyRepotTestAjax.py', 'alert(data) ;')
+  'testXs': AresJs.XsCall('test', 'MyRepotTestAjax.py', 'alert(data) ;')
 }
 
 # This list should contain the tuple (alias, scriptName

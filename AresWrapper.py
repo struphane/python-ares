@@ -11,6 +11,7 @@ Do not use True in both python and Javascript as the Json conversion is not real
 import os
 import sys
 import Lib.Ares as Ares
+import multiprocessing
 
 # CSS imports
 CSS = ['jquery-ui.css',
@@ -97,6 +98,22 @@ def test(className, directory):
   htmlFile.close()
   sys.exit()
 
+def startServer():
+  #
+  #
+  import socket
+
+  # Create a TCP/IP socket
+  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+  # Bind the socket to the port
+  server_address = ('localhost', 60000)
+  sock.bind(server_address)
+  sock.listen(1)
+
+  while True:
+    # Wait for a connection
+    connection, client_address = sock.accept()
 
 if __name__ == '__main__':
   # Run the script locally
@@ -112,11 +129,15 @@ if __name__ == '__main__':
   #components(directory)
   #test('ComboLineBar', directory)
 
-
   # Write the report
   htmlPage = Ares.htmlLocalHeader(directory, report, statisPath, CSS, JS)
   htmlPage.write(__import__(report).report(Ares.Report(), localPath=directory))
   Ares.htmlLocalFooter(htmlPage)
+
+  # Start a simple server to test the Ajax calls
+  #p = multiprocessing.Process(target=startServer)
+  #p.start()
+  #p.join()
 
 
 

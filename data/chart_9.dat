@@ -1,6 +1,0 @@
------------------ Python Object ----------------- 
-[('Olivier', 20), ('Aurelie', 80)]
-
-
------------------ Javascript Object ----------------- 
-[{'label': 'Olivier', 'value': 20}, {'label': 'Aurelie', 'value': 80}]

@@ -28,7 +28,7 @@ class XsCall(object):
     """ Generic Ajax callback method """
     return '''
               $.ajax({
-                    url: "%s",
+                    url: "%s", // 'http://192.168.9.30/test/suma.php',
                     method: "%s",
                     data: %s,
                     dataType: "html"
