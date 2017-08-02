@@ -81,35 +81,47 @@ def htmlLocalFooter(htmlFile):
   htmlFile.write('</html>\n')
   htmlFile.close()
 
-def addHtmlObject(func):
+
+def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
+  def addChart(func):
+    def wrapper(self, *args, **kwargs):
+      paramArgs = {'width': width, 'height': height, 'cssCls': cssCls}
+      paramArgs.update(kwargs)
+      # for now this call to func is useless but I leave it for the day someone wants to do a special treatment in a new graph
+      func(self, *args, **kwargs)
+
+      if hasattr(AresGraph, chartName):
+        graphContainer = AresHtml.Graph(self.countItems, paramArgs['width'], paramArgs['height'], withSvg=withSvg, cssCls=paramArgs['cssCls'])
+        self.htmlItems[graphContainer.htmlId] = graphContainer
+        self.content.append(graphContainer.htmlId)
+        self.countItems += 1
+
+        graphObject = getattr(AresGraph, chartName)(graphContainer.htmlId, *args)
+        self.jsGraph.append(graphObject)
+        return graphContainer.htmlId
+    return wrapper
+  return addChart
+
+def addHtmlObject(addNavBar=False):
   """ Simple decorator to add basic html objects """
   functionMapping = {'grid': 'split', 'anchor': 'a'}
-  def addObject(self, *args):
-    func(self, *args)
-    #reset object attributes in here as self cannot be accessed directly in simple decorators (maybe use class decorators)
-    htmlItems = getattr(self, '_%s__htmlItems' % self.__class__.__name__)
-    content = getattr(self, '_%s__content' % self.__class__.__name__)
-    countItems = getattr(self, '_%s__countItems' % self.__class__.__name__)
-    prefix = getattr(self, '_%s__prefix' % self.__class__.__name__)
-    # print '_%s'
-    for member in dir(AresHtml):
-      funcName = func.__name__
-      if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
-        htmlObj = getattr(AresHtml, member)("%s%s" % (prefix, countItems), *args)
-        htmlItems[htmlObj.htmlId] = htmlObj
-        content.append(htmlObj.htmlId)
-        countItems += 1
-        return htmlObj.htmlId
-    else:
-      raise Exception("No object is configured yet for %s" % func.__name__)
-  return addObject
-
-def addChartObject(func):
-  """ Simple decorator for chart objects """
-  def addObject(self, *args):
-    func(self, *args)
-    """ do something"""
-
+  def addHtml(func):
+    def wrapper(self, *args, **kwargs):
+      func(self, *args, **kwargs)
+      for member in dir(AresHtml):
+        funcName = func.__name__
+        if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
+          htmlObj = getattr(AresHtml, member)(self.countItems, *args)
+          self.htmlItems[htmlObj.htmlId] = htmlObj
+          self.content.append(htmlObj.htmlId)
+          if addNavBar:
+            self.navTitle.append(htmlObj)
+          self.countItems += 1
+          return htmlObj.htmlId
+      else:
+        raise Exception("No object is configured yet for %s" % func.__name__)
+    return wrapper
+  return addHtml
 
 class Report(object):
   """
@@ -126,10 +138,11 @@ class Report(object):
 
     # Internal variable that should not be used directly
     # Those variable will drive the report generation
-    self.__countItems = 0
-    self.__prefix = prefix
-    self.__content, self.__jsGraph, self.navTitle = [], [], []
-    self.__htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
+    self.countItems = 0
+    self.prefix = prefix
+    self.content, self.jsGraph, self.navTitle = [], [], []
+    self.htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
+
     if htmlFactory is None:
       htmlFactory = mapHtmlItems()
     #for name, htmlCls in htmlFactory.items():
@@ -140,10 +153,9 @@ class Report(object):
 
   def item(self, itemId):
     """ Return the HTML object """
-    print(self.__htmlItems)
-    return self.__htmlItems[itemId]
+    return self.htmlItems[itemId]
 
-  @addHtmlObject
+  @addHtmlObject()
   def div(self, value):
     """
 
@@ -152,53 +164,53 @@ class Report(object):
     """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def list(self, values):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def table(self, cols, values):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def dropDown(self, title, values):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def dropZone(self):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def textArea(self):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def select(self, values):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def container(self, htmlObj):
     """ """
-    del self.__content[self.__content.index(htmlObj.htmlId)] # Is not defined in the root structure
+    del self.content[self.content.index(htmlObj.htmlId)] # Is not defined in the root structure
 
-  @addHtmlObject
+  @addHtmlObject()
   def grid(self, htmlObjLeft, htmlObjRight):
     """ """
-    del self.__content[self.__content.index(htmlObjLeft.htmlId)] # Is not defined in the root structure
-    del self.__content[self.__content.index(htmlObjRight.htmlId)] # Is not defined in the root structure
+    del self.content[self.content.index(htmlObjLeft.htmlId)] # Is not defined in the root structure
+    del self.content[self.content.index(htmlObjRight.htmlId)] # Is not defined in the root structure
 
-  @addHtmlObject
+  @addHtmlObject()
   def button(self, value, cssCls=None):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def input(self, name, value):
     """ """
     pass
@@ -208,84 +220,57 @@ class Report(object):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def text(self, value, cssCls=None):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def code(self, value, cssCls=None):
     """ """
     pass
 
-  @addHtmlObject
+  @addHtmlObject()
   def paragraph(self, value, textObjsList=None, cssCls=None):
     """ """
     if textObjsList is not None:
       for textObj in textObjsList:
-        del self.__content[self.__content.index(textObj.htmlId)] # Is not defined in the root structure
+        del self.content[self.content.index(textObj.htmlId)] # Is not defined in the root structure
 
   def modal(self, value, cssCls=None):
     """ """
-    htmlObject = AresHtml.Modal(self.__countItems, value, Report("modal_%s_" % self.__countItems), cssCls=cssCls)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
+    htmlObject = AresHtml.Modal(self.countItems, value, Report("modal_%s_" % self.countItems), cssCls=cssCls)
+    self.htmlItems[htmlObject.htmlId] = htmlObject
+    self.content.append(htmlObject.htmlId)
+    self.countItems += 1
     return htmlObject.htmlId
 
+  @addHtmlObject(addNavBar=True)
   def title(self, dim, value, cssCls=None):
     """ """
-    htmlObject = AresHtml.Title(self.__countItems, dim, value, cssCls=cssCls)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
-    self.navTitle.append(htmlObject)
-    return htmlObject.htmlId
+    pass
 
+  @addGraphObject('Donut')
   def pieChart(self, values, width=960, height=500, cssCls=None):
     """ Construct a Pie Chart in the HTML page """
-    graphContainer = AresHtml.Graph(self.__countItems, width, height, cssCls=cssCls)
-    self.__htmlItems[graphContainer.htmlId] = graphContainer
-    self.__content.append(graphContainer.htmlId)
-    self.__countItems += 1
+    pass
 
-    graphObject = AresGraph.Donut(graphContainer.htmlId, values)
-    self.__jsGraph.append(graphObject)
-    return graphContainer.htmlId
-
+  @addGraphObject('WordCloud')
   def cloudChart(self, values, width=960, height=500, cssCls=None):
     """ Construct a Pie Chart in the HTML page """
-    graphContainer = AresHtml.Graph(self.__countItems, width, height, cssCls=cssCls)
-    self.__htmlItems[graphContainer.htmlId] = graphContainer
-    self.__content.append(graphContainer.htmlId)
-    self.__countItems += 1
+    pass
 
-    graphObject = AresGraph.WordCloud(graphContainer.htmlId, values)
-    self.__jsGraph.append(graphObject)
-    return graphContainer.htmlId
-
+  @addGraphObject('IndentedTree', withSvg=False)
   def tree(self, cols, values, width=960, height=500, cssCls=None):
     """ """
-    graphContainer = AresHtml.Graph(self.__countItems, width, height, withSgv=False, cssCls=cssCls)
-    self.__htmlItems[graphContainer.htmlId] = graphContainer
-    self.__content.append(graphContainer.htmlId)
-    self.__countItems += 1
+    pass
 
-    graphObject = AresGraph.IndentedTree(graphContainer.htmlId, cols, values)
-    self.__jsGraph.append(graphObject)
-    return graphContainer.htmlId
-
+  @addGraphObject('ComboLineBar')
   def comboLineBar(self, values, width=960, height=500, cssCls=None):
     """ Construct a Pie Chart in the HTML page """
-    graphContainer = AresHtml.Graph(self.__countItems, width, height, cssCls=cssCls)
-    self.__htmlItems[graphContainer.htmlId] = graphContainer
-    self.__content.append(graphContainer.htmlId)
-    self.__countItems += 1
+    pass
 
-    graphObject = AresGraph.ComboLineBar(graphContainer.htmlId, values)
-    self.__jsGraph.append(graphObject)
-    return graphContainer.htmlId
-
+  #don't use the decorator as this function needs to change the value of some parameters before doing the generic processing
   def anchor(self, value, link, structure, localPath, cssCls=None):
     """ Add an anchor HTML tag to the report """
     if localPath is not None:
@@ -310,11 +295,13 @@ class Report(object):
         link = "../reports_child/%s?%s" % (structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
       else:
         link = "../reports_child/%s" % (structure[splitUrl[0]].replace(".py", ""))
-    htmlObject = AresHtml.A(self.__countItems, value, link, cssCls=cssCls)
-    self.__htmlItems[htmlObject.htmlId] = htmlObject
-    self.__content.append(htmlObject.htmlId)
-    self.__countItems += 1
+
+    htmlObject = AresHtml.A(self.countItems, value, link, cssCls=cssCls)
+    self.htmlItems[htmlObject.htmlId] = htmlObject
+    self.content.append(htmlObject.htmlId)
+    self.countItems += 1
     return htmlObject.htmlId
+
 
   def html(self, localPath, title=None, menu=True):
     """ Main function used to generate the report
@@ -346,28 +333,28 @@ class Report(object):
         #  jsResults.append('</ul>')
       results.append("</ul></nav></div>")
     if title is not None:
-      titleObj = AresHtml.Title(self.__countItems, 1, title)
+      titleObj = AresHtml.Title(self.countItems, 1, title)
       results.append(titleObj.html(localPath))
     results.append('</div></div></div></div>')
 
-    for htmlId in self.__content:
-      results.append(self.__htmlItems[htmlId].html(localPath))
-      if self.__htmlItems[htmlId].jsEvent is not None:
-        for fnc, fncDef in self.__htmlItems[htmlId].jsEvent:
+    for htmlId in self.content:
+      results.append(self.htmlItems[htmlId].html(localPath))
+      if self.htmlItems[htmlId].jsEvent is not None:
+        for fnc, fncDef in self.htmlItems[htmlId].jsEvent:
           if fnc in ['drop', 'dragover']:
-            jsResults.append('%s.bind("%s", function (event){' % (self.__htmlItems[htmlId].jsRef(), fnc))
+            jsResults.append('%s.bind("%s", function (event){' % (self.htmlItems[htmlId].jsRef(), fnc))
             jsResults.append(fncDef)
             jsResults.append('});\n')
           elif fnc in ['autocomplete']:
             jsResults.append(fncDef)
           else:
-            jsResults.append('%s.%s(function(){' % (self.__htmlItems[htmlId].jsRef(), fnc))
+            jsResults.append('%s.%s(function(){' % (self.htmlItems[htmlId].jsRef(), fnc))
             jsResults.append(fncDef)
             jsResults.append('});\n')
 
-    if self.__jsGraph:
+    if self.jsGraph:
       jsResults.append("nv.addGraph(function() {\n")
-      for jsgraphs in self.__jsGraph:
+      for jsgraphs in self.jsGraph:
         jsResults.append(jsgraphs.js(localPath))
         jsResults.append("\n\n")
       jsResults.append("});\n")

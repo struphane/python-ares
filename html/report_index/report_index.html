@@ -31,15 +31,15 @@
         <nav id="doc-nav">
           <ul id="doc-menu" class="nav doc-menu" data-apy="affix">
 </ul></nav></div>
-<H1 id="title_1">Select an existing report</H1>
+<H1 id="title_3">Select an existing report</H1>
 </div></div></div></div>
 <div class="form-group">
   <label for="pwd">Report Name:</label>
   <input type="text" class="form-control" id="input_0" value="">
 </div>
-<button id="button_0" type="button" class="btn btn-success">Open Report Section</button>
-<br /><a data-toggle="modal" data-target="#modal_0" style="cursor: pointer">click on the link to create a new report section</a>
-<div class="modal fade" id="modal_0" role="dialog">
+<button id="button_1" type="button" class="btn btn-success">Open Report Section</button>
+<br /><a data-toggle="modal" data-target="#modal_2" style="cursor: pointer">click on the link to create a new report section</a>
+<div class="modal fade" id="modal_2" role="dialog">
 <div class="modal-dialog modal-sm">
   <div class="modal-content">
     <div class="modal-header">
@@ -60,13 +60,37 @@
 </div></div></div></div>
 <div class="form-group">
   <label for="pwd">Report Name:</label>
-  <input type="text" class="form-control" id="input_modal_0_0" value="">
+  <input type="text" class="form-control" id="input_0" value="">
 </div>
-<button id="button_modal_0_0" type="button" class="btn btn-primary">Create the Report</button>
+<button id="button_1" type="button" class="btn btn-primary">Create the Report</button>
 <script>
-$("#button_modal_0_0").click(function(){
-			 alert($("#input_modal_0_0").val());
-     
+$("#button_1").click(function(){
+
+              $.ajax({
+                    url: "../reports_ajax/report_index_set", // 'http://192.168.9.30/test/suma.php',
+                    method: "POST",
+                    data: {"report": $("#input_0").val()},
+                    dataType: "html"
+                }).done(function(data) {
+                    // Locally the request will never succeed
+                }).fail(function( jqXHR, textStatus ) {
+
+                  var rawFile = new XMLHttpRequest();
+                  rawFile.open("GET", 'ajax_report_index_set.json', false);
+                  rawFile.onreadystatechange = function ()
+                  {
+                    if(rawFile.readyState === 4)
+                    {
+                      if(rawFile.status === 200 || rawFile.status == 0)
+                      {
+                        var allText = rawFile.responseText;
+                        data = allText;
+                      }
+                    }
+                  }
+                  rawFile.send(null);
+                  alert(data) ; 
+                });
            
 });
 
