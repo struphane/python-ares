@@ -308,8 +308,13 @@ class Report(object):
           aresObj.http['GET'][varName] = varVal
       htmlPage.write(__import__(childReport).report(aresObj, localPath=LOCAL_DIRECTORY))
       htmlLocalFooter(htmlPage)
-
       link = "%s.html" % childReport
+    else:
+      splitUrl  = link.split("?")
+      if len(splitUrl) > 1:
+        link = "../reports_child/%s?%s" % (structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
+      else:
+        link = "../reports_child/%s" % (structure[splitUrl[0]].replace(".py", ""))
     htmlObject = AresHtml.A(self.__countItems, value, link, cssCls=cssCls)
     self.__htmlItems[htmlObject.htmlId] = htmlObject
     self.__content.append(htmlObject.htmlId)
