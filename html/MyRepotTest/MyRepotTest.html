@@ -157,7 +157,7 @@ alert("I can update the DB") ;
 nv.addGraph(function() {
 
 var fill = d3.scale.category20();
-  var data_15 = [{'text': 'Super', 'size': 10}, {'text': 'Olivier', 'size': 20}, {'text': 'Aurelie', 'size': 20}] ;
+  var data_15 = [{'size': 10, 'text': 'Super'}, {'size': 20, 'text': 'Olivier'}, {'size': 20, 'text': 'Aurelie'}] ;
 
           d3.layout.cloud().size([960, 600])
             .words(data_15) // Refer to the data variable
@@ -256,7 +256,7 @@ var fill = d3.scale.category20();
 
 
 // Data section for chart_18
-  var data_18 = [{'values': [{'key': 'Charts', '_values': [{'url': 'http://novus.github.com/nvd3/ghpages/line.html', 'key': 'Simple Line', 'type': 'Historical'}]}], 'key': 'NVD3', 'url': 'http://novus.github.com/nvd3'}] ;
+  var data_18 = [{'key': 'NVD3', 'values': [{'key': 'Charts', '_values': [{'key': 'Simple Line', 'type': 'Historical', 'url': 'http://novus.github.com/nvd3/ghpages/line.html'}]}], 'url': 'http://novus.github.com/nvd3'}] ;
 
   d3.select("#chart18")
                       .datum(data_18).transition()

@@ -98,7 +98,7 @@ class Report(object):
     # Those variable will drive the report generation
     self.__countItems = 0
     self.__content, self.__jsGraph, self.navTitle = [], [], []
-    self.__htmlItems, self.jsOnLoad = {}, {}
+    self.__htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
     if htmlFactory is None:
       htmlFactory = mapHtmlItems()
     #for name, htmlCls in htmlFactory.items():
@@ -295,10 +295,18 @@ class Report(object):
     """ Add an anchor HTML tag to the report """
     if localPath is not None:
       # There is a child and we need to produce the sub Report attached to it
-      #
-      childReport = structure[link].replace(".py", "")
+      # The below part allow also to test locally the get and post method that we put in the URL
+      # Basically the Wrapper will create all tehe secondary pages using all the different parameters
+      splitUrl  = link.split("?")
+      childReport = structure[splitUrl[0]].replace(".py", "")
       htmlPage = htmlLocalHeader(LOCAL_DIRECTORY, childReport, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES)
-      htmlPage.write(__import__(childReport).report(Report(), localPath=LOCAL_DIRECTORY))
+      aresObj = Report()
+      if len(splitUrl) > 1:
+        aresObj.http['GET'] = {}
+        for urlVar in splitUrl[1].split('&'):
+          varName, varVal = urlVar.split("=")
+          aresObj.http['GET'][varName] = varVal
+      htmlPage.write(__import__(childReport).report(aresObj, localPath=LOCAL_DIRECTORY))
       htmlLocalFooter(htmlPage)
 
       link = "%s.html" % childReport
