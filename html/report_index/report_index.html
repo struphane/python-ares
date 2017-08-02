@@ -69,7 +69,7 @@ $("#button_modal_2_1").click(function(){
               $.ajax({
                     url: "../reports_ajax/report_index_set", // 'http://192.168.9.30/test/suma.php',
                     method: "POST",
-                    data: {"report": $("#input_modal_2_0").val(),"serverPath": "E:\GitHub\Ares"},
+                    data: {"serverPath": "E:\GitHub\Ares","report": $("#input_modal_2_0").val()},
                     dataType: "html"
                 }).done(function(data) {
                     // Locally the request will never succeed
@@ -106,7 +106,7 @@ $("#button_modal_2_1").click(function(){
             });
            
 $("#button_1").click(function(){
-window.location.href="/page/" . $("#input_0").val(); return false;
+window.location.href="/page/" + $("#input_0").val(); return false;
 });
 
 </script>

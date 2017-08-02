@@ -9,7 +9,8 @@ def report(aresObj, localPath=None):
   """
 
   """
-  dropId = aresObj.dropZone()
+  dropId = aresObj.dropFile()
+  aresObj.item(dropId).reportName = aresObj.http['SCRIPTS_NAME']
   aresObj.title(2, 'List des scripts')
   scripts = [('%s.py' % aresObj.http['SCRIPTS_NAME'], 'Main Script', '')]
   for childScripts in aresObj.http['SCRIPTS_CHILD']:
