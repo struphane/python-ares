@@ -77,6 +77,20 @@ def ajaxCall(report_name):
 	  
 	return json.dumps(__import__(report_name).call(reportObj))
 
+@app.route("/script_upload/<report_name>", methods = ['POST'])
+def uploadFiles(report_name):
+	import sys
+	sys.path.append(r'E:\GitHub\Ares')
+	sys.path.append(r'E:\GitHub\Ares\Lib')
+	if request.method == 'POST':
+	  print ("------------")
+	  # f.save(secure_filename(f.filename))
+	  file = request.files['files']
+	  print (file.filename)
+	  print (report_name)
+	  file.save(r'user_reports/%s/%s' % (report_name, file.filename))
+	return json.dumps({})
+
 
 if __name__ == "__main__":
     app.debug = True
