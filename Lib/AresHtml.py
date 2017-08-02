@@ -294,24 +294,24 @@ class Graph(HtmlItem):
   dim = None
   cssCls = 'span4'
 
-  def __init__(self, htmlId, width, height, withSgv=True, cssCls=None):
+  def __init__(self, htmlId, width, height, withSvg=True, cssCls=None):
     """ Store the HTML object dimension """
     super(Graph, self).__init__(htmlId) # To get the HTML Id
     self.dim = (width, height)
-    self.withSgv = withSgv
+    self.withSvg = withSvg
     if cssCls is not None:
       self.cssCls = cssCls
 
   def html(self, localPath):
     """ Return the Graph container for D3 and DVD3 """
-    if self.withSgv:
+    if self.withSvg:
       return '<div id="chart%s" class="%s">\n<svg width="%s" height="%s"></svg>\n</div>\n' % (self.htmlId, self.cssCls, self.dim[0], self.dim[1])
 
     return '<div id="chart%s" class="%s"></div>\n' % (self.htmlId, self.cssCls)
 
   def jsRef(self):
     """ Function to return the Jquery reference to the Html object """
-    if self.withSgv:
+    if self.withSvg:
       return '$("#chart%s svg")' % self.htmlId
 
     return '$("#chart%s")' % self.htmlId
