@@ -11,7 +11,7 @@ def report(aresObj, localPath=None):
   return aresObj.html(localPath, title='Report Title')
 
 """
-import AresJs
+import Lib.AresJs as AresJs
 
 # This list should reference all the Ajax calls
 # Not sure about the right strategy to be able to test locally the impacts of those calls

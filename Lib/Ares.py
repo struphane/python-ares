@@ -21,13 +21,15 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 # TODO: To use it to replace the redondant functions calls
 # TODO: implement a decorator to wrap the current part in the functions
 
+import os
 import inspect
-import AresHtml
-import AresGraph
+import Lib.AresHtml as AresHtml
+import Lib.AresGraph as AresGraph
 
 htmlFactory = None # This is the factory with all the alias and HTML classes
 # the below global variables are only used locally to generate the secondary pages and Ajax calls
 LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES = None, None, None, None
+RESULT_FOLDER = 'html' # This is the folder with all the HTML files, it is only used locally
 
 def mapHtmlItems():
   """ Map the aliases to the HTML objects """
@@ -41,6 +43,20 @@ def htmlLocalHeader(directory, report, statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
   global LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES
 
+  if RESULT_FOLDER and LOCAL_DIRECTORY is None:
+    # This will move all the results in a html folder
+    # It only work locally
+    directory = os.path.join(directory, RESULT_FOLDER, report)
+    if not os.path.exists(directory):
+      os.makedirs(directory)
+
+    if not statisPath:
+      localPathSize = len(os.path.split(directory))
+      if os.path.split(directory)[0] == '':
+        localPathSize -= 1
+
+      statisPath = os.path.join(*[".." for i in range(localPathSize)])
+
   LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES = directory, statisPath, cssFiles, javascriptFiles
   htmlFile = open(r"%s\%s.html" % (directory, report), "w")
   htmlFile.write('<!DOCTYPE html>\n')
@@ -51,9 +67,9 @@ def htmlLocalHeader(directory, report, statisPath, cssFiles, javascriptFiles):
   htmlFile.write('%s<meta name="viewport" content="width=device-width, initial-scale=1">\n' % AresHtml.INDENT)
   htmlFile.write('%s<title>Local HTML Report</title>\n' % AresHtml.INDENT)
   for style in cssFiles:
-    htmlFile.write('%s<link rel="stylesheet" href="%scss/%s" type="text/css">\n' % (AresHtml.INDENT, statisPath, style))
+    htmlFile.write('%s<link rel="stylesheet" href="%s" type="text/css">\n' % (AresHtml.INDENT, os.path.join(statisPath, 'css', style)))
   for javascript in javascriptFiles:
-    htmlFile.write('%s<script src="%sjs/%s"></script>\n' % (AresHtml.INDENT, statisPath, javascript))
+    htmlFile.write('%s<script src="%s"></script>\n' % (AresHtml.INDENT, os.path.join(statisPath, 'js', javascript)))
   htmlFile.write('</head>\n')
   htmlFile.write('<body><div class="container">\n\n')
 

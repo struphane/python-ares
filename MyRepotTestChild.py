@@ -2,7 +2,6 @@
 
 """
 
-import Ares#
 
 # No Child for this page
 CHILD_PAGES = {

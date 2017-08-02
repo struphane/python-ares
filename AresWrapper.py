@@ -10,7 +10,7 @@ Do not use True in both python and Javascript as the Json conversion is not real
 
 import os
 import sys
-import Ares
+import Lib.Ares as Ares
 
 # CSS imports
 CSS = ['jquery-ui.css',
@@ -34,9 +34,8 @@ JS = ['jquery-3.2.1.min.js',
 def components(directory):
   """ Return the list of all the available components """
   import inspect
-  import Ares
-  import AresHtml
-  import AresGraph
+  import Lib.AresHtml as AresHtml
+  import Lib.AresGraph as AresGraph
 
   htmlObject = []
   for name, obj in inspect.getmembers(AresHtml):
@@ -65,9 +64,8 @@ def test(className, directory):
   """ Test a component based on Mock Json data
 
   """
-  import Ares
-  import AresGraph
-  import AresHtml
+  import Lib.AresGraph as AresGraph
+  import Lib.AresHtml as AresHtml
   import inspect
   import json
 

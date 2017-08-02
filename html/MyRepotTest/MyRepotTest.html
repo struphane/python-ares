@@ -5,19 +5,19 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Local HTML Report</title>
-  <link rel="stylesheet" href="css/jquery-ui.css" type="text/css">
-  <link rel="stylesheet" href="css/bootstrap.css" type="text/css">
-  <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-  <link rel="stylesheet" href="css/bootstrap-theme.min.css" type="text/css">
-  <link rel="stylesheet" href="css/nv.d3.css" type="text/css">
-  <link rel="stylesheet" href="css/bootstrap-select.min.css" type="text/css">
-  <script src="js/jquery-3.2.1.min.js"></script>
-  <script src="js/jquery-ui.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/bootstrap-select.min.js"></script>
-  <script src="js/d3.v3.js"></script>
-  <script src="js/nv.d3.js"></script>
-  <script src="js/d3.layout.cloud.js"></script>
+  <link rel="stylesheet" href="..\..\css\jquery-ui.css" type="text/css">
+  <link rel="stylesheet" href="..\..\css\bootstrap.css" type="text/css">
+  <link rel="stylesheet" href="..\..\css\bootstrap.min.css" type="text/css">
+  <link rel="stylesheet" href="..\..\css\bootstrap-theme.min.css" type="text/css">
+  <link rel="stylesheet" href="..\..\css\nv.d3.css" type="text/css">
+  <link rel="stylesheet" href="..\..\css\bootstrap-select.min.css" type="text/css">
+  <script src="..\..\js\jquery-3.2.1.min.js"></script>
+  <script src="..\..\js\jquery-ui.min.js"></script>
+  <script src="..\..\js\bootstrap.min.js"></script>
+  <script src="..\..\js\bootstrap-select.min.js"></script>
+  <script src="..\..\js\d3.v3.js"></script>
+  <script src="..\..\js\nv.d3.js"></script>
+  <script src="..\..\js\d3.layout.cloud.js"></script>
 </head>
 <body><div class="container">
 
@@ -157,7 +157,7 @@ alert("I can update the DB") ;
 nv.addGraph(function() {
 
 var fill = d3.scale.category20();
-  var data_15 = [{'size': 10, 'text': 'Super'}, {'size': 20, 'text': 'Olivier'}, {'size': 20, 'text': 'Aurelie'}] ;
+  var data_15 = [{'text': 'Super', 'size': 10}, {'text': 'Olivier', 'size': 20}, {'text': 'Aurelie', 'size': 20}] ;
 
           d3.layout.cloud().size([960, 600])
             .words(data_15) // Refer to the data variable
@@ -222,7 +222,7 @@ var fill = d3.scale.category20();
 
 
 // Data section for chart_16
-  var data_16 = [{'value': 29.765957771107, 'label': 'One'}, {'value': 32.807804682612, 'label': 'Two'}] ;
+  var data_16 = [{'label': 'One', 'value': 29.765957771107}, {'label': 'Two', 'value': 32.807804682612}] ;
 
   d3.select("#chart16 svg")
                       .datum(data_16).transition()
@@ -256,7 +256,7 @@ var fill = d3.scale.category20();
 
 
 // Data section for chart_18
-  var data_18 = [{'key': 'NVD3', 'values': [{'key': 'Charts', '_values': [{'key': 'Simple Line', 'type': 'Historical', 'url': 'http://novus.github.com/nvd3/ghpages/line.html'}]}], 'url': 'http://novus.github.com/nvd3'}] ;
+  var data_18 = [{'values': [{'key': 'Charts', '_values': [{'url': 'http://novus.github.com/nvd3/ghpages/line.html', 'key': 'Simple Line', 'type': 'Historical'}]}], 'key': 'NVD3', 'url': 'http://novus.github.com/nvd3'}] ;
 
   d3.select("#chart18")
                       .datum(data_18).transition()

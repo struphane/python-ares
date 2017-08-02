@@ -6,7 +6,7 @@ This module require jQuery
 reference website: http://api.jquery.com/jquery.ajax/
 """
 
-import AresHtml
+import Lib.AresHtml as AresHtml
 
 class XsCall(object):
   """
