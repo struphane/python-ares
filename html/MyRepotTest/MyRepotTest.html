@@ -145,12 +145,12 @@ $("#dropZone_2").bind("drop", function (event){
 $("#select_3").change(function(){
 
               $.ajax({
-                    url: "testXs", // 'http://192.168.9.30/test/suma.php',
+                    url: "../reports_ajax/MyRepotTestAjax", // 'http://192.168.9.30/test/suma.php',
                     method: "POST",
                     data: {},
                     dataType: "html"
-                }).done(function() {
-                  alert("Youpi") ;
+                }).done(function(data) {
+                  alert(data) ;
                 }).fail(function( jqXHR, textStatus ) {
                   alert( "Request failed: " + textStatus );
                 });
@@ -168,7 +168,7 @@ alert("I can update the DB") ;
 nv.addGraph(function() {
 
 var fill = d3.scale.category20();
-  var data_15 = [{'text': 'Super', 'size': 10}, {'text': 'Olivier', 'size': 20}, {'text': 'Aurelie', 'size': 20}] ;
+  var data_15 = [{'size': 10, 'text': 'Super'}, {'size': 20, 'text': 'Olivier'}, {'size': 20, 'text': 'Aurelie'}] ;
 
           d3.layout.cloud().size([960, 600])
             .words(data_15) // Refer to the data variable
@@ -233,7 +233,7 @@ var fill = d3.scale.category20();
 
 
 // Data section for chart_16
-  var data_16 = [{'value': 29.765957771107, 'label': 'One'}, {'value': 32.807804682612, 'label': 'Two'}] ;
+  var data_16 = [{'label': 'One', 'value': 29.765957771107}, {'label': 'Two', 'value': 32.807804682612}] ;
 
   d3.select("#chart16 svg")
                       .datum(data_16).transition()
@@ -267,7 +267,7 @@ var fill = d3.scale.category20();
 
 
 // Data section for chart_18
-  var data_18 = [{'url': 'http://novus.github.com/nvd3', 'values': [{'_values': [{'type': 'Historical', 'url': 'http://novus.github.com/nvd3/ghpages/line.html', 'key': 'Simple Line'}], 'key': 'Charts'}], 'key': 'NVD3'}] ;
+  var data_18 = [{'key': 'NVD3', 'url': 'http://novus.github.com/nvd3', 'values': [{'_values': [{'key': 'Simple Line', 'url': 'http://novus.github.com/nvd3/ghpages/line.html', 'type': 'Historical'}], 'key': 'Charts'}]}] ;
 
   d3.select("#chart18")
                       .datum(data_18).transition()

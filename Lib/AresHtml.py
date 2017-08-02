@@ -7,6 +7,8 @@ Please make sure that all the CSS information are defined in a CSS class
 
 """
 
+import Lib.AresJs as AresJs
+
 INDENT = '  '
 
 class HtmlItem(object):
@@ -54,6 +56,13 @@ class HtmlItem(object):
 
     if self.jsEvent is None:
       self.jsEvent = [(evenType, jsDef)]
+
+  def jsAjax(self, evenType, jsDef, scriptName, data=None):
+    """
+    """
+    ajaxObject = AresJs.XsCall(scriptName)
+    ajaxObject.success(jsDef)
+    self.js(evenType, ajaxObject.ajax(data))
 
   def jsVal(self):
     """ Return the Javascript Value """

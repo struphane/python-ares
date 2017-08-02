@@ -6,23 +6,23 @@ This module require jQuery
 reference website: http://api.jquery.com/jquery.ajax/
 """
 
-import Lib.AresHtml as AresHtml
-
 class XsCall(object):
   """
 
   data should be a python dictionary
   """
 
-  def __init__(self, alias, pythonModule, jsSucessFnc, ajaxMethod='POST'):
+  def __init__(self, pythonModule, ajaxMethod='POST'):
     """ Get the minimum information to create a Ajax request """
-    self.alias = alias
     if ajaxMethod not in ['POST', 'GET']:
       raise Exception('%s ajax method does not exist' % ajaxMethod)
 
-    self.jsSucessFnc = jsSucessFnc
     self.ajaxMethod = ajaxMethod
     self.pythonModule = pythonModule.replace(".py", "")
+
+  def success(self, jsSucessFnc):
+    """ Add the javascript method in case of success """
+    self.jsSucessFnc = jsSucessFnc
 
   def ajax(self, data):
     """ Generic Ajax callback method """
@@ -38,33 +38,3 @@ class XsCall(object):
                   alert( "Request failed: " + textStatus );
                 });
            ''' % (self.pythonModule, self.ajaxMethod, data, self.jsSucessFnc)
-
-class XSSave(AresHtml.Button):
-  """
-
-  """
-
-  def ajax(self):
-    """
-
-    """
-
-class XSValidate(AresHtml.Button):
-  """
-
-  """
-
-  def ajax(self):
-    """
-
-    """
-
-class XSComments(AresHtml.Button):
-  """
-
-  """
-
-  def ajax(self):
-    """
-
-    """
