@@ -158,15 +158,13 @@ class Report(object):
     return self.content
 
   def addNotification(self, notifType, comment, group=None):
-    """
-    """
+    """ Add a user notfication to the report """
     notif = notifType.upper()
     if not notif in self.definedNotif:
       print("Notification %s not recognized !" % notif)
       print("Allowed notification %s" % self.definedNotif)
       raise Exception("Notification Type should belong to one of the above category")
-      self.notifications[notifType].append()
-
+      self.notifications[notifType].append(comment)
 
   def item(self, itemId):
     """ Return the HTML object """
