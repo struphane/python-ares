@@ -216,9 +216,10 @@ class Report(object):
     pass
 
   @addHtmlObject()
-  def container(self, htmlObj):
-    """ """
-    del self.content[self.content.index(htmlObj.htmlId)] # Is not defined in the root structure
+  def container(self, htmlObjs):
+    """ HTML Object that can contain multiple HTML object """
+    for htmlObj in htmlObjs: # Is not defined in the root structure
+      del self.content[self.content.index(htmlObj.htmlId)]
 
   @addHtmlObject()
   def grid(self, htmlObjLeft, htmlObjRight):

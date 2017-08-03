@@ -250,20 +250,20 @@ class Container(Div):
 
   """
   cls = 'container'
-  htmlObj = None
+  htmlObjs = None
   alias = 'container'
 
-  def __init__(self, htmlId, htmlObj, cssCls=None):
+  def __init__(self, htmlId, htmlObjs, cssCls=None):
     """ Set the div value """
     super(Div, self).__init__(htmlId) # To get the HTML Id
-    self.htmlObj = htmlObj
+    self.htmlObjs = htmlObjs
     if cssCls is not None:
       self.cls = cssCls
 
   def html(self, localPath):
     """ Return the HMTL object of for div """
-    self.val = self.htmlObj.html()
-    return super(Container, self).html()
+    self.val = "\n".join([htmlObj.html(localPath) for htmlObj in self.htmlObjs])
+    return super(Container, self).html(localPath)
 
 class Split(Div):
   """ Wrapper for a bootstrap Grid
