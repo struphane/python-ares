@@ -186,6 +186,11 @@ class Report(object):
     pass
 
   @addHtmlObject()
+  def dropFile(self):
+    """ """
+    pass
+
+  @addHtmlObject()
   def textArea(self):
     """ """
     pass

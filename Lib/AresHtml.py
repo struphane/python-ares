@@ -649,3 +649,43 @@ class DropZone(HtmlItem):
     """ Return the Drop Zone component """
     item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
     return "\n".join(item)
+
+class DropFile(HtmlItem):
+  """
+
+  """
+  cssCls = None
+  val = None
+  alias = 'dropFile'
+  reportName = ''
+  jsEvent = [('dragover', '''
+                          event.originalEvent.stopPropagation();
+							            event.originalEvent.preventDefault();
+                          event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+                          '''),
+             ]
+
+  def drop(self):
+    """  """
+    ajaxObject = AresJs.XsCall(self.reportName)
+    ajaxObject.url = 'script_upload'
+    ajaxObject.async = 'false'
+    ajaxObject.success('alert(data) ;')
+    return ajaxObject.ajax('form_data')
+
+  def html(self, localPath):
+    """ Return the Drop Zone component """
+    self.jsEvent.append(('drop', '''
+                          event.originalEvent.stopPropagation();
+						              event.originalEvent.preventDefault();
+                          var file = event.originalEvent.dataTransfer.files[0]; // FileList object.
+
+                          //files is a FileList of File objects. List some properties.
+                          var form_data = new FormData();
+                          form_data.append('files', file);
+                          %s
+
+                      ''' % self.drop()))
+
+    item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
+    return "\n".join(item)

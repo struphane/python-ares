@@ -11,6 +11,8 @@ class XsCall(object):
 
   data should be a python dictionary
   """
+  url = 'reports_ajax'
+  async = 'true'
 
   def __init__(self, pythonModule, ajaxMethod='POST'):
     """ Get the minimum information to create a Ajax request """
@@ -28,22 +30,26 @@ class XsCall(object):
     """ Generic Ajax callback method """
     return '''
               $.ajax({
-                    url: "../reports_ajax/%s", // 'http://192.168.9.30/test/suma.php',
+                    url: "../%s/%s", // 'http://192.168.9.30/test/suma.php',
                     method: "%s",
                     data: %s,
-                    dataType: "html"
+                    //dataType: "html"
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    async: %s
                 }).done(function(data) {
                   %s
                 }).fail(function( jqXHR, textStatus ) {
                   alert( "Request failed: " + textStatus );
                 });
-           ''' % (self.pythonModule, self.ajaxMethod, data, self.jsSucessFnc)
+           ''' % (self.url, self.pythonModule, self.ajaxMethod, data, self.async, self.jsSucessFnc)
 
   def ajaxLocal(self, data):
     """ Generic Ajax callback method """
     return '''
               $.ajax({
-                    url: "../reports_ajax/%s", // 'http://192.168.9.30/test/suma.php',
+                    url: "../%s/%s", // 'http://192.168.9.30/test/suma.php',
                     method: "%s",
                     data: %s,
                     dataType: "html"
@@ -67,4 +73,4 @@ class XsCall(object):
                   rawFile.send(null);
                   %s
                 });
-           ''' % (self.pythonModule, self.ajaxMethod, data, self.pythonModule, self.jsSucessFnc)
+           ''' % (self.url, self.pythonModule, self.ajaxMethod, data, self.pythonModule, self.jsSucessFnc)
