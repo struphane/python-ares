@@ -32,4 +32,4 @@ def report(aresObj, localPath=None):
   modalAres.item(bModal).jsAjax('click', 'alert(data) ; ',
                                 'report_index_set.py', localPath, {'report': modalAres.item(iReportName).jsVal(), 'serverPath': '"%s"' % localPath})
 
-  return aresObj.html(localPath, title='Select an existing report')
+  return aresObj

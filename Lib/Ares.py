@@ -135,6 +135,7 @@ class Report(object):
 
   # This list should not be changed
   definedNotif = ['SUCCESS', 'INFO', 'WARNING', 'DANGER']
+  showNavMenu = True # To be implemented
 
   def __init__(self, prefix=''):
     """
@@ -343,40 +344,15 @@ class Report(object):
     self.countItems += 1
     return htmlObject.htmlId
 
-
-  def html(self, localPath, title=None, menu=True):
+  def html(self, localPath):
     """ Main function used to generate the report
 
     """
-    # TODO: add the menu
     results, jsResults = [], []
-
     results.append('<script>')
     for jsOnLoad in self.jsOnLoad.keys():
       results.append(jsOnLoad)
     results.append('</script>')
-
-    if menu:
-      results.append('<div class="page-wrapper">')
-      results.append('%s<div class="doc-wrapper">' % AresHtml.INDENT)
-      results.append('%s%s<div class="container">' % (AresHtml.INDENT, AresHtml.INDENT))
-      results.append('%s%s<div class="doc-body">' % (AresHtml.INDENT, AresHtml.INDENT))
-      results.append('%s%s%s<div class="doc-sidebar hidden-xs">' % (AresHtml.INDENT, AresHtml.INDENT, AresHtml.INDENT))
-      results.append('%s%s%s%s<nav id="doc-nav">' % (AresHtml.INDENT, AresHtml.INDENT, AresHtml.INDENT, AresHtml.INDENT))
-      results.append('%s%s%s%s%s<ul id="doc-menu" class="nav doc-menu" data-apy="affix">' % (AresHtml.INDENT, AresHtml.INDENT, AresHtml.INDENT, AresHtml.INDENT, AresHtml.INDENT))
-      for section in self.navTitle:
-        #subItems = self.navBar[section]
-        results.append('<li><a href="%s">%s</a></li>' % (section.htmlId, section.val))
-        #if subItems:
-        #  jsResults.append('<ul class="nav doc-sub-menu">')
-        #  for subItems in subItems:
-        #    jsResults.append('<li><a href="%s">%s</a></li>')
-        #  jsResults.append('</ul>')
-      results.append("</ul></nav></div>")
-    if title is not None:
-      titleObj = AresHtml.Title(self.countItems, 1, title)
-      results.append(titleObj.html(localPath))
-    results.append('</div></div></div></div>')
 
     for htmlId in self.content:
       results.append(self.htmlItems[htmlId].html(localPath))

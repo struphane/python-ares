@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
   # Write the report
   htmlPage = Ares.htmlLocalHeader(directory, report, statisPath, CSS, JS)
-  htmlPage.write(__import__(report).report(Ares.Report(), localPath=directory))
+  htmlPage.write(__import__(report).report(Ares.Report(), localPath=directory).html(directory))
   Ares.htmlLocalFooter(htmlPage)
 
   # Start a simple server to test the Ajax calls

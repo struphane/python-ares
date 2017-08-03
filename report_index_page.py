@@ -19,6 +19,7 @@ def report(aresObj, localPath=None):
 
   """
   dropId = aresObj.dropFile()
+  aresObj.title(1, '%s - ReportEnvironment' % aresObj.http['SCRIPTS_NAME'])
   aresObj.item(dropId).reportName = aresObj.http['SCRIPTS_NAME']
   CHILD_PAGES['report'] = "../reports/%s" % aresObj.http['SCRIPTS_NAME']
   aresObj.anchor(" > Go to Report", 'report', CHILD_PAGES, localPath)
@@ -35,5 +36,4 @@ def report(aresObj, localPath=None):
   spId = aresObj.button("Download report", 'btn-success')
   aresObj.item(spId).js('click',
                         'window.location.href="/script_download/%s/MyRepotTestChild.py"; return false;' % aresObj.http['SCRIPTS_NAME'])
-
-  return aresObj.html(localPath, title='%s - ReportEnvironment' % aresObj.http['SCRIPTS_NAME'])
+  return aresObj
