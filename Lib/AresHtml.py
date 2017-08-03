@@ -381,7 +381,7 @@ class ButtonRemove(HtmlItem):
 
   def html(self, localPath):
     """ """
-    return '<button type="button" class="btn btn-%s btn-lg"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.alias)
+    return '<button type="button" class="btn btn-%s btn-sm"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.alias)
 
 class ButtonOk(ButtonRemove):
   """
