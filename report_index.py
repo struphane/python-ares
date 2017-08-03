@@ -22,6 +22,8 @@ def report(aresObj, localPath=None):
   bId = aresObj.button("Open Report Section", 'btn-success')
   aresObj.item(bId).js('click', 'window.location.href="/page/" + %s; return false;' % aresObj.item(id).jsVal())
 
+
+
   # Create a new report
   modalId = aresObj.modal('click on the link to create a new report section')
   modalAres = aresObj.item(modalId).aresObj

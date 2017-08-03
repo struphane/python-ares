@@ -31,4 +31,9 @@ def report(aresObj, localPath=None):
   aresObj.table(['Script Name', 'Type', 'Action'], scripts)
   aresObj.title(2, 'Report Description')
   aresObj.paragraph(aresObj.http['SCRIPTS_DSC'])
+
+  spId = aresObj.button("Download report", 'btn-success')
+  aresObj.item(spId).js('click',
+                        'window.location.href="/script_download/%s/MyRepotTestChild.py"; return false;' % aresObj.http['SCRIPTS_NAME'])
+
   return aresObj.html(localPath, title='%s - ReportEnvironment' % aresObj.http['SCRIPTS_NAME'])

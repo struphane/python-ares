@@ -1,7 +1,7 @@
 
 import json
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory, send_file
 app = Flask(__name__)
 
 @app.route("/page/<report_name>")
@@ -91,7 +91,16 @@ def uploadFiles(report_name):
 	  file.save(r'user_reports/%s/%s' % (report_name, file.filename))
 	return json.dumps({})
 
-
+@app.route("/script_download/<report_name>/<script>", methods = ['GET', 'POST'])
+def downloadFiles(report_name, script):
+  """
+  """
+  if not script.endswith(".py"):
+    script = "%s.py" % script
+  uploads = os.path.join('user_reports',  report_name)
+  return send_file(uploads, mimetype='text/csv', attachment_filename=script, as_attachment=True)
+  #return send_from_directory(directory=uploads, filename=script, as_attachment=True)
+  
 if __name__ == "__main__":
     app.debug = True
     app.run()

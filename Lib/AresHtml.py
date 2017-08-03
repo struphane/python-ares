@@ -59,10 +59,12 @@ class HtmlItem(object):
     else:
       self.jsEvent.append((evenType, jsDef))
 
-  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None):
+  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
     """
     """
     ajaxObject = AresJs.XsCall(scriptName)
+    if url is not None:
+      ajaxObject.url = url
     ajaxObject.success(jsDef)
     vals = []
     for key, val in data.items():
