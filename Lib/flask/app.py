@@ -27,7 +27,7 @@ def page_report(report_name):
     reportObj.http['SCRIPTS_AJAX'] = getattr(mod, 'AJAX_CALL', {})
   else:
     reportObj.http.update({'SCRIPTS_DSC': '', 'SCRIPTS_CHILD': {}, 'SCRIPTS_AJAX': {}})
-  return render_template('ares_template.html', content=__import__('report_index_page').report(reportObj))
+  return render_template('ares_template.html', content=__import__('report_index_page').report(reportObj).html(None))
 
 @app.route("/reports_index")
 def report_index():
@@ -39,7 +39,7 @@ def report_index():
   sys.path.append(r'E:\GitHub\Ares\Lib')
 
   import Ares
-  return render_template('ares_template.html', content=__import__('report_index').report(Ares.Report()))
+  return render_template('ares_template.html', content=__import__('report_index').report(Ares.Report()).html(None))
 
 @app.route("/reports/<report_name>")
 def report(report_name):
@@ -47,7 +47,7 @@ def report(report_name):
 	sys.path.append(r'E:\GitHub\Ares')
 	sys.path.append(r'E:\GitHub\Ares\Lib')
 	import Ares
-	return render_template('ares_template.html', content=__import__(report_name).report(Ares.Report()))
+	return render_template('ares_template.html', content=__import__(report_name).report(Ares.Report()).html(None))
 
 @app.route("/reports_child/<report_name>", methods = ['GET'])
 def child(report_name):
@@ -60,7 +60,7 @@ def child(report_name):
 	for getValues in request.args.items():
 	  reportObj.http['GET'][getValues[0]] = getValues[1]
 
-	return render_template('ares_template.html', content=__import__(report_name).report(reportObj))
+	return render_template('ares_template.html', content=__import__(report_name).report(reportObj).html(None))
 
 @app.route("/reports_ajax/<report_name>", methods = ['GET', 'POST'])
 def ajaxCall(report_name):
@@ -83,11 +83,7 @@ def uploadFiles(report_name):
 	sys.path.append(r'E:\GitHub\Ares')
 	sys.path.append(r'E:\GitHub\Ares\Lib')
 	if request.method == 'POST':
-	  print ("------------")
-	  # f.save(secure_filename(f.filename))
 	  file = request.files['files']
-	  print (file.filename)
-	  print (report_name)
 	  file.save(r'user_reports/%s/%s' % (report_name, file.filename))
 	return json.dumps({})
 
