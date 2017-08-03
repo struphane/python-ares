@@ -89,11 +89,20 @@ def uploadFiles(report_name):
 
 @app.route("/file_delete/<report_name>", methods = ['POST'])
 def deleteFiles(report_name):
-	import sys
-	sys.path.append(r'E:\GitHub\Ares')
-	sys.path.append(r'E:\GitHub\Ares\Lib')
+  import sys
+  import shutil
 
-	return json.dumps({})
+  sys.path.append(r'E:\GitHub\Ares')
+  sys.path.append(r'E:\GitHub\Ares\Lib')
+
+  if request.form.get('SCRIPT') is not None:
+    deletedReportPath = 'deleted_report'
+    if not os.path.exists(deletedReportPath):
+      os.makedirs(deletedReportPath)
+
+    shutil.move("user_reports/%s/%s" % (report_name, request.form.get('SCRIPT')),
+                "%s/%s_%s" % (deletedReportPath, report_name, request.form.get('SCRIPT')))
+  return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
 @app.route("/script_download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):

@@ -10,7 +10,7 @@ AJAX_CALL = {
   }
 
 CHILD_PAGES = {
-	'report': 'MyRepotTestChild.py',
+	'report': 'MyRepotTestChild2.py',
   'test3': 'MyRepotTestChild3.py',
   }
 
@@ -27,10 +27,13 @@ def report(aresObj, localPath=None):
 
   aresObj.title(2, 'List des scripts')
   scripts = [('%s.py' % aresObj.http['SCRIPTS_NAME'], 'Main Script', '')]
-  for childScripts in aresObj.http['SCRIPTS_CHILD']:
+  for childScripts in aresObj.http['SCRIPTS']:
+    if childScripts == "%s.py" % aresObj.http['SCRIPTS_NAME']:
+      continue
+
     bId = aresObj.remove()
-    aresObj.item(bId).jsAjax('click', 'alert("Youpi") ;', aresObj.http['SCRIPTS_NAME'], localPath, {'SCRIPT': childScripts})
-    scripts.append(('%s.py' % childScripts, 'Child of %s' % aresObj.http['SCRIPTS_NAME'], aresObj.item(bId)))
+    aresObj.item(bId).jsAjax('click', 'alert(data) ;', aresObj.http['SCRIPTS_NAME'], localPath, {'SCRIPT': "'%s'" % childScripts})
+    scripts.append((childScripts, 'Child of %s' % aresObj.http['SCRIPTS_NAME'], aresObj.item(bId)))
 
   #aresObj.remove()
   #aresObj.ok()

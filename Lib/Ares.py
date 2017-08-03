@@ -388,6 +388,9 @@ class Report(object):
             jsResults.append(fncDef)
             jsResults.append('});\n')
 
+      if self.htmlItems[htmlId].isComplex:
+        jsResults.extend(self.htmlItems[htmlId].buildJs())
+
     if self.jsGraph:
       jsResults.append("nv.addGraph(function() {\n")
       for jsgraphs in self.jsGraph:

@@ -21,6 +21,7 @@ class HtmlItem(object):
   """
   alias = None
   jsEvent = None
+  isComplex = False
 
   def __init__(self, htmlId, cssCls=None):
     """ Get the html object ID and store the CSS Class if passed """
@@ -70,7 +71,6 @@ class HtmlItem(object):
     for key, val in data.items():
       vals.append('"%s": %s' % (key, val))
     vals = '{%s}' % ",".join(vals)
-    print (vals)
     if localPath is not None:
       self.js(evenType, ajaxObject.ajaxLocal(vals))
     else:
@@ -252,6 +252,7 @@ class Container(Div):
   cls = 'container'
   htmlObjs = None
   alias = 'container'
+  isComplex = True
 
   def __init__(self, htmlId, htmlObjs, cssCls=None):
     """ Set the div value """
@@ -264,6 +265,16 @@ class Container(Div):
     """ Return the HMTL object of for div """
     self.val = "\n".join([htmlObj.html(localPath) for htmlObj in self.htmlObjs])
     return super(Container, self).html(localPath)
+
+  def buildJs(self):
+    """
+
+    """
+    jsResults = []
+    for htmlObj in self.htmlObjs:
+      if htmlObj.isComplex:
+        jsResults.extend(htmlObj.buildJs())
+    return jsResults
 
 class Split(Div):
   """ Wrapper for a bootstrap Grid
@@ -326,10 +337,11 @@ class NestedTable(Table):
   if the needs are very specific.
   """
   alias = 'nestedtable'
+  isComplex = True
 
   def html(self, localPath):
     """ Return the HTML object for the table """
-    item = ['<table class="table">']
+    item = ['<table class="table" id="%s">' % self.htmlId]
     item.append('%s<thead><tr>' % INDENT)
     for header in self.headers:
       item.append('%s%s<th>%s</th>' % (INDENT, INDENT, header))
@@ -343,6 +355,26 @@ class NestedTable(Table):
     item.append('</table>')
     return "\n".join(item)
 
+  def buildJs(self):
+    """
+    """
+    jsResults = []
+    for row in self.vals:
+      for val in row:
+        if hasattr(val, 'html'):
+          if val.jsEvent is not None:
+            for fnc, fncDef in val.jsEvent:
+              if fnc in ['drop', 'dragover']:
+                jsResults.append('%s.bind("%s", function (event){' % (val.jsRef(), fnc))
+                jsResults.append(fncDef)
+                jsResults.append('});\n')
+              elif fnc in ['autocomplete']:
+                jsResults.append(fncDef)
+              else:
+                jsResults.append('%s.%s(function(){' % (val.jsRef(), fnc))
+                jsResults.append(fncDef)
+                jsResults.append('});\n')
+    return jsResults
 
 class Button(HtmlItem):
   """
@@ -383,7 +415,7 @@ class ButtonRemove(HtmlItem):
 
   def html(self, localPath):
     """ """
-    return '<button type="button" class="btn btn-%s btn-sm"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.alias)
+    return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.htmlId, self.alias)
 
   def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
     """
@@ -397,7 +429,6 @@ class ButtonRemove(HtmlItem):
     for key, val in data.items():
       vals.append('"%s": %s' % (key, val))
     vals = '{%s}' % ",".join(vals)
-    print (vals)
     if localPath is not None:
       self.js(evenType, ajaxObject.ajaxLocal(vals))
     else:
