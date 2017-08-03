@@ -148,7 +148,7 @@ class Report(object):
     self.prefix = prefix
     self.content, self.jsGraph, self.navTitle = [], [], []
     self.htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
-    self.notifications = collections,delattr(list)
+    self.notifications = collections.defaultdict(list)
 
     if htmlFactory is None:
       htmlFactory = mapHtmlItems()
