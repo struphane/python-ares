@@ -29,6 +29,7 @@ def report(aresObj, localPath=None):
   scripts = [('%s.py' % aresObj.http['SCRIPTS_NAME'], 'Main Script', '')]
   for childScripts in aresObj.http['SCRIPTS_CHILD']:
     bId = aresObj.remove()
+    aresObj.item(bId).jsAjax('click', 'alert("Youpi") ;', aresObj.http['SCRIPTS_NAME'], localPath, {'SCRIPT': childScripts})
     scripts.append(('%s.py' % childScripts, 'Child of %s' % aresObj.http['SCRIPTS_NAME'], aresObj.item(bId)))
 
   #aresObj.remove()

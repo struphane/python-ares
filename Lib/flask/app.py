@@ -87,6 +87,14 @@ def uploadFiles(report_name):
 	  file.save(r'user_reports/%s/%s' % (report_name, file.filename))
 	return json.dumps({})
 
+@app.route("/file_delete/<report_name>", methods = ['POST'])
+def deleteFiles(report_name):
+	import sys
+	sys.path.append(r'E:\GitHub\Ares')
+	sys.path.append(r'E:\GitHub\Ares\Lib')
+
+	return json.dumps({})
+
 @app.route("/script_download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
   """
