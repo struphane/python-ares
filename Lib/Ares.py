@@ -23,6 +23,7 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 
 import os
 import inspect
+import collections
 import Lib.AresHtml as AresHtml
 import Lib.AresGraph as AresGraph
 
@@ -132,6 +133,9 @@ class Report(object):
 
   """
 
+  # This list should not be changed
+  definedNotif = ['SUCCESS', 'INFO', 'WARNING', 'DANGER']
+
   def __init__(self, prefix=''):
     """
     """
@@ -143,6 +147,7 @@ class Report(object):
     self.prefix = prefix
     self.content, self.jsGraph, self.navTitle = [], [], []
     self.htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
+    self.notifications = collections,delattr(list)
 
     if htmlFactory is None:
       htmlFactory = mapHtmlItems()
@@ -151,6 +156,17 @@ class Report(object):
 
   def structure(self):
     return self.content
+
+  def addNotification(self, notifType, comment, group=None):
+    """
+    """
+    notif = notifType.upper()
+    if not notif in self.definedNotif:
+      print("Notification %s not recognized !" % notif)
+      print("Allowed notification %s" % self.definedNotif)
+      raise Exception("Notification Type should belong to one of the above category")
+      self.notifications[notifType].append()
+
 
   def item(self, itemId):
     """ Return the HTML object """
