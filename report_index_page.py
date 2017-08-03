@@ -5,12 +5,24 @@
 
 import os
 
+AJAX_CALL = {
+  'download': 'MyRepotTestAjax.py'
+  }
+
+CHILD_PAGES = {
+	'report': 'MyRepotTestChild.py',
+  'test3': 'MyRepotTestChild3.py',
+  }
+
 def report(aresObj, localPath=None):
   """
 
   """
   dropId = aresObj.dropFile()
   aresObj.item(dropId).reportName = aresObj.http['SCRIPTS_NAME']
+  CHILD_PAGES['report'] = "../reports/%s" % aresObj.http['SCRIPTS_NAME']
+  aresObj.anchor(" > Go to Report", 'report', CHILD_PAGES, localPath)
+
   aresObj.title(2, 'List des scripts')
   scripts = [('%s.py' % aresObj.http['SCRIPTS_NAME'], 'Main Script', '')]
   for childScripts in aresObj.http['SCRIPTS_CHILD']:
