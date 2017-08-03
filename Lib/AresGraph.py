@@ -177,10 +177,22 @@ class Line(JsGraph):
 class StackedArea(JsGraph):
   """ This object will output a simple stacked area chart
 
+  To be factorised in an abstract class
+
   Reference website: http://nvd3.org/examples/stackedArea.html
   """
 
   mockData = r'json\stackedAreaData.json'
+  withFocus = False
+  multiY = False
+  chartFunction = 'stackedAreaChart'
+  useExtraChartOptions = True
+  chartOptions = '''
+                  .useInteractiveGuideline(true)
+                  .clipEdge(true)
+                  '''
+  extraOptions = ''
+  useDefaultYAxis = True
 
   def pyDataToJs(self, localPath=None):
     """
@@ -195,34 +207,102 @@ class StackedArea(JsGraph):
 
     jsData = '['
     for rec in self.pyData:
+      keys = rec.keys()
       jsData = '%s {"key": "%s", "values" : [' % (jsData, rec['key'])
       for value in rec['values']:
         jsData = '%s [%s, %s], ' % (jsData, str(value[0]), str(value[1]))
-      jsData = '%s ] },' % jsData
+
+      jsData = '%s ]' % jsData
+      if len(keys) > 2:
+        for key in keys:
+          if key not in ('key', 'values'):
+            if rec[key][0] == 'str':
+              jsData = '%s, "%s": "%s" ' % (jsData, key, rec[key][1])
+            else:
+              jsData = '%s, "%s": %s ' % (jsData, key, rec[key][1])
+      jsData = '%s },' % jsData
     jsData = '%s ]' % jsData
     return jsData
 
+  def addExtraOptions(self):
+    """ To be overriden in case extraOptions are used """
+    return self.extraOptions
+
   def jsChart(self):
     """ """
+    focusOption = ''
+    if self.withFocus:
+      focusOption = '''
+            chart_%s.x2Axis
+                .showMaxMin(false)
+                .tickFormat(function(d) { return d3.time.format('%%x')(new Date(d)) });
+          
+            chart_%s.y2Axis
+                .tickFormat(d3.format(',.2f'));''' % (self.htmlId, self.htmlId)
+    elif self.multiY:
+      focusOption = '''
+      
+            chart_%s.y2Axis
+                .tickFormat(d3.format(',.2f'));''' % (self.htmlId)
+
+    if not self.useExtraChartOptions:
+      self.chartOptions = ''
+
+    if self.useDefaultYAxis:
+      yAxis = '''chart_%s.yAxis
+                .tickFormat(d3.format(',.2f'));''' % self.htmlId
+    else:
+      yAxis = ''
+
     return ''' 
-            nv.models.stackedAreaChart()
+            nv.models.%s()
                 .x(function(d) { return d[0] })
                 .y(function(d) { return d[1] })
-                .clipEdge(true)
-                .useInteractiveGuideline(true)
+                %s
                 ;
 
             chart_%s.xAxis
                 .showMaxMin(false)
                 .tickFormat(function(d) { return d3.time.format('%%x')(new Date(d)) });
           
-            chart_%s.yAxis
-                .tickFormat(d3.format(',.2f'));
-          ''' % (self.htmlId, self.htmlId)
+            %s
+                
+            %s
+            
+            %s
+          ''' % (self.chartFunction, self.chartOptions, self.htmlId, yAxis, focusOption, self.addExtraOptions())
 
+class MultiBars(StackedArea):
+  """ """
 
+  mockData = r'json\multiBar.json'
+  withFocus = False
+  chartFunction = 'multiBarChart'
+  useExtraChartOptions = False
 
-class ComboLineBar(JsGraph):
+class LineWithFocus(StackedArea):
+  """ """
+
+  mockData = r'json\lineWithFocus.json'
+  withFocus = True
+  chartFunction = 'lineWithFocusChart'
+  useExtraChartOptions = False
+
+class HorizontalBars(StackedArea):
+  """ """
+
+  mockData = r'json\horizBars.json'
+  withFocus = False
+  chartFunction = 'multiBarHorizontalChart'
+  useExtraChartOptions = True
+  chartOptions = ''' 
+                  .margin({top: 30, right: 20, bottom: 50, left: 175})
+                  .showValues(true)
+                  .tooltips(false)
+                  .showControls(false)
+                  '''
+
+class ComboLineBar(StackedArea):
   """
   This object will combine a line and a bar chart.
   The first item should be the line chart
@@ -232,33 +312,17 @@ class ComboLineBar(JsGraph):
   Reference website: http://nvd3.org/examples/linePlusBar.html
   """
   mockData = r'json\linePlusBarData.json'
+  withFocus = False
+  chartFunction = 'linePlusBarChart'
+  multiY = True
+  interGuidelines = False
+  extraOptions = '''chart_%s.bars.forceY([0]); chart_22.y1Axis
+                .tickFormat(d3.format(',.2f'));'''
+  chartOptions = '''.color(d3.scale.category10().range())'''
+  useDefaultYAxis = False
 
-  def pyDataToJs(self, localPath=None):
-    """
-    """
-    return self.pyData
-
-  def jsChart(self):
-    """ """
-    return '''
-          nv.models.linePlusBarChart()
-            .margin({top: 30, right: 60, bottom: 50, left: 70})
-            .x(function(d,i) { return i })
-            .y(function(d,i) { return d[1] })
-          ;
-
-          chart_%s.xAxis.tickFormat(function(d) {
-            var dx = data_%s[0].values[d] && data_%s[0].values[d][0] || 0;
-            return d3.time.format('%%x')(new Date(dx))
-          });
-
-          chart_%s.y1Axis.tickFormat(d3.format(',f'));
-
-          chart_%s.y2Axis.tickFormat(function(d) { return '$' + d3.format(',f')(d) });
-
-          chart_%s.bars.forceY([0]);
-
-          ''' % (self.htmlId, self.htmlId, self.htmlId, self.htmlId, self.htmlId, self.htmlId)
+  def addExtraOptions(self):
+    return self.extraOptions % self.htmlId
 
 class Network(JsGraph):
   """

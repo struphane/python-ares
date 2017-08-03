@@ -267,12 +267,27 @@ class Report(object):
     pass
 
   @addGraphObject('ComboLineBar')
-  def comboLineBar(self, values, width=960, height=500, cssCls=None):
+  def comboLineBar(self, values, width=960, height=500, cssCls=None, useMockData=False):
     """ Construct a Pie Chart in the HTML page """
     pass
 
   @addGraphObject('StackedArea')
   def stackedAreaChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
+    """ """
+    pass
+
+  @addGraphObject('MultiBars')
+  def multiBarChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
+    """ """
+    pass
+
+  @addGraphObject('LineWithFocus')
+  def lineChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
+    """ """
+    pass
+
+  @addGraphObject('HorizontalBars')
+  def horizBarChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
     """ """
     pass
 
