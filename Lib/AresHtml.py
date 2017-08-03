@@ -376,6 +376,25 @@ class NestedTable(Table):
                 jsResults.append('});\n')
     return jsResults
 
+class Tabs(HtmlItem):
+  """
+  """
+  alias = 'tabs'
+
+  def __init__(self, htmlId, menus, cssCls=None):
+    """ Set the content of the table """
+    super(Tabs, self).__init__(htmlId) # To get the HTML Id
+    self.headers = menus
+
+  def html(self, localPath):
+    """ """
+    item = ['<ul class="nav nav-tabs" id="%s">' % self.htmlId]
+    item.append('<li class="active"><a href="#">Home</a></li>')
+    for header in self.headers:
+      item.append('<li><a href="#">%s</a></li>' % header)
+    item.append('</ul>')
+    return "\n".join(item)
+
 class Button(HtmlItem):
   """
 

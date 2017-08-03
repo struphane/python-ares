@@ -191,6 +191,11 @@ class Report(object):
     pass
 
   @addHtmlObject()
+  def tabs(self, cols):
+    """ """
+    pass
+
+  @addHtmlObject()
   def nestedtable(self, cols, values):
     """ """
     for row in values:
