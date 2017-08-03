@@ -77,7 +77,7 @@ class XsCallFile(XsCallHtml):
   Specific Ajax call to deal with files
   In this case Data are files object and it will pass this to the Python layer in order to perform some extra actions
   """
-  url = 'reports_ajax'
+  url = None
 
   def ajax(self, data):
     """ Generic Ajax callback method """
@@ -99,6 +99,9 @@ class XsCallFile(XsCallHtml):
 
   def ajaxLocal(self, data):
     """ Generic Ajax callback method """
+    if self.url is None:
+      raise Exception("URL has to be defined for this Ajax usage !!!")
+
     return '''
               $.ajax({
                     url: "../%s/%s", // 'http://192.168.9.30/test/suma.php',

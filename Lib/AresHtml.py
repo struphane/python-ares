@@ -62,7 +62,7 @@ class HtmlItem(object):
   def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
     """
     """
-    ajaxObject = AresJs.XsCall(scriptName)
+    ajaxObject = AresJs.XsCallHtml(scriptName)
     if url is not None:
       ajaxObject.url = url
     ajaxObject.success(jsDef)
@@ -669,7 +669,7 @@ class DropFile(HtmlItem):
 
   def drop(self):
     """  """
-    ajaxObject = AresJs.XsCall(self.reportName)
+    ajaxObject = AresJs.XsCallFile(self.reportName)
     ajaxObject.url = 'script_upload'
     ajaxObject.async = 'false'
     ajaxObject.success('alert(data) ;')

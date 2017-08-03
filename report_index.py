@@ -9,9 +9,10 @@ def report(aresObj, localPath=None):
   """
 
   """
+
+  aresObj.title(1, 'Reports Environment')
   id = aresObj.input("Report Name", '')
   reportsPath = r"E:\GitHub\Ares\html"
-
   # Get the list of all the reports
   foldersReports = []
   for folder in os.listdir(reportsPath):
