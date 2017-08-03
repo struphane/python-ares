@@ -320,7 +320,10 @@ class Graph(HtmlItem):
 
 class NestedTable(Table):
   """
+  This is a table of potential other HTML items
 
+  This is not an optimised version of a table and it might be better to use dedicated bespoke new HTML classes
+  if the needs are very specific.
   """
 
   def html(self, localPath):
@@ -333,11 +336,11 @@ class NestedTable(Table):
     for row in self.vals:
       item.append("%s<tr>" % INDENT)
       for val in row:
-        item.append("%s%s<td>%s</td>" % (INDENT, INDENT, val.html()))
+        htmlStr = val.html() if issubclass(val, HtmlItem) else val
+        item.append("%s%s<td>%s</td>" % (INDENT, INDENT, htmlStr))
       item.append("%s</tr>" % INDENT)
     item.append('</table>')
     return "\n".join(item)
-
 
 
 class Button(HtmlItem):
@@ -363,6 +366,28 @@ class Button(HtmlItem):
       return '<button id="%s" type="button" class="btn %s">%s</button>' % (self.htmlId, self.cssCls, self.val)
 
     return '<button id="%s" type="button" class="btn">%s</button>' % (self.htmlId, self.val)
+
+class ButtonRemove(HtmlItem):
+  """
+
+  http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html
+  """
+  alias = 'remove'
+  btype = 'danger'
+
+  def __init__(self, htmlId, cssCls=None):
+    """ """
+    super(ButtonRemove, self).__init__(htmlId, cssCls=cssCls) # To get the HTML Id
+
+  def html(self, localPath):
+    """ """
+    return '<button type="button" class="btn btn-%s btn-lg"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.alias)
+
+class ButtonOk(ButtonRemove):
+  """
+  """
+  alias = 'ok'
+  btype = 'success'
 
 class A(HtmlItem):
   """ Wrapper for a Anchor HTML tag """
