@@ -28,12 +28,13 @@ def report(aresObj, localPath=None):
   aresObj.title(2, 'List des scripts')
   scripts = [('%s.py' % aresObj.http['SCRIPTS_NAME'], 'Main Script', '')]
   for childScripts in aresObj.http['SCRIPTS_CHILD']:
-    scripts.append(('%s.py' % childScripts, 'Child of %s' % aresObj.http['SCRIPTS_NAME'], 'Remove'))
+    bId = aresObj.remove()
+    scripts.append(('%s.py' % childScripts, 'Child of %s' % aresObj.http['SCRIPTS_NAME'], aresObj.item(bId)))
 
-  aresObj.remove()
-  aresObj.ok()
+  #aresObj.remove()
+  #aresObj.ok()
   spId = aresObj.button("Download report", 'btn-success')
-  tpId = aresObj.table(['Script Name', 'Type', 'Action'], scripts)
+  tpId = aresObj.nestedtable(['Script Name', 'Type', 'Action'], scripts)
   aresObj.container([aresObj.item(spId), aresObj.item(tpId)])
   aresObj.title(2, 'Report Description')
   aresObj.paragraph(aresObj.http['SCRIPTS_DSC'])

@@ -325,6 +325,7 @@ class NestedTable(Table):
   This is not an optimised version of a table and it might be better to use dedicated bespoke new HTML classes
   if the needs are very specific.
   """
+  alias = 'nestedtable'
 
   def html(self, localPath):
     """ Return the HTML object for the table """
@@ -336,7 +337,7 @@ class NestedTable(Table):
     for row in self.vals:
       item.append("%s<tr>" % INDENT)
       for val in row:
-        htmlStr = val.html() if issubclass(val, HtmlItem) else val
+        htmlStr = val.html(localPath) if hasattr(val, 'html') else val
         item.append("%s%s<td>%s</td>" % (INDENT, INDENT, htmlStr))
       item.append("%s</tr>" % INDENT)
     item.append('</table>')

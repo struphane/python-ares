@@ -191,6 +191,14 @@ class Report(object):
     pass
 
   @addHtmlObject()
+  def nestedtable(self, cols, values):
+    """ """
+    for row in values:
+      for val in row:
+        if hasattr(val, 'html'):
+          del self.content[self.content.index(val.htmlId)]
+
+  @addHtmlObject()
   def dropDown(self, title, values):
     """ """
     pass
