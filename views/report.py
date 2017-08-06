@@ -24,7 +24,7 @@ report = Blueprint('ares', __name__, url_prefix='/reports')
 LIB_PACKAGE = {
   'JS': ['jquery-3.2.1.min.js', 'jquery-ui.min.js', 'bootstrap.min.js', 'bootstrap-select.min.js', 'd3.v3.js',
          'nv.d3.js', 'd3.layout.cloud.js'],
-  'CSS': ['jquery-ui.css', 'bootstrap.css', 'bootstrap.min.css', 'bootstrap-theme.min.css', 'nv.d3.css',
+  'CSS': ['jquery-ui.css', 'bootstrap.min.css', 'bootstrap-theme.min.css', 'nv.d3.css',
           'bootstrap-select.min.css', 'w3.css'],
   'PY': ['Ares.py', 'AresGraph.py', 'AresHtml.py', 'AresJs.py', '__init__.py'],
   'JSON': ['horizBars.json', 'linePlusBarData.json', 'lineWithFocus.json', 'multiBar.json', 'stackedAreaData.json']
@@ -132,9 +132,11 @@ def run_report(report_name):
   """ Run the report """
   sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
   reportObj = Ares.Report()
-  htmlReport = [__import__(report_name).report(reportObj).html(None)]
-  htmlReport.append(AresHtmlPyBar.PyBar().html(None, report_name, "%s.py" % report_name))
-  return render_template('ares_template.html', content="\n".join(htmlReport))
+  aresObj = __import__(report_name).report(reportObj)
+  dId = aresObj.download()
+  spId = aresObj.downloadAll("")
+  aresObj.grid(aresObj.item(dId), aresObj.item(spId), cssCls='bdiBar')
+  return render_template('ares_template.html', content=__import__(report_name).report(reportObj).html(None))
 
 @report.route("/child/<report_name>", methods = ['GET'])
 def child(report_name):

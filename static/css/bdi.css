@@ -1,0 +1,8 @@
+
+.bdiBar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    padding: 3px;
+    border: 1px solid black
+}

@@ -15,7 +15,6 @@ import multiprocessing
 
 # CSS imports
 CSS = ['jquery-ui.css',
-       'bootstrap.css',
        'bootstrap.min.css',
        'bootstrap-theme.min.css',
        'nv.d3.css',

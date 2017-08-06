@@ -321,7 +321,7 @@ class Split(Div):
     super(Div, self).__init__(htmlId) # To get the HTML Id
     self.htmlObjs = [htmlObjLeft, htmlObjRight]
     if cssCls is not None:
-      self.cls = cssCls
+      self.cls = "%s " % (self.cls, cssCls)
 
   def html(self, localPath):
     """ """

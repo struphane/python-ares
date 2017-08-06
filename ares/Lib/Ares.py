@@ -254,7 +254,7 @@ class Report(object):
       del self.content[self.content.index(htmlObj.htmlId)]
 
   @addHtmlObject()
-  def grid(self, htmlObjLeft, htmlObjRight):
+  def grid(self, htmlObjLeft, htmlObjRight, cssCls=None):
     """ """
     del self.content[self.content.index(htmlObjLeft.htmlId)] # Is not defined in the root structure
     del self.content[self.content.index(htmlObjRight.htmlId)] # Is not defined in the root structure
