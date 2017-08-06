@@ -33,7 +33,7 @@ def report(aresObj, localPath=None):
       continue
 
     bId = aresObj.remove()
-    aresObj.item(bId).jsAjax('click', 'alert(data) ;', aresObj.http['SCRIPTS_NAME'], localPath, {'SCRIPT': "'%s'" % childScripts})
+    aresObj.item(bId).jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, {'SCRIPT': "'%s'" % childScripts})
     scripts.append((childScripts, 'Child of %s' % aresObj.http['SCRIPTS_NAME'], aresObj.item(bId)))
 
   #aresObj.remove()

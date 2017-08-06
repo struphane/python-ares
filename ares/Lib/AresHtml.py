@@ -786,9 +786,9 @@ class DropFile(HtmlItem):
   def drop(self):
     """  """
     ajaxObject = AresJs.XsCallFile(self.reportName)
-    ajaxObject.url = 'script_upload'
+    ajaxObject.url = 'upload'
     ajaxObject.async = 'false'
-    ajaxObject.success('alert(data) ;')
+    ajaxObject.success('location.href = "/reports/page/%s";' % self.reportName)
     return ajaxObject.ajax('form_data')
 
   def html(self, localPath):
