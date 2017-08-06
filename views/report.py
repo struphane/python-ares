@@ -16,7 +16,7 @@ from flask import current_app, Blueprint, Flask, render_template, request, send_
 from ares.Lib import Ares
 from ares.Lib import AresHtmlPyBar
 
-from ares import report_index, report_index_page, report_index_set, report_index_remove
+from ares import report_index, report_index_page, report_index_set
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
 # Return the list of all the scripts needed to run this package
@@ -55,7 +55,21 @@ def getChildrenFlatStruct(scriptTree, listChildren):
       if children[child]:
         getChildrenFlatStruct(children, listChildren)
 
-@report.route("/dsc/html")
+@report.route("/dsc/index")
+def report_dsc_index():
+  """
+
+  """
+  aresObj = Ares.Report()
+  aresObj.title(1, "Report Documentation")
+  aresObj.title(2, "How to create a report")
+
+  aresObj.title(2, "Report Components")
+  aresObj.anchor('HTML Component documentation%s' % aresObj.newLine, 'dsc', 'html', {'html': 'html'}, None)
+  aresObj.anchor('Graph Component documentation%s' % aresObj.newLine, 'dsc', 'graph', {'graph': 'graph'}, None)
+  return render_template('ares_template.html', content=aresObj.html(None))
+
+@report.route("/child:dsc/html")
 def report_dsc_html():
   """ Function to return the HTML object description and a user guide """
   import inspect
@@ -66,14 +80,14 @@ def report_dsc_html():
   htmlObject = []
   for name, obj in inspect.getmembers(AresHtml):
     if inspect.isclass(obj) and obj.alias is not None:
-      iId = aresObj.anchor(name, name, {name: '../dsc/html/%s' % name}, None)
+      iId = aresObj.anchor(name, name, name, {name: '../dsc/html/%s' % name}, None)
       dId = aresObj.code(obj.__doc__)
       htmlObject.append((aresObj.item(iId), aresObj.item(dId)))
   aresObj.title(1, "Html Components")
   aresObj.nestedtable(['Class Name', 'Description'], htmlObject)
   return render_template('ares_template.html', content=aresObj.html(None))
 
-@report.route("/dsc/graph")
+@report.route("/child:dsc/graph")
 def report_dsc_graph():
   """ Function to return the Graph object description and a user guide """
   import inspect
@@ -84,7 +98,7 @@ def report_dsc_graph():
   graphObject = []
   for name, obj in inspect.getmembers(AresGraph):
     if inspect.isclass(obj):
-      iId = aresObj.anchor(name, name, {name: '../dsc/graph/%s' % name}, None)
+      iId = aresObj.anchor(name, name, name, {name: '../dsc/graph/%s' % name}, None)
       dId = aresObj.code(obj.__doc__)
       graphObject.append((aresObj.item(iId), aresObj.item(dId)))
   aresObj.title(1, "Graph Components")
