@@ -43,9 +43,10 @@ def page_report(report_name):
 
 @report.route("/index")
 def index():
-  """
-  """
-  return render_template('ares_template.html', content=report_index.report(Ares.Report()).html(None))
+  """ Return the main page with the reports selection """
+  aresObj = Ares.Report()
+  aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
+  return render_template('ares_template.html', content=report_index.report(aresObj).html(None))
 
 @report.route("/run/<report_name>")
 def run_report(report_name):
@@ -58,6 +59,15 @@ def child(report_name):
 	  reportObj.http['GET'][getValues[0]] = getValues[1]
 
 	return render_template('ares_template.html', content=report_name.report(reportObj).html(None))
+
+@report.route("/create/<report_name>", methods = ['GET', 'POST'])
+def ajaxCreate(report_name):
+  """
+  """
+  reportObj = Ares.Report()
+  for postValues in request.form.items():
+	  reportObj.http['POST'][postValues[0]] = postValues[1]
+  return json.dumps(report_index_set.call(reportObj))
 
 @report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
 def ajaxCall(report_name):

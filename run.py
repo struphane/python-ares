@@ -2,12 +2,11 @@
 
 """
 
-import json
 import os
-import sys
 
 from flask import Blueprint, Flask, render_template, request, send_from_directory, send_file
 app = Flask(__name__)
+app.config['ROOT_PATH'] = os.path.dirname(os.path.abspath(__file__))
 
 from views.report import report
 app.register_blueprint(report)
