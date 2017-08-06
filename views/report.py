@@ -5,7 +5,7 @@
 import json
 import os
 import sys
-import config
+
 from flask import current_app, Blueprint, Flask, render_template, request, send_from_directory, send_file
 
 # Ares Framework
