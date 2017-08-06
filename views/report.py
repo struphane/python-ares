@@ -133,10 +133,9 @@ def run_report(report_name):
   sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
   reportObj = Ares.Report()
   aresObj = __import__(report_name).report(reportObj)
-  dId = aresObj.download()
-  spId = aresObj.downloadAll("")
-  aresObj.grid(aresObj.item(dId), aresObj.item(spId), cssCls='bdiBar')
-  return render_template('ares_template.html', content=__import__(report_name).report(reportObj).html(None))
+  dId = aresObj.download(cssCls='bdiBar')
+  spId = aresObj.downloadAll(cssCls='bdiBar')
+  return render_template('ares_template.html', content=aresObj.html(None))
 
 @report.route("/child/<report_name>", methods = ['GET'])
 def child(report_name):
