@@ -7,7 +7,7 @@ Please make sure that all the CSS information are defined in a CSS class
 
 """
 
-import Lib.AresJs as AresJs
+from ares.Lib import AresJs
 
 INDENT = '  '
 

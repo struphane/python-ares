@@ -1,19 +1,31 @@
+""" Special app for the report section
+
+"""
 
 import json
 import os
-from flask import Flask, render_template, request, send_from_directory, send_file
-app = Flask(__name__)
+import sys
+import config
+from flask import current_app, Blueprint, Flask, render_template, request, send_from_directory, send_file
 
-@app.route("/page/<report_name>")
+# Ares Framework
+from ares.Lib import Ares
+from ares import report_index, report_index_page, report_index_set
+report = Blueprint('ares', __name__, url_prefix='/reports')
+
+@report.route("/report/dsc")
+def report_description():
+  """ Function to return the HTML object description and a user guide """
+
+@report.route("/html/<objectName>")
+def report_html_description(objectName):
+  """ Function to return teh html defition of an object """
+
+
+@report.route("/page/<report_name>")
 def page_report(report_name):
   """
   """
-  import os
-  import sys
-  sys.path.append(r'E:\GitHub\Ares')
-  sys.path.append(r'E:\GitHub\Ares\Lib')
-
-  import Ares
   reportObj = Ares.Report()
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join('user_reports', reportEnv)
@@ -27,74 +39,46 @@ def page_report(report_name):
     reportObj.http['SCRIPTS_AJAX'] = getattr(mod, 'AJAX_CALL', {})
   else:
     reportObj.http.update({'SCRIPTS_DSC': '', 'SCRIPTS_CHILD': {}, 'SCRIPTS_AJAX': {}})
-  return render_template('ares_template.html', content=__import__('report_index_page').report(reportObj).html(None))
+  return render_template('ares_template.html', content=report_index_page.report(reportObj).html(None))
 
-@app.route("/reports_index")
-def report_index():
+@report.route("/index")
+def index():
   """
   """
-  import os
-  import sys
-  sys.path.append(r'E:\GitHub\Ares')
-  sys.path.append(r'E:\GitHub\Ares\Lib')
+  return render_template('ares_template.html', content=report_index.report(Ares.Report()).html(None))
 
-  import Ares
-  return render_template('ares_template.html', content=__import__('report_index').report(Ares.Report()).html(None))
+@report.route("/run/<report_name>")
+def run_report(report_name):
+	return render_template('ares_template.html', content=report_name.report(Ares.Report()).html(None))
 
-@app.route("/reports/<report_name>")
-def report(report_name):
-	import sys
-	sys.path.append(r'E:\GitHub\Ares')
-	sys.path.append(r'E:\GitHub\Ares\Lib')
-	import Ares
-	return render_template('ares_template.html', content=__import__(report_name).report(Ares.Report()).html(None))
-
-@app.route("/reports_child/<report_name>", methods = ['GET'])
+@report.route("/child/<report_name>", methods = ['GET'])
 def child(report_name):
-	import sys
-	sys.path.append(r'E:\GitHub\Ares')
-	sys.path.append(r'E:\GitHub\Ares\Lib')
-
-	import Ares
 	reportObj = Ares.Report()
 	for getValues in request.args.items():
 	  reportObj.http['GET'][getValues[0]] = getValues[1]
 
-	return render_template('ares_template.html', content=__import__(report_name).report(reportObj).html(None))
+	return render_template('ares_template.html', content=report_name.report(reportObj).html(None))
 
-@app.route("/reports_ajax/<report_name>", methods = ['GET', 'POST'])
+@report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
 def ajaxCall(report_name):
-	import sys
-	sys.path.append(r'E:\GitHub\Ares')
-	sys.path.append(r'E:\GitHub\Ares\Lib')
-	
-	import Ares
 	reportObj = Ares.Report()
 	for getValues in request.args.items():
 	  reportObj.http['GET'][getValues[0]] = getValues[1]
 	for postValues in request.form.items():
 	  reportObj.http['POST'][postValues[0]] = postValues[1]
 	  
-	return json.dumps(__import__(report_name).call(reportObj))
+	return json.dumps(report_name.call(reportObj))
 
-@app.route("/script_upload/<report_name>", methods = ['POST'])
+@report.route("/upload/<report_name>", methods = ['POST'])
 def uploadFiles(report_name):
-	import sys
-	sys.path.append(r'E:\GitHub\Ares')
-	sys.path.append(r'E:\GitHub\Ares\Lib')
 	if request.method == 'POST':
 	  file = request.files['files']
 	  file.save(r'user_reports/%s/%s' % (report_name, file.filename))
 	return json.dumps({})
 
-@app.route("/file_delete/<report_name>", methods = ['POST'])
+@report.route("/delete/<report_name>", methods = ['POST'])
 def deleteFiles(report_name):
-  import sys
   import shutil
-
-  sys.path.append(r'E:\GitHub\Ares')
-  sys.path.append(r'E:\GitHub\Ares\Lib')
-
   if request.form.get('SCRIPT') is not None:
     deletedReportPath = 'deleted_report'
     if not os.path.exists(deletedReportPath):
@@ -104,7 +88,7 @@ def deleteFiles(report_name):
                 "%s/%s_%s" % (deletedReportPath, report_name, request.form.get('SCRIPT')))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
-@app.route("/script_download/<report_name>/<script>", methods = ['GET', 'POST'])
+@report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
   """
   """
@@ -113,7 +97,3 @@ def downloadFiles(report_name, script):
   uploads = os.path.join('user_reports',  report_name)
   return send_file(uploads, mimetype='text/csv', attachment_filename=script, as_attachment=True)
   #return send_from_directory(directory=uploads, filename=script, as_attachment=True)
-  
-if __name__ == "__main__":
-    app.debug = True
-    app.run()

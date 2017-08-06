@@ -10,7 +10,7 @@ def report(aresObj, localPath=None):
 
   """
 
-  aresObj.title(1, 'Reports Environment')
+  aresObj.title(1, 'Reports Environment (Beta)')
   id = aresObj.input("Report Name", '')
   reportsPath = r"E:\GitHub\Ares\html"
   # Get the list of all the reports

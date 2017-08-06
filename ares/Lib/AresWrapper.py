@@ -10,7 +10,7 @@ Do not use True in both python and Javascript as the Json conversion is not real
 
 import os
 import sys
-import Lib.Ares as Ares
+import Ares
 import multiprocessing
 
 # CSS imports

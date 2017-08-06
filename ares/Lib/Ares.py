@@ -24,8 +24,8 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 import os
 import inspect
 import collections
-import Lib.AresHtml as AresHtml
-import Lib.AresGraph as AresGraph
+from ares.Lib import AresHtml
+from ares.Lib import AresGraph
 
 htmlFactory = None # This is the factory with all the alias and HTML classes
 # the below global variables are only used locally to generate the secondary pages and Ajax calls
