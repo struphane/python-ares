@@ -127,6 +127,8 @@ def downloadReport():
   """
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
+    for css in LIB_PACKAGE['CSS']:
+      zipfile.write("test.py", "css\\test.py", zipfile.ZIP_DEFLATED )
     pass
 
   memory_file.seek(0)
