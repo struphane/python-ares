@@ -470,6 +470,40 @@ class ButtonRemove(HtmlItem):
     else:
       self.js(evenType, ajaxObject.ajax(vals))
 
+class ButtonDownload(HtmlItem):
+  """
+
+  http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html
+  """
+  alias = 'download'
+  btype = 'success'
+  jQueryEvent = ['click']
+
+  def __init__(self, htmlId, cssCls=None):
+    """ """
+    super(ButtonDownload, self).__init__(htmlId, cssCls=cssCls) # To get the HTML Id
+
+  def html(self, localPath):
+    """ """
+    return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.htmlId, self.alias)
+
+  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
+    """
+    """
+    ajaxObject = AresJs.XsCallHtml(scriptName)
+    ajaxObject.url = 'file_delete'
+    if url is not None:
+      ajaxObject.url = url
+    ajaxObject.success(jsDef)
+    vals = []
+    for key, val in data.items():
+      vals.append('"%s": %s' % (key, val))
+    vals = '{%s}' % ",".join(vals)
+    if localPath is not None:
+      self.js(evenType, ajaxObject.ajaxLocal(vals))
+    else:
+      self.js(evenType, ajaxObject.ajax(vals))
+
 class ButtonOk(ButtonRemove):
   """
   """
@@ -808,7 +842,7 @@ class DropFile(HtmlItem):
 
                       ''' % self.drop()))
 
-    item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
+    item = ['<div style="border: 1px dotted black;text-align:center;padding:5px;background-color:#F8F8F8" id="%s"><h3><b>+ Add Scripts</b></h3> Drop scripts here to upload</div>' % self.htmlId]
     return "\n".join(item)
 
 class NavBar(object):

@@ -53,6 +53,7 @@ def page_report(report_name):
     reportObj.http['SCRIPTS_AJAX'] = getattr(mod, 'AJAX_CALL', {})
   else:
     reportObj.http.update({'SCRIPTS_DSC': '', 'SCRIPTS_CHILD': {}, 'SCRIPTS_AJAX': {}})
+  reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
   return render_template('ares_template.html', content=report_index_page.report(reportObj).html(None))
 
 @report.route("/index")

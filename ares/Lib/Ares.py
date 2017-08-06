@@ -105,7 +105,7 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
 
 def addHtmlObject(addNavBar=False):
   """ Simple decorator to add basic html objects """
-  functionMapping = {'grid': 'split', 'anchor': 'a', 'remove': 'buttonremove',
+  functionMapping = {'grid': 'split', 'anchor': 'a', 'remove': 'buttonremove', 'download': 'ButtonDownload',
                      'ok': 'ButtonOk', 'date': 'DatePicker'}
   def addHtml(func):
     def wrapper(self, *args, **kwargs):
@@ -265,6 +265,11 @@ class Report(object):
 
   @addHtmlObject()
   def remove(self, cssCls=None):
+    """ """
+    pass
+
+  @addHtmlObject()
+  def download(self, cssCls=None):
     """ """
     pass
 
