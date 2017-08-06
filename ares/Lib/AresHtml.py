@@ -501,7 +501,6 @@ class ButtonDownload(HtmlItem):
 
   def html(self, localPath):
     """ """
-    print(self.cssCls)
     if self.cssCls is not None:
       return '<button type="button" class="btn btn-%s btn-sm %s" id="%s"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.cssCls, self.htmlId, self.alias)
 
