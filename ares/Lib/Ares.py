@@ -72,7 +72,7 @@ def htmlLocalHeader(directory, report, statisPath, cssFiles, javascriptFiles):
   for javascript in javascriptFiles:
     htmlFile.write('%s<script src="%s"></script>\n' % (AresHtml.INDENT, os.path.join(statisPath, 'js', javascript)))
   htmlFile.write('</head>\n')
-  htmlFile.write('<body><div class="container">\n\n')
+  htmlFile.write('<body>\n\n')
 
   return htmlFile
 
@@ -118,8 +118,6 @@ def addHtmlObject(addNavBar=False):
             self.jsOnLoad.append(htmlObj.jsOnLoad())
           self.htmlItems[htmlObj.htmlId] = htmlObj
           self.content.append(htmlObj.htmlId)
-          if addNavBar:
-            self.navTitle.append(htmlObj)
           self.countItems += 1
           return htmlObj.htmlId
       else:
@@ -138,7 +136,7 @@ class Report(object):
 
   # This list should not be changed
   definedNotif = ['SUCCESS', 'INFO', 'WARNING', 'DANGER']
-  showNavMenu = True # To be implemented
+  showNavMenu = False
 
   def __init__(self, prefix=''):
     """
@@ -149,7 +147,8 @@ class Report(object):
     # Those variable will drive the report generation
     self.countItems = 0
     self.prefix = prefix
-    self.content, self.jsGraph, self.navTitle = [], [], []
+    self.content, self.jsGraph = [], []
+    self.currentTitleObj, self.navBarContent = {}, {'content': []}
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {'GET': {}, 'POST': {}}
     self.notifications = collections.defaultdict(list)
 
@@ -160,6 +159,10 @@ class Report(object):
 
   def structure(self):
     return self.content
+
+  def addNavigationBar(self, width=25, cssCls=None):
+    self.showNavMenu = True
+    self.navBarContent.update({'width': width, 'cssCls': cssCls})
 
   def addNotification(self, notifType, comment, group=None):
     """ Add a user notfication to the report """
@@ -305,10 +308,25 @@ class Report(object):
     self.countItems += 1
     return htmlObject.htmlId
 
-  @addHtmlObject(addNavBar=True)
+  @addHtmlObject()
   def title(self, dim, value, cssCls=None):
     """ """
-    pass
+    if dim == 1:
+      titleObj = {'dim': dim, 'value': value, 'subObj': []}
+      self.navBarContent['content'].append(titleObj)
+      self.currentTitleObj = titleObj
+    else:
+      if not self.currentTitleObj:
+        raise Exception('You need to have at lease one title H1 in the report before adding subtitles')
+
+      currentObj = self.currentTitleObj
+      while True:
+        if not currentObj['subObj'] or currentObj['subObj'][-1]['dim'] == dim:
+          currentObj['subObj'].append({'dim': dim, 'value': value, 'subObj': []})
+          break
+
+        else:
+          currentObj = currentObj['subObj'][-1]
 
   @addGraphObject('Donut')
   def pieChart(self, values, width=960, height=500, cssCls=None):
@@ -350,6 +368,8 @@ class Report(object):
     """ """
     pass
 
+  def __populateNavBar(self):
+    return AresHtml.NavBar(self.navBarContent).html()
 
   #don't use the decorator as this function needs to change the value of some parameters before doing the generic processing
   def anchor(self, value, link, structure, localPath, cssCls=None):
@@ -388,6 +408,9 @@ class Report(object):
 
     """
     results, jsResults = [], []
+    if self.showNavMenu:
+      results.append(self.__populateNavBar())
+      results.append('<div class="container" style="margin-left:%s%%">' % self.navBarContent['width'])
     results.append('<script>')
     results.append('$( function() {')
     for jsOnLoad in self.jsOnLoad:

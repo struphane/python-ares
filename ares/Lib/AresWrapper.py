@@ -19,7 +19,8 @@ CSS = ['jquery-ui.css',
        'bootstrap.min.css',
        'bootstrap-theme.min.css',
        'nv.d3.css',
-       'bootstrap-select.min.css'
+       'bootstrap-select.min.css',
+       'w3.css'
        ]
 
 # Javascript imports
