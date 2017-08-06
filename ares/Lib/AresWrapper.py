@@ -46,7 +46,7 @@ def components(directory):
 
   htmlFile = open(r"%s\ArES_components.html" % directory, "w")
   aresObj = Ares.Report()
-  aresObj.title(2, "Html Components")
+  aresObj.title(1, "Html Components")
   aresObj.table(['Class Name', 'Description'], htmlObject)
 
 

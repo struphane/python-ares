@@ -5,7 +5,7 @@
 
 # No Child for this page
 CHILD_PAGES = {
-  'test2': 'MyRepotTestChild2'
+  'test2': 'MyRepotTestChild2.py'
 }
 
 def report(aresObj, localPath=None):

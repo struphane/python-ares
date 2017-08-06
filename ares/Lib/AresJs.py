@@ -7,6 +7,19 @@ reference website: http://api.jquery.com/jquery.ajax/
 
 """
 
+def genericCall(url, method, data, success, fail):
+    """ Generic Ajax callback method """
+    return '''
+              $.ajax({
+                    url: "%s", method: "%s", data: %s, dataType: "html"
+                }).done(function(data) {
+                  %s
+                }).fail(function( jqXHR, textStatus ) {
+                  %s
+                });
+           ''' % (url, method, data, success, fail)
+
+
 class XsCallHtml(object):
   """
   Normal wrapper for an Ajax Call expecting to deal with HTML data (String, Dictionaries)

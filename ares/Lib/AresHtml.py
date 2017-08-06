@@ -60,6 +60,12 @@ class HtmlItem(object):
     else:
       self.jsEvent.append((evenType, jsDef))
 
+  def ajax(self, evenType, ajaxModule, jsData, jsSuccess, jsFail):
+    """ """
+    jsStr = AresJs.genericCall(ajaxModule.URL, ajaxModule.METHOD, jsData, jsSuccess, jsFail)
+    print(jsStr)
+    self.js(evenType, jsStr)
+
   def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
     """
     """
@@ -227,6 +233,7 @@ class Div(HtmlItem):
   cls = None
   jQueryEvent = ['drop']
   alias = 'div'
+  tooltips = ''
 
   def __init__(self, htmlId, value, cssCls=None):
     """ Set the div value """
@@ -234,16 +241,25 @@ class Div(HtmlItem):
     self.val = value
     self.cls = cssCls
 
+  def toolTip(self, value):
+    """
+    """
+    self.tooltips = 'title="%s"' % value
+
   def html(self, localPath):
     """ Return the HMTL object of for div """
     if self.cls is not None:
-      return '<div id="%s" class="%s">%s</div>' % (self.htmlId, self.cls, self.val)
+      return '<div id="%s" class="%s" %s>%s</div>' % (self.htmlId, self.cls, self.tooltips, self.val)
 
-    return '<div id="%s">%s</div>' % (self.htmlId, self.val)
+    return '<div id="%s" %s>%s</div>' % (self.htmlId, self.tooltips, self.val)
 
   def JsVal(self):
     """ Return the Javascript Value """
     return '$("#%s").html()' % self.htmlId
+
+  def jsOnLoad(self):
+    if self.tooltips:
+      return "$( document ).tooltip();"
 
 class Slider(Div):
   """
@@ -503,6 +519,42 @@ class ButtonDownload(HtmlItem):
       self.js(evenType, ajaxObject.ajaxLocal(vals))
     else:
       self.js(evenType, ajaxObject.ajax(vals))
+
+class ButtonDownloadAll(HtmlItem):
+  """
+
+  http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html
+  """
+  alias = 'downloadAll'
+  btype = 'success'
+  jQueryEvent = ['click']
+
+  def __init__(self, htmlId, value, cssCls=None):
+    """ """
+    self.val = value
+    super(ButtonDownloadAll, self).__init__(htmlId, cssCls=cssCls) # To get the HTML Id
+
+  def html(self, localPath):
+    """ """
+    return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-download-alt">%s</span></button>' % (self.btype, self.htmlId, self.val)
+
+  def jsAjax(self, evenType, jsDef, reportEnvName, localPath, data=None, url=None):
+    """
+    """
+    ajaxObject = AresJs.XsCallHtml(scriptName)
+    ajaxObject.url = 'download/%s/package' % reportEnvName
+    if url is not None:
+      ajaxObject.url = url
+    ajaxObject.success(jsDef)
+    vals = []
+    for key, val in data.items():
+      vals.append('"%s": %s' % (key, val))
+    vals = '{%s}' % ",".join(vals)
+    if localPath is not None:
+      self.js(evenType, ajaxObject.ajaxLocal(vals))
+    else:
+      self.js(evenType, ajaxObject.ajax(vals))
+
 
 class ButtonOk(ButtonRemove):
   """

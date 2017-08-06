@@ -17,9 +17,9 @@ def report(aresObj, localPath=None):
 # Thanks to this the script should behave the same locally and on the server.
 # The only different is that the wrapper will locally create the different child pages (in html) instead
 # of generating them on the fly from Flask
-AJAX_CALL = {
-  'testAjax': 'MyRepotTestAjax.py'
-  }
+AJAX_CALLS = [
+  'MyRepotTestAjax.py'
+  ]
 
 # Currently this is only supported by the anchor balises
 # If there is button and actions we will assume that this will be sent via Ajax calls
