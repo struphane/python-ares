@@ -7,6 +7,7 @@ import os
 import sys
 import zipfile
 import io
+import config
 
 from flask import current_app, Blueprint, Flask, render_template, request, send_from_directory, send_file
 
@@ -22,7 +23,8 @@ LIB_PACKAGE = {
          'nv.d3.js', 'd3.layout.cloud.js'],
   'CSS': ['jquery-ui.css', 'bootstrap.css', 'bootstrap.min.css', 'bootstrap-theme.min.css', 'nv.d3.css',
           'bootstrap-select.min.css', 'w3.css'],
-  'PY': ['Ares.py', 'AresGraph.py', 'AresHtml.py', 'AresJs.py']
+  'PY': ['Ares.py', 'AresGraph.py', 'AresHtml.py', 'AresJs.py', '__init__.py'],
+  'JSON': ['horizBars.json', 'linePlusBarData.json', 'lineWithFocus.json', 'multiBar.json', 'stackedAreaData.json']
 }
 
 @report.route("/report/dsc")
@@ -128,9 +130,14 @@ def downloadReport():
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
     for css in LIB_PACKAGE['CSS']:
-      zipfile.write("test.py", "css\\test.py", zipfile.ZIP_DEFLATED )
-    pass
-
+      zf.write(os.path.join(current_app.config['ROOT_PATH'], "static", "css", css), os.path.join("css", css), zipfile.ZIP_DEFLATED )
+    for jsFile in LIB_PACKAGE['JS']:
+      zf.write(os.path.join(current_app.config['ROOT_PATH'], "static", "js", jsFile), os.path.join("js", jsFile), zipfile.ZIP_DEFLATED )
+    for pyFile in LIB_PACKAGE['PY']:
+      zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "Lib", pyFile), os.path.join("Lib", pyFile), zipfile.ZIP_DEFLATED )
+    for jsonFile in LIB_PACKAGE['JSON']:
+      zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "json", jsonFile), os.path.join("json", jsonFile), zipfile.ZIP_DEFLATED )
+    zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "Lib", 'AresWrapper.py'), os.path.join('AresWrapper.py'), zipfile.ZIP_DEFLATED )
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='capsule.zip', as_attachment=True)
   #return send_from_directory(directory=uploads, filename=script, as_attachment=True)
