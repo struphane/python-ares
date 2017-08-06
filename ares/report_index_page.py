@@ -76,13 +76,9 @@ def report(aresObj, localPath=None):
 
   dropId = aresObj.dropFile()
   aresObj.item(dropId).reportName = aresObj.http['SCRIPTS_NAME']
-  tpId = aresObj.nestedtable(['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'], scripts)
+  aresObj.nestedtable(['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'], scripts)
 
   spId = aresObj.downloadAll(" %s.zip" % aresObj.http['SCRIPTS_NAME'])
   aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
-
-  #aresObj.container([aresObj.item(tpId), aresObj.item(spId)])
-  #aresObj.item(spId).jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'],
-  #                          'download/%s/package' % aresObj.http['SCRIPTS_NAME'], localPath, {})
 
   return aresObj
