@@ -473,14 +473,15 @@ class ButtonRemove(HtmlItem):
     """
     """
     ajaxObject = AresJs.XsCallHtml(scriptName)
-    ajaxObject.url = 'file_delete'
+    ajaxObject.url = 'delete'
     if url is not None:
       ajaxObject.url = url
     ajaxObject.success(jsDef)
     vals = []
     for key, val in data.items():
-      vals.append('"%s": %s' % (key, val))
+      vals.append('"%s": "%s"' % (key, val))
     vals = '{%s}' % ",".join(vals)
+    print(ajaxObject.ajax(vals))
     if localPath is not None:
       self.js(evenType, ajaxObject.ajaxLocal(vals))
     else:

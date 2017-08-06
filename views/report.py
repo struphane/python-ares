@@ -16,7 +16,7 @@ from flask import current_app, Blueprint, Flask, render_template, request, send_
 from ares.Lib import Ares
 from ares.Lib import AresHtmlPyBar
 
-from ares import report_index, report_index_page, report_index_set, report_index_remove, report_index_download
+from ares import report_index, report_index_page, report_index_set, report_index_remove
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
 # Return the list of all the scripts needed to run this package
@@ -91,7 +91,6 @@ def report_dsc_graph():
   aresObj.nestedtable(['Class Name', 'Description'], graphObject)
   return render_template('ares_template.html', content=aresObj.html(None))
 
-
 @report.route("/html/<objectName>")
 def report_html_description(objectName):
   """ Function to return teh html defition of an object """
@@ -102,6 +101,7 @@ def page_report(report_name):
   """
   import pprint
   reportObj = Ares.Report()
+  reportObj.http['FILE'] = report_name
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
   reportObj.http['SCRIPTS'] = os.listdir(scriptEnv)
@@ -116,7 +116,7 @@ def page_report(report_name):
   reportObj.http['SCRIPTS_CHILD'] = children
   reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
   # Internal callback functions, Users are not expected to use them
-  reportObj.http['AJAX_CALLBACK'] = {'__remove': report_index_remove, '__download': report_index_download}
+  reportObj.http['AJAX_CALLBACK'] = {}
   reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
   return render_template('ares_template.html', content=report_index_page.report(reportObj).html(None))
 
