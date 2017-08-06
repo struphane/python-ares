@@ -62,8 +62,7 @@ def child(report_name):
 
 @report.route("/create/<report_name>", methods = ['GET', 'POST'])
 def ajaxCreate(report_name):
-  """
-  """
+  """ Special Ajax call to set up the environment """
   reportObj = Ares.Report()
   for postValues in request.form.items():
 	  reportObj.http['POST'][postValues[0]] = postValues[1]
@@ -71,6 +70,7 @@ def ajaxCreate(report_name):
 
 @report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
 def ajaxCall(report_name):
+  """ Generic Ajax call """
 	reportObj = Ares.Report()
 	for getValues in request.args.items():
 	  reportObj.http['GET'][getValues[0]] = getValues[1]
