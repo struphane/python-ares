@@ -14,7 +14,6 @@ from flask import current_app, Blueprint, Flask, render_template, request, send_
 
 # Ares Framework
 from ares.Lib import Ares
-from ares.Lib import AresHtmlPyBar
 
 from ares import report_index, report_index_page, report_index_set
 report = Blueprint('ares', __name__, url_prefix='/reports')
@@ -139,6 +138,7 @@ def index():
   """ Return the main page with the reports selection """
   aresObj = Ares.Report()
   aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
+  aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   return render_template('ares_template.html', content=report_index.report(aresObj).html(None))
 
 @report.route("/run/<report_name>")
@@ -176,6 +176,7 @@ def child(report_name, script):
 def ajaxCreate(report_name):
   """ Special Ajax call to set up the environment """
   reportObj = Ares.Report()
+  reportObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   for postValues in request.form.items():
 	  reportObj.http['POST'][postValues[0]] = postValues[1]
   return json.dumps(report_index_set.call(reportObj))

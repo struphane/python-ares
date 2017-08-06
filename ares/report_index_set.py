@@ -7,7 +7,7 @@ import os
 
 def call(aresObj):
   """ """
-  path = os.path.join("user_reports", aresObj.http['POST']['report'])
+  path = os.path.join(aresObj.http['USER_PATH'], aresObj.http['POST']['report'])
   if not os.path.exists(path):
       os.makedirs(path)
       reportFile = open(r"%s\%s.py" % (path, aresObj.http['POST']['report']), "w")

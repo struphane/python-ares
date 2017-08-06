@@ -12,13 +12,13 @@ def report(aresObj, localPath=None):
 
   aresObj.title(1, 'Reports Environment (Beta)')
   id = aresObj.input("Report Name", '')
-  reportsPath = r"%s\user_reports" % aresObj.http.get('ROOT_PATH')
+  reportsPath = aresObj.http.get('USER_PATH')
   if localPath is not None:
     reportsPath = r"%s\html"
   # Get the list of all the reports
   foldersReports = []
   for folder in os.listdir(reportsPath):
-    if os.path.isdir(r"%s\%s" % (reportsPath, folder)):
+    if os.path.isdir(os.path.join(reportsPath, folder)):
       foldersReports.append(folder)
   # Add this list to the auto completion of the input item
   aresObj.item(id).autocomplete(foldersReports)
@@ -30,8 +30,8 @@ def report(aresObj, localPath=None):
   modalAres = aresObj.item(modalId).aresObj
   iReportName = modalAres.input("Report Name", '')
   bModal = modalAres.button("Create the Report", 'btn-primary')
-  modalAres.item(bModal).jsAjax('click', 'alert(data) ; ',
+  modalAres.item(bModal).jsAjax('click', 'location.href = "../reports/index";',
                                 'report_index_set.py', localPath, {'report': modalAres.item(iReportName).jsVal(),
-                                                                   'serverPath': '"%s"' % localPath})
-
+                                                                   'serverPath': '"%s"' % localPath}, url='create')
+ #create
   return aresObj
