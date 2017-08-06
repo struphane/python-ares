@@ -25,13 +25,10 @@ def convert_bytes(num):
       num /= 1024.0
 
 def report(aresObj, localPath=None):
-  """
-
-  """
-
+  """ Run the report """
   aresObj.title(1, '%s - ReportEnvironment' % aresObj.http['SCRIPTS_NAME'])
   aresObj.title(2, 'Report Description')
-  aresObj.paragraph(aresObj.http['SCRIPTS_DSC'])
+  aresObj.code(aresObj.http['SCRIPTS_DSC'])
 
   CHILD_PAGES['report'] = "../run/%s" % aresObj.http['SCRIPTS_NAME']
   aId = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'], 'report', CHILD_PAGES, localPath)
