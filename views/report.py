@@ -113,14 +113,20 @@ def deleteFiles(report_name):
                 "%s/%s_%s" % (deletedReportPath, report_name, request.form.get('SCRIPT')))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
+# ---------------------------------------------------------------------------------------------------------
+#                                          DOWNLOAD SECTION
+#
+# The below section will allow
+#   - To get the full Ares updated package
+#   - To get the full report updated package
+#   - To get the last version of a specific script
+# ---------------------------------------------------------------------------------------------------------
 @report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
-  """
-  """
+  """ Download a specific file in a report project """
   if not script.endswith(".py"):
     script = "%s.py" % script
-  uploads = os.path.join('user_reports',  report_name)
-  return send_file(uploads, mimetype='text/csv', attachment_filename=script, as_attachment=True)
+  return send_file(os.path.join('user_reports',  report_name), mimetype='text/csv', attachment_filename=script, as_attachment=True)
 
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
