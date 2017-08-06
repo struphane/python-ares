@@ -49,13 +49,14 @@ def report(aresObj, localPath=None):
                             'MyRepotTestAjax.py', localPath, {})
 
   bId =  aresObj.div("Olivier")
-  aresObj.anchor('Great link to a new page', 'test', CHILD_PAGES, localPath)
-  aresObj.anchor('Great link to a new page, Again and Again', 'test3', CHILD_PAGES, localPath)
+  # aresObj.anchor('Great link to a new page', 'test', CHILD_PAGES, localPath)
+  # aresObj.anchor('Great link to a new page, Again and Again', 'test3', CHILD_PAGES, localPath)
   # Section put in a container
   lId = aresObj.list([('test', 1), ('Aurelie', 12)])
   tId = aresObj.table(['Olivier', 'Aurelie', 'Youpi'], [[1, 2, 'super'], [3, 4, 'encore']])
   aresObj.grid(aresObj.item(lId), aresObj.item(tId))
   aresObj.title(1, 'Test Report Header')
+  aresObj.title(2, 'sub Title')
   bId = aresObj.button('Youpi Test', 'btn-success')
   iId2 = aresObj.input('test', 'Encore')
   aresObj.item(iId2).js('blur', 'alert("I can update the DB") ;')
@@ -63,11 +64,14 @@ def report(aresObj, localPath=None):
   tId = aresObj.text('YYYYYYYYYYYYYYYYYYYYYYYYYYYYYOUPI', 'font-weight-bold')
   aresObj.paragraph('Voici mon result {0}', [aresObj.item(tId)])
   aresObj.item(bId).js('click', ' %s.html(%s);' % (aresObj.item(tId).jsRef(), aresObj.item(iId2).jsVal()))
-
+  aresObj.title(3, 'sub Title 2')
+  aresObj.title(1, 'Title 2')
+  aresObj.title(2, 'Sub Title Test')
   cloudId = aresObj.cloudChart([('Super', 10), ('Olivier', 20), ('Aurelie', 20)])
   pieDi = aresObj.pieChart([("One", 29.765957771107), ("Two", 32.807804682612)  ])
   aresObj.grid(aresObj.item(cloudId), aresObj.item(pieDi))
 
+  aresObj.addNavigationBar(width=15)
   data = [{'key': 'NVD3', 'url': 'http://novus.github.com/nvd3', 'values': [{'key': "Charts", '_values': [{
             'key': "Simple Line", 'type': "Historical", 'url': "http://novus.github.com/nvd3/ghpages/line.html"
             }] }]
@@ -81,4 +85,4 @@ def report(aresObj, localPath=None):
 
   aresObj.horizBarChart(None, useMockData=True)
 
-  return aresObj.html(localPath, title='Youpi')
+  return aresObj

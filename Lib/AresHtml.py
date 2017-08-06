@@ -660,9 +660,9 @@ class Title(HtmlItem):
   def html(self, localPath):
     """ Return a header HTML Tag """
     if self.cssCls is not None:
-      return '<H%s id="%s" class="%s">%s</H%s>' % (self.dim, self.htmlId, self.cssCls, self.val, self.dim)
+      return '<H%s id="%s" class="%s"><a name="%s">%s</a></H%s>' % (self.dim, self.htmlId, self.cssCls, self.val, self.val, self.dim)
 
-    return '<H%s id="%s">%s</H%s>' % (self.dim, self.htmlId, self.val, self.dim)
+    return '<H%s id="%s"><a name="%s">%s</a></H%s>' % (self.dim, self.htmlId, self.val, self.val, self.dim)
 
   def jsOnLoad(self):
     if self.tooltips:
@@ -786,3 +786,35 @@ class DropFile(HtmlItem):
 
     item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
     return "\n".join(item)
+
+class NavBar(object):
+  """ """
+
+  alias = None
+
+  def __init__(self, titleAttr):
+    """ """
+    self.titleAttr = titleAttr
+
+  def unstackTitles(self, titleLst):
+    result = []
+    result.append('<ul style="list-style-type:none">')
+    for title in titleLst:
+      result.append(r'<li><a href="#%s" class="w3-hover-green">%s</a></li>' % (title['value'], title['value']))
+      if title['subObj']:
+        result.append(self.unstackTitles(title['subObj']))
+    result.append(r'</ul>')
+    return '\n'.join(result)
+
+
+  def html(self):
+    """ """
+    content = []
+    if self.titleAttr['cssCls']:
+      content.append('<div class="%s" style="width:%s%%">' % (self.titleAttr['cssCls'], self.titleAttr['width']))
+    else:
+      content.append('<div class="w3-sidebar w3-light-grey w3-bar-block" style="width:%s%%">' % self.titleAttr['width'])
+    content.append(r'<h3 class="w3-bar-item">Navigation</h3>')
+    content.append(self.unstackTitles(self.titleAttr['content']))
+    content.append(r'</div>')
+    return '\n'.join(content)
