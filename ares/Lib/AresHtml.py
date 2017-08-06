@@ -481,7 +481,6 @@ class ButtonRemove(HtmlItem):
     for key, val in data.items():
       vals.append('"%s": "%s"' % (key, val))
     vals = '{%s}' % ",".join(vals)
-    print(ajaxObject.ajax(vals))
     if localPath is not None:
       self.js(evenType, ajaxObject.ajaxLocal(vals))
     else:
