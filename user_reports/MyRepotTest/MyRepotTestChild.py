@@ -12,6 +12,6 @@ def report(aresObj, localPath=None):
   """
   """
   aresObj.title(1, 'I am a child')
-  aresObj.anchor('Great link to a new page, again !', 'test2?myvar=great!!!!&var2=10', CHILD_PAGES, localPath)
-  return aresObj.html(localPath, title='Second Page')
+  aresObj.anchor('Great link to a new page, again !', aresObj.http['FILE'], 'test2?myvar=great!!!!&var2=10', CHILD_PAGES, localPath)
+  return aresObj
 	

@@ -1,8 +1,16 @@
 
-.bdiBar {
+.bdiBar-download {
     position: fixed;
-    right: 0;
-    bottom: 0;
+    right: 5px;
+    bottom: 5px;
+    padding: 3px;
+    border: 1px solid black
+}
+
+.bdiBar-download-all {
+    position: fixed;
+    right: 5px;
+    bottom: 40px;
     padding: 3px;
     border: 1px solid black
 }

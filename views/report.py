@@ -132,18 +132,31 @@ def run_report(report_name):
   """ Run the report """
   sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
   reportObj = Ares.Report()
+  reportObj.http['FILE'] = report_name
   aresObj = __import__(report_name).report(reportObj)
-  dId = aresObj.download(cssCls='bdiBar')
-  spId = aresObj.downloadAll(cssCls='bdiBar')
+  dId = aresObj.download(cssCls='bdiBar-download')
+  aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
+  spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
+  aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
   return render_template('ares_template.html', content=aresObj.html(None))
 
-@report.route("/child/<report_name>", methods = ['GET'])
-def child(report_name):
-	reportObj = Ares.Report()
-	for getValues in request.args.items():
-	  reportObj.http['GET'][getValues[0]] = getValues[1]
+@report.route("/child:<report_name>/<script>", methods = ['GET'])
+def child(report_name, script):
+  """
 
-	return render_template('ares_template.html', content=report_name.report(reportObj).html(None))
+  """
+  sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
+  reportObj = Ares.Report()
+  reportObj.http['FILE'] = report_name
+  for getValues in request.args.items():
+    reportObj.http['GET'][getValues[0]] = getValues[1]
+
+  aresObj = __import__(script).report(reportObj)
+  dId = aresObj.download(cssCls='bdiBar-download')
+  aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
+  spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
+  aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
+  return render_template('ares_template.html', content=aresObj.html(None))
 
 @report.route("/create/<report_name>", methods = ['GET', 'POST'])
 def ajaxCreate(report_name):

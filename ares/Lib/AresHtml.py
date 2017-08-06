@@ -522,6 +522,9 @@ class ButtonDownloadAll(HtmlItem):
 
   def html(self, localPath):
     """ """
+    if self.cssCls is not None:
+      return '<button type="button" class="btn btn-%s btn-sm %s" id="%s"><span class="glyphicon glyphicon-download-alt">%s</span></button>' % (self.btype, self.cssCls, self.htmlId, self.val)
+
     return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-download-alt">%s</span></button>' % (self.btype, self.htmlId, self.val)
 
 class ButtonOk(ButtonRemove):

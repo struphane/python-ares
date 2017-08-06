@@ -113,7 +113,7 @@ def addHtmlObject(addNavBar=False):
       for member in dir(AresHtml):
         funcName = func.__name__
         if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
-          htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args)
+          htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args, **kwargs)
           if htmlObj.jsOnLoad() is not None:
             self.jsOnLoad.append(htmlObj.jsOnLoad())
           self.htmlItems[htmlObj.htmlId] = htmlObj
@@ -383,7 +383,7 @@ class Report(object):
     return AresHtml.NavBar(self.navBarContent).html()
 
   #don't use the decorator as this function needs to change the value of some parameters before doing the generic processing
-  def anchor(self, value, link, structure, localPath, cssCls=None):
+  def anchor(self, value, src, link, structure, localPath, cssCls=None):
     """ Add an anchor HTML tag to the report """
     if localPath is not None:
       # There is a child and we need to produce the sub Report attached to it
@@ -404,9 +404,9 @@ class Report(object):
     else:
       splitUrl  = link.split("?")
       if len(splitUrl) > 1:
-        link = "../reports_child/%s?%s" % (structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
+        link = "../child:%s/%s?%s" % (src, structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
       else:
-        link = "../reports_child/%s" % (structure[splitUrl[0]].replace(".py", ""))
+        link = "../child:%s/%s" % (src, structure[splitUrl[0]].replace(".py", ""))
 
     htmlObject = AresHtml.A(self.countItems, value, link, cssCls=cssCls)
     self.htmlItems[htmlObject.htmlId] = htmlObject
