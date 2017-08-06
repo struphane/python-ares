@@ -71,13 +71,12 @@ def ajaxCreate(report_name):
 @report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
 def ajaxCall(report_name):
   """ Generic Ajax call """
-	reportObj = Ares.Report()
-	for getValues in request.args.items():
-	  reportObj.http['GET'][getValues[0]] = getValues[1]
-	for postValues in request.form.items():
-	  reportObj.http['POST'][postValues[0]] = postValues[1]
-	  
-	return json.dumps(report_name.call(reportObj))
+  reportObj = Ares.Report()
+  for getValues in request.args.items():
+    reportObj.http['GET'][getValues[0]] = getValues[1]
+  for postValues in request.form.items():
+    reportObj.http['POST'][postValues[0]] = postValues[1]
+  return json.dumps(report_name.call(reportObj))
 
 @report.route("/upload/<report_name>", methods = ['POST'])
 def uploadFiles(report_name):
