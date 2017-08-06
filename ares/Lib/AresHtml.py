@@ -796,11 +796,14 @@ class DropFile(HtmlItem):
     self.jsEvent.append(('drop', '''
                           event.originalEvent.stopPropagation();
 						              event.originalEvent.preventDefault();
-                          var file = event.originalEvent.dataTransfer.files[0]; // FileList object.
+                          var file = event.originalEvent.dataTransfer.files; // FileList object.
 
                           //files is a FileList of File objects. List some properties.
                           var form_data = new FormData();
-                          form_data.append('files', file);
+                          $.each(event.originalEvent.dataTransfer.files, function(i, file) {
+                            form_data.append('file_' + i, file);
+                            i ++;
+                          });
                           %s
 
                       ''' % self.drop()))

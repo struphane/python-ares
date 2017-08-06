@@ -5,6 +5,8 @@
 import json
 import os
 import sys
+import zipfile
+import io
 
 from flask import current_app, Blueprint, Flask, render_template, request, send_from_directory, send_file
 
@@ -12,6 +14,16 @@ from flask import current_app, Blueprint, Flask, render_template, request, send_
 from ares.Lib import Ares
 from ares import report_index, report_index_page, report_index_set
 report = Blueprint('ares', __name__, url_prefix='/reports')
+
+# Return the list of all the scripts needed to run this package
+# This will group all the module CSS, JS and Python scripts
+LIB_PACKAGE = {
+  'JS': ['jquery-3.2.1.min.js', 'jquery-ui.min.js', 'bootstrap.min.js', 'bootstrap-select.min.js', 'd3.v3.js',
+         'nv.d3.js', 'd3.layout.cloud.js'],
+  'CSS': ['jquery-ui.css', 'bootstrap.css', 'bootstrap.min.css', 'bootstrap-theme.min.css', 'nv.d3.css',
+          'bootstrap-select.min.css', 'w3.css'],
+  'PY': ['Ares.py', 'AresGraph.py', 'AresHtml.py', 'AresJs.py']
+}
 
 @report.route("/report/dsc")
 def report_description():
@@ -80,10 +92,12 @@ def ajaxCall(report_name):
 
 @report.route("/upload/<report_name>", methods = ['POST'])
 def uploadFiles(report_name):
-	if request.method == 'POST':
-	  file = request.files['files']
-	  file.save(r'user_reports/%s/%s' % (report_name, file.filename))
-	return json.dumps({})
+  """ Add all the files that a users will drag and drop in the section """
+  if request.method == 'POST':
+    for filename, fileType in request.files.items():
+      file = request.files[filename]
+      file.save(r'user_reports/%s/%s' % (report_name, file.filename))
+  return json.dumps({})
 
 @report.route("/delete/<report_name>", methods = ['POST'])
 def deleteFiles(report_name):
@@ -105,4 +119,16 @@ def downloadFiles(report_name, script):
     script = "%s.py" % script
   uploads = os.path.join('user_reports',  report_name)
   return send_file(uploads, mimetype='text/csv', attachment_filename=script, as_attachment=True)
+  #return send_from_directory(directory=uploads, filename=script, as_attachment=True)
+
+@report.route("/download/package")
+def downloadReport():
+  """
+  """
+  memory_file = io.BytesIO()
+  with zipfile.ZipFile(memory_file, 'w') as zf:
+    pass
+
+  memory_file.seek(0)
+  return send_file(memory_file, attachment_filename='capsule.zip', as_attachment=True)
   #return send_from_directory(directory=uploads, filename=script, as_attachment=True)
