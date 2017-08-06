@@ -699,6 +699,8 @@ class Title(HtmlItem):
   cssCls = None
   val = None
   alias = 'title'
+  prop = None
+  color = '#398438'
 
   def __init__(self, htmlId, dim, value, tooltips=False, cssCls=None):
     """ Instanciate the object, define the level and add the class """
@@ -710,10 +712,16 @@ class Title(HtmlItem):
 
   def html(self, localPath):
     """ Return a header HTML Tag """
+    if self.prop is None:
+      self.prop = {}
+      self.prop['color'] = self.color
+      self.prop['cursor'] = 'pointer'
+      self.prop['text-decoration'] = 'none'
     if self.cssCls is not None:
       return '<H%s id="%s" class="%s"><a name="%s">%s</a></H%s>' % (self.dim, self.htmlId, self.cssCls, self.val, self.val, self.dim)
 
-    return '<H%s id="%s"><a name="%s">%s</a></H%s>' % (self.dim, self.htmlId, self.val, self.val, self.dim)
+    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.prop.items()])
+    return '<H%s id="%s"><a name="%s" style="%s">%s</a></H%s>' % (self.dim, self.htmlId, self.val, styleStr, self.val, self.dim)
 
   def jsOnLoad(self):
     if self.tooltips:
