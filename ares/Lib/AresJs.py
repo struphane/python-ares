@@ -12,7 +12,7 @@ class XsCallHtml(object):
   Normal wrapper for an Ajax Call expecting to deal with HTML data (String, Dictionaries)
   This is the common way to query using Ajax. Data should be a python dictionary
   """
-  url = 'reports_ajax'
+  url = 'reports/ajax'
 
   def __init__(self, pythonModule, ajaxMethod='POST'):
     """ Get the minimum information to create a Ajax request """

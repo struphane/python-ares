@@ -10,9 +10,11 @@ def report(aresObj, localPath=None):
 
   """
 
-  aresObj.title(1, 'Reports Environment')
+  aresObj.title(1, 'Reports Environment (Beta)')
   id = aresObj.input("Report Name", '')
-  reportsPath = r"E:\GitHub\Ares\html"
+  reportsPath = r"%s\user_reports" % aresObj.http.get('ROOT_PATH')
+  if localPath is not None:
+    reportsPath = r"%s\html"
   # Get the list of all the reports
   foldersReports = []
   for folder in os.listdir(reportsPath):
@@ -21,9 +23,7 @@ def report(aresObj, localPath=None):
   # Add this list to the auto completion of the input item
   aresObj.item(id).autocomplete(foldersReports)
   bId = aresObj.button("Open Report Section", 'btn-success')
-  aresObj.item(bId).js('click', 'window.location.href="/page/" + %s; return false;' % aresObj.item(id).jsVal())
-
-
+  aresObj.item(bId).js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresObj.item(id).jsVal())
 
   # Create a new report
   modalId = aresObj.modal('click on the link to create a new report section')
@@ -31,6 +31,7 @@ def report(aresObj, localPath=None):
   iReportName = modalAres.input("Report Name", '')
   bModal = modalAres.button("Create the Report", 'btn-primary')
   modalAres.item(bModal).jsAjax('click', 'alert(data) ; ',
-                                'report_index_set.py', localPath, {'report': modalAres.item(iReportName).jsVal(), 'serverPath': '"%s"' % localPath})
+                                'report_index_set.py', localPath, {'report': modalAres.item(iReportName).jsVal(),
+                                                                   'serverPath': '"%s"' % localPath})
 
   return aresObj

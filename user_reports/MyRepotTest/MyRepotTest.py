@@ -78,11 +78,11 @@ def report(aresObj, localPath=None):
            }],
   cols = [{'key': 'type', 'label': 'Type', 'width': '25%', 'type': 'text'}]
   aresObj.tree(cols, data)
-  aresObj.stackedAreaChart(None, useMockData=True)
-  aresObj.multiBarChart(None, useMockData=True)
-  aresObj.lineChart(None, useMockData=True)
-  aresObj.comboLineBar(None, useMockData=True)
+  #aresObj.stackedAreaChart(None, useMockData=False)
+  #aresObj.multiBarChart(None, useMockData=False)
+  #aresObj.lineChart(None, useMockData=False)
+  #aresObj.comboLineBar(None, useMockData=False)
 
-  aresObj.horizBarChart(None, useMockData=True)
+  #aresObj.horizBarChart(None, useMockData=True)
 
   return aresObj

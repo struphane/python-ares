@@ -7,7 +7,7 @@ Please make sure that all the CSS information are defined in a CSS class
 
 """
 
-import Lib.AresJs as AresJs
+from ares.Lib import AresJs
 
 INDENT = '  '
 
@@ -89,7 +89,7 @@ class HtmlItem(object):
 
   def jsOnLoad(self):
     """ Functions which need to be run in the header """
-    pass
+    return ''
 
 
 class Table(HtmlItem):
@@ -244,6 +244,23 @@ class Div(HtmlItem):
   def JsVal(self):
     """ Return the Javascript Value """
     return '$("#%s").html()' % self.htmlId
+
+class Slider(Div):
+  """
+
+  """
+  alias = 'slider'
+
+  def __init__(self, htmlId, cssCls=None):
+    """ Set the div value """
+    super(Div, self).__init__(htmlId) # To get the HTML Id
+    self.val = ''
+    self.cls = cssCls
+
+  def jsOnLoad(self):
+    """ Use the Jquery UI property to change the DIV in slider object """
+    return '%s%s%s.slider();' % (INDENT, INDENT, self.jsRef())
+
 
 class Container(Div):
   """ Wrapper for a simple DIV container
@@ -709,8 +726,12 @@ class DatePicker(HtmlItem):
   val = None
   alias = 'date'
 
+  def html(self, localPath):
+    """ """
+    return '<p>Date: <input type="text" id="%s"></p>' % self.htmlId
+
   def jsOnLoad(self):
-    return "%s.datepicker();" % self.jsRef
+    return "%s%s%s.datepicker();" % (INDENT, INDENT, self.jsRef())
 
 class DropZone(HtmlItem):
   """

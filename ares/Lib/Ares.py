@@ -24,8 +24,8 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 import os
 import inspect
 import collections
-import Lib.AresHtml as AresHtml
-import Lib.AresGraph as AresGraph
+from ares.Lib import AresHtml
+from ares.Lib import AresGraph
 
 htmlFactory = None # This is the factory with all the alias and HTML classes
 # the below global variables are only used locally to generate the secondary pages and Ajax calls
@@ -105,7 +105,8 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
 
 def addHtmlObject(addNavBar=False):
   """ Simple decorator to add basic html objects """
-  functionMapping = {'grid': 'split', 'anchor': 'a', 'remove': 'buttonremove', 'ok': 'ButtonOk'}
+  functionMapping = {'grid': 'split', 'anchor': 'a', 'remove': 'buttonremove',
+                     'ok': 'ButtonOk', 'date': 'DatePicker'}
   def addHtml(func):
     def wrapper(self, *args, **kwargs):
       func(self, *args, **kwargs)
@@ -113,6 +114,8 @@ def addHtmlObject(addNavBar=False):
         funcName = func.__name__
         if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
           htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args)
+          if htmlObj.jsOnLoad() is not None:
+            self.jsOnLoad.append(htmlObj.jsOnLoad())
           self.htmlItems[htmlObj.htmlId] = htmlObj
           self.content.append(htmlObj.htmlId)
           self.countItems += 1
@@ -146,7 +149,7 @@ class Report(object):
     self.prefix = prefix
     self.content, self.jsGraph = [], []
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
-    self.htmlItems, self.jsOnLoad, self.http = {}, {}, {'GET': {}, 'POST': {}}
+    self.htmlItems, self.jsOnLoad, self.http = {}, [], {'GET': {}, 'POST': {}}
     self.notifications = collections.defaultdict(list)
 
     if htmlFactory is None:
@@ -180,6 +183,18 @@ class Report(object):
 
     Return the object ID to help on getting the object back. In any time during the
     report generation. THis ID is not supposed to change and it will be the
+    """
+    pass
+
+  @addHtmlObject()
+  def slider(self):
+    """
+    """
+    pass
+
+  @addHtmlObject()
+  def date(self):
+    """
     """
     pass
 
@@ -397,8 +412,10 @@ class Report(object):
       results.append(self.__populateNavBar())
       results.append('<div class="container" style="margin-left:%s%%">' % self.navBarContent['width'])
     results.append('<script>')
-    for jsOnLoad in self.jsOnLoad.keys():
+    results.append('$( function() {')
+    for jsOnLoad in self.jsOnLoad:
       results.append(jsOnLoad)
+    results.append('} );')
     results.append('</script>')
 
     for htmlId in self.content:
