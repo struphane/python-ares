@@ -121,12 +121,24 @@ def downloadFiles(report_name, script):
     script = "%s.py" % script
   uploads = os.path.join('user_reports',  report_name)
   return send_file(uploads, mimetype='text/csv', attachment_filename=script, as_attachment=True)
-  #return send_from_directory(directory=uploads, filename=script, as_attachment=True)
+
+@report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
+def downloadReport(report_name):
+  """ Return in a Zip archive the full python package """
+  memory_file = io.BytesIO()
+  with zipfile.ZipFile(memory_file, 'w') as zf:
+    reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+    for reportFile in os.listdir(reportPath):
+      if reportFile == '__pycache__':
+        continue
+
+      zf.write(os.path.join(reportPath, reportFile), reportFile)
+  memory_file.seek(0)
+  return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
 @report.route("/download/package")
-def downloadReport():
-  """
-  """
+def download():
+  """ Return the package in order to test the scripts """
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
     for css in LIB_PACKAGE['CSS']:
@@ -138,6 +150,6 @@ def downloadReport():
     for jsonFile in LIB_PACKAGE['JSON']:
       zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "json", jsonFile), os.path.join("json", jsonFile), zipfile.ZIP_DEFLATED )
     zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "Lib", 'AresWrapper.py'), os.path.join('AresWrapper.py'), zipfile.ZIP_DEFLATED )
+  zf.writestr('html/', '')
   memory_file.seek(0)
-  return send_file(memory_file, attachment_filename='capsule.zip', as_attachment=True)
-  #return send_from_directory(directory=uploads, filename=script, as_attachment=True)
+  return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
