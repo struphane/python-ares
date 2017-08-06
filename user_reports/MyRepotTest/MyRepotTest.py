@@ -1,4 +1,5 @@
-""" This is the main page for the report.
+"""
+This is the main page for the report.
 
 Users will start with this page then they will navigate to get the other pages.
 The minimum to create a report is

@@ -48,7 +48,7 @@ def page_report(report_name):
   if os.path.isfile(r"%s\%s.py" % (scriptEnv, reportEnv)):
     sys.path.append(scriptEnv)
     mod = __import__(reportObj.http['SCRIPTS_NAME'])
-    reportObj.http['SCRIPTS_DSC'] = mod.__doc__
+    reportObj.http['SCRIPTS_DSC'] = mod.__doc__.strip()
     reportObj.http['SCRIPTS_CHILD'] = getattr(mod, 'CHILD_PAGES', {})
     reportObj.http['SCRIPTS_AJAX'] = getattr(mod, 'AJAX_CALL', {})
   else:
