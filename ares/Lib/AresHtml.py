@@ -503,23 +503,6 @@ class ButtonDownload(HtmlItem):
     """ """
     return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.htmlId, self.alias)
 
-  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
-    """
-    """
-    ajaxObject = AresJs.XsCallHtml(scriptName)
-    ajaxObject.url = 'file_delete'
-    if url is not None:
-      ajaxObject.url = url
-    ajaxObject.success(jsDef)
-    vals = []
-    for key, val in data.items():
-      vals.append('"%s": %s' % (key, val))
-    vals = '{%s}' % ",".join(vals)
-    if localPath is not None:
-      self.js(evenType, ajaxObject.ajaxLocal(vals))
-    else:
-      self.js(evenType, ajaxObject.ajax(vals))
-
 class ButtonDownloadAll(HtmlItem):
   """
 
@@ -537,24 +520,6 @@ class ButtonDownloadAll(HtmlItem):
   def html(self, localPath):
     """ """
     return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-download-alt">%s</span></button>' % (self.btype, self.htmlId, self.val)
-
-  def jsAjax(self, evenType, jsDef, reportEnvName, localPath, data=None, url=None):
-    """
-    """
-    ajaxObject = AresJs.XsCallHtml(scriptName)
-    ajaxObject.url = 'download/%s/package' % reportEnvName
-    if url is not None:
-      ajaxObject.url = url
-    ajaxObject.success(jsDef)
-    vals = []
-    for key, val in data.items():
-      vals.append('"%s": %s' % (key, val))
-    vals = '{%s}' % ",".join(vals)
-    if localPath is not None:
-      self.js(evenType, ajaxObject.ajaxLocal(vals))
-    else:
-      self.js(evenType, ajaxObject.ajax(vals))
-
 
 class ButtonOk(ButtonRemove):
   """

@@ -50,15 +50,9 @@ def report(aresObj, localPath=None):
       if script not in displayedScript:
         bId = aresObj.remove()
         dId = aresObj.download()
-
-        ajaxObj = aresObj.http['AJAX_CALLBACK']['__download']
-        ajaxObj.URL = url % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script}
-        aresObj.item(dId).ajax('click', aresObj.http['AJAX_CALLBACK']['__download'],
-                               {}, "",
-                               'alert( "Request failed: " + textStatus );')
+        aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
         fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], script)))
         fileDate = time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], script))))
-
         aresObj.item(bId).jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, {'SCRIPT': "'%s'" % script})
         ajxCall =  aresObj.http['SCRIPTS_AJAX'].get(script, [])
         for call in ajxCall:
@@ -73,18 +67,21 @@ def report(aresObj, localPath=None):
     if script not in displayedScript and script != '__pycache__':
       bId = aresObj.remove()
       dId = aresObj.download()
+      aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
       fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], script)))
       fileDate = time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], script))))
       tid = aresObj.div(script)
       aresObj.item(tid).toolTip('Script not correctly linked')
       scripts.append((aresObj.item(tid), fileSize, fileDate, '', '', aresObj.item(dId), aresObj.item(bId)))
 
-  spId = aresObj.downloadAll(" %s.zip" % aresObj.http['SCRIPTS_NAME'])
-  tpId = aresObj.nestedtable(['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'], scripts)
-
   dropId = aresObj.dropFile()
   aresObj.item(dropId).reportName = aresObj.http['SCRIPTS_NAME']
-  aresObj.container([aresObj.item(tpId), aresObj.item(spId)])
+  tpId = aresObj.nestedtable(['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'], scripts)
+
+  spId = aresObj.downloadAll(" %s.zip" % aresObj.http['SCRIPTS_NAME'])
+  aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
+
+  #aresObj.container([aresObj.item(tpId), aresObj.item(spId)])
   #aresObj.item(spId).jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'],
   #                          'download/%s/package' % aresObj.http['SCRIPTS_NAME'], localPath, {})
 

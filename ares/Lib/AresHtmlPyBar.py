@@ -13,10 +13,13 @@ class PyBar(object):
 
   """
 
-  def html(self, localPath):
+  def html(self, scriptEnv, scriptName, localPath):
     """ """
     items = ['<div style="position:fixed;right:0;bottom:0;padding:3px;border:1px solid black"><img src="../../static/images/py.bmp">']
-    items.append(AresHtml.ButtonDownload('d_script').html(localPath))
+
+    obj = AresHtml.ButtonDownload('d_script')
+    obj.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': scriptEnv, 'script': scriptName})
+    items.append(obj.html(localPath))
     items.append(AresHtml.ButtonDownloadAll('d_all', '').html(localPath))
     items.append('</div>')
     return "\n".join(items)

@@ -133,7 +133,7 @@ def run_report(report_name):
   sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
   reportObj = Ares.Report()
   htmlReport = [__import__(report_name).report(reportObj).html(None)]
-  htmlReport.append(AresHtmlPyBar.PyBar().html(None))
+  htmlReport.append(AresHtmlPyBar.PyBar().html(None, report_name, "%s.py" % report_name))
   return render_template('ares_template.html', content="\n".join(htmlReport))
 
 @report.route("/child/<report_name>", methods = ['GET'])
@@ -196,9 +196,11 @@ def deleteFiles(report_name):
 @report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
   """ Download a specific file in a report project """
+
   if not script.endswith(".py"):
     script = "%s.py" % script
-  return send_file(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION,  report_name), attachment_filename=script, as_attachment=True)
+
+  return send_from_directory(os.path.join(config.ARES_USERS_LOCATION, report_name), script, as_attachment=True)
 
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
