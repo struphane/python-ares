@@ -826,14 +826,21 @@ class DropZone(HtmlItem):
                                         '</li>');
                           }
                           $('#list').html('<ul>' + output.join('') + '</ul>');
-
                       '''),
              ]
 
   def html(self, localPath):
     """ Return the Drop Zone component """
-    item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
+    item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div>' % self.htmlId]
     return "\n".join(item)
+
+  def jsOnLoad(self):
+    return """
+            $(document).on("dragover drop", function(e) {
+          e.preventDefault();
+          }
+
+            """
 
 class DropFile(HtmlItem):
   """
@@ -844,8 +851,18 @@ class DropFile(HtmlItem):
   alias = 'dropFile'
   reportName = ''
   jsEvent = [('dragover', '''
+                          event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
-							            event.originalEvent.preventDefault();
+                         event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+                          '''),
+             ('dragleave', '''
+                          event.originalEvent.preventDefault();
+                          event.originalEvent.stopPropagation();
+                          event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+                          '''),
+             ('dragenter', '''
+                          event.originalEvent.preventDefault();
+                          event.originalEvent.stopPropagation();
                           event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
                           '''),
              ]
@@ -861,8 +878,8 @@ class DropFile(HtmlItem):
   def html(self, localPath):
     """ Return the Drop Zone component """
     self.jsEvent.append(('drop', '''
+                          event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
-						              event.originalEvent.preventDefault();
                           var file = event.originalEvent.dataTransfer.files; // FileList object.
 
                           //files is a FileList of File objects. List some properties.
@@ -875,8 +892,9 @@ class DropFile(HtmlItem):
 
                       ''' % self.drop()))
 
-    item = ['<div style="border: 1px dotted black;text-align:center;padding:5px;background-color:#F8F8F8" id="%s"><h3><b>+ Add Scripts</b></h3> Drop scripts here to upload</div>' % self.htmlId]
+    item = ['<div ondrop="drop(event)" style="border: 1px dotted black;text-align:center;padding:5px;background-color:#F8F8F8" id="%s"><h3><b>+ Add Scripts</b></h3> Drop scripts here to upload</div>' % self.htmlId]
     return "\n".join(item)
+
 
 class NavBar(object):
   """ """

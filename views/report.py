@@ -202,7 +202,7 @@ def uploadFiles(report_name):
   if request.method == 'POST':
     for filename, fileType in request.files.items():
       file = request.files[filename]
-      file.save(r'user_reports/%s/%s' % (report_name, file.filename))
+      file.save(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename))
   return json.dumps({})
 
 @report.route("/delete/<report_name>", methods = ['POST'])
