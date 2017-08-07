@@ -34,6 +34,7 @@ def report(aresObj, localPath=None):
   aId = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'], aresObj.http['FILE'], 'report', CHILD_PAGES, localPath)
   aresObj.title(2, 'List des scripts')
   dId = aresObj.download()
+  aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
 
   fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], '%s.py' % aresObj.http['SCRIPTS_NAME'])))
   fileDate = time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], '%s.py' % aresObj.http['SCRIPTS_NAME']))))
@@ -64,7 +65,7 @@ def report(aresObj, localPath=None):
         displayedScript[script] = True
 
   for script in aresObj.http['SCRIPTS']:
-    if script not in displayedScript and script != '__pycache__':
+    if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc'):
       bId = aresObj.remove()
       aresObj.item(bId).jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
       dId = aresObj.download()

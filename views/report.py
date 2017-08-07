@@ -152,7 +152,10 @@ def run_report(report_name):
   aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
   spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
   aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
-  return render_template('ares_template.html', content=aresObj.html(None))
+
+  result = aresObj.html(None)
+  del sys.modules[report_name]
+  return render_template('ares_template.html', content=result)
 
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):
@@ -170,7 +173,9 @@ def child(report_name, script):
   aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
   spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
   aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
-  return render_template('ares_template.html', content=aresObj.html(None))
+  result = aresObj.html(None)
+  del sys.modules[script]
+  return render_template('ares_template.html', content=result)
 
 @report.route("/create/<report_name>", methods = ['GET', 'POST'])
 def ajaxCreate(report_name):
@@ -238,7 +243,7 @@ def downloadReport(report_name):
   with zipfile.ZipFile(memory_file, 'w') as zf:
     reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     for reportFile in os.listdir(reportPath):
-      if reportFile == '__pycache__':
+      if reportFile == '__pycache__' or reportFile.endswith('pyc') :
         continue
 
       zf.write(os.path.join(reportPath, reportFile), reportFile)
@@ -259,6 +264,6 @@ def download():
     for jsonFile in LIB_PACKAGE['JSON']:
       zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "json", jsonFile), os.path.join("json", jsonFile), zipfile.ZIP_DEFLATED )
     zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "Lib", 'AresWrapper.py'), os.path.join('AresWrapper.py'), zipfile.ZIP_DEFLATED )
-  zf.writestr('html/', '')
+    zf.writestr('html/', '')
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
