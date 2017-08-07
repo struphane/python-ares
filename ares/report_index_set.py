@@ -17,7 +17,7 @@ def call(aresObj):
       reportFile.write("def report(aresObj, localPath=None):\n\n\n\n")
       reportFile.write("  return aresObj")
       reportFile.close()
-      return '%s - Report created %s' % aresObj.http['POST']['report']
+      return '%s - Report created' % aresObj.http['POST']['report']
 
   else:
     return '%s - Already exist' % aresObj.http['POST']['report']

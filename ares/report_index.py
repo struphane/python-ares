@@ -30,8 +30,8 @@ def report(aresObj, localPath=None):
   modalAres = aresObj.item(modalId).aresObj
   iReportName = modalAres.input("Report Name", '')
   bModal = modalAres.button("Create the Report", 'btn-primary')
-  modalAres.item(bModal).jsAjax('click', 'location.href = "../reports/index";',
+  modalAres.item(bModal).jsAjax('click', 'alert(data);location.href = "../reports/index";',
                                 'report_index_set.py', localPath, {'report': modalAres.item(iReportName).jsVal(),
-                                                                   'serverPath': '"%s"' % localPath}, url='create')
+                                                                   'serverPath': '"%s"' % localPath}, url='reports/create')
  #create
   return aresObj
