@@ -54,6 +54,7 @@ def getChildrenFlatStruct(scriptTree, listChildren):
       if children[child]:
         getChildrenFlatStruct(children, listChildren)
 
+@report.route("/dsc")
 @report.route("/dsc/index")
 def report_dsc_index():
   """
@@ -93,7 +94,6 @@ def report_dsc_graph():
   from ares.Lib import AresGraph
 
   aresObj = Ares.Report()
-
   graphObject = []
   for name, obj in inspect.getmembers(AresGraph):
     if inspect.isclass(obj):
@@ -110,8 +110,7 @@ def report_html_description(objectName):
 
 @report.route("/page/<report_name>")
 def page_report(report_name):
-  """
-  """
+  """ Return the html content of the main report """
   import pprint
   reportObj = Ares.Report()
   reportObj.http['FILE'] = report_name
@@ -119,20 +118,27 @@ def page_report(report_name):
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
   reportObj.http['SCRIPTS'] = os.listdir(scriptEnv)
   reportObj.http['SCRIPTS_NAME'] = report_name
-  sys.path.append(scriptEnv)
-
-  mod = __import__(reportObj.http['SCRIPTS_NAME'])
   scriptTree, children, ajaxCalls = {}, [], collections.defaultdict(list)
-  getScriptChildren(scriptEnv, "%s.py" % report_name, scriptTree, ajaxCalls)
-  getChildrenFlatStruct(scriptTree, children)
-  reportObj.http['SCRIPTS_DSC'] = mod.__doc__.strip()
-  reportObj.http['SCRIPTS_CHILD'] = children
-  reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
-  # Internal callback functions, Users are not expected to use them
-  reportObj.http['AJAX_CALLBACK'] = {}
-  reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-  return render_template('ares_template.html', content=report_index_page.report(reportObj).html(None))
+  try:
+    sys.path.append(scriptEnv)
+    getScriptChildren(scriptEnv, "%s.py" % report_name, scriptTree, ajaxCalls)
+    getChildrenFlatStruct(scriptTree, children)
+    mod = __import__(reportObj.http['SCRIPTS_NAME'])
+    reportObj.http['SCRIPTS_DSC'] = mod.__doc__.strip()
+  except Exception as e:
+    reportObj.http['SCRIPTS_DSC'] = e
+  finally:
+    # Internal callback functions, Users are not expected to use them
+    reportObj.http['SCRIPTS_CHILD'] = children
+    reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
+    reportObj.http['AJAX_CALLBACK'] = {}
+    reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+    result = report_index_page.report(reportObj).html(None)
+    if scriptEnv in sys.modules:
+      del sys.modules[scriptEnv]
+  return render_template('ares_template.html', content=result)
 
+@report.route("/")
 @report.route("/index")
 def index():
   """ Return the main page with the reports selection """
@@ -159,22 +165,27 @@ def run_report(report_name):
 
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):
-  """
-
-  """
-  sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
+  """ Return the content of the attached pages """
   reportObj = Ares.Report()
   reportObj.http['FILE'] = report_name
   for getValues in request.args.items():
     reportObj.http['GET'][getValues[0]] = getValues[1]
 
-  aresObj = __import__(script).report(reportObj)
-  dId = aresObj.download(cssCls='bdiBar-download')
-  aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
-  spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
-  aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
-  result = aresObj.html(None)
-  del sys.modules[script]
+  try:
+    sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
+    aresObj = __import__(script).report(reportObj)
+    dId = aresObj.download(cssCls='bdiBar-download')
+    aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
+    spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
+    aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
+    result = aresObj.html(None)
+    del sys.modules[script]
+  except Exception as e:
+    result = e
+  finally:
+    if report_name in sys.modules:
+      del sys.modules[report_name]
+
   return render_template('ares_template.html', content=result)
 
 @report.route("/create/<report_name>", methods = ['GET', 'POST'])
