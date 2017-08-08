@@ -63,7 +63,6 @@ class HtmlItem(object):
   def ajax(self, evenType, ajaxModule, jsData, jsSuccess, jsFail):
     """ """
     jsStr = AresJs.genericCall(ajaxModule.URL, ajaxModule.METHOD, jsData, jsSuccess, jsFail)
-    print(jsStr)
     self.js(evenType, jsStr)
 
   def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
@@ -537,6 +536,7 @@ class A(HtmlItem):
   """ Wrapper for a Anchor HTML tag """
   val, link = None, None
   alias = 'anchor'
+  jQueryEvent = ['click']
 
   def __init__(self, htmlId, value, link, cssCls=None):
     """ Set the div value """
@@ -547,13 +547,28 @@ class A(HtmlItem):
 
   def html(self, localPath):
     """ Return the HMTL object of for div """
-
-
+    link = '#' if self.jsEvent is not None else self.link
     if self.cssCls is not None:
-      return '<a href="%s" class="%s">%s</a>' % (self.link, self.val, self.cssCls)
+      return '<a href="%s" class="%s" id="%s">%s</a>' % (link, self.cssCls, self.htmlId, self.val)
 
-    return '<a href="%s">%s</a>' % (self.link, self.val)
+    return '<a href="%s" id="%s">%s</a>' % (link, self.htmlId, self.val)
 
+  def js(self, evenType, jsDef):
+    """
+    Common implementation to add javascript callback functions
+
+    This javascript wrapper include on purpose a defined set of javascript methods in order to control the calls
+    If some Ajax / DB calls are required, users will have to directly defined those items when they are writing
+    the python report
+    """
+    if not evenType in getattr(self, 'jQueryEvent', []):
+      # This is a check to control the number of events per class
+      # Also because some of them might require specific display
+      print('Do not use any Ajax call or bespoke methods here')
+      print('In the function is not implemented yet please have a look at the call in AreHtml.py')
+      raise Exception('%s not defined for this %s!' % (evenType, self.__class__))
+
+    self.jsEvent = [(evenType, "%s window.location = '%s' ;" % (jsDef, self.link))]
 
 
 class Text(HtmlItem):

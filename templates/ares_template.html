@@ -22,10 +22,18 @@
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/d3.v3.js') }}"></script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/nv.d3.js') }}"></script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/d3.layout.cloud.js') }}"></script>
+
+    <script>
+        function preloader() {
+            $('#loading').show();
+        }
+    </script>
 </head>
 <body oncontextmenu="return false;">
-<div class="container">	
-{{ content|safe }}
-</div>
+<div class="container" id="html_content">{{ content|safe }}</div>
+
 </body>
+<div id="loading">
+    <img src="/static/images/loading.gif" alt="Be patient.."/>
+</div>
 </html>

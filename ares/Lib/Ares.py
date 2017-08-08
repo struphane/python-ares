@@ -433,7 +433,7 @@ class Report(object):
       results.append(self.htmlItems[htmlId].html(localPath))
       if self.htmlItems[htmlId].jsEvent is not None:
         for fnc, fncDef in self.htmlItems[htmlId].jsEvent:
-          if fnc in ['drop', 'dragover', 'dragleave', 'dragenter']:
+          if fnc in ['drop', 'dragover', 'dragleave', 'dragenter', 'click']:
             jsResults.append('%s.on("%s", function (event){' % (self.htmlItems[htmlId].jsRef(), fnc))
             jsResults.append(fncDef)
             jsResults.append('});\n')

@@ -32,6 +32,7 @@ def report(aresObj, localPath=None):
 
   CHILD_PAGES['report'] = "../run/%s" % aresObj.http['SCRIPTS_NAME']
   aId = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'], aresObj.http['FILE'], 'report', CHILD_PAGES, localPath)
+  aresObj.item(aId).js('click', 'preloader();')
   aresObj.title(2, 'List des scripts')
   dId = aresObj.download()
   aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
