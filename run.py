@@ -11,6 +11,9 @@ app.config['ROOT_PATH'] = os.path.dirname(os.path.abspath(__file__))
 from ares.report import report
 app.register_blueprint(report)
 
+from saturn.saturn import saturn
+app.register_blueprint(saturn)
+
 if __name__ == "__main__":
     app.debug = True
     app.run()
