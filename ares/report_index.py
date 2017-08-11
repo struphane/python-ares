@@ -14,7 +14,7 @@ def report(aresObj, localPath=None):
   id = aresObj.input("Report Name", '')
   reportsPath = r"%s\user_reports" % aresObj.http.get('ROOT_PATH')
   if localPath is not None:
-    reportsPath = r"%s\html"
+    reportsPath = r".\html"
   # Get the list of all the reports
   foldersReports = []
   for folder in os.listdir(reportsPath):
@@ -24,7 +24,10 @@ def report(aresObj, localPath=None):
   aresObj.item(id).autocomplete(foldersReports)
   bId = aresObj.button("Open Report Section", 'btn-success')
   aresObj.item(bId).js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresObj.item(id).jsVal())
-
+  aresObj.addNotification('Success', 'GOOD', 'something wrong happened')
+  aresObj.addNotification('Info', 'HEY', 'something wrong happened')
+  aresObj.addNotification('Warning', 'ATTNENTION', 'something wrong happened')
+  # aresObj.addNotification('Danger', 'NO VALUE', 'something wrong happened')
   # Create a new report
   modalId = aresObj.modal('click on the link to create a new report section')
   modalAres = aresObj.item(modalId).aresObj

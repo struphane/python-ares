@@ -26,6 +26,7 @@ import inspect
 import collections
 from ares.Lib import AresHtml
 from ares.Lib import AresGraph
+from ares.Lib import AresAlert
 
 htmlFactory = None # This is the factory with all the alias and HTML classes
 # the below global variables are only used locally to generate the secondary pages and Ajax calls
@@ -103,10 +104,14 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
 
   return addChart
 
+def addHtmlNotif(func):
+  functionMapping = {}
+
+
 def addHtmlObject(addNavBar=False):
   """ Simple decorator to add basic html objects """
   functionMapping = {'grid': 'split', 'anchor': 'a', 'remove': 'buttonremove', 'download': 'ButtonDownload',
-                     'ok': 'ButtonOk', 'date': 'DatePicker'}
+                     'ok': 'ButtonOk', 'date': 'DatePicker' }
   def addHtml(func):
     def wrapper(self, *args, **kwargs):
       func(self, *args, **kwargs)
@@ -135,7 +140,7 @@ class Report(object):
   """
 
   # This list should not be changed
-  definedNotif = ['SUCCESS', 'INFO', 'WARNING', 'DANGER']
+  definedNotif = {'SUCCESS': 'SuccessAlert', 'INFO': 'InfoAlert', 'WARNING': 'WarningAlert', 'DANGER': 'DangerAlert'}
   showNavMenu = False
 
   def __init__(self, prefix=''):
@@ -151,6 +156,7 @@ class Report(object):
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {'GET': {}, 'POST': {}}
     self.notifications = collections.defaultdict(list)
+    self.interruptReport = (False, None)
 
     if htmlFactory is None:
       htmlFactory = mapHtmlItems()
@@ -164,14 +170,21 @@ class Report(object):
     self.showNavMenu = True
     self.navBarContent.update({'width': width, 'cssCls': cssCls})
 
-  def addNotification(self, notifType, comment, group=None):
+  def addNotification(self, notifType, title, value, cssCls=None, backgroundColor=None, closeButton=True):
     """ Add a user notfication to the report """
     notif = notifType.upper()
     if not notif in self.definedNotif:
       print("Notification %s not recognized !" % notif)
-      print("Allowed notification %s" % self.definedNotif)
+      print("Allowed notification %s" % self.definedNotif.keys())
       raise Exception("Notification Type should belong to one of the above category")
-      self.notifications[notifType].append(comment)
+    alertCls = getattr(AresAlert, self.definedNotif[notif])
+    alertObject = alertCls(self.countItems, title, value, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
+    self.htmlItems[alertObject.htmlId] = alertObject
+    self.content.append(alertObject.htmlId)
+    if notif == 'DANGER':
+      self.interruptReport = (True, alertObject.htmlId)  # we keep track of the object since this is the only thing we will display
+    self.countItems += 1
+    return alertObject.htmlId
 
   def item(self, itemId):
     """ Return the HTML object """
@@ -333,6 +346,23 @@ class Report(object):
         else:
           currentObj = currentObj['subObj'][-1]
 
+  @addHtmlObject()
+  def addDangerAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
+    """ """
+    self.interruptReport = (True, self.countItems + 1)#we keep track of the object since this is the only thing we will display
+
+  @addHtmlObject()
+  def addSuccessAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
+    pass
+
+  @addHtmlObject()
+  def addInfoAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
+    pass
+
+  @addHtmlObject()
+  def addWarningAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
+    pass
+
   @addGraphObject('Donut')
   def pieChart(self, values, width=960, height=500, cssCls=None):
     """ Construct a Pie Chart in the HTML page """
@@ -412,7 +442,12 @@ class Report(object):
     """ Main function used to generate the report
 
     """
+
+
     results, jsResults = [], []
+    if self.interruptReport[0]:
+      return self.htmlItems[self.interruptReport[1]].html(localPath)
+
     if self.showNavMenu:
       results.append(self.__populateNavBar())
       results.append('<div class="container" style="margin-left:%s%%">' % self.navBarContent['width'])
