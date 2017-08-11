@@ -16,4 +16,4 @@ def report(aresObj, localPath=None):
   aresObj.title(1, 'I am a child 3')
   data = [(id_generator(), random.randint(5, 35)) for i in range(10)]
   aresObj.cloudChart(data) # Add a Cloud Chart
-  return aresObj.html(localPath, title='Fourth Page')
+  return aresObj

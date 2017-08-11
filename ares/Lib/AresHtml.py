@@ -60,6 +60,11 @@ class HtmlItem(object):
     else:
       self.jsEvent.append((evenType, jsDef))
 
+  def ajax(self, evenType, ajaxModule, jsData, jsSuccess, jsFail):
+    """ """
+    jsStr = AresJs.genericCall(ajaxModule.URL, ajaxModule.METHOD, jsData, jsSuccess, jsFail)
+    self.js(evenType, jsStr)
+
   def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
     """
     """
@@ -227,6 +232,7 @@ class Div(HtmlItem):
   cls = None
   jQueryEvent = ['drop']
   alias = 'div'
+  tooltips = ''
 
   def __init__(self, htmlId, value, cssCls=None):
     """ Set the div value """
@@ -234,16 +240,25 @@ class Div(HtmlItem):
     self.val = value
     self.cls = cssCls
 
+  def toolTip(self, value):
+    """
+    """
+    self.tooltips = 'title="%s"' % value
+
   def html(self, localPath):
     """ Return the HMTL object of for div """
     if self.cls is not None:
-      return '<div id="%s" class="%s">%s</div>' % (self.htmlId, self.cls, self.val)
+      return '<div id="%s" class="%s" %s>%s</div>' % (self.htmlId, self.cls, self.tooltips, self.val)
 
-    return '<div id="%s">%s</div>' % (self.htmlId, self.val)
+    return '<div id="%s" %s>%s</div>' % (self.htmlId, self.tooltips, self.val)
 
   def JsVal(self):
     """ Return the Javascript Value """
     return '$("#%s").html()' % self.htmlId
+
+  def jsOnLoad(self):
+    if self.tooltips:
+      return "$( document ).tooltip();"
 
 class Slider(Div):
   """
@@ -457,13 +472,13 @@ class ButtonRemove(HtmlItem):
     """
     """
     ajaxObject = AresJs.XsCallHtml(scriptName)
-    ajaxObject.url = 'file_delete'
+    ajaxObject.url = 'delete'
     if url is not None:
       ajaxObject.url = url
     ajaxObject.success(jsDef)
     vals = []
     for key, val in data.items():
-      vals.append('"%s": %s' % (key, val))
+      vals.append('"%s": "%s"' % (key, val))
     vals = '{%s}' % ",".join(vals)
     if localPath is not None:
       self.js(evenType, ajaxObject.ajaxLocal(vals))
@@ -485,24 +500,31 @@ class ButtonDownload(HtmlItem):
 
   def html(self, localPath):
     """ """
+    if self.cssCls is not None:
+      return '<button type="button" class="btn btn-%s btn-sm %s" id="%s"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.cssCls, self.htmlId, self.alias)
+
     return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-%s"></span></button>' % (self.btype, self.htmlId, self.alias)
 
-  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
-    """
-    """
-    ajaxObject = AresJs.XsCallHtml(scriptName)
-    ajaxObject.url = 'file_delete'
-    if url is not None:
-      ajaxObject.url = url
-    ajaxObject.success(jsDef)
-    vals = []
-    for key, val in data.items():
-      vals.append('"%s": %s' % (key, val))
-    vals = '{%s}' % ",".join(vals)
-    if localPath is not None:
-      self.js(evenType, ajaxObject.ajaxLocal(vals))
-    else:
-      self.js(evenType, ajaxObject.ajax(vals))
+class ButtonDownloadAll(HtmlItem):
+  """
+
+  http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html
+  """
+  alias = 'downloadAll'
+  btype = 'success'
+  jQueryEvent = ['click']
+
+  def __init__(self, htmlId, value, cssCls=None):
+    """ """
+    self.val = value
+    super(ButtonDownloadAll, self).__init__(htmlId, cssCls=cssCls) # To get the HTML Id
+
+  def html(self, localPath):
+    """ """
+    if self.cssCls is not None:
+      return '<button type="button" class="btn btn-%s btn-sm %s" id="%s"><span class="glyphicon glyphicon-download-alt">%s</span></button>' % (self.btype, self.cssCls, self.htmlId, self.val)
+
+    return '<button type="button" class="btn btn-%s btn-sm" id="%s"><span class="glyphicon glyphicon-download-alt">%s</span></button>' % (self.btype, self.htmlId, self.val)
 
 class ButtonOk(ButtonRemove):
   """
@@ -514,6 +536,7 @@ class A(HtmlItem):
   """ Wrapper for a Anchor HTML tag """
   val, link = None, None
   alias = 'anchor'
+  jQueryEvent = ['click']
 
   def __init__(self, htmlId, value, link, cssCls=None):
     """ Set the div value """
@@ -524,13 +547,28 @@ class A(HtmlItem):
 
   def html(self, localPath):
     """ Return the HMTL object of for div """
-
-
+    link = '#' if self.jsEvent is not None else self.link
     if self.cssCls is not None:
-      return '<a href="%s" class="%s">%s</a>' % (self.link, self.val, self.cssCls)
+      return '<a href="%s" class="%s" id="%s">%s</a>' % (link, self.cssCls, self.htmlId, self.val)
 
-    return '<a href="%s">%s</a>' % (self.link, self.val)
+    return '<a href="%s" id="%s">%s</a>' % (link, self.htmlId, self.val)
 
+  def js(self, evenType, jsDef):
+    """
+    Common implementation to add javascript callback functions
+
+    This javascript wrapper include on purpose a defined set of javascript methods in order to control the calls
+    If some Ajax / DB calls are required, users will have to directly defined those items when they are writing
+    the python report
+    """
+    if not evenType in getattr(self, 'jQueryEvent', []):
+      # This is a check to control the number of events per class
+      # Also because some of them might require specific display
+      print('Do not use any Ajax call or bespoke methods here')
+      print('In the function is not implemented yet please have a look at the call in AreHtml.py')
+      raise Exception('%s not defined for this %s!' % (evenType, self.__class__))
+
+    self.jsEvent = [(evenType, "%s window.location = '%s' ;" % (jsDef, self.link))]
 
 
 class Text(HtmlItem):
@@ -803,14 +841,21 @@ class DropZone(HtmlItem):
                                         '</li>');
                           }
                           $('#list').html('<ul>' + output.join('') + '</ul>');
-
                       '''),
              ]
 
   def html(self, localPath):
     """ Return the Drop Zone component """
-    item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div><output id="list"></output>' % self.htmlId]
+    item = ['<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" id="%s">Drop files here</div>' % self.htmlId]
     return "\n".join(item)
+
+  def jsOnLoad(self):
+    return """
+            $(document).on("dragover drop", function(e) {
+          e.preventDefault();
+          }
+
+            """
 
 class DropFile(HtmlItem):
   """
@@ -821,8 +866,18 @@ class DropFile(HtmlItem):
   alias = 'dropFile'
   reportName = ''
   jsEvent = [('dragover', '''
+                          event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
-							            event.originalEvent.preventDefault();
+                         event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+                          '''),
+             ('dragleave', '''
+                          event.originalEvent.preventDefault();
+                          event.originalEvent.stopPropagation();
+                          event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+                          '''),
+             ('dragenter', '''
+                          event.originalEvent.preventDefault();
+                          event.originalEvent.stopPropagation();
                           event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
                           '''),
              ]
@@ -838,8 +893,8 @@ class DropFile(HtmlItem):
   def html(self, localPath):
     """ Return the Drop Zone component """
     self.jsEvent.append(('drop', '''
+                          event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
-						              event.originalEvent.preventDefault();
                           var file = event.originalEvent.dataTransfer.files; // FileList object.
 
                           //files is a FileList of File objects. List some properties.
@@ -852,8 +907,9 @@ class DropFile(HtmlItem):
 
                       ''' % self.drop()))
 
-    item = ['<div style="border: 1px dotted black;text-align:center;padding:5px;background-color:#F8F8F8" id="%s"><h3><b>+ Add Scripts</b></h3> Drop scripts here to upload</div>' % self.htmlId]
+    item = ['<div ondrop="drop(event)" style="border: 1px dotted black;text-align:center;padding:5px;background-color:#F8F8F8" id="%s"><h3><b>+ Add Scripts</b></h3> Drop scripts here to upload</div>' % self.htmlId]
     return "\n".join(item)
+
 
 class NavBar(object):
   """ """

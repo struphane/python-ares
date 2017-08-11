@@ -104,21 +104,17 @@ def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
 
   return addChart
 
-def addHtmlNotif(func):
-  functionMapping = {}
-
-
 def addHtmlObject(addNavBar=False):
   """ Simple decorator to add basic html objects """
   functionMapping = {'grid': 'split', 'anchor': 'a', 'remove': 'buttonremove', 'download': 'ButtonDownload',
-                     'ok': 'ButtonOk', 'date': 'DatePicker' }
+                     'ok': 'ButtonOk', 'date': 'DatePicker', 'downloadAll': 'ButtonDownloadAll'}
   def addHtml(func):
     def wrapper(self, *args, **kwargs):
       func(self, *args, **kwargs)
       for member in dir(AresHtml):
         funcName = func.__name__
         if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
-          htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args)
+          htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args, **kwargs)
           if htmlObj.jsOnLoad() is not None:
             self.jsOnLoad.append(htmlObj.jsOnLoad())
           self.htmlItems[htmlObj.htmlId] = htmlObj
@@ -142,6 +138,7 @@ class Report(object):
   # This list should not be changed
   definedNotif = {'SUCCESS': 'SuccessAlert', 'INFO': 'InfoAlert', 'WARNING': 'WarningAlert', 'DANGER': 'DangerAlert'}
   showNavMenu = False
+  newLine = '<BR />'
 
   def __init__(self, prefix=''):
     """
@@ -266,7 +263,7 @@ class Report(object):
       del self.content[self.content.index(htmlObj.htmlId)]
 
   @addHtmlObject()
-  def grid(self, htmlObjLeft, htmlObjRight):
+  def grid(self, htmlObjLeft, htmlObjRight, cssCls=None):
     """ """
     del self.content[self.content.index(htmlObjLeft.htmlId)] # Is not defined in the root structure
     del self.content[self.content.index(htmlObjRight.htmlId)] # Is not defined in the root structure
@@ -287,6 +284,11 @@ class Report(object):
     pass
 
   @addHtmlObject()
+  def downloadAll(self, value, cssCls=None):
+    """ """
+    pass
+
+  @addHtmlObject()
   def ok(self, cssCls=None):
     """ """
     pass
@@ -302,7 +304,7 @@ class Report(object):
     pass
 
   @addHtmlObject()
-  def text(self, value, cssCls=None):
+  def text(self, value, cssCls=None, toolTips=''):
     """ """
     pass
 
@@ -345,23 +347,6 @@ class Report(object):
 
         else:
           currentObj = currentObj['subObj'][-1]
-
-  @addHtmlObject()
-  def addDangerAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
-    """ """
-    self.interruptReport = (True, self.countItems + 1)#we keep track of the object since this is the only thing we will display
-
-  @addHtmlObject()
-  def addSuccessAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
-    pass
-
-  @addHtmlObject()
-  def addInfoAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
-    pass
-
-  @addHtmlObject()
-  def addWarningAlert(self, title, value, cssCls=None, backgroundColor=None, closeButton=True):
-    pass
 
   @addGraphObject('Donut')
   def pieChart(self, values, width=960, height=500, cssCls=None):
@@ -407,7 +392,7 @@ class Report(object):
     return AresHtml.NavBar(self.navBarContent).html()
 
   #don't use the decorator as this function needs to change the value of some parameters before doing the generic processing
-  def anchor(self, value, link, structure, localPath, cssCls=None):
+  def anchor(self, value, src, link, structure, localPath, cssCls=None):
     """ Add an anchor HTML tag to the report """
     if localPath is not None:
       # There is a child and we need to produce the sub Report attached to it
@@ -428,9 +413,9 @@ class Report(object):
     else:
       splitUrl  = link.split("?")
       if len(splitUrl) > 1:
-        link = "../reports_child/%s?%s" % (structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
+        link = "../child:%s/%s?%s" % (src, structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
       else:
-        link = "../reports_child/%s" % (structure[splitUrl[0]].replace(".py", ""))
+        link = "../child:%s/%s" % (src, structure[splitUrl[0]].replace(".py", ""))
 
     htmlObject = AresHtml.A(self.countItems, value, link, cssCls=cssCls)
     self.htmlItems[htmlObject.htmlId] = htmlObject
@@ -442,8 +427,6 @@ class Report(object):
     """ Main function used to generate the report
 
     """
-
-
     results, jsResults = [], []
     if self.interruptReport[0]:
       return self.htmlItems[self.interruptReport[1]].html(localPath)
@@ -462,8 +445,8 @@ class Report(object):
       results.append(self.htmlItems[htmlId].html(localPath))
       if self.htmlItems[htmlId].jsEvent is not None:
         for fnc, fncDef in self.htmlItems[htmlId].jsEvent:
-          if fnc in ['drop', 'dragover']:
-            jsResults.append('%s.bind("%s", function (event){' % (self.htmlItems[htmlId].jsRef(), fnc))
+          if fnc in ['drop', 'dragover', 'dragleave', 'dragenter', 'click']:
+            jsResults.append('%s.on("%s", function (event){' % (self.htmlItems[htmlId].jsRef(), fnc))
             jsResults.append(fncDef)
             jsResults.append('});\n')
           elif fnc in ['autocomplete']:
