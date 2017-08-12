@@ -390,26 +390,13 @@ class WordCloud(JsGraph):
   TODO finalise the update method and make it generic with all the graph
   the update method should appear once and only once in the javascript section of the page
   """
+  mockData = r'json\pie.json'
 
   def pyDataToJs(self, localPath=None):
     """ """
     res = []
     for label, value in self.pyData:
       res.append({"text": label, "size": value})
-
-    # If the script is run locally intermediate data will be stored
-    # This is for investigation only
-    if localPath is not None:
-      dataFolder = r"%s\data" % localPath
-      if not os.path.exists(dataFolder):
-        os.makedirs(dataFolder)
-
-      inFile = open(r"%s\chart_%s.dat" % (dataFolder, self.htmlId), "w")
-      inFile.write("----------------- Python Object ----------------- \n")
-      pprint.pprint(self.pyData, inFile)
-      inFile.write("\n\n----------------- Javascript Object ----------------- \n")
-      pprint.pprint(res, inFile)
-      inFile.close()
     return str(res)
 
   def js(self, localPath=None):
@@ -421,7 +408,7 @@ class WordCloud(JsGraph):
             .words(data_%s) // Refer to the data variable
             .rotate(function() { return ~~(Math.random() * 2) * 90; })
             .font("Impact")
-            .fontSize(function(d) {  return d.size; })
+            .fontSize(function(d) { return d.size; })
             .on("end", draw)
             .start()
           ;
@@ -437,7 +424,7 @@ class WordCloud(JsGraph):
               .style("font-family", "Impact")
               .style("fill", function(d, i) {  return fill(i); })
               .attr("text-anchor", "middle")
-              .attr("transform", function(d) {  return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+              .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
               .text(function(d) {  return d.text; });
           }
           ;
