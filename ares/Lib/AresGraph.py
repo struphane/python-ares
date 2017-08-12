@@ -324,6 +324,14 @@ class ComboLineBar(StackedArea):
   def addExtraOptions(self):
     return self.extraOptions % self.htmlId
 
+
+class ScatterChart(StackedArea):
+  """
+
+  """
+  mockData = r'json\linePlusBarData.json'
+  chartFunction = 'scatterChart'
+
 class Network(JsGraph):
   """
 

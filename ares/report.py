@@ -7,15 +7,18 @@ import os
 import sys
 import zipfile
 import io
-import config
 import collections
 
-from flask import current_app, Blueprint, Flask, render_template, request, send_from_directory, send_file
+from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file
+
+import config
+
 
 # Ares Framework
 from ares.Lib import Ares
 
 from ares import report_index, report_index_page, report_index_set
+
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
 # Return the list of all the scripts needed to run this package
@@ -97,11 +100,47 @@ def report_dsc_graph():
   graphObject = []
   for name, obj in inspect.getmembers(AresGraph):
     if inspect.isclass(obj):
-      iId = aresObj.anchor(name, name, name, {name: '../dsc/graph/%s' % name}, None)
+      iId = aresObj.anchor(name, name, name, {name: '../child:dsc/graph/%s' % name}, None)
       dId = aresObj.code(obj.__doc__)
       graphObject.append((aresObj.item(iId), aresObj.item(dId)))
   aresObj.title(1, "Graph Components")
   aresObj.nestedtable(['Class Name', 'Description'], graphObject)
+  return render_template('ares_template.html', content=aresObj.html(None))
+
+@report.route("/child:dsc/graph/<chartName>")
+def report_dsc_graph_details(chartName):
+  """ """
+  import inspect
+  import json
+  from ares.Lib import AresGraph
+  from ares.Lib import AresHtml
+
+  aresObj = Ares.Report()
+  aresComponents = {}
+  for name, obj in inspect.getmembers(AresGraph):
+    if inspect.isclass(obj):
+      aresComponents[name] = obj
+  object = aresComponents[chartName]
+  aresObj.title(1, "%s Components" % chartName)
+  aresObj.text(object.__doc__)
+  mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
+  with open(mokfilePath) as data_file:
+    data = json.load(data_file)
+
+  # Add the chart to the Ares interface
+  graphContainer = AresHtml.Graph(2, width=960, height=500, cssCls=None)
+  aresObj.htmlItems[graphContainer.htmlId] = graphContainer
+  aresObj.content.append(graphContainer.htmlId)
+  graphObject = getattr(AresGraph, chartName)(graphContainer.htmlId, data)
+  aresObj.jsGraph.append(graphObject)
+
+  # Add the mock data as example
+  aresObj.title(2, 'Source Code')
+  aId = aresObj.anchor('Data Source', object.mockData, 'html', {'html': '../../../download/dsc/%s' % object.mockData}, None)
+  aresObj.paragraph('You can download the input data here: {0}', [aresObj.item(aId)])
+  compObj = aresComponents[chartName](0, data)
+  aresObj.code(compObj.js())
+
   return render_template('ares_template.html', content=aresObj.html(None))
 
 @report.route("/html/<objectName>")
@@ -250,6 +289,14 @@ def downloadFiles(report_name, script):
     script = "%s.py" % script
 
   return send_from_directory(os.path.join(config.ARES_USERS_LOCATION, report_name), script, as_attachment=True)
+
+@report.route("/download/dsc/json/<jsonFile>", methods = ['GET', 'POST'])
+def downloadJsonFiles(jsonFile):
+  if not jsonFile.endswith(".json"):
+    jsonFile = "%s.json" % jsonFile
+
+  mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'json')
+  return send_from_directory(mokfilePath, jsonFile, as_attachment=True)
 
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
