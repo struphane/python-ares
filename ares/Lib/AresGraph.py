@@ -33,9 +33,9 @@ class JsGraph(object):
   def htmlId(self):
     return self.__htmlId
 
-  def pyDataToJs(self):
+  def pyDataToJs(self, localPath=None):
     """ Return the data Source """
-    raise NotImplementedError('subclasses must override data()!')
+    return self.pyData
 
   def jsChart(self):
     """ Return the javascript fragment require to build the graph """
@@ -66,32 +66,12 @@ class Pie(JsGraph):
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   showLabel = True
-
-  def pyDataToJs(self, localPath=None):
-    """ """
-    res = []
-    for label, value in self.pyData:
-      res.append({"label": label, "value": value})
-
-    # If the script is run locally intermediate data will be stored
-    # This is for investigation only
-    if localPath is not None:
-      dataFolder = r"%s\data" % localPath
-      if not os.path.exists(dataFolder):
-        os.makedirs(dataFolder)
-
-      inFile = open(r"%s\chart_%s.dat" % (dataFolder, self.htmlId), "w")
-      inFile.write("----------------- Python Object ----------------- \n")
-      pprint.pprint(self.pyData, inFile)
-      inFile.write("\n\n----------------- Javascript Object ----------------- \n")
-      pprint.pprint(res, inFile)
-      inFile.close()
-    return str(res)
+  mockData = r'json\pie.json'
 
   def jsChart(self):
     """
     """
-    return "nv.models.pieChart().x(function(d){ return d.label }).y(function(d){ return d.value }).showLabels(true);"
+    return "nv.models.pieChart().x(function(d){ return d[0] }).y(function(d){ return d[1] }).showLabels(true);"
 
 class Donut(Pie):
   """
@@ -100,13 +80,14 @@ class Donut(Pie):
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   showLabel = 1 # True in Javascript
+  mockData = r'json\pie.json'
 
   def jsChart(self):
     """ """
     return '''
               nv.models.pieChart()
-                .x(function(d){ return d.label })
-                .y(function(d){ return d.value })
+                .x(function(d){ return d[0] ; })
+                .y(function(d){ return d[1] ; })
                 .showLabels(%s)
                 .labelThreshold(.05)
                 .labelType("percent")
@@ -121,16 +102,17 @@ class Bar(JsGraph):
     [{key: "Cumulative Return", values: [{ "label": "One","value" : 29.765957771107},  {"label": "Four", "value" : 196.45946739256}]}]
   """
   duration = 200
+  mockData = r'json\bar.json'
 
   def jsChart(self):
     """ """
     return '''
               nv.models.discreteBarChart()
-                .x(function(d) { return d.label })    //Specify the data accessors.
-                .y(function(d) { return d.value })
-                .staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
-                .showValues(true)       //...instead, show the bar value right on top of each bar.
-                .duration(350);
+                .x(function(d) { return d[0] ; })    //Specify the data accessors.
+                .y(function(d) { return d[1] ; })
+                .staggerLabels(true)    // Too many bars and not enough room? Try staggering labels.
+                .showValues(true)       // ...instead, show the bar value right on top of each bar.
+                .transitionDuration(350);
            '''
 
 class Line(JsGraph):
@@ -141,6 +123,7 @@ class Line(JsGraph):
 
   """
   duration = 200
+  mockData = r'json\line.json'
 
   def jsxAxix(self):
     """ """
@@ -316,21 +299,26 @@ class ComboLineBar(StackedArea):
   chartFunction = 'linePlusBarChart'
   multiY = True
   interGuidelines = False
-  extraOptions = '''chart_%s.bars.forceY([0]); chart_22.y1Axis
-                .tickFormat(d3.format(',.2f'));'''
-  chartOptions = '''.color(d3.scale.category10().range())'''
+  extraOptions = '''
+                    chart_%s.bars.forceY([0]) ;
+                    chart_22.y1Axis.tickFormat(d3.format(',.2f')) ;
+                 '''
+  chartOptions = '''
+                    .color(d3.scale.category10().range())
+                 '''
   useDefaultYAxis = False
 
   def addExtraOptions(self):
     return self.extraOptions % self.htmlId
 
-
 class ScatterChart(StackedArea):
   """
 
   """
-  mockData = r'json\linePlusBarData.json'
+  mockData = r'json\multiBar.json'
+  withFocus = False
   chartFunction = 'scatterChart'
+  useExtraChartOptions = False
 
 class Network(JsGraph):
   """

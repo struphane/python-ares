@@ -99,7 +99,7 @@ def report_dsc_graph():
   aresObj = Ares.Report()
   graphObject = []
   for name, obj in inspect.getmembers(AresGraph):
-    if inspect.isclass(obj):
+    if inspect.isclass(obj) and name != 'JsGraph':
       iId = aresObj.anchor(name, name, name, {name: '../child:dsc/graph/%s' % name}, None)
       dId = aresObj.code(obj.__doc__)
       graphObject.append((aresObj.item(iId), aresObj.item(dId)))
@@ -126,7 +126,6 @@ def report_dsc_graph_details(chartName):
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
   with open(mokfilePath) as data_file:
     data = json.load(data_file)
-
   # Add the chart to the Ares interface
   graphContainer = AresHtml.Graph(2, width=960, height=500, cssCls=None)
   aresObj.htmlItems[graphContainer.htmlId] = graphContainer
