@@ -41,12 +41,12 @@ class ListBadge(AresHtml.Html):
   reference = 'https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp'
   alias = 'listbadge'
 
-  def __repr__(self, localPath):
+  def __repr__(self):
     """ Return the String representation of a HTML List """
     item = AresItem.Item('<ul %s>' % self.strAttr())
     for label, cnt in self.vals:
-      item.add(1, '%s<li class="list-group-item">%s<span class="badge">%s</span></li>' % (label, cnt))
-    item.add('</ul>')
+      item.add(1, '<li class="list-group-item">%s<span class="badge">%s</span></li>' % (label, cnt))
+    item.add(0, '</ul>')
     return str(item)
 
 
@@ -83,12 +83,12 @@ class Split(AresHtml.Html):
     """ Return the HTML display of a split container"""
     res = AresItem.Item('<div %s>' % self.strAttr())
     res.add(1, '%s<div class="row">')
-    for htmObj in self.htmlObjs:
+    for htmObj in self.vals:
       res.add(2, '<div class="col-lg-%s">' % self.col_lg)
       res.add(3, str(htmObj))
       res.add(2, '</div>')
     res.add(1, '</div>')
-    res.append('</div>')
+    res.add(0, '</div>')
     return str(res)
 
 

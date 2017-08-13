@@ -8,6 +8,7 @@ import sys
 import zipfile
 import io
 import collections
+import traceback
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file
 
@@ -219,23 +220,27 @@ def index():
 @report.route("/run/<report_name>")
 def run_report(report_name):
   """ Run the report """
+  onload, js = '', ''
   try:
     sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
     reportObj = Ares.Report()
+    reportObj.reportName = report_name
+    mod = __import__(report_name)
+    reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
     reportObj.http['FILE'] = report_name
-    aresObj = __import__(report_name).report(reportObj)
-    dId = aresObj.download(cssCls='bdiBar-download')
-    aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
-    spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
-    aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
-    result = aresObj.html(None)
+    aresObj = mod.report(reportObj)
+    downAll = aresObj.download(cssCls='bdiBar-download')
+    downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
+    downScript = aresObj.downloadAll(cssCls='bdiBar-download-all')
+    downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
+    onload, content, js = aresObj.html()
   except Exception as e:
-    result = e
+    content = traceback.format_exc()
   finally:
     # Try to unload the module
     if report_name in sys.modules:
       del sys.modules[report_name]
-  return render_template('ares_template.html', content=result)
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):

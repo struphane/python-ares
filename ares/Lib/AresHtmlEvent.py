@@ -72,6 +72,7 @@ class ButtonDownload(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'download'
 
+
 class ButtonDownloadAll(ButtonRemove):
   """
   Python wrapper to the HTML Button component
@@ -82,9 +83,10 @@ class ButtonDownloadAll(ButtonRemove):
     - CSS Default Class = btn btn-success
     - glyphicon = downloadAll
   """
-  glyphicon, cssCls = 'downloadAll', 'btn btn-success'
+  glyphicon, cssCls = 'download-alt', 'btn btn-success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'downloadAll'
+
 
 class ButtonOk(ButtonRemove):
   """
@@ -99,6 +101,7 @@ class ButtonOk(ButtonRemove):
   glyphicon, cssCls = 'ok', 'success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'ok'
+
 
 class A(AresHtml.Html):
   """
@@ -281,12 +284,12 @@ class DropDown(AresHtml.Html):
   title, cssCls = 'Title', 'dropdown'
   alias = 'dropdown'
 
-  def __repr__(self, localPath):
+  def __repr__(self):
     """ Return the HTML String of a Drop Down list """
     item = AresItem.Item('<div %s>' % self.strAttr())
     item.add(1, '<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">%s<span class="caret"></span></button>' % self.title)
     item.add(1, '<ul class="dropdown-menu">')
-    for val in self.val:
+    for val in self.vals:
       item.add(2, '<li><a href="#%s">%s</a></li>' % (val[0], val[1]))
     item.add(1, '</ul>')
     item.add(0, '</div>')
@@ -379,7 +382,7 @@ class DropZone(AresHtml.Html):
   alias = 'dropzone'
 
   def __init__(self, htmlId, vals, cssCls=None):
-    super(DropZone, self).__init__( htmlId, vals, cssCls)
+    super(DropZone, self).__init__(htmlId, vals, cssCls)
     self.js('dragover',
             '''
               event.originalEvent.stopPropagation();
@@ -425,21 +428,21 @@ class DropFile(AresHtml.Html):
 
   def __init__(self, htmlId, vals, cssCls=None):
     super(DropFile, self).__init__( htmlId, vals, cssCls)
-    self.js(('dragover', '''
-                          event.originalEvent.preventDefault();
-                          event.originalEvent.stopPropagation();
-                         event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-                          '''))
-    self.js(('dragleave', '''
+    self.js('dragover', '''
                           event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
                           event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-                          '''))
-    self.js(('dragenter', '''
+                          ''')
+    self.js('dragleave', '''
                           event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
                           event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-                          '''))
+                          ''')
+    self.js('dragenter', '''
+                          event.originalEvent.preventDefault();
+                          event.originalEvent.stopPropagation();
+                          event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+                          ''')
   def drop(self):
     """  """
     ajaxObject = AresJs.XsCallFile(self.reportName)
@@ -448,26 +451,29 @@ class DropFile(AresHtml.Html):
     ajaxObject.success('location.href = "/reports/page/%s";' % self.reportName)
     return ajaxObject.ajax('form_data')
 
-  def html(self):
-    """ Return the Drop Zone component """
-    self.jsEvent.append(('drop', '''
-                          event.originalEvent.preventDefault();
-                          event.originalEvent.stopPropagation();
-                          var file = event.originalEvent.dataTransfer.files; // FileList object.
+  def __repr__(self):
+    """
+    """
+    self.js('drop', '''
+                      event.originalEvent.preventDefault();
+                      event.originalEvent.stopPropagation();
+                      var file = event.originalEvent.dataTransfer.files; // FileList object.
 
-                          //files is a FileList of File objects. List some properties.
-                          var form_data = new FormData();
-                          $.each(event.originalEvent.dataTransfer.files, function(i, file) {
-                            form_data.append('file_' + i, file);
-                            i ++;
-                          });
-                          %s
-
-                      ''' % self.drop()))
-
-    item = ['<div ondrop="drop(event)" style="border: 1px dotted black;text-align:center;padding:5px;background-color:#F8F8F8" id="%s"><h3><b>+ Add Scripts</b></h3> Drop scripts here to upload</div>' % self.htmlId]
-    return "\n".join(item)
-
+                      //files is a FileList of File objects. List some properties.
+                      var form_data = new FormData();
+                      $.each(event.originalEvent.dataTransfer.files, function(i, file) {
+                        form_data.append('file_' + i, file);
+                        i ++;
+                      });
+                      %s
+                    ''' % self.drop())
+    items = AresItem.Item('<div ondrop="drop(event)" style="border: 1px dotted black;text-align:center;padding:5px;background-color:#F8F8F8" %s>' % self.strAttr())
+    items.add(1, "<h3>")
+    items.add(2, "<b>%s</b>" % self.vals) # + Add Scripts
+    items.add(1, "</h3>")
+    items.add(1, "Drop scripts here to upload")
+    items.add(0, "</div>")
+    return str(items)
 
 
 

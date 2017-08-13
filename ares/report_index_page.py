@@ -30,9 +30,10 @@ def report(aresObj, localPath=None):
   aresObj.title2('Report Description')
   aresObj.code(aresObj.http['SCRIPTS_DSC'])
 
-  CHILD_PAGES['report'] = "../run/%s" % aresObj.http['SCRIPTS_NAME']
-  comp = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'])
-  comp.js('click', 'preloader();')
+  CHILD_PAGES['report'] = "../../run/%s" % aresObj.http['SCRIPTS_NAME']
+  scriptComp = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'])
+  scriptComp.js('click', 'preloader();')
+  scriptComp.addLink('report')
   aresObj.title('List des scripts')
   comp = aresObj.download()
   comp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
@@ -45,7 +46,7 @@ def report(aresObj, localPath=None):
   for call in ajxCall:
     displayedScript[call] = True
   scripts = [['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'],
-             [comp, fileSize, fileDate,  '', ''.join(ajxCall), comp, '']]
+             [scriptComp, fileSize, fileDate,  '', ''.join(ajxCall), comp, '']]
   displayedScript['%s.py' % aresObj.http['SCRIPTS_NAME']] = True
   for mainScript, child in aresObj.http['SCRIPTS_CHILD']:
     for i, script in enumerate([mainScript, child]):
