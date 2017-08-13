@@ -9,9 +9,8 @@ Do not use True in both python and Javascript as the Json conversion is not real
 """
 
 import os
-import sys
 from Lib import Ares
-import multiprocessing
+
 
 # CSS imports
 CSS = ['jquery-ui.css',
@@ -19,7 +18,7 @@ CSS = ['jquery-ui.css',
        'bootstrap-theme.min.css',
        'nv.d3.css',
        'bootstrap-select.min.css',
-       'w3.css'
+       #'svg.css'
        ]
 
 # Javascript imports
@@ -32,112 +31,58 @@ JS = ['jquery-3.2.1.min.js',
       'd3.layout.cloud.js' # world cloud chart
       ]
 
-def components(directory):
-  """ Return the list of all the available components """
-  import inspect
-  import Lib.AresHtml as AresHtml
-  import Lib.AresGraph as AresGraph
 
-  htmlObject = []
-  for name, obj in inspect.getmembers(AresHtml):
-    if inspect.isclass(obj) and obj.alias is not None:
-      htmlObject.append((name, obj.__doc__))
-
-  htmlFile = open(r"%s\ArES_components.html" % directory, "w")
+def getReport(reportModule, results, scriptPath):
+  """ Recursively runs all the reports """
+  print("  > Running report %s" % reportModule.__name__)
   aresObj = Ares.Report()
-  aresObj.title(1, "Html Components")
-  aresObj.table(['Class Name', 'Description'], htmlObject)
+  aresObj.http['USER_PATH'] = scriptPath
+  results[reportModule.__name__] = reportModule.report(aresObj)
+  for child in getattr(reportModule, 'CHILD_PAGES', {}).values():
+    getReport(child.replace(".py", ""), results, scriptPath)
 
-
-  graphObject = []
-  for name, obj in inspect.getmembers(AresGraph):
-    if inspect.isclass(obj):
-      graphObject.append((name, obj.__doc__))
-  aresObj.title(2, "Graph Components")
-  aresObj.table(['Class Name', 'Description'], graphObject)
-
-  htmlPage(htmlFile, aresObj.html(directory, title='ArES Components'))
-
-  htmlFile.close()
-  sys.exit()
-
-def test(className, directory):
-  """ Test a component based on Mock Json data
-
-  """
-  import Lib.AresGraph as AresGraph
-  import Lib.AresHtml as AresHtml
-  import inspect
-  import json
-
-  aresComponents = {}
-  for name, obj in inspect.getmembers(AresHtml):
-    if inspect.isclass(obj):
-      aresComponents[name] = obj
-  for name, obj in inspect.getmembers(AresGraph):
-    if inspect.isclass(obj):
-      aresComponents[name] = obj
-
-  htmlFile = open(r"%s\ArES_%s.html" % (directory, className), "w")
-  aresObj = Ares.Report()
-  aresObj.title(2, "%s Components" % className)
-  object = aresComponents[className]
-  aresObj.text(object.__doc__)
-  with open(r"%s\%s" % (directory, object.mockData)) as data_file:
-    data = json.load(data_file)
-  aresObj.comboLineBar(data)
-
-  aresObj.title(2, 'Source Code')
-  aId = aresObj.anchor('Data Source', object.mockData)
-  aresObj.paragraph('You can download the input data here: {0}', [aresObj.item(aId)])
-
-  compObj = aresComponents[className](0, data)
-  aresObj.code(compObj.js())
-  htmlPage(htmlFile, aresObj.html(directory, title='ArES Components'))
-
-  htmlFile.close()
-  sys.exit()
-
-def startServer():
-  #
-  #
-  import socket
-
-  # Create a TCP/IP socket
-  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-  # Bind the socket to the port
-  server_address = ('localhost', 60000)
-  sock.bind(server_address)
-  sock.listen(1)
-
-  while True:
-    # Wait for a connection
-    connection, client_address = sock.accept()
 
 if __name__ == '__main__':
   # Run the script locally
-
-  statisPath = r'' # the path with the CSS and JS folders (if current path please keep this empty
+  statisPath = r'..\..\..\static' # the path with the CSS and JS folders (if current path please keep this empty
   directory = os.getcwd() # The path of this script by default
   report = "report_index" # The name of the main script with the report
+  result_folder = 'html'
 
-  # -----------------------------------------------------------------------------------------------
-  # Test functions
-  # -----------------------------------------------------------------------------------------------
-  # Get a description of the different available items
-  #components(directory)
-  #test('ComboLineBar', directory)
+  # This will move all the results in a html folder
+  # It only work locally
+  path = os.path.join(directory, result_folder, report)
+  if not os.path.exists(path):
+    os.makedirs(path)
+  if not statisPath:
+    localPathSize = len(os.path.split(path))
+    if os.path.split(path)[0] == '':
+      localPathSize -= 1
+    statisPath = os.path.join(*[".." for i in range(localPathSize)])
 
-  # Write the report
-  htmlPage = Ares.htmlLocalHeader(directory, report, statisPath, CSS, JS)
-  htmlPage.write(__import__(report).report(Ares.Report(), localPath=directory).html(directory))
-  Ares.htmlLocalFooter(htmlPage)
+  # Create the generic headers and footers
+  header = Ares.htmlLocalHeader(statisPath, CSS, JS)
+  footer = Ares.htmlLocalFooter()
 
-  # Start a simple server to test the Ajax calls
-  #p = multiprocessing.Process(target=startServer)
-  #p.start()
-  #p.join()
+  res = {}
+  getReport(__import__(report), res, directory)
+
+  for report, htmlReport in res.items():
+    htmlFile = open(r"%s\%s.html" % (path, report), "w")
+    jsOnload, html, js = htmlReport.html()
+    htmlFile.write(header)
+    htmlFile.write("\n  <script>\n")
+    htmlFile.write(jsOnload)
+    htmlFile.write("\n  </script>\n</head>\n<body>\n<div class='container' id='html_content'>\n")
+    htmlFile.write(html)
+    htmlFile.write("\n<script>\n")
+    htmlFile.write(js)
+    htmlFile.write("\n</script>\n</div>")
+    htmlFile.write(footer)
+    htmlFile.close()
+
+
+
 
 
 

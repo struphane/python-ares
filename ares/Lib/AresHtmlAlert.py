@@ -10,8 +10,10 @@
 #     return self.__htmlId
 
 from ares.Lib import AresHtml
+from ares.Lib import AresItem
 
-class DangerAlert(AresHtml.HtmlItem):
+
+class DangerAlert(AresHtml.Html):
   """ """
 
   level = 'Danger'
@@ -32,8 +34,7 @@ class DangerAlert(AresHtml.HtmlItem):
     if backgroundColor:
       self.backgroundColor = backgroundColor
 
-
-  def html(self, localPath):
+  def html(self):
     """ """
     if self.closeButton:
       item = ['<div class="alert %s %s fade in">' % (self.cssCls, 'alert-dismissable')]

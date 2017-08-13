@@ -60,87 +60,116 @@ def getChildrenFlatStruct(scriptTree, listChildren):
 @report.route("/dsc")
 @report.route("/dsc/index")
 def report_dsc_index():
-  """
-
-  """
+  """ Main page for the Ares Documentation """
   aresObj = Ares.Report()
-  aresObj.title(1, "Report Documentation")
-  aresObj.title(2, "How to create a report")
-
-  aresObj.title(2, "Report Components")
-  aresObj.anchor('HTML Component documentation%s' % aresObj.newLine, 'dsc', 'html', {'html': 'html'}, None)
-  aresObj.anchor('Graph Component documentation%s' % aresObj.newLine, 'dsc', 'graph', {'graph': 'graph'}, None)
-  return render_template('ares_template.html', content=aresObj.html(None))
+  aresObj.reportName = 'dsc'
+  aresObj.childPages = {'html': 'html', 'graph': 'graph'}
+  aresObj.title("Report Documentation")
+  aresObj.title2("How to create a report")
+  aresObj.title2("Report Components")
+  aresComp = aresObj.anchor('HTML Component documentation')
+  aresComp.addLink('html')
+  aresObj.newline()
+  aresComp = aresObj.anchor('Graph Component documentation')
+  aresComp.addLink('graph')
+  onload, content, js = aresObj.html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/child:dsc/html")
 def report_dsc_html():
   """ Function to return the HTML object description and a user guide """
   import inspect
-  from ares.Lib import AresHtml
+  from ares.Lib import AresHtmlText
+  from ares.Lib import AresHtmlEvent
+  from ares.Lib import AresHtmlModal
+  from ares.Lib import AresHtmlTable
+  from ares.Lib import AresHtmlContainer
 
   aresObj = Ares.Report()
+  aresObj.reportName = 'dsc/html'
+  aresObj.childPages = {}
+  aresObj.title("Html Components")
+  for aresModule in [AresHtmlText, AresHtmlContainer, AresHtmlEvent, AresHtmlModal, AresHtmlTable]:
+    aresObj.title4(aresModule.__doc__)
+    htmlObject = [['Class Name', 'Description']]
+    for name, obj in inspect.getmembers(aresModule):
+      if inspect.isclass(obj) and obj.alias is not None:
+        aresObj.childPages[name] = '../../../child:dsc/html/%s' % obj.alias
+        comp = aresObj.anchor(name)
+        comp.addLink(name)
+        htmlObject.append([comp, aresObj.code(obj.__doc__)])
+    aresObj.table(htmlObject)
 
-  htmlObject = []
-  for name, obj in inspect.getmembers(AresHtml):
-    if inspect.isclass(obj) and obj.alias is not None:
-      iId = aresObj.anchor(name, name, name, {name: '../dsc/html/%s' % name}, None)
-      dId = aresObj.code(obj.__doc__)
-      htmlObject.append((aresObj.item(iId), aresObj.item(dId)))
-  aresObj.title(1, "Html Components")
-  aresObj.nestedtable(['Class Name', 'Description'], htmlObject)
-  return render_template('ares_template.html', content=aresObj.html(None))
+  onload, content, js = aresObj.html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
+
+@report.route("/child:dsc/html/<chartName>")
+def report_dsc_html_details(chartName):
+  """ """
+  aresObj = Ares.Report()
+  aresObj.reportName = 'dsc/html'
+  aresObj.childPages = {}
+  aresObj.title(chartName)
+  getattr(aresObj, chartName)('Youpi')
+  onload, content, js = aresObj.html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/child:dsc/graph")
 def report_dsc_graph():
   """ Function to return the Graph object description and a user guide """
   import inspect
-  from ares.Lib import AresGraph
+  from ares.Lib import AresHtmlGraph
 
   aresObj = Ares.Report()
+  aresObj.reportName = 'dsc/graph'
+  aresObj.childPages = {}
   graphObject = []
-  for name, obj in inspect.getmembers(AresGraph):
-    if inspect.isclass(obj) and name != 'JsGraph':
-      iId = aresObj.anchor(name, name, name, {name: '../child:dsc/graph/%s' % name}, None)
-      dId = aresObj.code(obj.__doc__)
-      graphObject.append((aresObj.item(iId), aresObj.item(dId)))
-  aresObj.title(1, "Graph Components")
-  aresObj.nestedtable(['Class Name', 'Description'], graphObject)
-  return render_template('ares_template.html', content=aresObj.html(None))
+  aresObj.title("Graph Components")
+  aresObj.title4(AresHtmlGraph.__doc__)
+  for name, obj in inspect.getmembers(AresHtmlGraph):
+    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
+      aresObj.childPages[name] = '../../../child:dsc/graph/%s' % name
+      comp = aresObj.anchor(name)
+      comp.addLink(name)
+      graphObject.append([comp, aresObj.code(obj.__doc__)])
+  aresObj.table(['Class Name', 'Description'], graphObject)
+  onload, content, js = aresObj.html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/child:dsc/graph/<chartName>")
 def report_dsc_graph_details(chartName):
   """ """
   import inspect
   import json
-  from ares.Lib import AresGraph
+  from ares.Lib import AresHtmlGraph
   from ares.Lib import AresHtml
 
   aresObj = Ares.Report()
+  aresObj.reportName = 'download'
+  aresObj.childPages = {}
   aresComponents = {}
-  for name, obj in inspect.getmembers(AresGraph):
+  for name, obj in inspect.getmembers(AresHtmlGraph):
     if inspect.isclass(obj):
       aresComponents[name] = obj
   object = aresComponents[chartName]
-  aresObj.title(1, "%s Components" % chartName)
+  aresObj.title(chartName)
+  aresObj.title3("%s Components Details" % chartName)
   aresObj.text(object.__doc__)
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
   with open(mokfilePath) as data_file:
     data = json.load(data_file)
-  # Add the chart to the Ares interface
-  graphContainer = AresHtml.Graph(2, width=960, height=500, cssCls=None)
-  aresObj.htmlItems[graphContainer.htmlId] = graphContainer
-  aresObj.content.append(graphContainer.htmlId)
-  graphObject = getattr(AresGraph, chartName)(graphContainer.htmlId, data)
-  aresObj.jsGraph.append(graphObject)
+  getattr(aresObj, object.alias)(data)
 
   # Add the mock data as example
-  aresObj.title(2, 'Source Code')
-  aId = aresObj.anchor('Data Source', object.mockData, 'html', {'html': '../../../download/dsc/%s' % object.mockData}, None)
-  aresObj.paragraph('You can download the input data here: {0}', [aresObj.item(aId)])
+  aresObj.title3('Source Code')
+  aresObj.childPages['graph'] = '../../../download/dsc/%s' % object.mockData
+  comp = aresObj.anchor('Data Source') #, object.mockData, 'html', {'html': '../../../download/dsc/%s' % object.mockData}, None)
+  comp.addLink('graph')
+  aresObj.paragraph(['You can download the input data here: ', comp])
   compObj = aresComponents[chartName](0, data)
-  aresObj.code(compObj.js())
-
-  return render_template('ares_template.html', content=aresObj.html(None))
+  aresObj.code(compObj.jsEvents()['addGraph'])
+  onload, content, js = aresObj.html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/html/<objectName>")
 def report_html_description(objectName):
@@ -151,6 +180,7 @@ def page_report(report_name):
   """ Return the html content of the main report """
   reportObj = Ares.Report()
   reportObj.http['FILE'] = report_name
+  reportObj.reportName = report_name
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
   reportObj.http['SCRIPTS'] = os.listdir(scriptEnv)
@@ -170,10 +200,11 @@ def page_report(report_name):
     reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
     reportObj.http['AJAX_CALLBACK'] = {}
     reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-    result = report_index_page.report(reportObj).html(None)
+    reportObj.childPages = report_index_page.CHILD_PAGES
+    onload, content, js = report_index_page.report(reportObj).html()
     if scriptEnv in sys.modules:
       del sys.modules[scriptEnv]
-  return render_template('ares_template.html', content=result)
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/")
 @report.route("/index")
@@ -182,7 +213,8 @@ def index():
   aresObj = Ares.Report()
   aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
   aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  return render_template('ares_template.html', content=report_index.report(aresObj).html(None))
+  onload, content, js = report_index.report(aresObj).html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/run/<report_name>")
 def run_report(report_name):

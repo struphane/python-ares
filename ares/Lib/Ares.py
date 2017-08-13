@@ -22,143 +22,64 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 # TODO: implement a decorator to wrap the current part in the functions
 
 import os
-import inspect
+import sys
 import collections
-from ares.Lib import AresHtml
-from ares.Lib import AresGraph
-from ares.Lib import AresAlert
 
-htmlFactory = None # This is the factory with all the alias and HTML classes
-# the below global variables are only used locally to generate the secondary pages and Ajax calls
-LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES = None, None, None, None
-RESULT_FOLDER = 'html' # This is the folder with all the HTML files, it is only used locally
+from ares.Lib import AresHtmlContainer
+from ares.Lib import AresHtmlEvent
+from ares.Lib import AresHtmlText
+from ares.Lib import AresHtmlTable
+from ares.Lib import AresHtmlGraph
+from ares.Lib import AresHtmlAlert
+from ares.Lib import AresHtmlModal
+from ares.Lib import AresItem
 
-def mapHtmlItems():
-  """ Map the aliases to the HTML objects """
-  htmlObjs = {}
-  for name, obj in inspect.getmembers(AresHtml):
-    if inspect.isclass(obj) and obj.alias is not None:
-      htmlObjs[obj.alias] = obj
-  return htmlObjs
 
-def htmlLocalHeader(directory, report, statisPath, cssFiles, javascriptFiles):
+def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
-  global LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES
-
-  if RESULT_FOLDER and LOCAL_DIRECTORY is None:
-    # This will move all the results in a html folder
-    # It only work locally
-    directory = os.path.join(directory, RESULT_FOLDER, report)
-    if not os.path.exists(directory):
-      os.makedirs(directory)
-
-    if not statisPath:
-      localPathSize = len(os.path.split(directory))
-      if os.path.split(directory)[0] == '':
-        localPathSize -= 1
-
-      statisPath = os.path.join(*[".." for i in range(localPathSize)])
-
-  LOCAL_DIRECTORY, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES = directory, statisPath, cssFiles, javascriptFiles
-  htmlFile = open(r"%s\%s.html" % (directory, report), "w")
-  htmlFile.write('<!DOCTYPE html>\n')
-  htmlFile.write('<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr"> \n')
-  htmlFile.write('<head>\n')
-  htmlFile.write('%s<meta charset="utf-8">\n' % AresHtml.INDENT)
-  htmlFile.write('%s<meta http-equiv="X-UA-Compatible" content="IE=edge">\n' % AresHtml.INDENT)
-  htmlFile.write('%s<meta name="viewport" content="width=device-width, initial-scale=1">\n' % AresHtml.INDENT)
-  htmlFile.write('%s<title>Local HTML Report</title>\n' % AresHtml.INDENT)
+  item = AresItem.Item('<!DOCTYPE html>')
+  item.add(0, '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">')
+  item.add(0, '<head>')
+  item.add(1, '<meta charset="utf-8">')
+  item.add(1, '<meta http-equiv="X-UA-Compatible" content="IE=edge">')
+  item.add(1, '<meta name="viewport" content="width=device-width, initial-scale=1">')
+  item.add(1, '<title>Local HTML Report</title>')
   for style in cssFiles:
-    htmlFile.write('%s<link rel="stylesheet" href="%s" type="text/css">\n' % (AresHtml.INDENT, os.path.join(statisPath, 'css', style)))
+    item.add(1, '<link rel="stylesheet" href="%s" type="text/css">' % os.path.join(statisPath, 'css', style))
   for javascript in javascriptFiles:
-    htmlFile.write('%s<script src="%s"></script>\n' % (AresHtml.INDENT, os.path.join(statisPath, 'js', javascript)))
-  htmlFile.write('</head>\n')
-  htmlFile.write('<body>\n\n')
+    item.add(1, '<script src="%s"></script>' % os.path.join(statisPath, 'js', javascript))
+  return str(item)
 
-  return htmlFile
-
-def htmlLocalFooter(htmlFile):
+def htmlLocalFooter():
   """ Close all the HTML report and close the input text File - namely locally """
-  htmlFile.write('\n</div>\n</body>\n')
-  htmlFile.write('</html>\n')
-  htmlFile.close()
+  item = AresItem.Item(None)
+  item.add(1, '</div>')
+  item.add(0, '</body>')
+  item.add(0, '</html>')
+  return str(item)
 
-
-def addGraphObject(chartName, width=960, height=500, withSvg=True, cssCls=None):
-  def addChart(func):
-    def wrapper(self, *args, **kwargs):
-      paramArgs = {'width': width, 'height': height, 'cssCls': cssCls}
-      paramArgs.update(kwargs)
-      # for now this call to func is useless but I leave it for the day someone wants to do a special treatment in a new graph
-      func(self, *args, **kwargs)
-      if hasattr(AresGraph, chartName):
-        graphContainer = AresHtml.Graph(self.countItems, paramArgs['width'], paramArgs['height'], withSvg=withSvg, cssCls=paramArgs['cssCls'])
-        self.htmlItems[graphContainer.htmlId] = graphContainer
-        self.content.append(graphContainer.htmlId)
-        self.countItems += 1
-        graphObject = getattr(AresGraph, chartName)(graphContainer.htmlId, *args, useMockData=kwargs.get('useMockData', False))
-
-        self.jsGraph.append(graphObject)
-        return graphContainer.htmlId
-    return wrapper
-
-  return addChart
-
-def addHtmlObject(addNavBar=False):
-  """ Simple decorator to add basic html objects """
-  functionMapping = {'grid': 'split', 'anchor': 'a', 'remove': 'buttonremove', 'download': 'ButtonDownload',
-                     'ok': 'ButtonOk', 'date': 'DatePicker', 'downloadAll': 'ButtonDownloadAll'}
-  def addHtml(func):
-    def wrapper(self, *args, **kwargs):
-      func(self, *args, **kwargs)
-      for member in dir(AresHtml):
-        funcName = func.__name__
-        if member.upper() == funcName.upper() or functionMapping.get(funcName, 'UNK#FUNC').upper() == member.upper():
-          htmlObj = getattr(AresHtml, member)("%s%s" % (self.prefix, self.countItems), *args, **kwargs)
-          if htmlObj.jsOnLoad() is not None:
-            self.jsOnLoad.append(htmlObj.jsOnLoad())
-          self.htmlItems[htmlObj.htmlId] = htmlObj
-          self.content.append(htmlObj.htmlId)
-          self.countItems += 1
-          return htmlObj.htmlId
-      else:
-        raise Exception("No object is configured yet for %s" % func.__name__)
-    return wrapper
-
-  return addHtml
 
 class Report(object):
   """
-  Ares Interface
-
-  Main module to link the user reports and the HTML and Graph modules.
 
   """
 
   # This list should not be changed
   definedNotif = {'SUCCESS': 'SuccessAlert', 'INFO': 'InfoAlert', 'WARNING': 'WarningAlert', 'DANGER': 'DangerAlert'}
   showNavMenu = False
-  newLine = '<BR />'
 
   def __init__(self, prefix=''):
     """
     """
-    global htmlFactory
-
     # Internal variable that should not be used directly
     # Those variable will drive the report generation
     self.countItems = 0
-    self.prefix = prefix
+    self.prefix, self.directory = prefix, None
     self.content, self.jsGraph = [], []
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {'GET': {}, 'POST': {}}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
-
-    if htmlFactory is None:
-      htmlFactory = mapHtmlItems()
-    #for name, htmlCls in htmlFactory.items():
-    #  print(name)
 
   def structure(self):
     return self.content
@@ -174,7 +95,7 @@ class Report(object):
       print("Notification %s not recognized !" % notif)
       print("Allowed notification %s" % self.definedNotif.keys())
       raise Exception("Notification Type should belong to one of the above category")
-    alertCls = getattr(AresAlert, self.definedNotif[notif])
+    alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
     alertObject = alertCls(self.countItems, title, value, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
     self.htmlItems[alertObject.htmlId] = alertObject
     self.content.append(alertObject.htmlId)
@@ -187,288 +108,119 @@ class Report(object):
     """ Return the HTML object """
     return self.htmlItems[itemId]
 
-  @addHtmlObject()
-  def div(self, value):
-    """
-
-    Return the object ID to help on getting the object back. In any time during the
-    report generation. THis ID is not supposed to change and it will be the
-    """
-    pass
-
-  @addHtmlObject()
-  def slider(self):
-    """
-    """
-    pass
-
-  @addHtmlObject()
-  def date(self):
-    """
-    """
-    pass
-
-  @addHtmlObject()
-  def list(self, values):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def table(self, cols, values):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def tabs(self, cols):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def nestedtable(self, cols, values):
-    """ """
-    for row in values:
-      for val in row:
-        if hasattr(val, 'html'):
-          del self.content[self.content.index(val.htmlId)]
-
-  @addHtmlObject()
-  def dropDown(self, title, values):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def dropZone(self):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def dropFile(self):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def textArea(self):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def select(self, values):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def container(self, htmlObjs):
-    """ HTML Object that can contain multiple HTML object """
-    for htmlObj in htmlObjs: # Is not defined in the root structure
-      del self.content[self.content.index(htmlObj.htmlId)]
-
-  @addHtmlObject()
-  def grid(self, htmlObjLeft, htmlObjRight, cssCls=None):
-    """ """
-    del self.content[self.content.index(htmlObjLeft.htmlId)] # Is not defined in the root structure
-    del self.content[self.content.index(htmlObjRight.htmlId)] # Is not defined in the root structure
-
-  @addHtmlObject()
-  def button(self, value, cssCls=None):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def remove(self, cssCls=None):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def download(self, cssCls=None):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def downloadAll(self, value, cssCls=None):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def ok(self, cssCls=None):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def input(self, name, value):
-    """ """
-    pass
-
-  @addHtmlObject
-  def comment(self, name, value):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def text(self, value, cssCls=None, toolTips=''):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def code(self, value, cssCls=None):
-    """ """
-    pass
-
-  @addHtmlObject()
-  def paragraph(self, value, textObjsList=None, cssCls=None):
-    """ """
-    if textObjsList is not None:
-      for textObj in textObjsList:
-        del self.content[self.content.index(textObj.htmlId)] # Is not defined in the root structure
-
-  def modal(self, value, cssCls=None):
-    """ """
-    htmlObject = AresHtml.Modal(self.countItems, value, Report("modal_%s_" % self.countItems), cssCls=cssCls)
-    self.htmlItems[htmlObject.htmlId] = htmlObject
-    self.content.append(htmlObject.htmlId)
+  def getNext(self):
+    """ Return the next ID available for a HTML component """
     self.countItems += 1
-    return htmlObject.htmlId
+    return self.countItems
 
-  @addHtmlObject()
-  def title(self, dim, value, cssCls=None):
-    """ """
-    if dim == 1:
-      titleObj = {'dim': dim, 'value': value, 'subObj': []}
-      self.navBarContent['content'].append(titleObj)
-      self.currentTitleObj = titleObj
-    else:
-      if not self.currentTitleObj:
-        raise Exception('You need to have at lease one title H1 in the report before adding subtitles')
+  def add(self, htmlObj, fncName):
+    """ Register the HTML component to the Ares object """
+    if fncName != htmlObj.alias:
+      raise Exception("%s not register for the Ares function %s" % (htmlObj.alias, fncName))
 
-      currentObj = self.currentTitleObj
-      while True:
-        if not currentObj['subObj'] or currentObj['subObj'][-1]['dim'] == dim:
-          currentObj['subObj'].append({'dim': dim, 'value': value, 'subObj': []})
-          break
+    self.htmlItems[htmlObj.htmlId] = htmlObj
+    self.content.append(htmlObj.htmlId)
+    return htmlObj
 
+  def supp(self, htmlObjs):
+    """ Unregister the HTML component to the Ares object """
+    if isinstance(htmlObjs, list):
+      for htmlObj in htmlObjs:
+        if isinstance(htmlObj, list):
+          for val in htmlObj:
+            if hasattr(val, 'htmlId'):
+              try:
+                del self.content[self.content.index(val.htmlId)]
+              except:
+                print("PROBLEME")
+                pass
         else:
-          currentObj = currentObj['subObj'][-1]
-
-  @addGraphObject('Donut')
-  def pieChart(self, values, width=960, height=500, cssCls=None):
-    """ Construct a Pie Chart in the HTML page """
-    pass
-
-  @addGraphObject('WordCloud')
-  def cloudChart(self, values, width=960, height=500, cssCls=None):
-    """ Construct a Pie Chart in the HTML page """
-    pass
-
-  @addGraphObject('IndentedTree', withSvg=False)
-  def tree(self, cols, values, width=960, height=500, cssCls=None):
-    """ """
-    pass
-
-  @addGraphObject('ComboLineBar')
-  def comboLineBar(self, values, width=960, height=500, cssCls=None, useMockData=False):
-    """ Construct a Pie Chart in the HTML page """
-    pass
-
-  @addGraphObject('StackedArea')
-  def stackedAreaChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
-    """ """
-    pass
-
-  @addGraphObject('MultiBars')
-  def multiBarChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
-    """ """
-    pass
-
-  @addGraphObject('LineWithFocus')
-  def lineChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
-    """ """
-    pass
-
-  @addGraphObject('HorizontalBars')
-  def horizBarChart(self, values, width=960, height=500, cssCls=None, useMockData=False):
-    """ """
-    pass
-
-  def __populateNavBar(self):
-    return AresHtml.NavBar(self.navBarContent).html()
-
-  #don't use the decorator as this function needs to change the value of some parameters before doing the generic processing
-  def anchor(self, value, src, link, structure, localPath, cssCls=None):
-    """ Add an anchor HTML tag to the report """
-    if localPath is not None:
-      # There is a child and we need to produce the sub Report attached to it
-      # The below part allow also to test locally the get and post method that we put in the URL
-      # Basically the Wrapper will create all tehe secondary pages using all the different parameters
-      splitUrl  = link.split("?")
-      childReport = structure[splitUrl[0]].replace(".py", "")
-      htmlPage = htmlLocalHeader(LOCAL_DIRECTORY, childReport, LOCAL_STATIC_PATH, LOCAL_CSSFILES, LOCALJSFILES)
-      aresObj = Report()
-      if len(splitUrl) > 1:
-        aresObj.http['GET'] = {}
-        for urlVar in splitUrl[1].split('&'):
-          varName, varVal = urlVar.split("=")
-          aresObj.http['GET'][varName] = varVal
-      htmlPage.write(__import__(childReport).report(aresObj, localPath=LOCAL_DIRECTORY))
-      htmlLocalFooter(htmlPage)
-      link = "%s.html" % childReport
+          if hasattr(htmlObj, 'htmlId'):
+            del self.content[self.content.index(htmlObj.htmlId)]
     else:
-      splitUrl  = link.split("?")
-      if len(splitUrl) > 1:
-        link = "../child:%s/%s?%s" % (src, structure[splitUrl[0]].replace(".py", ""), splitUrl[1])
-      else:
-        link = "../child:%s/%s" % (src, structure[splitUrl[0]].replace(".py", ""))
+      if hasattr(htmlObjs, 'htmlId'):
+        del self.content[self.content.index(htmlObjs.htmlId)]
+    return htmlObjs
 
-    htmlObject = AresHtml.A(self.countItems, value, link, cssCls=cssCls)
-    self.htmlItems[htmlObject.htmlId] = htmlObject
-    self.content.append(htmlObject.htmlId)
-    self.countItems += 1
-    return htmlObject.htmlId
+  def addTo(self, container, htmlObj):
+    """ """
+    self.supp(htmlObj)
+    container.addVal(htmlObj)
 
-  def html(self, localPath):
-    """ Main function used to generate the report
+  # ---------------------------------------------------------------------------------------------------------
+  # Section dedicated to map the functions call to the HTML Component
+  # This part is done in python 3 in order to ensure users will put the right type of objects
+  # del self.content[self.content.index(val.htmlId)]
+  # ---------------------------------------------------------------------------------------------------------
+  def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def text(self, value, cssCls=None): return self.add(AresHtmlText.Text(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def code(self, value, cssCls=None): return self.add(AresHtmlText.Code(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def paragraph(self, value, cssCls=None): return self.add(AresHtmlText.Paragraph(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def dropzone(self, value:str, cssCls=None): return self.add(AresHtmlEvent.DropZone(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def dropfile(self, value:str, cssCls=None): return self.add(AresHtmlEvent.DropFile(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def newline(self, cssCls=None): return self.add(AresHtmlText.Newline(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def line(self, cssCls=None): return self.add(AresHtmlText.Line(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+
+  # Title section
+  def title(self, value:str, cssCls=None): return self.add(AresHtmlText.Title(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title2(self, value:str, cssCls=None): return self.add(AresHtmlText.Title2(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title3(self, value:str, cssCls=None): return self.add(AresHtmlText.Title3(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title4(self, value:str, cssCls=None): return self.add(AresHtmlText.Title4(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+
+  # Action section
+  def slider(self, value:float, cssCls=None): return self.add(AresHtmlEvent.Slider(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def date(self, value:str, cssCls=None): return self.add(AresHtmlEvent.DatePicker(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def textArea(self, value:str, cssCls=None): return self.add(AresHtmlEvent.TextArea(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def button(self, value:str, cssCls=None): return self.add(AresHtmlEvent.Button(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def downloadAll(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def ok(self, value:str, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+
+  # Containers section
+  def listbadge(self, values:list, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def table(self, values:list, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def tabs(self, values:list, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def dropdown(self, values:list, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def select(self, values:list, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def container(self, values:list, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def grid(self, values:list, cssCls=None): return self.add(AresHtmlContainer.Split(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+
+  # Modal Section
+  def modal(self, values:list, cssCls=None): return self.add(AresHtmlModal.Modal(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+
+  # Chart section
+  def bar(self, values:list, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def pieChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def cloudChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def tree(self, values:list, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def comboLineBar(self, values:list, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def stackedAreaChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def multiBarChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def lineChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def horizBarChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+
+  # Anchor section
+  def anchor(self, value, cssCls=None):
+    return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
+  def input(self, value:str, cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+
+  def html(self):
+    """
 
     """
-    results, jsResults = [], []
-    if self.interruptReport[0]:
-      return self.htmlItems[self.interruptReport[1]].html(localPath)
-
-    if self.showNavMenu:
-      results.append(self.__populateNavBar())
-      results.append('<div class="container" style="margin-left:%s%%">' % self.navBarContent['width'])
-    results.append('<script>')
-    results.append('$( function() {')
-    for jsOnLoad in self.jsOnLoad:
-      results.append(jsOnLoad)
-    results.append('} );')
-    results.append('</script>')
-
+    onloadParts, htmlParts, jsCallsParts = set(), [], collections.defaultdict(set)
     for htmlId in self.content:
-      results.append(self.htmlItems[htmlId].html(localPath))
-      if self.htmlItems[htmlId].jsEvent is not None:
-        for fnc, fncDef in self.htmlItems[htmlId].jsEvent:
-          if fnc in ['drop', 'dragover', 'dragleave', 'dragenter', 'click']:
-            jsResults.append('%s.on("%s", function (event){' % (self.htmlItems[htmlId].jsRef(), fnc))
-            jsResults.append(fncDef)
-            jsResults.append('});\n')
-          elif fnc in ['autocomplete']:
-            jsResults.append(fncDef)
-          else:
-            jsResults.append('%s.%s(function(){' % (self.htmlItems[htmlId].jsRef(), fnc))
-            jsResults.append(fncDef)
-            jsResults.append('});\n')
+      jsOnload, html, js = self.htmlItems[htmlId].html()
+      onloadParts = onloadParts.union(jsOnload)
+      htmlParts.append(html)
+      for jsType, jsFncs in js.items():
+        jsCallsParts[jsType] = jsCallsParts[jsType].union(jsFncs)
 
-      if self.htmlItems[htmlId].isComplex:
-        jsResults.extend(self.htmlItems[htmlId].buildJs())
-
-    if self.jsGraph:
-      jsResults.append("nv.addGraph(function() {\n")
-      for jsgraphs in self.jsGraph:
-        jsResults.append(jsgraphs.js(localPath))
-        jsResults.append("\n\n")
-      jsResults.append("});\n")
-
-    # Section dedicated to write all the extra Javascript callback functions
-    # This will allow the page to be interactive
-    results.append("<script>")
-    results.extend(jsResults)
-    results.append("</script>\n")
-    return "\n".join(results)
+    jsSection = []
+    for jsType, jsFncs in jsCallsParts.items():
+      if jsType == 'addGraph':
+        jsSection.append("nv.addGraph(function() {\n %s });" % "\n".join(jsFncs))
+      else:
+        jsSection.append("\n".join(jsFncs))
+    return "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

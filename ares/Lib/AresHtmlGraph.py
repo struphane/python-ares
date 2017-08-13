@@ -5,12 +5,11 @@ Most of the graph can be details on the below links:
 
 """
 
-import os
-import pprint
+from ares.Lib import AresHtmlContainer
+from ares.Lib import AresItem
+from ares.Lib import AresJs
 
-INDENT = '  '
-
-class JsGraph(object):
+class JsGraph(AresHtmlContainer.GraphSvG):
   """
 
   the variable self.htmlId will directly refer to the parent Div tag.
@@ -21,57 +20,50 @@ class JsGraph(object):
 
   """
   duration = 350
-  pyData = None
 
-  def __init__(self, htmlId, data, useMockData=False):
-    """ """
-    self.__htmlId = htmlId
-    self.pyData = data
-    self.useMocked = useMockData
-
-  @property
-  def htmlId(self):
-    return self.__htmlId
-
-  def pyDataToJs(self, localPath=None):
-    """ Return the data Source """
-    return self.pyData
+  def dataFnc(self):
+    """ Return the data Source converted to them be sent to the javascript layer """
+    return self.vals
 
   def jsChart(self):
     """ Return the javascript fragment require to build the graph """
     raise NotImplementedError('subclasses must override jsChart()!')
 
-  def js(self, localPath=None):
-    """ Return the entries to be added to the Javascript to create the graph during the loading """
-    res = ['%svar chart_%s = %s' % (INDENT, self.htmlId, self.jsChart().strip())]
-    res.append('\n\n// Data section for chart_%s' % self.htmlId)
-    res.append("%svar data_%s = %s ;\n" % (INDENT, self.htmlId, self.pyDataToJs(localPath)))
-    res.append('''%sd3.%s
-                      .datum(data_%s).transition()
-                      .duration(%s)
-                      .call(chart_%s);
-                '''% (INDENT, self.jsRef(), self.htmlId, self.duration, self.htmlId))
-    return "\n".join(res)
+  def jsEvents(self, jsEventFnc=None):
+    """ It is not possible to have sub HTML items in a graph object """
+    if jsEventFnc is None:
+      jsEventFnc = self.jsEventFnc
+    jGraphAttr = {'src': self.jsRef(), 'htmlId': self.htmlId, 'duration': self.duration}
+    self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart(), self.dataFnc())
+    for jEventType, jsEvent in self.jsEvent.items():
+      jsEventFnc[jEventType].add(str(jsEvent))
+    return jsEventFnc
 
   def jsRef(self):
     """ Function to return the Jquery reference to the Html object """
-    return 'select("#chart%s svg")' % self.htmlId
+    return 'select("#%s svg")' % self.htmlId
 
 class Pie(JsGraph):
-  """ NVD3 Wrapper for a Pie Chart object.
+  """
+  NVD3 Wrapper for a Pie Chart object.
 
   This will expect as input data a list of tuple (label, value)
 
   Data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
-  showLabel = True
+  showLabel, alias = 1, 'pieChart'
   mockData = r'json\pie.json'
 
   def jsChart(self):
-    """
-    """
-    return "nv.models.pieChart().x(function(d){ return d[0] }).y(function(d){ return d[1] }).showLabels(true);"
+    """ Return the javascript method to use to create the Chart """
+    return '''
+              nv.models.pieChart()
+                .x(function(d){ return d[0] }).
+                y(function(d){ return d[1] }).
+                showLabels(%s);
+            ''' % self.showLabel
+
 
 class Donut(Pie):
   """
@@ -83,7 +75,7 @@ class Donut(Pie):
   mockData = r'json\pie.json'
 
   def jsChart(self):
-    """ """
+    """ Return the javascript method to use to create the Chart """
     return '''
               nv.models.pieChart()
                 .x(function(d){ return d[0] ; })
@@ -95,6 +87,7 @@ class Donut(Pie):
                 .donutRatio(0.35);
            ''' % self.showLabel
 
+
 class Bar(JsGraph):
   """
 
@@ -103,6 +96,7 @@ class Bar(JsGraph):
   """
   duration = 200
   mockData = r'json\bar.json'
+  alias = 'bar'
 
   def jsChart(self):
     """ """
@@ -114,6 +108,7 @@ class Bar(JsGraph):
                 .showValues(true)       // ...instead, show the bar value right on top of each bar.
                 .transitionDuration(350);
            '''
+
 
 class Line(JsGraph):
   """
@@ -156,6 +151,7 @@ class Line(JsGraph):
 
               %s
            ''' % (self.jsxAxix().strip(), self.jsyAxix().strip())
+
 
 class StackedArea(JsGraph):
   """ This object will output a simple stacked area chart
@@ -255,6 +251,7 @@ class StackedArea(JsGraph):
             %s
           ''' % (self.chartFunction, self.chartOptions, self.htmlId, yAxis, focusOption, self.addExtraOptions())
 
+
 class MultiBars(StackedArea):
   """ """
 
@@ -262,6 +259,7 @@ class MultiBars(StackedArea):
   withFocus = False
   chartFunction = 'multiBarChart'
   useExtraChartOptions = False
+  alias = 'multiBarChart'
 
 class LineWithFocus(StackedArea):
   """ """
@@ -270,10 +268,11 @@ class LineWithFocus(StackedArea):
   withFocus = True
   chartFunction = 'lineWithFocusChart'
   useExtraChartOptions = False
+  alias = 'lineChart'
 
 class HorizontalBars(StackedArea):
   """ """
-
+  alias = 'horizBarChart'
   mockData = r'json\horizBars.json'
   withFocus = False
   chartFunction = 'multiBarHorizontalChart'
@@ -285,6 +284,7 @@ class HorizontalBars(StackedArea):
                   .showControls(false)
                   '''
 
+
 class ComboLineBar(StackedArea):
   """
   This object will combine a line and a bar chart.
@@ -294,6 +294,7 @@ class ComboLineBar(StackedArea):
 
   Reference website: http://nvd3.org/examples/linePlusBar.html
   """
+  alias = 'comboLineBar'
   mockData = r'json\linePlusBarData.json'
   withFocus = False
   chartFunction = 'linePlusBarChart'
@@ -311,6 +312,7 @@ class ComboLineBar(StackedArea):
   def addExtraOptions(self):
     return self.extraOptions % self.htmlId
 
+
 class ScatterChart(StackedArea):
   """
 
@@ -319,12 +321,20 @@ class ScatterChart(StackedArea):
   withFocus = False
   chartFunction = 'scatterChart'
   useExtraChartOptions = False
+  alias = 'stackedAreaChart'
 
 class Network(JsGraph):
   """
 
   Reference website: https://github.com/nylen/d3-process-map
   """
+  mockData = r'json\mapGraph.json'
+
+  def js(self, localPath=None):
+    """ Return the entries to be added to the Javascript to create the graph during the loading """
+    res = ["%svar config = %s ;\n" % (INDENT, self.pyDataToJs(localPath))]
+    return "\n".join(res)
+
 
 class IndentedTree(JsGraph):
   """
@@ -338,6 +348,7 @@ class IndentedTree(JsGraph):
   reference site: http://nvd3.org/examples/indentedtree.html
   """
   showCount = 1
+  alias = 'tree'
 
   def __init__(self, htmlId, cols, data, useMockData=False):
     """
@@ -382,6 +393,7 @@ class IndentedTree(JsGraph):
                 ]);
           '''
 
+
 class WordCloud(JsGraph):
   """
 
@@ -391,6 +403,7 @@ class WordCloud(JsGraph):
   the update method should appear once and only once in the javascript section of the page
   """
   mockData = r'json\pie.json'
+  alias = 'cloudChart'
 
   def pyDataToJs(self, localPath=None):
     """ """
@@ -463,3 +476,13 @@ class WordCloud(JsGraph):
                   .text(function(d) { return d.text; });
           };
           '''
+
+
+
+
+if __name__ == '__main__':
+  obj = Pie(0, [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}])
+
+  print(obj.jsEvents())
+  print('\n'.join(obj.onLoad()))
+  print(obj.__repr__())
