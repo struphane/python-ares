@@ -305,8 +305,8 @@ def deleteFiles(report_name):
       os.makedirs(deletedLocation)
     # Move the file to the deleted Location
     # This folder should be purged every month
-    shutil.move(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, request.form.get('SCRIPT')),
-                os.path.join(deletedLocation, "%s_%s" % (report_name, request.form.get('SCRIPT'))))
+    #shutil.move(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, request.form.get('SCRIPT')),
+    #            os.path.join(deletedLocation, "%s_%s" % (report_name, request.form.get('SCRIPT'))))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
 # ---------------------------------------------------------------------------------------------------------

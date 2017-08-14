@@ -24,7 +24,7 @@ class JQueryEvents(object):
               'addGraph': ['nv.%(eventType)s(function() {', '}', ');'],
         }
 
-  def __init__(self, htmlId, jsSrcRef, eventType, jsFnc):
+  def __init__(self, htmlId, jsSrcRef, eventType, jsFnc, data=None, url=None):
     """
     """
     if not eventType in self.mapEvent:
@@ -42,7 +42,8 @@ class JQueryEvents(object):
       jsItemFnc = items
     else:
       jsItemFnc = jsFnc
-    self.jsAttr = {'src': jsSrcRef, 'eventType': eventType, 'fnc': jsItemFnc, 'htmlId': htmlId}
+    self.jsAttr = {'src': jsSrcRef, 'eventType': eventType, 'fnc': jsItemFnc, 'htmlId': htmlId,
+                   'data': data, 'url': url}
 
   def __repr__(self):
     """  Return the String representation of the Javascripts methods """

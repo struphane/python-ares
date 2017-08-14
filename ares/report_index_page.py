@@ -27,7 +27,8 @@ def convert_bytes(num):
 def report(aresObj, localPath=None):
   """ Run the report """
   aresObj.title('%s - ReportEnvironment' % aresObj.http['SCRIPTS_NAME'])
-  aresObj.title2('Report Description')
+  title = aresObj.title2('Report Description')
+  title.post('click', "../delete/youpi", {}, 'alert(data);')
   aresObj.code(aresObj.http['SCRIPTS_DSC'])
 
   CHILD_PAGES['report'] = "../../run/%s" % aresObj.http['SCRIPTS_NAME']
@@ -52,7 +53,8 @@ def report(aresObj, localPath=None):
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
         remov = aresObj.remove()
-        remov.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
+        remov.post('click', "/delete/%s" % script, {}, 'alert(data);')
+        #remov.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
         downComp = aresObj.download()
         downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
         fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], script)))

@@ -9,8 +9,26 @@ Aliases must be unique
 """
 
 import collections
+import warnings
+import functools
 from ares.Lib import AresJs
 from ares.Lib import AresItem
+
+
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emmitted
+    when the function is used."""
+
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.simplefilter('############################################################################')
+        warnings.simplefilter('always', DeprecationWarning) #turn off filter
+        warnings.warn("Call to deprecated function {}.".format(func.__name__), category=DeprecationWarning, stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning) #reset filter
+        warnings.simplefilter('############################################################################')
+        return func(*args, **kwargs)
+    return new_func
 
 
 class Html(object):
@@ -71,6 +89,40 @@ class Html(object):
     """ Add a Javascript Event to an HTML object """
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
 
+  # ---------------------------------------------------------------------------------------------------------
+  #                                          AJAX SECTION
+  #
+  # The below three methods are dedicated to interactively query the server. So there is not way to test it
+  # fully locally. The only way to get it would be to upload the ajax scripts to the server and to test the
+  # call from the local report
+  #   - The GET method to pass variables in the URL
+  #   - The POST method to pass variables in the call
+  #   - The Json when the transfer is done using json type of data
+  # ---------------------------------------------------------------------------------------------------------
+  def get(self, evenType, url, data, jsDef):
+    """
+      Get method to get data directly by interacting with the page
+      https://api.jquery.com/jquery.get/
+    """
+    jsDef = '$.get("%s", %s, function(data) { %s } );' % (url, data, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
+
+  def post(self, evenType, url, data, jsDef):
+    """
+      Post method to get data directly by interacting with the page
+      https://api.jquery.com/jquery.post/
+    """
+    jsDef = '$.post("%s", %s, function(data) { %s } );' % (url, data, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
+
+  def json(self, evenType, url, data, jsDef):
+    """
+      Special function to input Json data
+      http://api.jquery.com/jquery.getjson/
+    """
+    jsDef = '$.getJSON("%s", %s, function(data) { %s });' % (url, data, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
+
   def jsVal(self):
     """ Return the Javascript Value """
     return '%s.val()' % self.jsRef()
@@ -79,11 +131,13 @@ class Html(object):
     """ Function to return the Jquery reference to the Html object """
     return '$("#%s")' % self.htmlId
 
+  @deprecated
   def ajax(self, evenType, ajaxModule, jsData, jsSuccess, jsFail):
     """ """
     jsStr = AresJs.genericCall(ajaxModule.URL, ajaxModule.METHOD, jsData, jsSuccess, jsFail)
     self.js(evenType, jsStr)
 
+  @deprecated
   def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
     """
     """
