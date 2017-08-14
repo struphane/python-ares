@@ -40,3 +40,9 @@
     text-align: center;
     display: none;
 }
+
+.notif {
+    margin-top: 10px;
+    position: fixed;
+    width: 50%;
+}

@@ -22,9 +22,9 @@ def report(aresObj):
   aresInput.autocomplete(foldersReports)
   aresButton = aresObj.button("Open Report Section", 'btn btn-success')
   aresButton.js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresInput.jsVal())
-  #aresObj.addNotification('Success', 'GOOD', 'something wrong happened')
-  #aresObj.addNotification('Info', 'HEY', 'something wrong happened')
-  #aresObj.addNotification('Warning', 'ATTNENTION', 'something wrong happened')
+  aresObj.addNotification('Success', 'GOOD', 'something wrong happened')
+  aresObj.addNotification('Info', 'HEY', 'something wrong happened')
+  aresObj.addNotification('Warning', 'ATTENTION', 'something wrong happened')
   # aresObj.addNotification('Danger', 'NO VALUE', 'something wrong happened')
   # Create a new report
   modal = aresObj.modal('click on the link to create a new report section')

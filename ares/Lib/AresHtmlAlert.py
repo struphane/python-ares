@@ -14,7 +14,9 @@ from ares.Lib import AresItem
 
 
 class DangerAlert(AresHtml.Html):
-  """ """
+  """
+
+  """
 
   level = 'Danger'
   backgroundColor = '#f44336'
@@ -22,27 +24,27 @@ class DangerAlert(AresHtml.Html):
   cssCls = 'alert-danger'
   jsEvent = None
 
-  def __init__(self, htmlId, title, value, closeButton=False, backgroundColor=None, cssCls=None):
+  def __init__(self, htmlId, title, value, countNotif, closeButton=False, backgroundColor=None, cssCls=None):
     """ """
-
     if cssCls:
       self.cssCls = cssCls
     super(DangerAlert, self).__init__(htmlId, self.cssCls)
     self.title = title
     self.val = value
     self.closeButton = closeButton
+    self.countNotif = countNotif
     if backgroundColor:
       self.backgroundColor = backgroundColor
 
-  def html(self):
+  def __repr__(self):
     """ """
     if self.closeButton:
-      item = ['<div class="alert %s %s fade in">' % (self.cssCls, 'alert-dismissable')]
-      item.append('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>')
+      items = AresItem.Item('<div class="alert %s %s notif fade in" style="top:%spx">' % (self.cssCls, 'alert-dismissable', self.countNotif * 70))
+      items.add(1, '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>')
     else:
-      item = ['<div class="alert %s">' % self.cssCls]
-    item.append('<strong>%s!</strong> %s </div>' % (self.title, self.val))
-    return '\n'.join(item)
+      items = AresItem.Item('<div class="alert notif %s" style="top:%spx">' % (self.cssCls, self.countNotif * 10))
+    items.add(0, '<strong>%s!</strong> %s </div>' % (self.title, self.val))
+    return str(items)
 
 
 class SuccessAlert(DangerAlert):

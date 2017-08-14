@@ -73,7 +73,7 @@ class Report(object):
     """
     # Internal variable that should not be used directly
     # Those variable will drive the report generation
-    self.countItems = 0
+    self.countItems, self.countNotif = 0, 0
     self.prefix, self.directory = prefix, None
     self.content, self.jsGraph = [], []
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
@@ -96,13 +96,14 @@ class Report(object):
       print("Allowed notification %s" % self.definedNotif.keys())
       raise Exception("Notification Type should belong to one of the above category")
     alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
-    alertObject = alertCls(self.countItems, title, value, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
+    alertObject = alertCls(self.countItems, title, value, self.countNotif, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
     self.htmlItems[alertObject.htmlId] = alertObject
     self.content.append(alertObject.htmlId)
     if notif == 'DANGER':
       self.interruptReport = (True, alertObject.htmlId)  # we keep track of the object since this is the only thing we will display
     self.countItems += 1
-    return alertObject.htmlId
+    self.countNotif += 1
+    return alertObject
 
   def item(self, itemId):
     """ Return the HTML object """
