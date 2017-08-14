@@ -83,6 +83,6 @@ def report(aresObj, localPath=None):
   dropComp.reportName = aresObj.http['SCRIPTS_NAME']
   aresObj.table(scripts)
 
-  zipComp = aresObj.downloadAll(" %s.zip" % aresObj.http['SCRIPTS_NAME'])
+  zipComp = aresObj.downloadAll()
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
   return aresObj

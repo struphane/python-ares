@@ -20,7 +20,7 @@ def report(aresObj):
       foldersReports.append(folder)
   # Add this list to the auto completion of the input item
   aresInput.autocomplete(foldersReports)
-  aresButton = aresObj.button("Open Report Section", 'btn-success')
+  aresButton = aresObj.button("Open Report Section", 'btn btn-success')
   aresButton.js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresInput.jsVal())
   #aresObj.addNotification('Success', 'GOOD', 'something wrong happened')
   #aresObj.addNotification('Info', 'HEY', 'something wrong happened')
@@ -29,7 +29,7 @@ def report(aresObj):
   # Create a new report
   modal = aresObj.modal('click on the link to create a new report section')
   aresObj.addTo(modal, aresObj.input("Report Name", ''))
-  aresObj.addTo(modal, aresObj.button("Create the Report", 'btn-primary'))
+  aresObj.addTo(modal, aresObj.button("Create the Report", 'btn btn-primary'))
   #modalAres.item(bModal).jsAjax('click', 'alert(data);location.href = "../reports/index";',
   #                              'report_index_set.py', localPath, {'report': modalAres.item(iReportName).jsVal(),
   #                                                                 'serverPath': '"%s"' % localPath}, url='reports/create')
