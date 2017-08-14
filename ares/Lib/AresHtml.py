@@ -192,8 +192,7 @@ class Html(object):
     return jsEventFnc
 
   def html(self):
-    """
-    """
+    """ Return the onload, the HTML object and the javascript events """
     return self.onLoad(), self.__repr__(), self.jsEvents()
 
 

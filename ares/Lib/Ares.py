@@ -201,7 +201,7 @@ class Report(object):
   def horizBarChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
 
   # Anchor section
-  def anchor(self, value, cssCls=None):
+  def anchor(self, value='', cssCls=None):
     return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
   def input(self, value:str, cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
@@ -209,18 +209,17 @@ class Report(object):
     """
 
     """
-    onloadParts, htmlParts, jsCallsParts = set(), [], collections.defaultdict(set)
+    onloadParts, htmlParts, jsSection, jsGraphs = set(), [], [], []
     for htmlId in self.content:
       jsOnload, html, js = self.htmlItems[htmlId].html()
-      onloadParts = onloadParts.union(jsOnload)
+      for onloadFnc in jsOnload:
+        onloadParts.add(onloadFnc)
       htmlParts.append(html)
       for jsType, jsFncs in js.items():
-        jsCallsParts[jsType] = jsCallsParts[jsType].union(jsFncs)
+        if jsType == 'addGraph':
+          jsGraphs.append("\n".join(jsFncs))
+        else:
+          jsSection.append("\n".join(jsFncs))
 
-    jsSection = []
-    for jsType, jsFncs in jsCallsParts.items():
-      if jsType == 'addGraph':
-        jsSection.append("nv.addGraph(function() {\n %s });" % "\n".join(jsFncs))
-      else:
-        jsSection.append("\n".join(jsFncs))
+    jsSection.append("nv.addGraph(function() {\n %s });" % "\n".join(jsGraphs))
     return "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

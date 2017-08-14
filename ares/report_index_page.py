@@ -27,13 +27,12 @@ def convert_bytes(num):
 def report(aresObj, localPath=None):
   """ Run the report """
   aresObj.title('%s - ReportEnvironment' % aresObj.http['SCRIPTS_NAME'])
-  title = aresObj.title2('Report Description')
-  title.post('click', "../delete/youpi", {}, 'alert(data);')
+  aresObj.title2('Report Description')
   aresObj.code(aresObj.http['SCRIPTS_DSC'])
 
   CHILD_PAGES['report'] = "../../run/%s" % aresObj.http['SCRIPTS_NAME']
   scriptComp = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'])
-  scriptComp.js('click', 'preloader();')
+  scriptComp.preload('click')
   scriptComp.addLink('report')
   aresObj.title('List des scripts')
   comp = aresObj.download()
@@ -53,7 +52,7 @@ def report(aresObj, localPath=None):
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
         remov = aresObj.remove()
-        remov.post('click', "/delete/%s" % script, {}, 'alert(data);')
+        remov.post('click', "../delete/%s" % script, {}, 'alert(data);')
         #remov.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
         downComp = aresObj.download()
         downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
@@ -72,7 +71,7 @@ def report(aresObj, localPath=None):
   for script in aresObj.http['SCRIPTS']:
     if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc'):
       removComp = aresObj.remove()
-      removComp.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
+      #removComp.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
       downComp = aresObj.download()
       downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
       fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], script)))

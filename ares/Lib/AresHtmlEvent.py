@@ -141,7 +141,7 @@ class A(AresHtml.Html):
       self.link = '#' if self.jsEvent is not None else self.link
     return '<a href="%s" %s>%s</a>' % (self.link , self.strAttr(), self.vals)
 
-  def js(self, evenType, jsDef):
+  def preload(self, evenType, jsDef='', preloading=True):
     """
     Common implementation to add javascript callback functions
 
@@ -149,7 +149,9 @@ class A(AresHtml.Html):
     If some Ajax / DB calls are required, users will have to directly defined those items when they are writing
     the python report
     """
-    self.jsEvent[evenType] = "%s window.location = '%s' ;" % (jsDef, self.link)
+    if preloading:
+      jsDef = "preloader(); %s" % jsDef
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, "%s window.location = '%s' ;" % (jsDef, self.link), jsDef)
 
 
 class Input(AresHtml.Html):

@@ -195,16 +195,16 @@ def page_report(report_name):
     reportObj.http['SCRIPTS_DSC'] = mod.__doc__.strip()
   except Exception as e:
     reportObj.http['SCRIPTS_DSC'] = e
-  finally:
-    # Internal callback functions, Users are not expected to use them
-    reportObj.http['SCRIPTS_CHILD'] = children
-    reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
-    reportObj.http['AJAX_CALLBACK'] = {}
-    reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-    reportObj.childPages = report_index_page.CHILD_PAGES
-    onload, content, js = report_index_page.report(reportObj).html()
-    if scriptEnv in sys.modules:
-      del sys.modules[scriptEnv]
+
+  # Internal callback functions, Users are not expected to use them
+  reportObj.http['SCRIPTS_CHILD'] = children
+  reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
+  reportObj.http['AJAX_CALLBACK'] = {}
+  reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  reportObj.childPages = report_index_page.CHILD_PAGES
+  onload, content, js = report_index_page.report(reportObj).html()
+  if scriptEnv in sys.modules:
+    del sys.modules[scriptEnv]
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/")

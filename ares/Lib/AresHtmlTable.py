@@ -34,8 +34,21 @@ class Table(AresHtml.Html):
     item.add(0, '</table>')
     return str(item)
 
+  def jsEvents(self, jsEventFnc=None):
+    """ Function to get the Javascript methods for this object and all the underlying objects """
+    if jsEventFnc is None:
+      jsEventFnc = self.jsEventFnc
+    for jEventType, jsEvent in self.jsEvent.items():
+      jsEventFnc[jEventType].add(str(jsEvent))
+
+    for row in self.vals:
+      for val in row:
+        if hasattr(val, 'jsEvent'):
+          getattr(val, 'jsEvents')(jsEventFnc)
+    return jsEventFnc
+
 
 
 if __name__ == '__main__':
   obj = Table(0, [['Olivier', 'Aurelie'], [1, 2]])
-  print(obj)
+  print(obj.html())
