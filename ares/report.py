@@ -268,13 +268,13 @@ def child(report_name, script):
 
   return render_template('ares_template.html', content=result)
 
-@report.route("/create/<report_name>", methods = ['GET', 'POST'])
-def ajaxCreate(report_name):
+@report.route("/create/env", methods = ['GET', 'POST'])
+def ajaxCreate():
   """ Special Ajax call to set up the environment """
   reportObj = Ares.Report()
   reportObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   for postValues in request.form.items():
-	  reportObj.http['POST'][postValues[0]] = postValues[1]
+    reportObj.http['POST'][postValues[0]] = postValues[1]
   return json.dumps(report_index_set.call(reportObj))
 
 @report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
