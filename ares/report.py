@@ -9,6 +9,7 @@ import zipfile
 import io
 import collections
 import traceback
+import time
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file
 
@@ -292,7 +293,15 @@ def uploadFiles(report_name):
   if request.method == 'POST':
     for filename, fileType in request.files.items():
       file = request.files[filename]
-      file.save(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename))
+      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
+      file.save(fileFullPath)
+    if not os.path.exists("%s.zip" % fileFullPath):
+      with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
+        zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
+    else:
+      zf = zipfile.ZipFile("%s.zip" % fileFullPath, 'a')
+      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
+      zf.close()
   return json.dumps({})
 
 @report.route("/delete/<report_name>", methods = ['POST'])

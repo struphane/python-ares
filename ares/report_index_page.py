@@ -69,7 +69,7 @@ def report(aresObj, localPath=None):
         displayedScript[script] = True
 
   for script in aresObj.http['SCRIPTS']:
-    if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc'):
+    if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc') and not script.endswith('zip'):
       removComp = aresObj.remove()
       #removComp.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
       downComp = aresObj.download()
