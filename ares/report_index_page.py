@@ -52,7 +52,7 @@ def report(aresObj, localPath=None):
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
         remov = aresObj.remove()
-        remov.post('click', "../delete/%s" % script, {}, 'alert(data);')
+        remov.post('click', "../delete/%s" % script, {}, 'display(data);')
         #remov.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
         downComp = aresObj.download()
         downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
