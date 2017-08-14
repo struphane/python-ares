@@ -131,29 +131,6 @@ class Html(object):
     """ Function to return the Jquery reference to the Html object """
     return '$("#%s")' % self.htmlId
 
-  @deprecated
-  def ajax(self, evenType, ajaxModule, jsData, jsSuccess, jsFail):
-    """ """
-    jsStr = AresJs.genericCall(ajaxModule.URL, ajaxModule.METHOD, jsData, jsSuccess, jsFail)
-    self.js(evenType, jsStr)
-
-  @deprecated
-  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
-    """
-    """
-    ajaxObject = AresJs.XsCallHtml(scriptName)
-    if url is not None:
-      ajaxObject.url = url
-    ajaxObject.success(jsDef)
-    vals = []
-    for key, val in data.items():
-      vals.append('"%s": %s' % (key, val))
-    vals = '{%s}' % ",".join(vals)
-    if localPath is not None:
-      self.js(evenType, ajaxObject.ajaxLocal(vals))
-    else:
-      self.js(evenType, ajaxObject.ajax(vals))
-
   def onLoadFnc(self):
     """ Return a String with the Javascript method to put in the HTML report """
     return None

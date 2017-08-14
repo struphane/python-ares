@@ -41,22 +41,6 @@ class ButtonRemove(AresHtml.Html):
     """ Return the String representation of a HTML Style Twitter button """
     return '<button type="button" %s><span class="glyphicon glyphicon-%s"></span></button>' % (self.strAttr(), self.glyphicon)
 
-  def jsAjax(self, evenType, jsDef, scriptName, localPath, data=None, url=None):
-    """ """
-    ajaxObject = AresJs.XsCallHtml(scriptName)
-    ajaxObject.url = 'delete'
-    if url is not None:
-      ajaxObject.url = url
-    ajaxObject.success(jsDef)
-    vals = []
-    for key, val in data.items():
-      vals.append('"%s": "%s"' % (key, val))
-    vals = '{%s}' % ",".join(vals)
-    if localPath is not None:
-      self.js(evenType, ajaxObject.ajaxLocal(vals))
-    else:
-      self.js(evenType, ajaxObject.ajax(vals))
-
 
 class ButtonDownload(ButtonRemove):
   """
