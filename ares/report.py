@@ -125,7 +125,7 @@ def report_dsc_graph():
   aresObj = Ares.Report()
   aresObj.reportName = 'dsc/graph'
   aresObj.childPages = {}
-  graphObject = []
+  graphObject = [['Class Name', 'Description']]
   aresObj.title("Graph Components")
   aresObj.title4(AresHtmlGraph.__doc__)
   for name, obj in inspect.getmembers(AresHtmlGraph):
@@ -134,7 +134,7 @@ def report_dsc_graph():
       comp = aresObj.anchor(name)
       comp.addLink(name)
       graphObject.append([comp, aresObj.code(obj.__doc__)])
-  aresObj.table(['Class Name', 'Description'], graphObject)
+  aresObj.table(graphObject)
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 

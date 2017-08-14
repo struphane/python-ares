@@ -71,8 +71,8 @@ class Donut(Pie):
   Data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
-  showLabel = 1 # True in Javascript
   mockData = r'json\pie.json'
+  alias = 'donutChart'
 
   def jsChart(self):
     """ Return the javascript method to use to create the Chart """
@@ -119,6 +119,7 @@ class Line(JsGraph):
   """
   duration = 200
   mockData = r'json\line.json'
+  alias = 'lineChart'
 
   def jsxAxix(self):
     """ """
@@ -160,7 +161,7 @@ class StackedArea(JsGraph):
 
   Reference website: http://nvd3.org/examples/stackedArea.html
   """
-
+  alias = 'stackedAreaChart'
   mockData = r'json\stackedAreaData.json'
   withFocus = False
   multiY = False
@@ -268,7 +269,7 @@ class LineWithFocus(StackedArea):
   withFocus = True
   chartFunction = 'lineWithFocusChart'
   useExtraChartOptions = False
-  alias = 'lineChart'
+  alias = 'lineChartFocus'
 
 class HorizontalBars(StackedArea):
   """ """
@@ -321,7 +322,7 @@ class ScatterChart(StackedArea):
   withFocus = False
   chartFunction = 'scatterChart'
   useExtraChartOptions = False
-  alias = 'stackedAreaChart'
+  alias = 'scatterChart'
 
 class Network(JsGraph):
   """

@@ -193,12 +193,15 @@ class Report(object):
   # Chart section
   def bar(self, values:list, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
   def pieChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def donutChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def lineChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
   def cloudChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
   def tree(self, values:list, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
   def comboLineBar(self, values:list, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def stackedAreaChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def scatterChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def stackedAreaChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
   def multiBarChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def lineChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def lineChartFocus(self, values:list, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
   def horizBarChart(self, values:list, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
 
   # Anchor section
