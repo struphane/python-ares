@@ -229,9 +229,9 @@ def run_report(report_name):
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
     reportObj.http['FILE'] = report_name
     aresObj = mod.report(reportObj)
-    downAll = aresObj.download(cssCls='bdiBar-download')
+    downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
-    downScript = aresObj.downloadAll(cssCls='bdiBar-download-all')
+    downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     onload, content, js = aresObj.html()
   except Exception as e:
