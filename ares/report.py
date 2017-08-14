@@ -169,7 +169,7 @@ def report_dsc_graph_details(chartName):
   comp.addLink('graph')
   aresObj.paragraph(['You can download the input data here: ', comp])
   compObj = aresComponents[chartName](0, data)
-  aresObj.code(compObj.jsEvents()['addGraph'])
+  aresObj.code("%s\n" % "".join(compObj.jsEvents()['addGraph'])[:-3])
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 

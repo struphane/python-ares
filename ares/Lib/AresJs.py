@@ -21,7 +21,6 @@ class JQueryEvents(object):
               'blur': [''],
               'autocomplete': ['%(src)s.autocomplete({', '}', ');'],
               'change': ['%(src)s.on("%(eventType)s", function (event){', '}', ');'],
-              'addGraph': ['nv.%(eventType)s(function() {', '}', ');'],
         }
 
   def __init__(self, htmlId, jsSrcRef, eventType, jsFnc, data=None, url=None):
@@ -80,14 +79,14 @@ class JD3Graph(object):
     else:
       jsChart = chart
 
-    self.jGraphAttr.update({'chart': jsChart, 'data': data})
+    self.jGraphAttr.update({'chart': str(jsChart)[1:].strip(), 'data': data})
 
   def __repr__(self):
     """ """
     res = AresItem.Item()
     res.add(1, 'var chart_%(htmlId)s = %(chart)s' % self.jGraphAttr)
     res.add(1, "var data_%(htmlId)s = %(data)s ;" % self.jGraphAttr)
-    res.add(1, "d3.%(src)s.datum(data_%(htmlId)s).transition().call(chart_%(htmlId)s)); " % self.jGraphAttr)
+    res.add(1, "d3.%(src)s.datum(data_%(htmlId)s).transition().call(chart_%(htmlId)s) ; " % self.jGraphAttr)
     return str(res)
 
 

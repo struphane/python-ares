@@ -34,7 +34,7 @@ class JsGraph(AresHtmlContainer.GraphSvG):
     if jsEventFnc is None:
       jsEventFnc = self.jsEventFnc
     jGraphAttr = {'src': self.jsRef(), 'htmlId': self.htmlId, 'duration': self.duration}
-    self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart(), self.dataFnc())
+    self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart().strip(), self.dataFnc())
     for jEventType, jsEvent in self.jsEvent.items():
       jsEventFnc[jEventType].add(str(jsEvent))
     return jsEventFnc
