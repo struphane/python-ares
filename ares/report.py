@@ -308,14 +308,15 @@ def uploadFiles(report_name):
 def deleteFiles(report_name):
   """ Delete a file in the report environment """
   import shutil
+  print (request.form.get('SCRIPT'))
   if request.form.get('SCRIPT') is not None:
     deletedLocation = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_DELETED_FOLDERS)
     if not os.path.exists(deletedLocation):
       os.makedirs(deletedLocation)
     # Move the file to the deleted Location
     # This folder should be purged every month
-    #shutil.move(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, request.form.get('SCRIPT')),
-    #            os.path.join(deletedLocation, "%s_%s" % (report_name, request.form.get('SCRIPT'))))
+    shutil.move(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, request.form.get('SCRIPT')),
+                os.path.join(deletedLocation, "%s_%s" % (report_name, request.form.get('SCRIPT'))))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
 # ---------------------------------------------------------------------------------------------------------

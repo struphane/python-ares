@@ -52,13 +52,11 @@ def report(aresObj, localPath=None):
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
         remov = aresObj.remove()
-        remov.post('click', "../delete/%s" % script, {}, 'display(data);')
-        #remov.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
+        remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
         downComp = aresObj.download()
         downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
         fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], script)))
         fileDate = time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], script))))
-        #aresObj.item(bId).jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, {'SCRIPT': "'%s'" % script})
         ajxCall =  aresObj.http['SCRIPTS_AJAX'].get(script, [])
         for call in ajxCall:
           displayedScript[call] = True
@@ -71,7 +69,7 @@ def report(aresObj, localPath=None):
   for script in aresObj.http['SCRIPTS']:
     if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc') and not script.endswith('zip'):
       removComp = aresObj.remove()
-      #removComp.jsAjax('click', 'location.href = "/reports/page/%s";' % aresObj.http['SCRIPTS_NAME'], aresObj.http['SCRIPTS_NAME'], localPath, data={'SCRIPT': script}, url=None)
+      removComp.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, "display(data); window.location.href='../page/%s' ;" % aresObj.http['SCRIPTS_NAME'])
       downComp = aresObj.download()
       downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
       fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], script)))
