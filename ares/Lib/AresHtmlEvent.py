@@ -15,7 +15,7 @@ class Button(AresHtml.Html):
   Default class parameters
     - CSS Default Class = button
   """
-  alias, cssCls = 'button', 'btn'
+  alias, cssCls = 'button', 'btn btn-success'
   reference = 'https://www.w3schools.com/tags/tag_button.asp'
 
   def __repr__(self):
@@ -351,14 +351,17 @@ class DatePicker(AresHtml.Html):
   reference = 'https://jqueryui.com/datepicker/'
   requirements = ['jquery-ui.js']
   alias = 'date'
+  cssCls = 'datepicker'
 
   def __repr__(self):
     """ Return the String representation of a Date picker object """
+    if '-' in self.vals:
+      return '<p>Date: <input type="text" %s value="%s"></p>' % (self.strAttr(), self.vals)
     return '<p>Date: <input type="text" %s></p>' % self.strAttr()
 
-  def onloadFnc(self):
+  def onLoadFnc(self):
     """ Start the Date picker transformation when the document is loaded """
-    return AresItem.Item.indents(2, "%s.datepicker();" % self.jsRef())
+    return AresItem.Item.indents(2, "$( function() {%s.datepicker({dateFormat: 'yy-mm-dd'} ); } );" % self.jsRef())
 
 
 class DropZone(AresHtml.Html):
