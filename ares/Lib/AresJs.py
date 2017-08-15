@@ -7,6 +7,7 @@ reference website: http://api.jquery.com/jquery.ajax/
 
 """
 
+import six
 from ares.Lib import AresItem
 
 
@@ -34,7 +35,7 @@ class JQueryEvents(object):
       print('In the function is not implemented yet please have a look at the call in AreHtml.py')
       raise Exception('%s not defined for this %s!' % (eventType, self.__class__))
 
-    if isinstance(jsFnc, str):
+    if isinstance(jsFnc, six. text_type): # to be compatible with unicode in python 2
       splitFnc = jsFnc.strip().split("\n")
       items = AresItem.Item(splitFnc[0].strip())
       for line in splitFnc[1:]:
