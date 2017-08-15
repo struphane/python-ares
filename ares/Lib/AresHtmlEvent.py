@@ -101,14 +101,14 @@ class A(AresHtml.Html):
     self.reportName = reportName
     self.directory = directory
 
-  def addLink(self, link):
+  def addLink(self, link, dots='..'):
     """ Add the link to another page to this object """
     if self.directory is None:
       splitUrl  = link.split("?")
       if len(splitUrl) > 1:
-        link = "./child:%s/%s?%s" % (self.reportName, self.childPages[splitUrl[0]].replace(".py", ""), splitUrl[1])
+        link = "%s/child:%s/%s?%s" % (dots, self.reportName, self.childPages[splitUrl[0]].replace(".py", ""), splitUrl[1])
       else:
-        link = "./child:%s/%s" % (self.reportName, self.childPages[splitUrl[0]].replace(".py", ""))
+        link = "%s/child:%s/%s" % (dots, self.reportName, self.childPages[splitUrl[0]].replace(".py", ""))
       self.link = link
     else:
       # There is a child and we need to produce the sub Report attached to it

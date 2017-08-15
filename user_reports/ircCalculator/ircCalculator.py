@@ -1,7 +1,7 @@
 ''' [SCRIPT COMMENT] '''
 
 AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
-CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',} 
+CHILD_PAGES = {'results': 'ircCalculatorResults.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 def report(aresObj):
   aresObj.title('IRC Calculator')
@@ -17,5 +17,13 @@ def report(aresObj):
   aresObj.newline()
   aresObj.title3('Available Environments')
 
+  dataTabe = [['Folder']]
+  for folder in aresObj.getFolders():
+    env = folder.split("\\")
+    if len(env) == 3:
+      ahref = aresObj.anchor(folder)
+      ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]))
+      dataTabe.append([ahref])
+  aresObj.table(dataTabe)
 
   return aresObj

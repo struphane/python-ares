@@ -9,8 +9,8 @@ import requests
 
 
 reportName = 'ircCalculator'
-projectLocalPath = r'E:\GitHub\Ares\saturn'
-filename = 'saturn.py'
+projectLocalPath = r'E:\GitHub\Ares\ares\Lib'
+filename = 'ircCalculatorResults.py'
 
 # The Url to be used in order to create the environments in Ares
 # This will allow the use of scripts instead of the web interface
@@ -18,7 +18,7 @@ serverPath = 'http://127.0.0.1:5000'
 postUrlDeploy = r'%s/reports/upload/%s' % (serverPath, reportName)
 postUrlCreate = r'%s/reports/create/env' % serverPath
 postUrlFolderCreate = r'%s/reports/folder/create' % serverPath
-withEnvCreation = True
+withEnvCreation = False
 
 def uploadFile(filename):
   """ Upload a file on the server """
@@ -37,4 +37,5 @@ def createFolders(folders):
   response = requests.post(postUrlFolderCreate, {'REPORT_NAME': reportName, 'FOLDERS': "/".join(folders)})
 
 
-createFolders(['aa', 'bb'])
+#createFolders(['aa', 'bb'])
+uploadFile(filename)

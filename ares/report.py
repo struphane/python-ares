@@ -74,7 +74,7 @@ def report_dsc_index():
   aresComp.addLink('html')
   aresObj.newline()
   aresComp = aresObj.anchor('Graph Component documentation')
-  aresComp.addLink('graph')
+  aresComp.addLink('graph', dots='.')
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
@@ -99,7 +99,7 @@ def report_dsc_html():
       if inspect.isclass(obj) and obj.alias is not None:
         aresObj.childPages[name] = '../../../child:dsc/html/%s' % obj.alias
         comp = aresObj.anchor(name)
-        comp.addLink(name)
+        comp.addLink(name, dots='.')
         htmlObject.append([comp, aresObj.code(obj.__doc__)])
     aresObj.table(htmlObject)
 
@@ -133,7 +133,7 @@ def report_dsc_graph():
     if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
       aresObj.childPages[name] = '../../../child:dsc/graph/%s' % name
       comp = aresObj.anchor(name)
-      comp.addLink(name)
+      comp.addLink(name, dots='.')
       graphObject.append([comp, aresObj.code(obj.__doc__)])
   aresObj.table(graphObject)
   onload, content, js = aresObj.html()
@@ -231,6 +231,7 @@ def run_report(report_name):
     mod = __import__(report_name)
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
     reportObj.http['FILE'] = report_name
+    reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
     aresObj = mod.report(reportObj)
     downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
@@ -250,28 +251,32 @@ def run_report(report_name):
 def child(report_name, script):
   """ Return the content of the attached pages """
   reportObj = Ares.Report()
-  reportObj.http['FILE'] = report_name
   for getValues in request.args.items():
     reportObj.http['GET'][getValues[0]] = getValues[1]
 
+  onload, js = '', ''
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
+    mod = __import__(script)
+    reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
+    reportObj.http['FILE'] = script
+    reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
-    aresObj = __import__(script).report(reportObj)
-    dId = aresObj.download(cssCls='bdiBar-download')
-    aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
-    spId = aresObj.downloadAll('', cssCls='bdiBar-download-all')
-    aresObj.item(spId).js('click', "window.location.href='../download/%s/package'" % report_name)
-    result = aresObj.html(None)
-    del sys.modules[script]
+    reportObj.reportName = report_name
+    aresObj = mod.report(reportObj)
+    downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
+    downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
+    downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
+    downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
+    onload, content, js = aresObj.html()
   except Exception as e:
-    result = e
+    content = traceback.format_exc()
   finally:
-    if report_name in sys.modules:
-      del sys.modules[report_name]
+    if script in sys.modules:
+      del sys.modules[script]
 
-  return render_template('ares_template.html', content=result)
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/create/env", methods = ['GET', 'POST'])
 def ajaxCreate():
@@ -398,7 +403,6 @@ def create_folder():
   for postValues in request.form.items():
     reportObj.http['POST'][postValues[0]] = postValues[1]
   reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['POST']['REPORT_NAME'])
-  print(reportObj.http['POST']['FOLDERS'])
   subfolders = reportObj.http['POST']['FOLDERS'].split("/")
   subDirectories = os.path.join(reportObj.http['DIRECTORY'], *subfolders)
   if not os.path.exists(subDirectories):

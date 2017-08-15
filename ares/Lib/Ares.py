@@ -259,6 +259,14 @@ class Report(object):
       os.makedirs(subFolderDirectory)
     return open('%s\%s' % (subFolderDirectory, file), 'w')
 
+  def getFolders(self):
+    """ Return the list of sub folders in tne environment """
+    folders = set()
+    for folder in os.walk(os.path.join(self.http['DIRECTORY'])):
+      if not '__pycache__' in folder[0] and folder[0]  != self.http['DIRECTORY']:
+        folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
+    return folders
+
   def html(self):
     """
 
