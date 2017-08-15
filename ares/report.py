@@ -380,3 +380,28 @@ def download():
     zf.writestr('html/', '')
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
+
+
+# ---------------------------------------------------------------------------------------------------------
+#                             CREATE FILES AND FOLDERS IN AN ARES ENV
+#
+# The below section will allow
+#   - To get the full Ares updated package
+#   - To get the full report updated package
+#   - To get the last version of a specific script
+# ---------------------------------------------------------------------------------------------------------
+
+@report.route("/folder/create", methods = ['POST'])
+def create_folder():
+  """ This REST service will create a file in a given env """
+  reportObj = Ares.Report()
+  for postValues in request.form.items():
+    reportObj.http['POST'][postValues[0]] = postValues[1]
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['POST']['REPORT_NAME'])
+  print(reportObj.http['POST']['FOLDERS'])
+  subfolders = reportObj.http['POST']['FOLDERS'].split("/")
+  subDirectories = os.path.join(reportObj.http['DIRECTORY'], *subfolders)
+  if not os.path.exists(subDirectories):
+    os.makedirs(subDirectories)
+  return json.dumps('Folders created in the env %s' % reportObj.http['POST']['REPORT_NAME'])
+

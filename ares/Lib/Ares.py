@@ -170,7 +170,7 @@ class Report(object):
 
   # Action section
   def slider(self, value, cssCls=None): return self.add(AresHtmlEvent.Slider(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def date(self, value, cssCls=None): return self.add(AresHtmlEvent.DatePicker(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def date(self, label='Date', cssCls=None): return self.add(AresHtmlEvent.DatePicker(self.getNext(), label, cssCls), sys._getframe().f_code.co_name)
   def textArea(self, value, cssCls=None): return self.add(AresHtmlEvent.TextArea(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def button(self, value, cssCls=None): return self.add(AresHtmlEvent.Button(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
@@ -211,7 +211,7 @@ class Report(object):
 
 
   # ---------------------------------------------------
-  # Action on files and folders reaad and write
+  #    Action on files and folders reaad and write
   #
   # ---------------------------------------------------
 

@@ -352,12 +352,17 @@ class DatePicker(AresHtml.Html):
   requirements = ['jquery-ui.js']
   alias = 'date'
   cssCls = 'datepicker'
+  dflt = ''
+
+  def addVal(self, dflt):
+    """ Add a default value to this object """
+    self.dflt = dflt
 
   def __repr__(self):
     """ Return the String representation of a Date picker object """
-    if '-' in self.vals:
-      return '<p>Date: <input type="text" %s value="%s"></p>' % (self.strAttr(), self.vals)
-    return '<p>Date: <input type="text" %s></p>' % self.strAttr()
+    if '-' in self.dflt:
+      return '<p>%s: <input type="text" %s value="%s"></p>' % (self.vals, self.strAttr(), self.dflt)
+    return '<p>%s: <input type="text" %s></p>' % (self.vals, self.strAttr())
 
   def onLoadFnc(self):
     """ Start the Date picker transformation when the document is loaded """
