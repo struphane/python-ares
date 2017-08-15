@@ -60,6 +60,7 @@ def getChildrenFlatStruct(scriptTree, listChildren):
       if children[child]:
         getChildrenFlatStruct(children, listChildren)
 
+@report.route("/doc")
 @report.route("/dsc")
 @report.route("/dsc/index")
 def report_dsc_index():
