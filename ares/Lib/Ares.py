@@ -209,6 +209,56 @@ class Report(object):
     return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
   def input(self, value, cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
+
+  # ---------------------------------------------------
+  # Action on files and folders reaad and write
+  #
+  # ---------------------------------------------------
+
+  # TODO add the closure in ares when the report is running
+  # It should not be the user responsible to close the files
+
+  def readFile(self, file, subfolders=None):
+    """
+    This function will read a file in the list of sub folder
+    that the user will select in the report directory
+    """
+    if subfolders is not None:
+      filePath = os.path.join(self.http['DIRECTORY'], *subfolders, file)
+    else:
+      filePath = os.path.join(self.http['DIRECTORY'], file)
+
+    if os.path.exists(filePath):
+      return open(filePath)
+
+    return None
+
+  def createFile(self, file, subfolders=None, checkFileExist=True):
+    """
+    This function will create a file in the folder that the user will select
+    This function will return an error is the file already exist and we try to override it
+    You can change the flag to False if you do not want to fail
+    """
+    if checkFileExist:
+      if subfolders is not None:
+        subFolderDirectory = os.path.join(self.http['DIRECTORY'], *subfolders, file)
+        if os.path.exists(subFolderDirectory):
+          print("%s file already created on the server" % file)
+          return None
+
+      else:
+        if os.path.exists(os.path.join(self.http['DIRECTORY'], file)):
+          print("%s file already created on the server" % file)
+          return None
+
+    if subfolders is None:
+      return open(os.path.join(self.http['DIRECTORY'], file), 'w')
+
+    subFolderDirectory = os.path.join(self.http['DIRECTORY'], *subfolders)
+    if not os.path.exists(subFolderDirectory):
+      os.makedirs(subFolderDirectory)
+    return open('%s\%s' % (subFolderDirectory, file), 'w')
+
   def html(self):
     """
 

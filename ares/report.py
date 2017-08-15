@@ -15,6 +15,7 @@ from flask import current_app, Blueprint, render_template, request, send_from_di
 
 import config
 
+# TODO add a check on the variable DIRECTORY to ensure that it cannot be changed
 
 # Ares Framework
 from ares.Lib import Ares
@@ -223,12 +224,14 @@ def run_report(report_name):
   """ Run the report """
   onload, js = '', ''
   try:
-    sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+    sys.path.append(userDirectory)
     reportObj = Ares.Report()
     reportObj.reportName = report_name
     mod = __import__(report_name)
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
     reportObj.http['FILE'] = report_name
+    reportObj.http['DIRECTORY'] = userDirectory
     aresObj = mod.report(reportObj)
     downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
@@ -252,7 +255,9 @@ def child(report_name, script):
     reportObj.http['GET'][getValues[0]] = getValues[1]
 
   try:
-    sys.path.append(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+    sys.path.append(userDirectory)
+    reportObj.http['DIRECTORY'] = userDirectory
     aresObj = __import__(script).report(reportObj)
     dId = aresObj.download(cssCls='bdiBar-download')
     aresObj.item(dId).js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
