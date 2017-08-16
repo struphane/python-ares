@@ -161,7 +161,7 @@ def report_dsc_graph_details(chartName):
   aresObj.text(object.__doc__)
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
   with open(mokfilePath) as data_file:
-    data = json.load(data_file)
+    data = data_file.read()
   getattr(aresObj, object.alias)(data)
 
   # Add the mock data as example
@@ -366,11 +366,12 @@ def downloadReport(report_name):
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
     reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-    for reportFile in os.listdir(reportPath):
-      if reportFile == '__pycache__' or reportFile.endswith('pyc') :
-        continue
-
-      zf.write(os.path.join(reportPath, reportFile), reportFile)
+    for (path, dirs, files) in os.walk(reportPath):
+      for pyFile in  files:
+        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+          continue
+        folder = path.replace("%s" % reportPath, "")
+        zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s" % (folder, pyFile))
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 

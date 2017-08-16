@@ -224,7 +224,8 @@ class Report(object):
     that the user will select in the report directory
     """
     if subfolders is not None:
-      filePath = os.path.join(self.http['DIRECTORY'], *subfolders, file)
+      filePath = os.path.join(self.http['DIRECTORY'], *subfolders)
+      filePath = os.path.join(filePath, file)
     else:
       filePath = os.path.join(self.http['DIRECTORY'], file)
 
@@ -241,7 +242,8 @@ class Report(object):
     """
     if checkFileExist:
       if subfolders is not None:
-        subFolderDirectory = os.path.join(self.http['DIRECTORY'], *subfolders, file)
+        subFolderDirectory = os.path.join(self.http['DIRECTORY'], *subfolders)
+        subFolderDirectory = os.path.join(subFolderDirectory, file)
         if os.path.exists(subFolderDirectory):
           print("%s file already created on the server" % file)
           return None
@@ -263,9 +265,16 @@ class Report(object):
     """ Return the list of sub folders in tne environment """
     folders = set()
     for folder in os.walk(os.path.join(self.http['DIRECTORY'])):
-      if not '__pycache__' in folder[0] and folder[0]  != self.http['DIRECTORY']:
+      if not '__pycache__' in folder[0] and folder[0]  != self.http['DIRECTORY'] and not folder[0].startswith('.svn'):
         folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
     return folders
+
+  def getFiles(self, subfolders):
+    """ return the list of files in a given directory structure """
+    files = set()
+    for pyFile in os.listdir(os.path.join(self.http['DIRECTORY'], *subfolders)):
+      files.add(pyFile)
+    return files
 
   def html(self):
     """

@@ -59,8 +59,7 @@ def report(aresObj):
   aresObj.title2('sub Title')
   aresObj.button('Youpi Test', 'btn-success')
   inComp = aresObj.input('test', 'Encore')
-  inComp.js('blur', 'alert("I can update the DB") ;')
-
+  #inComp.js('blur', 'alert("I can update the DB") ;')
   fontComp = aresObj.text('YYYYYYYYYYYYYYYYYYYYYYYYYYYYYOUPI', 'font-weight-bold')
   aresObj.paragraph('Voici mon result {0}', [fontComp])
   divComp.js('click', ' %s.html(%s);' % (fontComp.jsRef(), spId.jsVal()))
