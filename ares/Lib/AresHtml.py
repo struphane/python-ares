@@ -99,20 +99,20 @@ class Html(object):
   #   - The POST method to pass variables in the call
   #   - The Json when the transfer is done using json type of data
   # ---------------------------------------------------------------------------------------------------------
-  def get(self, evenType, url, data, jsDef):
+  def get(self, evenType, url, data, jsDef, preAjaxJs=''):
     """
       Get method to get data directly by interacting with the page
       https://api.jquery.com/jquery.get/
     """
-    jsDef = '$.get("%s", %s, function(data) { %s } );' % (url, data, jsDef)
+    jsDef = '%s $.get("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
 
-  def post(self, evenType, url, data, jsDef):
+  def post(self, evenType, url, data, jsDef, preAjaxJs=''):
     """
       Post method to get data directly by interacting with the page
       https://api.jquery.com/jquery.post/
     """
-    jsDef = '$.post("%s", %s, function(data) { %s } );' % (url, data, jsDef)
+    jsDef = '%s $.post("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
 
   def json(self, evenType, url, data, jsDef):

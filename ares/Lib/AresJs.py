@@ -66,6 +66,7 @@ class JD3Graph(object):
 
   jGraphAttr = {'src': self.jsRef(), 'fnc': jsDef, 'htmlId': self.htmlId}
   """
+  clickFnc = None
 
   def __init__(self, jGraphAttr, chart, data):
     """ """
@@ -89,8 +90,16 @@ class JD3Graph(object):
     res.add(1, 'var chart_%(htmlId)s = %(chart)s' % self.jGraphAttr)
     res.add(1, "var data_%(htmlId)s = %(data)s ;" % self.jGraphAttr)
     res.add(1, "d3.%(src)s.datum(data_%(htmlId)s).transition().call(chart_%(htmlId)s) ; " % self.jGraphAttr)
+    if self.clickFnc is not None:
+      res.add(1, self.clickFnc)
     return str(res)
 
+  def click(self, jsFnc):
+    """ Store the click function """
+    self.clickFnc = jsFnc
+
+  def jsSelectedValRef(self):
+    return "e.data.label"
 
 class XsCallFile(object):
   """

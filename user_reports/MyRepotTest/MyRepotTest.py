@@ -47,7 +47,9 @@ def report(aresObj):
 
   spId = aresObj.select([('Node', ['GBC', 'BNPPAR'])])
   #aresObj.item(spId).jsAjax('change', textComp.text('data'), 'MyRepotTestAjax.py', '', {})
-
+  donut = aresObj.pieChart([['UN', 1], ['DEUX', 2]])
+  # donut = aresObj.bar([{"key": "Cumulative Return","values": [["A Label", -29.76595777110], ["C Label",  17.76595777110]]}])
+  donut.addClick("alert(e.toSource()) ;")
   divComp =  aresObj.div("Olivier")
   #aresObj.anchor('Great link to a new page', aresObj.http['FILE'], 'test', CHILD_PAGES, localPath)
   #aresObj.anchor('Great link to a new page, Again and Again', aresObj.http['FILE'], 'test3', CHILD_PAGES, localPath)

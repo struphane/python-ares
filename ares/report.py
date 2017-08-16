@@ -162,7 +162,8 @@ def report_dsc_graph_details(chartName):
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
   with open(mokfilePath) as data_file:
     data = data_file.read()
-  getattr(aresObj, object.alias)(data)
+  graphCom = getattr(aresObj, object.alias)(data)
+  graphCom.addClick('alert(e.toSource()) ;')
 
   # Add the mock data as example
   aresObj.title3('Source Code')

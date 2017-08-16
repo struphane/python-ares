@@ -20,6 +20,7 @@ class JsGraph(AresHtmlContainer.GraphSvG):
 
   """
   duration = 350
+  clickFnc, clickObject = None, None
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
@@ -35,6 +36,8 @@ class JsGraph(AresHtmlContainer.GraphSvG):
       jsEventFnc = self.jsEventFnc
     jGraphAttr = {'src': self.jsRef(), 'htmlId': self.htmlId, 'duration': self.duration}
     self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart().strip(), self.dataFnc())
+    if self.clickFnc is not None:
+      self.jsEvent['addGraph'].click(self.clickFnc)
     for jEventType, jsEvent in self.jsEvent.items():
       jsEventFnc[jEventType].add(str(jsEvent))
     return jsEventFnc
@@ -42,6 +45,14 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   def jsRef(self):
     """ Function to return the Jquery reference to the Html object """
     return 'select("#%s svg")' % self.htmlId
+
+  def js(self, evenType, jsDef):
+    """ Add a Javascript Event to an HTML object """
+    raise Exception("Cannot work for a graph ")
+
+  def addClick(self, fnc):
+    """ Add Click function on a graph """
+    self.clickFnc = 'chart_%s.%s.dispatch.on("elementClick", function(e) {%s});' % (self.htmlId, self.clickObject, fnc)
 
 class Pie(JsGraph):
   """
@@ -54,6 +65,7 @@ class Pie(JsGraph):
   """
   showLabel, alias = 1, 'pieChart'
   mockData = r'json\pie.json'
+  clickObject = 'pie'
 
   def jsChart(self):
     """ Return the javascript method to use to create the Chart """
@@ -73,6 +85,7 @@ class Donut(Pie):
   """
   mockData = r'json\pie.json'
   alias = 'donutChart'
+  clickObject = 'pie'
 
   def jsChart(self):
     """ Return the javascript method to use to create the Chart """
@@ -97,6 +110,7 @@ class Bar(JsGraph):
   duration = 200
   mockData = r'json\bar.json'
   alias = 'bar'
+  clickObject = 'discretebar'
 
   def jsChart(self):
     """ """
@@ -173,6 +187,7 @@ class StackedArea(JsGraph):
                   '''
   extraOptions = ''
   useDefaultYAxis = True
+  clickObject = 'scatter'
 
   def pyDataToJs(self, localPath=None):
     """
@@ -261,6 +276,7 @@ class MultiBars(StackedArea):
   chartFunction = 'multiBarChart'
   useExtraChartOptions = False
   alias = 'multiBarChart'
+  clickObject = 'multibar'
 
 class LineWithFocus(StackedArea):
   """ """
