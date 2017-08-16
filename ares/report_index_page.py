@@ -33,7 +33,7 @@ def report(aresObj, localPath=None):
   CHILD_PAGES['report'] = "../../run/%s" % aresObj.http['SCRIPTS_NAME']
   scriptComp = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'])
   scriptComp.preload('click')
-  scriptComp.addLink('report')
+  scriptComp.addLink('report', dots='.')
   aresObj.title('List des scripts')
   comp = aresObj.download()
   comp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})

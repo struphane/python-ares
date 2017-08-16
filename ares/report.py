@@ -223,7 +223,7 @@ def index():
 @report.route("/run/<report_name>")
 def run_report(report_name):
   """ Run the report """
-  onload, js = '', ''
+  onload, js, error = '', '', False
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
@@ -241,11 +241,16 @@ def run_report(report_name):
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     onload, content, js = aresObj.html()
   except Exception as e:
-    content = traceback.format_exc()
+    error = True
+    content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
+    content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
     # Try to unload the module
     if report_name in sys.modules:
       del sys.modules[report_name]
+
+  if error:
+    return render_template('ares_error.html', onload=onload, content=content, js=js)
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/child:<report_name>/<script>", methods = ['GET'])

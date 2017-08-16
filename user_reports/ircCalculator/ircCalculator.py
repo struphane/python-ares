@@ -25,5 +25,4 @@ def report(aresObj):
       ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]))
       dataTabe.append([ahref])
   aresObj.table(dataTabe)
-
   return aresObj
