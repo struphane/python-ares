@@ -260,7 +260,7 @@ def child(report_name, script):
   for getValues in request.args.items():
     reportObj.http['GET'][getValues[0]] = getValues[1]
 
-  onload, js = '', ''
+  onload, js, error = '', '', False
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
@@ -278,9 +278,12 @@ def child(report_name, script):
     onload, content, js = aresObj.html()
   except Exception as e:
     content = traceback.format_exc()
+    error = True
   finally:
     if script in sys.modules:
       del sys.modules[script]
+  if error:
+    return render_template('ares_error.html', onload=onload, content=content, js=js)
 
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
@@ -296,12 +299,30 @@ def ajaxCreate():
 @report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
 def ajaxCall(report_name):
   """ Generic Ajax call """
+  onload, js, error = '', '', False
+  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
   reportObj = Ares.Report()
+  reportObj.http['FILE'] = None
+  reportObj.http['REPORT_NAME'] = report_name
+  reportObj.http['DIRECTORY'] = userDirectory
+  reportObj.reportName = report_name
   for getValues in request.args.items():
     reportObj.http['GET'][getValues[0]] = getValues[1]
   for postValues in request.form.items():
     reportObj.http['POST'][postValues[0]] = postValues[1]
-  return json.dumps(report_name.call(reportObj))
+  try:
+    mod = __import__(report_name)
+    result = mod.call(reportObj)
+  except Exception as e:
+    content = traceback.format_exc()
+    error = True
+  finally:
+    if report_name in sys.modules:
+      del sys.modules[report_name]
+  if error:
+    return render_template('ares_error.html', onload=onload, content=content, js=js)
+
+  return json.dumps(result)
 
 @report.route("/upload/<report_name>", methods = ['POST'])
 def uploadFiles(report_name):
@@ -394,6 +415,35 @@ def download():
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
 
+@report.route("/download/ares", methods = ['GET', 'POST'])
+def downloadAres():
+  """ Download the up to date Ares package """
+  memory_file = io.BytesIO()
+  aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
+  with zipfile.ZipFile(memory_file, 'w') as zf:
+    for pyFile in os.listdir(aresModulePath):
+      if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+        continue
+
+      if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
+        zf.write(os.path.join(aresModulePath, pyFile), os.path.join('Lib', pyFile))
+      else:
+        zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
+  memory_file.seek(0)
+  return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
+
+@report.route("/ares/version", methods = ['GET', 'POST'])
+def getAresFilesVersions():
+  """ Return the files, the version and the size """
+  aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
+  files = {}
+  for pyFile in os.listdir(aresModulePath):
+    if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+      continue
+
+    stat = os.stat(os.path.join(aresModulePath, pyFile))
+    files[pyFile] = [stat.st_mtime, stat.st_size]
+  return json.dumps(files)
 # ---------------------------------------------------------------------------------------------------------
 #                             CREATE FILES AND FOLDERS IN AN ARES ENV
 #

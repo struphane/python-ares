@@ -13,6 +13,7 @@ Ares documentation is available here:
 
 """
 
+from __future__ import print_function
 import os
 from Lib import Ares
 
