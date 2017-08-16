@@ -174,7 +174,21 @@ class Tabs(AresHtml.Html):
     item.add(0, '</ul>')
     return str(item)
 
+class Image(AresHtml.Html):
+  """
+  Python wrapper for a multi Tabs component
 
+  Default class parameters
+    - CSS Default Class = nav nav-tabs
+    - title = Home
+  """
+  alias =  'img'
+  cssCls = 'img-responsive'
+  reference = 'https://www.w3schools.com/bootstrap/bootstrap_ref_css_images.asp'
+
+  def __repr__(self):
+    """ Return the HTML representation of a Tabular object """
+    return ' <img src="../static/images/%s" class="img-responsive" %s> ' % (self.vals, self.strAttr())
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])

@@ -70,11 +70,13 @@ def report_dsc_index():
   aresObj.childPages = {'html': 'html', 'graph': 'graph'}
   aresObj.title("Report Documentation")
   aresObj.title2("How to create a report")
+  aresObj.img('local_runs.JPG')
   aresObj.title2("Report Components")
   aresComp = aresObj.anchor('HTML Component documentation')
   aresComp.addLink('html')
   aresObj.newline()
   aresComp = aresObj.anchor('Graph Component documentation')
+  aresObj.img('graph.JPG')
   aresComp.addLink('graph', dots='.')
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
