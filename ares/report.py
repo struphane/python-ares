@@ -80,10 +80,10 @@ def report_dsc_index():
   aresObj.img('local_runs.JPG')
   aresObj.title2("Report Components")
   aresComp = aresObj.anchor('Local Environment')
-  aresComp.addLink('html')
+  aresComp.addLink('local', dots='.')
   aresObj.newline()
   aresComp = aresObj.anchor('HTML Component documentation')
-  aresComp.addLink('html')
+  aresComp.addLink('html', dots='.')
   aresObj.newline()
   aresComp = aresObj.anchor('Graph Component documentation')
   aresObj.img('graph.JPG')
@@ -127,6 +127,12 @@ def report_dsc_html_details(chartName):
   aresObj.childPages = {}
   aresObj.title(chartName)
   getattr(aresObj, chartName)('Youpi')
+  onload, content, js = aresObj.html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
+
+@report.route("/child:dsc/local")
+def report_dsc_local_details(chartName):
+  aresObj = Ares.Report()
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
