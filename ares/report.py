@@ -59,6 +59,14 @@ def getChildrenFlatStruct(scriptTree, listChildren):
       if children[child]:
         getChildrenFlatStruct(children, listChildren)
 
+def appendToLog(reportName, event, comment):
+  """ Append an event to the dedicated log file """
+  logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportName, 'log_ares.dat'), 'a')
+  showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
+  logFile.write("%s#%s#%s#%s" % (event, showtime[0], showtime[1], comment))
+  logFile.close()
+
+
 @report.route("/doc")
 @report.route("/dsc")
 @report.route("/dsc/index")
@@ -351,20 +359,23 @@ def uploadFiles(report_name):
       file = request.files[filename]
       fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
       file.save(fileFullPath)
-    if not os.path.exists("%s.zip" % fileFullPath):
-      with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
+      appendToLog(report_name, 'UPLOAD', file.filename)
+
+      if not os.path.exists("%s.zip" % fileFullPath):
+        with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
+          zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
+      else:
+        zf = zipfile.ZipFile("%s.zip" % fileFullPath, 'a')
         zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
-    else:
-      zf = zipfile.ZipFile("%s.zip" % fileFullPath, 'a')
-      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
-      zf.close()
+        zf.close()
+
   return json.dumps({})
 
 @report.route("/delete/<report_name>", methods = ['POST'])
 def deleteFiles(report_name):
   """ Delete a file in the report environment """
   import shutil
-  print (request.form.get('SCRIPT'))
+
   if request.form.get('SCRIPT') is not None:
     deletedLocation = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_DELETED_FOLDERS)
     if not os.path.exists(deletedLocation):
@@ -373,6 +384,7 @@ def deleteFiles(report_name):
     # This folder should be purged every month
     shutil.move(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, request.form.get('SCRIPT')),
                 os.path.join(deletedLocation, "%s_%s" % (report_name, request.form.get('SCRIPT'))))
+    appendToLog(report_name, 'DELETE', request.form.get('SCRIPT'))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
 # ---------------------------------------------------------------------------------------------------------
@@ -529,5 +541,6 @@ def create_folder():
   subDirectories = os.path.join(reportObj.http['DIRECTORY'], *subfolders)
   if not os.path.exists(subDirectories):
     os.makedirs(subDirectories)
+    appendToLog(reportObj.http['POST']['REPORT_NAME'], 'FOLDER_CREATION', reportObj.http['POST']['FOLDERS'])
   return json.dumps('Folders created in the env %s' % reportObj.http['POST']['REPORT_NAME'])
 
