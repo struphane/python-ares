@@ -179,6 +179,10 @@ def report_dsc_local_details():
   downloadPicture.doubleDots = 2
   aresObj.table([['', ''], [localEnv, downloadPicture]])
 
+  aresObj.paragraph('''
+                        Then add the different HTML components to your reports !!! <BR />
+                        Once
+                    ''')
 
   aresObj.newline()
   aresObj.title4("Example of Python to HTML transform")
