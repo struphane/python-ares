@@ -206,7 +206,7 @@ class Report(object):
   def horizBarChart(self, values, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
 
   # File HTML Section
-  def upload(self, values, cssCls=None): return self.add(AresHtmlEvent.UploadFile(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
 
 
   # Anchor section

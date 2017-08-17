@@ -492,7 +492,10 @@ class UploadFile(AresHtml.Html):
       jsDef = '$("#value_%s").val(%s);' % (self.htmlId, self.jsVal())
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
 
-
+  def jsEvents(self, jsEventFnc=None):
+    if not self.jsEvent:
+      self.js('change', '')
+    return super(UploadFile, self).jsEvents(jsEventFnc)
 
 
 if __name__ == '__main__':
