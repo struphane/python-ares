@@ -134,7 +134,7 @@ def report_dsc_html_details(chartName):
 def report_dsc_local_details():
   aresObj = Ares.Report()
   aresObj.reportName = None
-  aresObj.childPages = {'download': '../download/ares'}
+  aresObj.childPages = {'html': 'html', 'graph': 'graph', 'download': '../download/ares'}
   aresObj.title("How to use ArES locally")
   aresObj.newline()
   aresObj.title3("What is ArES")
@@ -154,8 +154,7 @@ def report_dsc_local_details():
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('ares_download.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['', ''], [localEnv, downloadPicture]])
-  aresObj.newline()
+  aresObj.table([['', ''], [downloadPicture, localEnv]])
   aresObj.newline()
   aresObj.paragraph('''
                       The framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment
@@ -166,6 +165,39 @@ def report_dsc_local_details():
                       ArES is only a wrapper layer between HTML5 and Javascript, so you can directly include some part of those language to enrich your
                       components. The ArES layer will only put together your object to then build your HTML page.
                     ''')
+  aresObj.title3("Run your first script")
+  aresObj.paragraph('''
+                        First of all create a folder with the name of your report. This name should be the name of the main script of your environment.
+                        Indeed it will be the entry point to go thought your pages interactively. <BR />
+                        Then copy the AresEmtpyReport.py from the Lib folder to your folder and rename it. This will give you the standard format
+                        expected by the framework.
+
+                    ''')
+
+  aresObj.newline()
+  aresObj.title4("Example of Python to HTML transform")
+  localEnv = aresObj.img('html_python.JPG')
+  localEnv.doubleDots = 2
+  downloadPicture = aresObj.img('html_example.JPG')
+  downloadPicture.doubleDots = 2
+  aresObj.table([['', ''], [localEnv, downloadPicture]])
+
+  aresObj.newline()
+  aresObj.title4("Example of Python to Javascript / Ajax transform")
+  localEnv = aresObj.img('javascript_python.JPG')
+  localEnv.doubleDots = 2
+  downloadPicture = aresObj.img('javascript_example.JPG')
+  downloadPicture.doubleDots = 2
+  aresObj.table([['', ''], [localEnv, downloadPicture]])
+
+  aresObj.paragraph('''
+                        More details on the components are available on the below links
+                    ''')
+  aresComp = aresObj.anchor('HTML Component documentation')
+  aresComp.addLink('html', dots='..')
+  aresObj.newline()
+  aresComp = aresObj.anchor('Graph Component documentation')
+  aresComp.addLink('graph', dots='..')
 
   aresObj.title3("Available Modules")
   onload, content, js = aresObj.html()

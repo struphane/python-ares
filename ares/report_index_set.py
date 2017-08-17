@@ -23,7 +23,7 @@ def call(aresObj):
       reportFile.write("In the javascript layer \n")
       reportFile.write("   display(data) to return the result in a notification modal popup \n")
       reportFile.write("   preloader() to show a loading page \n\n")
-      reportFile.write("AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']\n")
+      reportFile.write("AJAX_CALL = {} # Ajax call definition \n")
       reportFile.write("CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',} \n\n")
       reportFile.write("def report(aresObj):\n\n\n\n")
       reportFile.write("  return aresObj")
