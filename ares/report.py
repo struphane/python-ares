@@ -173,6 +173,12 @@ def report_dsc_local_details():
                         expected by the framework.
 
                     ''')
+  localEnv = aresObj.img('first_report_1.JPG')
+  localEnv.doubleDots = 2
+  downloadPicture = aresObj.img('first_report_2.JPG')
+  downloadPicture.doubleDots = 2
+  aresObj.table([['', ''], [localEnv, downloadPicture]])
+
 
   aresObj.newline()
   aresObj.title4("Example of Python to HTML transform")
