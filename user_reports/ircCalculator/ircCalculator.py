@@ -8,6 +8,8 @@ def report(aresObj):
   aresObj.title3('Environment set up')
   dateObj = aresObj.date('COB Date')
   nodeObj = aresObj.input('Node')
+  upload = aresObj.upload('Select File')
+  upload.js('change', 'alert(%s);' %  upload.jsVal())
   aresObj.input('Name')
   button = aresObj.button("Create")
   button.post('click', '/reports/folder/create',

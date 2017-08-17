@@ -222,7 +222,7 @@ def index():
   onload, content, js = report_index.report(aresObj).html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
-@report.route("/run/<report_name>")
+@report.route("/run/<report_name>", method = ['GET'])
 def run_report(report_name):
   """ Run the report """
   onload, js, error = '', '', False
@@ -230,6 +230,8 @@ def run_report(report_name):
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
     reportObj = Ares.Report()
+    for getValues in request.args.items():
+      reportObj.http['GET'][getValues[0]] = getValues[1]
     reportObj.reportName = report_name
     mod = __import__(report_name)
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})

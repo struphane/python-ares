@@ -470,6 +470,29 @@ class DropFile(AresHtml.Html):
     return str(items)
 
 
+class UploadFile(AresHtml.Html):
+  """
+
+  """
+  alias = 'upload'
+  clss = 'custom-file-input'
+
+  def __repr__(self):
+    """ Display the file upload object """
+    items = AresItem.Item('<div class="form-group row"><label class="custom-file col-sm-3 col-form-label">')
+    items.add(1, '<input type="file" %s>' % self.strAttr())
+    items.add(1, '<span class="custom-file-control" id="file_%s"></span>' % self.htmlId)
+    items.add(0, '</label><div class="form-group mx-sm-3"><input class="form-control" type="text" id="value_%s" readonly></div></div>' % self.htmlId)
+    return str(items)
+
+  def js(self, evenType, jsDef):
+    """ Add a Javascript Event to an HTML object """
+    if evenType == 'change':
+      jsDef = '$("#value_%s").val(%s);' % (self.htmlId, self.jsVal())
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
+
+
+
 
 if __name__ == '__main__':
   obj = DropZone(0, 'Drop files here')
