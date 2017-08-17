@@ -310,6 +310,8 @@ def page_report(report_name):
   """ Return the html content of the main report """
   reportObj = Ares.Report()
   reportObj.http['FILE'] = report_name
+  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  reportObj.http['DIRECTORY'] = userDirectory
   reportObj.reportName = report_name
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
@@ -322,9 +324,8 @@ def page_report(report_name):
     for pyFile in  files:
       if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
         continue
-      print(path)
-      scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
 
+      scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
   reportObj.http['SCRIPTS'] = scripts
   reportObj.http['SCRIPTS_NAME'] = report_name
   scriptTree, children, ajaxCalls = {}, [], collections.defaultdict(list)

@@ -5,6 +5,8 @@
 
 import os
 import time
+import collections
+import six
 
 AJAX_CALL = {
   'download': 'MyRepotTestAjax.py'
@@ -100,8 +102,21 @@ def report(aresObj, localPath=None):
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
   #dropComp = aresObj.dropfile('Drop you files here')
   #dropComp.reportName = aresObj.http['SCRIPTS_NAME']
-  graphObj = aresObj.bar([ {"key": "Cumulative Return","values": [["2017-08-17", 15] ] }])
+  inFile = aresObj.readFile('log_ares.dat')
+  six.next(inFile)
+  activity = collections.defaultdict(int)
+  for line in inFile:
+    splitLine = line.strip().split("#")
+    activity[splitLine[1]] += 1
+  inFile.close()
+  content = []
+  for k in sorted(activity.keys()):
+    content.append([k, activity[k]])
+  aresObj.title4('Deployments count')
+  graphObj = aresObj.bar([ {"key": "Cumulative Return","values": content }])
   graphObj.height = 200
+
+  aresObj.title4('Summary')
   aresObj.table(scripts, cssCls="table table-hover table-bordered")
 
   zipComp = aresObj.downloadAll()
