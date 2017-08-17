@@ -31,7 +31,6 @@ LIB_PACKAGE = {
          'nv.d3.js', 'd3.layout.cloud.js'],
   'CSS': ['jquery-ui.css', 'bootstrap.min.css', 'bootstrap-theme.min.css', 'nv.d3.css',
           'bootstrap-select.min.css', 'w3.css'],
-  'PY': ['Ares.py', 'AresGraph.py', 'AresHtml.py', 'AresJs.py', '__init__.py'],
   'JSON': ['horizBars.json', 'linePlusBarData.json', 'lineWithFocus.json', 'multiBar.json', 'stackedAreaData.json']
 }
 
@@ -404,7 +403,7 @@ def downloadReport(report_name):
           continue
 
         folder = path.replace("%s" % libPath, "")
-        zf.write(os.path.join(reportPath, path, pyFile), r"Lib\%s" % pyFile)
+        zf.write(os.path.join(libPath, path, pyFile), r"Lib\%s" % pyFile)
 
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
@@ -418,11 +417,17 @@ def download():
       zf.write(os.path.join(current_app.config['ROOT_PATH'], "static", "css", css), os.path.join("css", css), zipfile.ZIP_DEFLATED )
     for jsFile in LIB_PACKAGE['JS']:
       zf.write(os.path.join(current_app.config['ROOT_PATH'], "static", "js", jsFile), os.path.join("js", jsFile), zipfile.ZIP_DEFLATED )
-    for pyFile in LIB_PACKAGE['PY']:
-      zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "Lib", pyFile), os.path.join("Lib", pyFile), zipfile.ZIP_DEFLATED )
+    aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
+    for pyFile in os.listdir(aresModulePath):
+      if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+        continue
+
+      if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
+        zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares' ,'Lib', pyFile))
+      else:
+        zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
     for jsonFile in LIB_PACKAGE['JSON']:
       zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "json", jsonFile), os.path.join("json", jsonFile), zipfile.ZIP_DEFLATED )
-    zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "Lib", 'AresWrapper.py'), os.path.join('AresWrapper.py'), zipfile.ZIP_DEFLATED )
     zf.writestr('html/', '')
     # Add all the external libraries
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
@@ -432,7 +437,7 @@ def download():
           continue
 
         folder = path.replace("%s" % libPath, "")
-        zf.write(os.path.join(reportPath, path, pyFile), r"Lib\%s" % pyFile)
+        zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", pyFile))
 
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
@@ -449,9 +454,19 @@ def downloadAres():
         continue
 
       if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
-        zf.write(os.path.join(aresModulePath, pyFile), os.path.join('Lib', pyFile))
+        zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares', 'Lib', pyFile))
       else:
         zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
+
+    # Add all the external libraries
+    libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
+    for (path, dirs, files) in os.walk(libPath):
+      for pyFile in  files:
+        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+          continue
+
+        folder = path.replace("%s" % libPath, "")
+        zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", pyFile))
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
