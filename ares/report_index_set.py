@@ -30,9 +30,9 @@ def call(aresObj):
       reportFile.close()
       # Add entry to a system log files
       reportFile = open(os.path.join(path, "log_ares.dat"), "w")
-      reportFile.write("EVENT#DAY#TIME#COMMENT")
+      reportFile.write("EVENT#DAY#TIME#COMMENT\n")
       showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
-      reportFile.write("FOLDER CREATION#%s#%s#%s" % (showtime[0], showtime[1], aresObj.http['POST']['REPORT']))
+      reportFile.write("FOLDER CREATION#%s#%s#%s\n" % (showtime[0], showtime[1], aresObj.http['POST']['REPORT']))
       reportFile.close()
       with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
         zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), "%s.py" % aresObj.http['POST']['REPORT']))

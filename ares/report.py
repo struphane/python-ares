@@ -63,7 +63,7 @@ def appendToLog(reportName, event, comment):
   """ Append an event to the dedicated log file """
   logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportName, 'log_ares.dat'), 'a')
   showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
-  logFile.write("%s#%s#%s#%s" % (event, showtime[0], showtime[1], comment))
+  logFile.write("%s#%s#%s#%s\n" % (event, showtime[0], showtime[1], comment))
   logFile.close()
 
 
