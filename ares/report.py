@@ -396,6 +396,16 @@ def downloadReport(report_name):
           continue
         folder = path.replace("%s" % reportPath, "")
         zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s" % (folder, pyFile))
+    # Add all the external libraries
+    libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
+    for (path, dirs, files) in os.walk(libPath):
+      for pyFile in  files:
+        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+          continue
+
+        folder = path.replace("%s" % libPath, "")
+        zf.write(os.path.join(reportPath, path, pyFile), r"Lib\%s" % pyFile)
+
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
@@ -414,6 +424,16 @@ def download():
       zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "json", jsonFile), os.path.join("json", jsonFile), zipfile.ZIP_DEFLATED )
     zf.write(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, "Lib", 'AresWrapper.py'), os.path.join('AresWrapper.py'), zipfile.ZIP_DEFLATED )
     zf.writestr('html/', '')
+    # Add all the external libraries
+    libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
+    for (path, dirs, files) in os.walk(libPath):
+      for pyFile in  files:
+        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+          continue
+
+        folder = path.replace("%s" % libPath, "")
+        zf.write(os.path.join(reportPath, path, pyFile), r"Lib\%s" % pyFile)
+
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 

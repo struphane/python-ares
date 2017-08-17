@@ -28,6 +28,9 @@ CHILD_PAGES = {
   'test3': 'MyRepotTestChild3.py',
   }
 
+import testImports
+import Lib.secondTestIport
+
 def report(aresObj):
   """ Main function to build the reports
 
@@ -37,7 +40,6 @@ def report(aresObj):
 
   By running the script locally partial files will be generated
   """
-
   dropComp = aresObj.dropdown([['Super', ('A', 'a'), ('B', 'b')]])
   dropComp.js('click', 'alert($(this).text()) ; ')
 
