@@ -12,9 +12,9 @@ import requests
 import json
 import os
 
-reportName = 'ircCalculator'
-projectLocalPath = r'E:\GitHub\Ares\ares\Lib'
-filename = 'ircCalculatorResults.py'
+reportName = 'HelloWorld'
+projectLocalPath = os.path.join(os.getcwd(), reportName)
+filename = 'HelloWorld.py'
 
 # The Url to be used in order to create the environments in Ares
 # This will allow the use of scripts instead of the web interface
@@ -23,7 +23,7 @@ postUrlDeploy = r'%s/reports/upload/%s' % (serverPath, reportName)
 postUrlCreate = r'%s/reports/create/env' % serverPath
 postUrlFolderCreate = r'%s/reports/folder/create' % serverPath
 postUrlScriptVersion = r"%s/reports/ares/version" % serverPath
-withEnvCreation = False
+withEnvCreation = True
 
 def uploadFile(filename):
   """ Upload a file on the server """
@@ -35,6 +35,8 @@ def uploadFile(filename):
     print("########################################")
     if withEnvCreation:
       response = requests.post(postUrlCreate, {'REPORT': reportName})
+      files = {'file': open(r"%s\%s" % (projectLocalPath, filename))}
+      response = requests.post(postUrlDeploy, files=files)
       print(response)
 
 def createFolders(folders):
@@ -53,4 +55,4 @@ def getPackageVersion():
   print(json.loads(response.text))
 
 #createFolders(['aa', 'bb'])
-getPackageVersion()
+uploadFile(filename)

@@ -100,7 +100,7 @@ def report(aresObj, localPath=None):
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
   #dropComp = aresObj.dropfile('Drop you files here')
   #dropComp.reportName = aresObj.http['SCRIPTS_NAME']
-  graphObj = aresObj.bar([ {"key": "Cumulative Return","values": [["A Label", 5], ["C Label",  4],["B Label", 3] ] }])
+  graphObj = aresObj.bar([ {"key": "Cumulative Return","values": [["2017-08-17", 15] ] }])
   graphObj.height = 200
   aresObj.table(scripts, cssCls="table table-hover table-bordered")
 

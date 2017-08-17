@@ -278,6 +278,9 @@ class Report(object):
     """ return the list of files in a given directory structure """
     files = set()
     for pyFile in os.listdir(os.path.join(self.http['DIRECTORY'], *subfolders)):
+      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
+        continue
+
       files.add(pyFile)
     return files
 

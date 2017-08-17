@@ -181,16 +181,46 @@ def report_dsc_local_details():
 
   aresObj.paragraph('''
                         Then add the different HTML components to your reports !!! <BR />
-                        Once
+                        Once your report created you can run it locally and get the result in a HTML file
                     ''')
+  localEnv = aresObj.img('first_report_3.JPG')
+  localEnv.doubleDots = 2
+  downloadPicture = aresObj.img('first_report_4.JPG')
+  downloadPicture.doubleDots = 2
+  aresObj.table([['Create your report', 'Run the Wrapper in your IDE'], [localEnv, downloadPicture]])
 
+  localEnv = aresObj.img('first_report_5.JPG')
+  localEnv.doubleDots = 2
+  downloadPicture = aresObj.img('first_report_6.JPG')
+  downloadPicture.doubleDots = 2
+  aresObj.table([['Get the file', 'Open it in your web browser'], [localEnv, downloadPicture]])
+
+  aresObj.paragraph('''
+                        Then once your report is finalised your can upload it to our server and share it with other user. <BR />
+                        The module AresWrapperDeploy.py will allow the connection with the server. The creation of files, folder and
+                        also the check of the version of your locally framework are done from script. <BR />
+                        All new features and modules developed on the server will be available either from pip or directly in the zip
+                        archive for simple tools.
+                    ''')
+  localEnv = aresObj.img('first_report_7.JPG')
+  localEnv.doubleDots = 2
+  downloadPicture = aresObj.img('first_report_8.JPG')
+  downloadPicture.doubleDots = 2
+  aresObj.table([['Push to the server', 'Environment Available'], [localEnv, downloadPicture]])
+
+  aresObj.title4("Your script will be avaiable !!!")
+  localEnv = aresObj.img('first_report_9.JPG')
+  localEnv.doubleDots = 2
   aresObj.newline()
+  aresObj.newline()
+
+
   aresObj.title4("Example of Python to HTML transform")
   localEnv = aresObj.img('html_python.JPG')
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('html_example.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['', ''], [localEnv, downloadPicture]])
+  aresObj.table([['Python Code', 'HTML result'], [localEnv, downloadPicture]])
 
   aresObj.newline()
   aresObj.title4("Example of Python to Javascript / Ajax transform")
@@ -198,7 +228,7 @@ def report_dsc_local_details():
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('javascript_example.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['', ''], [localEnv, downloadPicture]])
+  aresObj.table([['Python Code', 'Javascript Result'], [localEnv, downloadPicture]])
 
   aresObj.paragraph('''
                         More details on the components are available on the below links
@@ -290,7 +320,7 @@ def page_report(report_name):
       continue
 
     for pyFile in  files:
-      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
         continue
       print(path)
       scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
@@ -503,8 +533,9 @@ def downloadReport(report_name):
     reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     for (path, dirs, files) in os.walk(reportPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
           continue
+
         folder = path.replace("%s" % reportPath, "")
         zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s" % (folder, pyFile))
     # Add all the external libraries
