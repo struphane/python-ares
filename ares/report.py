@@ -131,8 +131,14 @@ def report_dsc_html_details(chartName):
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/child:dsc/local")
-def report_dsc_local_details(chartName):
+def report_dsc_local_details():
   aresObj = Ares.Report()
+  aresObj.title("How to use ArES locally")
+  aresObj.title3("What is ArES")
+
+  aresObj.title3("Set up your environment")
+  
+  aresObj.title3("Available Modules")
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
