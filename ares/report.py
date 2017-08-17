@@ -66,11 +66,14 @@ def report_dsc_index():
   """ Main page for the Ares Documentation """
   aresObj = Ares.Report()
   aresObj.reportName = 'dsc'
-  aresObj.childPages = {'html': 'html', 'graph': 'graph'}
+  aresObj.childPages = {'html': 'html', 'graph': 'graph', 'local': 'local'}
   aresObj.title("Report Documentation")
   aresObj.title2("How to create a report")
   aresObj.img('local_runs.JPG')
   aresObj.title2("Report Components")
+  aresComp = aresObj.anchor('Local Environment')
+  aresComp.addLink('html')
+  aresObj.newline()
   aresComp = aresObj.anchor('HTML Component documentation')
   aresComp.addLink('html')
   aresObj.newline()
@@ -190,7 +193,7 @@ def page_report(report_name):
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
 
-  scripts = set()
+  scripts = {}
   for (path, dirs, files) in os.walk(scriptEnv):
     if path != scriptEnv and not '__init__.py' in files:
       continue
@@ -199,7 +202,7 @@ def page_report(report_name):
       if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
         continue
       print(path)
-      scripts.add((path, pyFile))
+      scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
 
   reportObj.http['SCRIPTS'] = scripts
   reportObj.http['SCRIPTS_NAME'] = report_name
@@ -217,7 +220,7 @@ def page_report(report_name):
   reportObj.http['SCRIPTS_CHILD'] = children
   reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
   reportObj.http['AJAX_CALLBACK'] = {}
-  reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   reportObj.childPages = report_index_page.CHILD_PAGES
   onload, content, js = report_index_page.report(reportObj).html()
   if scriptEnv in sys.modules:

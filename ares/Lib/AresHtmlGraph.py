@@ -21,6 +21,7 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   """
   duration = 350
   clickFnc, clickObject = None, None
+  width, height = 960, 500
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
@@ -36,6 +37,8 @@ class JsGraph(AresHtmlContainer.GraphSvG):
       jsEventFnc = self.jsEventFnc
     jGraphAttr = {'src': self.jsRef(), 'htmlId': self.htmlId, 'duration': self.duration}
     self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart().strip(), self.dataFnc())
+    self.jsEvent['addGraph'].width = self.width
+    self.jsEvent['addGraph'].height = self.height
     if self.clickFnc is not None:
       self.jsEvent['addGraph'].click(self.clickFnc)
     for jEventType, jsEvent in self.jsEvent.items():
