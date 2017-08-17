@@ -66,20 +66,20 @@ def report(aresObj, localPath=None):
           scripts.append([script, fileSize, fileDate, '', "".join(ajxCall), downComp, remov])
         displayedScript[script] = True
 
-  for script in aresObj.http['SCRIPTS']:
+  for (scriptPath, script) in aresObj.http['SCRIPTS']:
     if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc') and not script.endswith('zip') and not script.endswith('.svn'):
       removComp = aresObj.remove()
       removComp.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, "display(data); window.location.href='../page/%s' ;" % aresObj.http['SCRIPTS_NAME'])
       downComp = aresObj.download()
       downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
-      fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], script)))
-      fileDate = time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], script))))
+      fileSize = convert_bytes(os.path.getsize(os.path.join(scriptPath, script)))
+      fileDate = time.strftime("%m/%d/%Y %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(scriptPath, script))))
       divComp = aresObj.div(script)
       divComp.toolTip('Script not correctly linked')
       scripts.append([divComp, fileSize, fileDate, '', '', downComp, removComp])
 
-  dropComp = aresObj.dropfile('Drop you files here')
-  dropComp.reportName = aresObj.http['SCRIPTS_NAME']
+  #dropComp = aresObj.dropfile('Drop you files here')
+  #dropComp.reportName = aresObj.http['SCRIPTS_NAME']
   aresObj.table(scripts)
 
   zipComp = aresObj.downloadAll()

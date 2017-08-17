@@ -39,7 +39,7 @@ class ButtonRemove(AresHtml.Html):
 
   def __repr__(self):
     """ Return the String representation of a HTML Style Twitter button """
-    return '<button type="button" %s><span class="glyphicon glyphicon-%s"></span></button>' % (self.strAttr(), self.glyphicon)
+    return '<button type="button" %s><span class="fa fa-%s"></span></button>' % (self.strAttr(), self.glyphicon)
 
 
 class ButtonDownload(ButtonRemove):
@@ -67,7 +67,7 @@ class ButtonDownloadAll(ButtonRemove):
     - CSS Default Class = btn btn-success
     - glyphicon = downloadAll
   """
-  glyphicon, cssCls = 'download-alt', 'btn btn-success'
+  glyphicon, cssCls = 'cloud-download', 'btn btn-success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'downloadAll'
 

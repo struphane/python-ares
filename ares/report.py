@@ -189,7 +189,19 @@ def page_report(report_name):
   reportObj.reportName = report_name
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
-  reportObj.http['SCRIPTS'] = os.listdir(scriptEnv)
+
+  scripts = set()
+  for (path, dirs, files) in os.walk(scriptEnv):
+    if path != scriptEnv and not '__init__.py' in files:
+      continue
+
+    for pyFile in  files:
+      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        continue
+      print(path)
+      scripts.add((path, pyFile))
+
+  reportObj.http['SCRIPTS'] = scripts
   reportObj.http['SCRIPTS_NAME'] = report_name
   scriptTree, children, ajaxCalls = {}, [], collections.defaultdict(list)
   try:
@@ -222,7 +234,7 @@ def index():
   onload, content, js = report_index.report(aresObj).html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
-@report.route("/run/<report_name>", method = ['GET'])
+@report.route("/run/<report_name>", methods = ['GET'])
 def run_report(report_name):
   """ Run the report """
   onload, js, error = '', '', False
