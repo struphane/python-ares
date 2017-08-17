@@ -483,19 +483,40 @@ class UploadFile(AresHtml.Html):
     items.add(1, '<input type="file" %s>' % self.strAttr())
     items.add(1, '<span class="custom-file-control" id="file_%s"></span>' % self.htmlId)
     items.add(0, '</label><div class="form-group mx-sm-3"><input class="form-control" type="text" id="value_%s" readonly></div>' % self.htmlId)
-    items.add(0, '<button type="button" id="file_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button></div>' % self.htmlId)
+    items.add(0, '<button type="button" id="button_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button></div>' % self.htmlId)
     return str(items)
 
   def js(self, evenType, jsDef):
     """ Add a Javascript Event to an HTML object """
     if evenType == 'change':
-      jsDef = '$("#value_%s").val(%s);' % (self.htmlId, self.jsVal())
+      jsDef = '$("#value_%s").val(%s); %s' % (self.htmlId, self.jsVal(), jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
 
   def jsEvents(self, jsEventFnc=None):
     if not self.jsEvent:
       self.js('change', '')
     return super(UploadFile, self).jsEvents(jsEventFnc)
+
+  def post(self, evenType, url, data, jsDef, dstFolder, preAjaxJs=''):
+    """
+      Post method to get data directly by interacting with the page
+      https://api.jquery.com/jquery.post/
+
+    """
+    jsRef = self.jsRef()
+    if evenType == 'click':
+      #jsDef = '$("#value_%s").val(%s); %s' % (self.htmlId, self.jsVal(), jsDef)
+      jsRef = "$('#button_%s')" % self.htmlId
+    jsDef = '''
+
+        var file = $('#%s').prop('files')[0]; // FileList object.
+        var form_data = new FormData();
+        form_data.append('file_0', file);
+        form_data.append('DESTINATION', '%s');
+        %s
+        $.ajax({url: "%s", method: "POST", data: form_data, contentType: false, cache: false, processData: false, async: false}).done(function(data) {%s location.reload(); } );
+                ''' % (self.htmlId, dstFolder, preAjaxJs, url, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, jsRef, evenType, jsDef, data=data, url=url)
 
 
 if __name__ == '__main__':
