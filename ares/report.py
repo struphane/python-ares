@@ -481,7 +481,17 @@ def getAresFilesVersions():
 
     stat = os.stat(os.path.join(aresModulePath, pyFile))
     files[pyFile] = [stat.st_mtime, stat.st_size]
+  # Add all the external libraries
+  libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
+  for (path, dirs, f) in os.walk(libPath):
+    for pyFile in  f:
+      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        continue
+
+      stat = os.stat(os.path.join(libPath, pyFile))
+      files[pyFile] = [stat.st_mtime, stat.st_size]
   return json.dumps(files)
+
 # ---------------------------------------------------------------------------------------------------------
 #                             CREATE FILES AND FOLDERS IN AN ARES ENV
 #
