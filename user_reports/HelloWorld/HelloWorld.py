@@ -24,4 +24,5 @@ CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py
 def report(aresObj):
   # Write your report here
   aresObj.title("This is my first report !!!")
+  aresObj.upload('')
   return aresObj

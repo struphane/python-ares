@@ -82,7 +82,7 @@ class ButtonOk(ButtonRemove):
     - CSS Default Class = btn btn-success
     - glyphicon = ok
   """
-  glyphicon, cssCls = 'ok', 'success'
+  glyphicon, cssCls = 'check-square-o', 'success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'ok'
 
@@ -482,7 +482,8 @@ class UploadFile(AresHtml.Html):
     items = AresItem.Item('<div class="form-group row"><label class="custom-file col-sm-3 col-form-label">')
     items.add(1, '<input type="file" %s>' % self.strAttr())
     items.add(1, '<span class="custom-file-control" id="file_%s"></span>' % self.htmlId)
-    items.add(0, '</label><div class="form-group mx-sm-3"><input class="form-control" type="text" id="value_%s" readonly></div></div>' % self.htmlId)
+    items.add(0, '</label><div class="form-group mx-sm-3"><input class="form-control" type="text" id="value_%s" readonly></div>' % self.htmlId)
+    items.add(0, '<button type="button" id="file_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button></div>' % self.htmlId)
     return str(items)
 
   def js(self, evenType, jsDef):
