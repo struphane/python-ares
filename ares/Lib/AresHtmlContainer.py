@@ -185,10 +185,12 @@ class Image(AresHtml.Html):
   alias =  'img'
   cssCls = 'img-responsive'
   reference = 'https://www.w3schools.com/bootstrap/bootstrap_ref_css_images.asp'
+  doubleDots = 1
 
   def __repr__(self):
     """ Return the HTML representation of a Tabular object """
-    return ' <img src="../static/images/%s" class="img-responsive" %s> ' % (self.vals, self.strAttr())
+    doubleDotsPath = "/".join([".." for i in range(self.doubleDots)])
+    return ' <img src="%s/static/images/%s" class="img-responsive" %s> ' % (doubleDotsPath, self.vals, self.strAttr())
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])

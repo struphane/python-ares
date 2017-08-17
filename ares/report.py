@@ -133,11 +133,40 @@ def report_dsc_html_details(chartName):
 @report.route("/child:dsc/local")
 def report_dsc_local_details():
   aresObj = Ares.Report()
+  aresObj.reportName = None
+  aresObj.childPages = {'download': '../download/ares'}
   aresObj.title("How to use ArES locally")
+  aresObj.newline()
   aresObj.title3("What is ArES")
-
+  aresObj.paragraph('''
+                      ArES is a Python reporting suit which will allow you easily to get data from differents sources based on the different
+                      available modules in the
+                    ''')
   aresObj.title3("Set up your environment")
-  
+  aresObj.paragraph('''
+                      The framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment
+                      but also to deploy your scripts easily on the server. <BR />
+                      The only thing to do is to click on the Download ArES link below, unzip the archive in a folder and start writing Python codes. <BR />
+                    ''')
+  download = aresObj.anchor('Download ArES')
+  download.addLink('download')
+  localEnv = aresObj.img('local_env.JPG')
+  localEnv.doubleDots = 2
+  downloadPicture = aresObj.img('ares_download.JPG')
+  downloadPicture.doubleDots = 2
+  aresObj.table([['', ''], [localEnv, downloadPicture]])
+  aresObj.newline()
+  aresObj.newline()
+  aresObj.paragraph('''
+                      The framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment
+                      but also to deploy your scripts easily on the server. <BR />
+                      The only thing to do is to click on the Download ArES link, unzip the archive in a folder and start writing Python codes. <BR />
+                      The structure of the reports is very intuitive and linear. Each items is fully documented in the framework and extra links are
+                      available for advance users. <BR />
+                      ArES is only a wrapper layer between HTML5 and Javascript, so you can directly include some part of those language to enrich your
+                      components. The ArES layer will only put together your object to then build your HTML page.
+                    ''')
+
   aresObj.title3("Available Modules")
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
