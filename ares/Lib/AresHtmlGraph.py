@@ -174,8 +174,6 @@ class Line(JsGraph):
 class StackedArea(JsGraph):
   """ This object will output a simple stacked area chart
 
-  To be factorised in an abstract class
-
   Reference website: http://nvd3.org/examples/stackedArea.html
   """
   alias = 'stackedAreaChart'
@@ -272,7 +270,27 @@ class StackedArea(JsGraph):
 
 
 class MultiBars(StackedArea):
-  """ """
+  """ Simple multi bar chart
+
+    http://nvd3.org/examples/multiBar.html
+
+    Expected data should look like:
+
+    [
+    {
+      "key" : "North America" ,
+      "values" : [ [ 1025409600000 , 23.041422681023] , [ 1028088000000 , 19.854291255832] , [ 1030766400000 , 21.02286281168] ,
+        ...]
+    },
+
+    {
+      "key" : "Africa" ,
+      "values" : [ [ 1025409600000 , 7.9356392949025] , [ 1028088000000 , 7.4514668527298] , [ 1030766400000 , 7.9085410566608] ,
+        ... ]
+    },
+    ...
+    ]
+"""
 
   mockData = r'json\multiBar.json'
   withFocus = False
@@ -282,7 +300,28 @@ class MultiBars(StackedArea):
   clickObject = 'multibar'
 
 class LineWithFocus(StackedArea):
-  """ """
+  """ Simple line chart with a focus field to zoom in on specific parts of the chart
+
+    http://nvd3.org/examples/lineWithFocus.html
+
+    Expected data should look like:
+
+    [
+    {
+      "key" : "North America" ,
+      "values" : [ [ 1025409600000 , 23.041422681023] , [ 1028088000000 , 19.854291255832] , [ 1030766400000 , 21.02286281168] ,
+        ...]
+    },
+
+    {
+      "key" : "Africa" ,
+      "values" : [ [ 1025409600000 , 7.9356392949025] , [ 1028088000000 , 7.4514668527298] , [ 1030766400000 , 7.9085410566608] ,
+        ... ]
+    },
+    ...
+    ]
+
+  """
 
   mockData = r'json\lineWithFocus.json'
   withFocus = True
@@ -291,7 +330,28 @@ class LineWithFocus(StackedArea):
   alias = 'lineChartFocus'
 
 class HorizontalBars(StackedArea):
-  """ """
+  """ Simple Horizontal bar chart
+
+    http://nvd3.org/examples/multiBarHorizontal.html
+
+    Expected data should look like:
+
+    [
+    {
+      "key" : "North America" ,
+      "values" : [ [ 1025409600000 , 23.041422681023] , [ 1028088000000 , 19.854291255832] , [ 1030766400000 , 21.02286281168] ,
+        ...]
+    },
+
+    {
+      "key" : "Africa" ,
+      "values" : [ [ 1025409600000 , 7.9356392949025] , [ 1028088000000 , 7.4514668527298] , [ 1030766400000 , 7.9085410566608] ,
+        ... ]
+    },
+    ...
+    ]
+
+  """
   alias = 'horizBarChart'
   mockData = r'json\horizBars.json'
   withFocus = False
@@ -322,7 +382,7 @@ class ComboLineBar(StackedArea):
   interGuidelines = False
   extraOptions = '''
                     chart_%s.bars.forceY([0]) ;
-                    chart_22.y1Axis.tickFormat(d3.format(',.2f')) ;
+                    chart_%s.y1Axis.tickFormat(d3.format(',.2f')) ;
                  '''
   chartOptions = '''
                     .color(d3.scale.category10().range())
@@ -330,11 +390,30 @@ class ComboLineBar(StackedArea):
   useDefaultYAxis = False
 
   def addExtraOptions(self):
-    return self.extraOptions % self.htmlId
+    return self.extraOptions % (self.htmlId, self.htmlId)
 
 
 class ScatterChart(StackedArea):
-  """
+  """ Simple Scatter chart
+
+    http://nvd3.org/livecode/index.html#codemirrorNav
+
+    Expected data should look like:
+
+    [
+    {
+      "key" : "North America" ,
+      "values" : [ [ 1025409600000 , 23.041422681023] , [ 1028088000000 , 19.854291255832] , [ 1030766400000 , 21.02286281168] ,
+        ...]
+    },
+
+    {
+      "key" : "Africa" ,
+      "values" : [ [ 1025409600000 , 7.9356392949025] , [ 1028088000000 , 7.4514668527298] , [ 1030766400000 , 7.9085410566608] ,
+        ... ]
+    },
+    ...
+    ]
 
   """
   mockData = r'json\multiBar.json'
@@ -349,6 +428,7 @@ class Network(JsGraph):
   Reference website: https://github.com/nylen/d3-process-map
   """
   mockData = r'json\mapGraph.json'
+  alias = 'network'
 
   def js(self, localPath=None):
     """ Return the entries to be added to the Javascript to create the graph during the loading """

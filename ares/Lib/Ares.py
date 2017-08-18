@@ -197,6 +197,7 @@ class Report(object):
   def container(self, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def grid(self, values, cssCls=None): return self.add(AresHtmlContainer.Split(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Modal Section
   def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
