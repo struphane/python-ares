@@ -15,6 +15,10 @@ class Text(AresHtml.Html):
     """ Return the String representation of a Text HTML tag """
     return '<font %s>%s</font>' % (self.strAttr(), self.vals)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.text("My dummy text")
+
 
 class Code(AresHtml.Html):
   """ Python Wrapper to the Bootsrap CODE Tag """
@@ -24,6 +28,10 @@ class Code(AresHtml.Html):
   def __repr__(self):
     """ Return the String representation of a Code HTML tag """
     return '<pre><code %s>%s</code></pre>' % (self.strAttr(), self.vals)
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.code("def myFct(): pass")
 
 
 class Paragraph(AresHtml.Html):
@@ -35,6 +43,11 @@ class Paragraph(AresHtml.Html):
     """ Return the HTML string for a paragraph including or not some other html object """
     val = " ".join([str(val) for val in self.vals]) if isinstance(self.vals, list) else self.vals
     return '<p %s>%s</p>' % (self.strAttr(), val)
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    aresObj.text("My text")
+    return aresObj.paragraph("My Paragraph")
 
 
 class Title(AresHtml.Html):
@@ -63,12 +76,19 @@ class Title(AresHtml.Html):
     """ Activate the Jquery Tooltips """
     return "$( document ).tooltip();"
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.title("Level 1 Title")
 
 class Title2(Title):
   """ Python Wrapper to the HTML H2 Tag """
   dim, alias = 2, 'title2'
   default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.title2("Level 2 Title")
 
 
 class Title3(Title):
@@ -77,12 +97,20 @@ class Title3(Title):
   default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.title3("Level 3 Title")
+
 
 class Title4(Title):
   """ Python Wrapper to the HTML H4 Tag """
   dim, alias = 4, 'title4'
   default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.title4("Level 4 Title")
 
 
 class Newline(AresHtml.Html):
@@ -94,6 +122,10 @@ class Newline(AresHtml.Html):
     """ Return the String representation of a new line tag """
     return '<br />'
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.newline()
+
 
 class Line(AresHtml.Html):
   """ Python Wrapper to the HTML HR tag """
@@ -103,6 +135,10 @@ class Line(AresHtml.Html):
   def __repr__(self):
     """ Return the String representation of a line tag """
     return '<hr %s/><hr %s/>' % (self.strAttr(), self.strAttr())
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.line()
 
 
 

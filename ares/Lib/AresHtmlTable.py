@@ -47,7 +47,9 @@ class Table(AresHtml.Html):
           getattr(val, 'jsEvents')(jsEventFnc)
     return jsEventFnc
 
-
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.table([["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
 
 if __name__ == '__main__':
   obj = Table(0, [['Olivier', 'Aurelie'], [1, 2]])

@@ -163,7 +163,6 @@ class Report(object):
   # This part is done in python 3 in order to ensure users will put the right type of objects
   # del self.content[self.content.index(val.htmlId)]
   # ---------------------------------------------------------------------------------------------------------
-  def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def text(self, value, cssCls=None): return self.add(AresHtmlText.Text(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def code(self, value, cssCls=None): return self.add(AresHtmlText.Code(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def paragraph(self, value, cssCls=None): return self.add(AresHtmlText.Paragraph(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
@@ -189,6 +188,7 @@ class Report(object):
   def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
   # Containers section
+  def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def table(self, values, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -197,6 +197,7 @@ class Report(object):
   def container(self, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def grid(self, values, cssCls=None): return self.add(AresHtmlContainer.Split(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Modal Section
   def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)

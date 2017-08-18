@@ -107,15 +107,16 @@ def report_dsc_html():
   aresObj.title("Html Components")
   for aresModule in [AresHtmlText, AresHtmlContainer, AresHtmlEvent, AresHtmlModal, AresHtmlTable]:
     aresObj.title4(aresModule.__doc__)
-    htmlObject = [['Class Name', 'Description']]
-    for name, obj in inspect.getmembers(aresModule):
-      if inspect.isclass(obj) and obj.alias is not None:
-        aresObj.childPages[name] = '../../../child:dsc/html/%s' % obj.alias
+    htmlObject = [["Class Name", "Description", "Example", "Render"]]
+    for name, cls in inspect.getmembers(aresModule):
+      if inspect.isclass(cls) and cls.alias is not None:
+        aresObj.childPages[name] = '../../../child:dsc/html/%s' % cls.alias
         comp = aresObj.anchor(name)
         comp.addLink(name, dots='.')
-        htmlObject.append([comp, aresObj.code(obj.__doc__)])
-    aresObj.table(htmlObject)
 
+        src = inspect.getsource(cls.aresExample).split("\n", 2)[-1].replace("return ", "")
+        htmlObject.append([comp, aresObj.code(cls.__doc__), aresObj.code(src), cls.aresExample(aresObj)])
+    aresObj.table(htmlObject)
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
@@ -254,6 +255,7 @@ def report_dsc_graph():
   aresObj.childPages = {}
   graphObject = [['Class Name', 'Description']]
   aresObj.title("Graph Components")
+  aresObj.iframe('http://nvd3.org/livecode/index.html')
   aresObj.title4(AresHtmlGraph.__doc__)
   for name, obj in inspect.getmembers(AresHtmlGraph):
     if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
