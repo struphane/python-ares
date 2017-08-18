@@ -51,6 +51,9 @@ class Modal(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.modal("My modal")
 
 if __name__ == '__main__':
   obj = Modal(0, 'Hey', [['Olivier', 'Aurelie'], [1, 2]])

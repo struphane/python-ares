@@ -172,6 +172,9 @@ class Html(object):
     """ Return the onload, the HTML object and the javascript events """
     return self.onLoad(), self.__repr__(), self.jsEvents()
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj
 
 class NavBar(object):
   """ """

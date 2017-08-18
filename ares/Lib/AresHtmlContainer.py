@@ -23,16 +23,18 @@ class Div(AresHtml.Html):
     """ Activate the Jquery tooltips display """
     return "$( document ).tooltip();"
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.div("MyDiv")
+
 
 class ListBadge(AresHtml.Html):
   """
   HTML List
 
-  This object will return a HTML list and the constructor of this class is expecting in the values a list of tuples
-  THe first one should be the name and the second the count to be displayed in the badge
-
-  For example
-    [('A', 10), ('B', 50)]
+  This object will return a HTML list and the constructor of this class is
+  expecting in the values a list of tuples. The first one should be the
+  name and the second the count to be displayed in the badge
 
   Default class parameters
     - CSS Default Class = list-group
@@ -49,6 +51,10 @@ class ListBadge(AresHtml.Html):
     item.add(0, '</ul>')
     return str(item)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.listbadge([('A', 10), ('B', 50)])
+
 
 class Container(Div):
   """
@@ -59,6 +65,10 @@ class Container(Div):
   """
   cssCls, alias = 'container', 'container'
   reference = 'https://getbootstrap.com/docs/3.3/css/'
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.container("MyContainer")
 
 
 class Split(AresHtml.Html):
@@ -90,6 +100,10 @@ class Split(AresHtml.Html):
     res.add(1, '</div>')
     res.add(0, '</div>')
     return str(res)
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.grid(['A', 'B'])
 
 
 class GraphSvG(AresHtml.Html):
@@ -174,6 +188,11 @@ class Tabs(AresHtml.Html):
     item.add(0, '</ul>')
     return str(item)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.tabs(["Tab1", "Tab2"])
+
+
 class Image(AresHtml.Html):
   """
   Python wrapper for a multi Tabs component
@@ -191,6 +210,12 @@ class Image(AresHtml.Html):
     """ Return the HTML representation of a Tabular object """
     doubleDotsPath = "/".join([".." for i in range(self.doubleDots)])
     return ' <img src="%s/static/images/%s" class="img-responsive" %s> ' % (doubleDotsPath, self.vals, self.strAttr())
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.img("../../../static/images/sample_img.jpg")
+
+
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])

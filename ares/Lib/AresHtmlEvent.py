@@ -22,6 +22,10 @@ class Button(AresHtml.Html):
     """ Return the String representation of HTML button """
     return '<button %s type="button">%s</button>' % (self.strAttr(), self.vals)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.button("MyButton")
+
 
 class ButtonRemove(AresHtml.Html):
   """
@@ -41,6 +45,10 @@ class ButtonRemove(AresHtml.Html):
     """ Return the String representation of a HTML Style Twitter button """
     return '<button type="button" %s><span class="fa fa-%s"></span></button>' % (self.strAttr(), self.glyphicon)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.remove()
+
 
 class ButtonDownload(ButtonRemove):
   """
@@ -55,6 +63,10 @@ class ButtonDownload(ButtonRemove):
   glyphicon, cssCls = 'download', 'btn btn-success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'download'
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.download()
 
 
 class ButtonDownloadAll(ButtonRemove):
@@ -71,6 +83,10 @@ class ButtonDownloadAll(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'downloadAll'
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.downloadAll()
+
 
 class ButtonOk(ButtonRemove):
   """
@@ -85,6 +101,10 @@ class ButtonOk(ButtonRemove):
   glyphicon, cssCls = 'check-square-o', 'success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'ok'
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.ok("OK Button")
 
 
 class A(AresHtml.Html):
@@ -137,6 +157,10 @@ class A(AresHtml.Html):
       jsDef = "preloader(); %s" % jsDef
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, "%s window.location = '%s' ;" % (jsDef, self.link), jsDef)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.anchor("MyAnchor")
+
 
 class Input(AresHtml.Html):
   """
@@ -164,6 +188,10 @@ class Input(AresHtml.Html):
     item.add(2, '<input type="text" %s>' % (self.strAttr()))
     item.add(0, '</div>')
     return str(item)
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.input("Input text...")
 
 
 class Comment(AresHtml.Html):
@@ -249,6 +277,10 @@ class TextArea(AresHtml.Html):
     """ Function to return the Jquery reference to the Html object """
     return '$("#%s_button")' % self.htmlId
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.textArea("Enter text...")
+
 
 class DropDown(AresHtml.Html):
   """
@@ -285,13 +317,18 @@ class DropDown(AresHtml.Html):
     """ Return the javascript reference to the dropdown li item """
     return '$("#%s .dropdown-menu li")' % self.htmlId
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.dropdown([["Super", ("A", "a"), ("B", "b")]])
+
 
 class Select(AresHtml.Html):
   """
   Basic wrapper to the Select HTML Tag
     https://silviomoreto.github.io/bootstrap-select/examples/
 
-  For example to get a change on the Select Box Item in the Javascript call back method
+  For example to get a change on the Select Box Item in the
+  Javascript call back method
     - alert($(this).val()) ;
 
   For example
@@ -313,6 +350,10 @@ class Select(AresHtml.Html):
       item.add(1, '</optgroup>')
     item.add(0, '</select>')
     return str(item)
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.select([('Node', ['GBC', 'BNPPAR'])])
 
 
 class Slider(AresHtml.Html):
@@ -337,6 +378,10 @@ class Slider(AresHtml.Html):
   def onloadFnc(self):
     """ Use the Jquery UI property to change the DIV in slider object """
     return AresItem.Item.indents(2, '%s.slider();' % self.jsRef())
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.slider(100)
 
 
 class DatePicker(AresHtml.Html):
@@ -367,6 +412,10 @@ class DatePicker(AresHtml.Html):
   def onLoadFnc(self):
     """ Start the Date picker transformation when the document is loaded """
     return AresItem.Item.indents(2, "$( function() {%s.datepicker({dateFormat: 'yy-mm-dd'} ); } );" % self.jsRef())
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.date()
 
 
 class DropZone(AresHtml.Html):
@@ -412,6 +461,10 @@ class DropZone(AresHtml.Html):
             }
            """
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.dropzone("MyFiles")
+
 
 class DropFile(AresHtml.Html):
   """
@@ -437,6 +490,7 @@ class DropFile(AresHtml.Html):
                           event.originalEvent.stopPropagation();
                           event.originalEvent.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
                           ''')
+
   def drop(self):
     """  """
     ajaxObject = AresJs.XsCallFile(self.reportName)
@@ -469,6 +523,10 @@ class DropFile(AresHtml.Html):
     items.add(0, "</div>")
     return str(items)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.dropfile("MyFile")
+
 
 class UploadFile(AresHtml.Html):
   """
@@ -492,6 +550,9 @@ class UploadFile(AresHtml.Html):
       jsDef = '$("#value_%s").val(%s);' % (self.htmlId, self.jsVal())
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
 
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.upload("MyFile")
 
 
 
