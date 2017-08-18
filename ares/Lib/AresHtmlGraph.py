@@ -57,6 +57,7 @@ class JsGraph(AresHtmlContainer.GraphSvG):
     """ Add Click function on a graph """
     self.clickFnc = 'chart_%s.%s.dispatch.on("elementClick", function(e) {%s});' % (self.htmlId, self.clickObject, fnc)
 
+
 class Pie(JsGraph):
   """
   NVD3 Wrapper for a Pie Chart object.
@@ -125,6 +126,11 @@ class Bar(JsGraph):
                 .showValues(true)       // ...instead, show the bar value right on top of each bar.
                 .transitionDuration(350);
            '''
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    #return aresObj.bar([{"key": "Cumulative Return", "values": [{ "label": "One","value" : 29.765957771107},  {"label": "Four", "value": 196.45946739256}]}])
+    return aresObj.bar([{"key": "Cumulative Return", "values": [1, 2, 3, 4, 5]}])
 
 
 class Line(JsGraph):
@@ -299,6 +305,7 @@ class MultiBars(StackedArea):
   alias = 'multiBarChart'
   clickObject = 'multibar'
 
+
 class LineWithFocus(StackedArea):
   """ Simple line chart with a focus field to zoom in on specific parts of the chart
 
@@ -328,6 +335,7 @@ class LineWithFocus(StackedArea):
   chartFunction = 'lineWithFocusChart'
   useExtraChartOptions = False
   alias = 'lineChartFocus'
+
 
 class HorizontalBars(StackedArea):
   """ Simple Horizontal bar chart
@@ -421,6 +429,7 @@ class ScatterChart(StackedArea):
   chartFunction = 'scatterChart'
   useExtraChartOptions = False
   alias = 'scatterChart'
+
 
 class Network(JsGraph):
   """
@@ -576,8 +585,6 @@ class WordCloud(JsGraph):
                   .text(function(d) { return d.text; });
           };
           '''
-
-
 
 
 if __name__ == '__main__':
