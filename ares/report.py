@@ -11,7 +11,7 @@ import collections
 import traceback
 import time
 
-from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file
+from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response
 
 import config
 
@@ -437,8 +437,8 @@ def ajaxCreate():
     reportObj.http['POST'][postValues[0]] = postValues[1]
   return json.dumps(report_index_set.call(reportObj))
 
-@report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
-def ajaxCall(report_name):
+@report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
+def ajaxCall(report_name, script):
   """ Generic Ajax call """
   onload, js, error = '', '', False
   userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)

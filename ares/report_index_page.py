@@ -100,15 +100,14 @@ def report(aresObj, localPath=None):
       scriptUpdate = fileDate if fileDate > scriptUpdate else scriptUpdate
 
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
-  #dropComp = aresObj.dropfile('Drop you files here')
-  #dropComp.reportName = aresObj.http['SCRIPTS_NAME']
-  inFile = aresObj.readFile('log_ares.dat')
-  six.next(inFile)
   activity = collections.defaultdict(int)
-  for line in inFile:
-    splitLine = line.strip().split("#")
-    activity[splitLine[1]] += 1
-  inFile.close()
+  inFile = aresObj.readFile('log_ares.dat')
+  if inFile is not None:
+    six.next(inFile)
+    for line in inFile:
+      splitLine = line.strip().split("#")
+      activity[splitLine[1]] += 1
+    inFile.close()
   content = []
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
