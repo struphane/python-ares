@@ -469,10 +469,17 @@ def ajaxCall(report_name):
 @report.route("/upload/<report_name>", methods = ['POST'])
 def uploadFiles(report_name):
   """ Add all the files that a users will drag and drop in the section """
+  result = []
   if request.method == 'POST':
+    postParams = {}
+    for postValues in request.form.items():
+      postParams[postValues[0]] = postValues[1]
     for filename, fileType in request.files.items():
       file = request.files[filename]
-      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
+      if 'DESTINATION' in postParams:
+        fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['DESTINATION'], file.filename)
+      else:
+        fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
       file.save(fileFullPath)
       appendToLog(report_name, 'UPLOAD', file.filename)
 
@@ -483,8 +490,8 @@ def uploadFiles(report_name):
         zf = zipfile.ZipFile("%s.zip" % fileFullPath, 'a')
         zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
         zf.close()
-
-  return json.dumps({})
+      result.append(filename)
+  return json.dumps(result)
 
 @report.route("/delete/<report_name>", methods = ['POST'])
 def deleteFiles(report_name):

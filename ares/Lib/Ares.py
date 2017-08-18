@@ -23,6 +23,7 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 
 import os
 import sys
+import time
 import collections
 
 from ares.Lib import AresHtmlContainer
@@ -58,6 +59,15 @@ def htmlLocalFooter():
   item.add(0, '</html>')
   return str(item)
 
+
+def convert_bytes(num):
+  """
+  this function will convert bytes to MB.... GB... etc
+  """
+  for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+      if num < 1024.0:
+          return "%3.1f %s" % (num, x)
+      num /= 1024.0
 
 class Report(object):
   """
@@ -284,6 +294,14 @@ class Report(object):
 
       files.add(pyFile)
     return files
+
+  def getFileInfo(self, subfolders, fileName):
+    """ Return the size and the last modification date of a given file on the server """
+    filePath = os.path.join(self.http['DIRECTORY'], *subfolders)
+    filePath = os.path.join(filePath, fileName)
+    fileSize = convert_bytes(os.path.getsize(filePath))
+    fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
+    return {'SIZE': fileSize, 'LAST_MOD_DT': fileDate}
 
   def html(self):
     """
