@@ -24,6 +24,28 @@ class Div(AresHtml.Html):
     return "$( document ).tooltip();"
 
 
+class IFrame(AresHtml.Html):
+  """ Python Wrapper for an iFrame object"""
+
+  reference = 'https://www.w3schools.com/TAgs/tag_iframe.asp'
+  alias = 'iframe'
+  default = {'width': '1000px', 'height': '700px', 'margin': 'auto 0', 'display': 'block'}
+
+  def addStyle(self, name, value):
+    """ Add the style to the Title object """
+    if self.style is None:
+      self.style = dict(self.default)
+    self.style[name] = value
+
+  def __repr__(self):
+    """ Return an iFrame Tag """
+    if not hasattr(self, 'style'):
+      self.style = dict(self.default)
+    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
+    return '''<iframe src="%s" style=%s">  
+    <p>Your browser does not support iframes.</p>
+    </iframe>''' % (self.vals, styleStr)
+
 class ListBadge(AresHtml.Html):
   """
   HTML List

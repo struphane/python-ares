@@ -254,6 +254,7 @@ def report_dsc_graph():
   aresObj.childPages = {}
   graphObject = [['Class Name', 'Description']]
   aresObj.title("Graph Components")
+  aresObj.iframe('http://nvd3.org/livecode/index.html')
   aresObj.title4(AresHtmlGraph.__doc__)
   for name, obj in inspect.getmembers(AresHtmlGraph):
     if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
