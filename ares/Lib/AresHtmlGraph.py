@@ -117,6 +117,7 @@ class Bar(JsGraph):
   mockData = r'json\bar.json'
   alias = 'bar'
   clickObject = 'discretebar'
+  icon = 'fa fa-bar-chart'
 
   def jsChart(self):
     """ """
