@@ -1,7 +1,7 @@
 ''' [SCRIPT COMMENT] '''
 
 AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
-CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
+CHILD_PAGES = {'results': 'ircCalculatorResults.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 def report(aresObj):
 
@@ -23,7 +23,9 @@ def report(aresObj):
 
     fileInfo.append([file, info['LAST_MOD_DT'], info['SIZE'], downComp, iconComp])
   aresObj.table('Configuration Files', fileInfo)
-  button = aresObj.button("Run Computation")
+
+  ahref = aresObj.anchor("Go to Computation", cssCls='btn btn-success')
+  ahref.addLink('results?NODE=%s&DATE=%s' % (aresObj.http['GET']['NODE'], aresObj.http['GET']['DATE']))
 
   aresObj.title3('Environment Statistics')
   aresObj.pieChart('', [["One", 29],["4fdffgfd", 196]])
