@@ -539,12 +539,18 @@ class UploadFile(AresHtml.Html):
     """ Display the file upload object """
     self.headerBox = 'Select a file '
     items = AresItem.Item('<div class="panel panel-success">')
-    items.add(1, '<div class="panel-heading"><strong><i class="fa fa-file" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
-    items.add(1, '<div class="col-lg-7" style="padding:5px">')
-    items.add(2, '<label class="btn btn-default btn-file" style="width:93%%; height:100%%" id="value_%s">' % self.htmlId)
-    items.add(3, 'Browse a file<input type="file" style="display: none;"  %s>' % self.strAttr())
-    items.add(2, '</label>')
-    items.add(1, '<button type="button" id="button_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button></div></div>' % self.htmlId)
+    items.add(1, '<div class="panel-heading">')
+    items.add(2, '<strong><i class="fa fa-file" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
+    items.add(1, '</div>')
+    items.add(1, '<div class="panel-body">')
+    items.add(2, '<div class="col-lg-7" style="padding:5px">')
+    items.add(3, '<label class="btn btn-default btn-file" style="width:93%%; height:100%%" id="value_%s">' % self.htmlId)
+    items.add(4, 'Browse a file<input type="file" style="display: none;"  %s>' % self.strAttr())
+    items.add(3, '</label>')
+    items.add(3, '<button type="button" id="button_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button>' % self.htmlId)
+    items.add(2, '</div>')
+    items.add(1, '</div>')
+    items.add(0, '</div>')
     return str(items)
 
   def js(self, evenType, jsDef):

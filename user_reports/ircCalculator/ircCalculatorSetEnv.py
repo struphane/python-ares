@@ -11,6 +11,8 @@ def report(aresObj):
   uploadComp.post('click', '../upload/%s' % aresObj.http['REPORT_NAME'], {}, '', '%s/%s' % (aresObj.http['GET']['DATE'], aresObj.http['GET']['NODE']))
   button = aresObj.button("Refresh files with Live", cssCls='btn btn-info')
 
+  aresObj.newline()
+  aresObj.newline()
   fileInfo = [['FileName', 'Last Modification Date', 'Size', '', '']]
   for file in aresObj.getFiles([aresObj.http['GET']['DATE'], aresObj.http['GET']['NODE']]):
     info = aresObj.getFileInfo(file, [aresObj.http['GET']['DATE'], aresObj.http['GET']['NODE']])
