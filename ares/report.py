@@ -356,6 +356,8 @@ def page_report(report_name):
 def index():
   """ Return the main page with the reports selection """
   aresObj = Ares.Report()
+  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+  aresObj.http['DIRECTORY'] = userDirectory
   aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
   aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   onload, content, js = report_index.report(aresObj).html()
