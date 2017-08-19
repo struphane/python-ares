@@ -5,19 +5,15 @@ CHILD_PAGES = {'results': 'ircCalculatorResults.py'} # Child pages call definiti
 
 def report(aresObj):
   aresObj.title('IRC Calculator')
-  aresObj.title3('Environment set up')
   dateObj = aresObj.date('COB Date')
   nodeObj = aresObj.input('Node')
-  upload = aresObj.upload('Select File')
-  upload.js('change', 'alert(%s);' %  upload.jsVal())
-  aresObj.input('Name')
-  button = aresObj.button("Create")
+  nameObj = aresObj.input('Name')
+  button = aresObj.button("Create Environment")
   button.post('click', '/reports/folder/create',
               "{'REPORT_NAME': '%s', 'FOLDERS': %s + '/' + %s}" % (aresObj.http['FILE'], dateObj.jsVal(), nodeObj.jsVal()),
               'display(data);setTimeout(function() {location.reload();}, 1000);    ')
-  aresObj.newline()
-  aresObj.newline()
-  aresObj.title3('Available Environments')
+
+  aresObj.container('Create Test Environment', [dateObj, nodeObj, nameObj, aresObj, button])
 
   dataTabe = [['Folder']]
   for folder in aresObj.getFolders():
@@ -26,5 +22,5 @@ def report(aresObj):
       ahref = aresObj.anchor(folder)
       ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]))
       dataTabe.append([ahref])
-  aresObj.table(dataTabe)
+  aresObj.table('Available Environments', dataTabe)
   return aresObj
