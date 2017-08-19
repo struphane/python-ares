@@ -19,8 +19,8 @@ class Table(AresHtml.Html):
 
   def __repr__(self):
     """ Return the String representation of a HTML table """
-    item = AresItem.Item('<div class="panel panel-primary">', self.incIndent)
-    item.add(1, '<div class="panel-heading">Panel heading</div>')
+    item = AresItem.Item('<div class="panel panel-success">', self.incIndent)
+    item.add(1, '<div class="panel-heading"><i class="fa fa-table" aria-hidden="true"></i>&nbsp;Table header</div>')
     item.add(1, '<div class="panel-body">')
     item.add(1,'<table %s>' % self.strAttr())
     item.add(1, '<thead>')
