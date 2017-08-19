@@ -537,17 +537,24 @@ class UploadFile(AresHtml.Html):
 
   def __repr__(self):
     """ Display the file upload object """
-    items = AresItem.Item('<div class="form-group row"><label class="custom-file col-sm-3 col-form-label">')
-    items.add(1, '<input type="file" %s>' % self.strAttr())
-    items.add(1, '<span class="custom-file-control" id="file_%s"></span>' % self.htmlId)
-    items.add(0, '</label><div class="form-group mx-sm-3"><input class="form-control" type="text" id="value_%s" readonly></div>' % self.htmlId)
-    items.add(0, '<button type="button" id="button_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button></div>' % self.htmlId)
+    self.headerBox = 'Select a file '
+    items = AresItem.Item('<div class="panel panel-success">')
+    items.add(1, '<div class="panel-heading"><strong><i class="fa fa-file" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+    items.add(1, '<div class="col-lg-7" style="padding:5px">')
+    items.add(2, '<label class="btn btn-default btn-file" style="width:93%%; height:100%%" id="value_%s">' % self.htmlId)
+    #items.add(1, '<input type="file" %s>' % self.strAttr())
+    #items.add(1, '<span class="custom-file-control" id="file_%s"></span>' % self.htmlId)
+    items.add(3, 'Browse a file<input type="file" style="display: none;" %s>' % self.strAttr())
+    items.add(2, '</label>')
+    #items.add(0, '<div class="form-group mx-sm-3"><input class="form-control" type="text" id="value_%s" readonly></div>' % self.htmlId)
+    items.add(1, '<button type="button" id="button_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button></div></div>' % self.htmlId)
     return str(items)
 
   def js(self, evenType, jsDef):
     """ Add a Javascript Event to an HTML object """
     if evenType == 'change':
-      jsDef = '$("#value_%s").val(%s); %s' % (self.htmlId, self.jsVal(), jsDef)
+      # .replace(/\\/g, "/").replace(/.*\//, "")
+      jsDef = '$("#value_%s").html(%s); %s' % (self.htmlId, self.jsVal(), jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
 
   def jsEvents(self, jsEventFnc=None):
