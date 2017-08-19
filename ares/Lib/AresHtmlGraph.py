@@ -21,7 +21,11 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   """
   duration = 350
   clickFnc, clickObject = None, None
-  width, height = 960, 500
+
+  def __init__(self, htmlId, header, vals, cssCls=None):
+    """  """
+    super(JsGraph, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """

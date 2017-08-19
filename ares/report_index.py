@@ -30,4 +30,6 @@ def report(aresObj):
   aresObj.addTo(modal, createReport)
   aresObj.table('Existing Reports', [['Test', 'fdsf'], ['Test', 'fdsf']])
   createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.jsVal(), 'display(data);')
+
+  aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
   return aresObj
