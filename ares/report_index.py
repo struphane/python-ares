@@ -32,10 +32,12 @@ def report(aresObj):
   inputModal = aresObj.input("Report Name", '')
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)
-  tableComp = aresObj.table('Existing Reports', [['Test', 'fdsf'], ['Test', 'fdsf']])
   createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.jsVal(), 'display(data);')
 
-  print(aresObj.getFolders())
+  contentFolder = [['Environment', 'Date', 'Size']]
+  for folder, folderInfo in aresObj.getFoldersInfo().items():
+    contentFolder.append([folder, folderInfo['LAST_MOD_DT'], folderInfo['SIZE']])
+  tableComp = aresObj.table('Existing Reports', contentFolder)
   pieComp = aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
   aresObj.grid([pieComp, tableComp])
   return aresObj
