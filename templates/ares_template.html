@@ -5,15 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Saturn - BDI</title>
-    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
     <link rel="stylesheet" href="{{ url_for('static',filename='css/bdi.css') }}"  type="text/css" />
     <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-grid.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-reboot.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-select.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/docs.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/jquery-ui.css') }}"  type="text/css" />
     <link rel="stylesheet" href="{{ url_for('static',filename='css/nv.d3.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-select.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/svg.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/jquery.dataTables.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-simple-sidebar.css') }}" type="text/css">
@@ -24,7 +25,6 @@
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/jquery-3.2.1.min.js') }}"></script>
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/jquery-ui.min.js') }}"></script>
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
-    <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/bootstrap-select.min.js') }}"></script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/d3.v3.js') }}"></script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/nv.d3.js') }}"></script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/d3.layout.cloud.js') }}"></script>
@@ -41,6 +41,7 @@
             $('#temp-message').show();
             $('#temp-message').fadeOut( 4000 );
         }
+
     {{ onload|safe }}
     </script>
 </head>
@@ -108,7 +109,6 @@
         <!-- /#page-content-wrapper -->
 
     </div>
-
 
 <script>
     {{ js|safe }}

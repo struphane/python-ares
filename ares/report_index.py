@@ -22,16 +22,15 @@ def report(aresObj):
   aresInput.autocomplete(foldersReports)
   aresButton = aresObj.button("Open Report Section", 'btn btn-success')
   aresButton.js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresInput.jsVal())
+  modal = aresObj.modal('click on the link to create a new report section')
 
-
-  aresObj.container('Create Environment', [aresInput, aresButton])
+  aresObj.container('Create Environment', [aresInput, aresButton, modal])
 
   contentFolder, contentSize = [['Environment', 'Date', 'Size', '']], []
   for folder, folderInfo in aresObj.getFoldersInfo().items():
     contentFolder.append([folder, folderInfo['LAST_MOD_DT'], folderInfo['SIZE'], '<i class="fa fa-trash" aria-hidden="true"></i>'])
     contentSize.append([folder, len(aresObj.getFiles([folder]))])
   # Create a new report
-  modal = aresObj.modal('click on the link to create a new report section')
 
   aresObj.bar('Scripts per folder', [ {"key": "Cumulative Return","values": contentSize }])
   createReport = aresObj.button("Create the Report", 'btn btn-primary')
