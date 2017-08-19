@@ -141,6 +141,15 @@ class Line(AresHtml.Html):
     return aresObj.line()
 
 
+class Icon(AresHtml.Html):
+  """
+  """
+  reference = 'http://fontawesome.io/icons/'
+  alias = 'icon'
+
+  def __repr__(self):
+    """ Return the String representation of a line tag """
+    return '<i class="fa fa-%s" style="cursor:pointer" aria-hidden="true" %s></i>' % (self.vals, self.strAttr())
 
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')

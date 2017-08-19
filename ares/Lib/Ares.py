@@ -171,6 +171,7 @@ class Report(object):
   def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def newline(self, cssCls=None): return self.add(AresHtmlText.Newline(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def line(self, cssCls=None): return self.add(AresHtmlText.Line(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
   # Title section
   def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
@@ -306,9 +307,12 @@ class Report(object):
       files.add(pyFile)
     return files
 
-  def getFileInfo(self, subfolders, fileName):
+  def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """
-    filePath = os.path.join(self.http['DIRECTORY'], *subfolders)
+    if subfolders is None:
+      filePath = self.http['DIRECTORY']
+    else:
+      filePath = os.path.join(self.http['DIRECTORY'], *subfolders)
     filePath = os.path.join(filePath, fileName)
     fileSize = convert_bytes(os.path.getsize(filePath))
     fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
