@@ -80,6 +80,7 @@ class Title(AresHtml.Html):
   def aresExample(cls, aresObj):
     return aresObj.title("Level 1 Title")
 
+
 class Title2(Title):
   """ Python Wrapper to the HTML H2 Tag """
   dim, alias = 2, 'title2'
