@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Saturn - BDI</title>
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
@@ -15,6 +16,10 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='css/nv.d3.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-select.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/svg.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/jquery.dataTables.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap-simple-sidebar.css') }}" type="text/css">
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
 
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/jquery-3.2.1.min.js') }}"></script>
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/jquery-ui.min.js') }}"></script>
@@ -24,6 +29,7 @@
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/nv.d3.js') }}"></script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/d3.layout.cloud.js') }}"></script>
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/colorbrewer.js') }}"></script>
+	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/jquery.dataTables.min.js') }}"></script>
 
     <script>
         function preloader() {
@@ -40,29 +46,61 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="container" id="html_content">
+<div id="wrapper">
+
+        <!-- Sidebar -->
         <div id="sidebar-wrapper">
-        <ul class="sidebar-nav">
-            <li class="sidebar-brand"><br></li>
-            <li class="sidebar-brand"><a href="#" class="navbar-brand"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Profile</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</a></li>
-            <li><span class="glyphicon glyphicon-search" aria-hidden="true"></span><font color="#337AB7"> STATISTICS</font></li>
-            <li><a href="#"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Reports</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Statistic</a></li>
-            <li><span class="glyphicon glyphicon-search" aria-hidden="true"></span><font color="#337AB7"> ADMINISTRATION</font></li>
-            <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Users</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Messages</a></li>
-        </ul>
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        Start Bootstrap
+                    </a>
+                </li>
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Shortcuts</a>
+                </li>
+                <li>
+                    <a href="#">Overview</a>
+                </li>
+                <li>
+                    <a href="#">Events</a>
+                </li>
+                <li>
+                    <a href="#">About</a>
+                </li>
+                <li>
+                    <a href="#">Services</a>
+                </li>
+                <li>
+                    <a href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Toggle Menu</a>
+                {{ content|safe }}
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
     </div>
 
-    {{ content|safe }}
-    <BR />
-    <BR />
-</div>
 
 <script>
     {{ js|safe }}
+
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+
 </script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/map-graph.js') }}"></script>	
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/geometry.js') }}"></script>

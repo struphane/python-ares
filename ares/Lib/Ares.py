@@ -105,6 +105,7 @@ class Report(object):
       print("Notification %s not recognized !" % notif)
       print("Allowed notification %s" % self.definedNotif.keys())
       raise Exception("Notification Type should belong to one of the above category")
+
     alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
     alertObject = alertCls(self.countItems, title, value, self.countNotif, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
     self.htmlItems[alertObject.htmlId] = alertObject

@@ -18,6 +18,8 @@ In the javascript layer
 
 """
 
+REPORT_NAME = ''
+
 AJAX_CALL = {} # Ajax call definition
 CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 

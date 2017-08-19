@@ -26,11 +26,13 @@ class Table(AresHtml.Html):
       item.add(3, '<th>%s</th>' % header)
     item.add(2, '</tr>')
     item.add(1, '</thead>')
+    item.add(1, '<tbody>')
     for row in self.vals[1:]:
       item.add(1, '<tr>')
       for val in row:
         item.add(2, "<td>%s</td>" % val)
       item.add(1, '</tr>')
+    item.add(1, '</tbody>')
     item.add(0, '</table>')
     return str(item)
 
@@ -50,6 +52,10 @@ class Table(AresHtml.Html):
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.table([["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
+
+  def onLoadFnc(self):
+    """ Return a String with the Javascript method to put in the HTML report """
+    return "$(document).ready(function() {%s.DataTable();} );" % self.jsRef()
 
 if __name__ == '__main__':
   obj = Table(0, [['Olivier', 'Aurelie'], [1, 2]])

@@ -32,5 +32,6 @@ def report(aresObj):
   inputModal = aresObj.input("Report Name", '')
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)
+  aresObj.table([['Test', 'fdsf'], ['Test', 'fdsf']])
   createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.jsVal(), 'display(data);')
   return aresObj
