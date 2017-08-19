@@ -109,12 +109,10 @@ def report(aresObj, localPath=None):
   content = []
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
-  aresObj.title4('Deployments count')
-  graphObj = aresObj.bar('', [ {"key": "Cumulative Return","values": content }])
+  graphObj = aresObj.bar('Deployments count', [ {"key": "Cumulative Return","values": content }])
   graphObj.height = 200
 
-  aresObj.title4('Summary')
-  aresObj.table('', scripts, cssCls="table table-hover table-bordered")
+  aresObj.table('Scripts Summary', scripts, cssCls="table table-hover table-bordered")
 
   zipComp = aresObj.downloadAll()
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
