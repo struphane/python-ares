@@ -185,7 +185,7 @@ class Input(AresHtml.Html):
     """ Return the String representation of a HTML Input object """
     item = AresItem.Item('<div class="form-group">', self.incIndent)
     item.add(1, '<label for="%s">%s:</label>' % (self.vals.replace(" ", "").lower(), self.vals))
-    item.add(2, '<input type="text" %s>' % (self.strAttr()))
+    item.add(2, '<input type="text" style="width:100%%" %s>' %  self.strAttr())
     item.add(0, '</div>')
     return str(item)
 
