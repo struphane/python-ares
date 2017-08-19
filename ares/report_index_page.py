@@ -67,8 +67,6 @@ def report(aresObj, localPath=None):
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
         remov = aresObj.remove()
-        print("##########")
-        print(aresObj.http['SCRIPTS_PATH'])
         remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
         downComp = aresObj.download()
         downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
@@ -112,11 +110,11 @@ def report(aresObj, localPath=None):
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
   aresObj.title4('Deployments count')
-  graphObj = aresObj.bar([ {"key": "Cumulative Return","values": content }])
+  graphObj = aresObj.bar('', [ {"key": "Cumulative Return","values": content }])
   graphObj.height = 200
 
   aresObj.title4('Summary')
-  aresObj.table(scripts, cssCls="table table-hover table-bordered")
+  aresObj.table('', scripts, cssCls="table table-hover table-bordered")
 
   zipComp = aresObj.downloadAll()
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
