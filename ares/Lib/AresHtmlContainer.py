@@ -50,6 +50,7 @@ class IFrame(AresHtml.Html):
     <p>Your browser does not support iframes.</p>
     </iframe>''' % (self.vals, styleStr)
 
+
 class ListBadge(AresHtml.Html):
   """
   HTML List
@@ -85,8 +86,26 @@ class Container(Div):
   Default class parameters
     - CSS Default Class = container
   """
-  cssCls, alias = 'container', 'container'
+  cssCls, alias = 'container-fluid', 'container'
   reference = 'https://getbootstrap.com/docs/3.3/css/'
+
+  def __init__(self, htmlId, header, vals, cssCls=None):
+    """  """
+    super(Container, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
+
+  def __repr__(self):
+    """ Return the String representation of a HTML List """
+    item = AresItem.Item('<div class="container-fluid">')
+    item.add(1, '<div class="panel panel-success">') #% self.strAttr())
+    item.add(2, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+    item.add(2, '<div class="panel-body">')
+    for val in self.vals:
+      item.add(3, val)
+    item.add(2, '</div>')
+    item.add(1, '</div>')
+    item.add(0, '</div>')
+    return str(item)
 
   @classmethod
   def aresExample(cls, aresObj):

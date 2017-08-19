@@ -23,6 +23,9 @@ def report(aresObj):
   aresButton = aresObj.button("Open Report Section", 'btn btn-success')
   aresButton.js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresInput.jsVal())
 
+
+  aresObj.container('Create Environment', [aresInput, aresButton])
+
   # Create a new report
   modal = aresObj.modal('click on the link to create a new report section')
   createReport = aresObj.button("Create the Report", 'btn btn-primary')
