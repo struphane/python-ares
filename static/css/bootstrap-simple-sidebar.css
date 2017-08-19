@@ -8,6 +8,22 @@ body {
     overflow-x: hidden;
 }
 
+#menu-toggle {
+    text-decoration: none;
+    z-index: 50;
+    top: 0px;
+    position: fixed;
+    color: white;
+    padding: 5px;
+    background-color: #000000;
+}
+#menu-toggle:hover, #menu-toggle:active {
+    text-decoration: none;
+    background-color: #000000;
+    outline:none;
+}
+
+
 #wrapper {
     padding-left: 0;
     -webkit-transition: all 0.5s ease;
