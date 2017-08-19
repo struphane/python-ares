@@ -114,7 +114,7 @@ class Split(AresHtml.Html):
   def __repr__(self):
     """ Return the HTML display of a split container"""
     res = AresItem.Item('<div %s>' % self.strAttr())
-    res.add(1, '%s<div class="row">')
+    res.add(1, '<BR/><div class="row">')
     for htmObj in self.vals:
       res.add(2, '<div class="col-lg-%s">' % self.col_lg)
       res.add(3, str(htmObj))
@@ -137,16 +137,16 @@ class GraphSvG(AresHtml.Html):
     - width, height = 960, 500 (for the SVG component)
   """
   cssCls = 'span4'
-  width, height = 400, 400
+  width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
 
   def __repr__(self):
     """ Return the String representation of a DIV containing a SVG tag """
-    item = AresItem.Item('<div class="panel panel-success" style="width:%spx;height:%spx;">' % (self.width, self.height), self.incIndent)
+    item = AresItem.Item('<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height), self.incIndent)
     item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
-    item.add(1, '<div class="panel-body" %s>' % self.strAttr())
-    item.add(1, '<svg width="%s" height="%s"></svg>' % (self.width, self.height))
+    item.add(1, '<div class="panel-body" style="width:100%%;height:100%%;" %s>' % self.strAttr())
+    item.add(1, '<svg style="width:100%;height:100%;"></svg>')
     item.add(0, '</div>')
     item.add(0, '</div>')
     return str(item)

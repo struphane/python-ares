@@ -22,14 +22,17 @@ def report(aresObj):
   aresInput.autocomplete(foldersReports)
   aresButton = aresObj.button("Open Report Section", 'btn btn-success')
   aresButton.js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresInput.jsVal())
+
   # Create a new report
   modal = aresObj.modal('click on the link to create a new report section')
   createReport = aresObj.button("Create the Report", 'btn btn-primary')
   inputModal = aresObj.input("Report Name", '')
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)
-  aresObj.table('Existing Reports', [['Test', 'fdsf'], ['Test', 'fdsf']])
+  tableComp = aresObj.table('Existing Reports', [['Test', 'fdsf'], ['Test', 'fdsf']])
   createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.jsVal(), 'display(data);')
 
-  aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
+  #print(aresObj.getFolders())
+  pieComp = aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
+  aresObj.grid([pieComp, tableComp])
   return aresObj
