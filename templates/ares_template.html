@@ -56,24 +56,23 @@
             </ul>
         </div>
         <!-- /#sidebar-wrapper -->
-    
-        <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Toggle Menu</a>
+
+        <a href="#menu-toggle" class="btn btn-outline-secondary" id="menu-toggle"><i id='menu-icon' class="fa fa-chevron-circle-right fa-2x" aria-hidden="true"></i></a>
         <!-- Page Content -->
         <div id="page-content-wrapper">
-
             <div class="col-sm-6 col-md-3">
                 <div class="thumbnail tile tile-medium tile-green">
                     <a href="#" class="fa-links">
                         <h1>Home</h1>
-                            <i class="fa fa-3x fa-home"></i>
+                        <i class="fa fa-3x fa-home"></i>
                     </a>
                 </div>
             </div>
+
             <div class="col-sm-6 col-md-6">
                 <div class="thumbnail tile tile-wide tile-orange">
                     <a href="#" >
-                        <h1 class="tile-text">
-                            I'm the 2!</h1>
+                        <h1 class="tile-text">I'm the 2!</h1>
                     </a>
                 </div>
             </div>
@@ -92,6 +91,8 @@
 
     $("#menu-toggle").click(function(e) {
         e.preventDefault();
+        if($("#menu-icon").hasClass('fa-chevron-circle-left')) {$("#menu-icon").removeClass('fa-chevron-circle-left').addClass("fa fa-chevron-circle-right fa-2x");}
+        else {$("#menu-icon").removeClass('fa-chevron-circle-right').addClass("fa fa-chevron-circle-left fa-2x");}
         $("#wrapper").toggleClass("toggled");
     });
 
