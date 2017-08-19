@@ -53,7 +53,7 @@ class Paragraph(AresHtml.Html):
 class Title(AresHtml.Html):
   """ Python Wrapper to the HTML H1 Tag """
   dim, alias = 1, 'title'
-  default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none', 'text-align': 'center'}
+  default = {'color': '#398438', 'font-family': 'anchorjs-icons', 'font-style': 'normal', 'font-varian': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   def addStyle(self, name, value):
@@ -67,8 +67,8 @@ class Title(AresHtml.Html):
     if not hasattr(self, 'style'):
       self.style = dict(self.default)
     styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
-    items = AresItem.Item('<H%s %s style="%s">' % (self.dim, self.strAttr(), styleStr))
-    items.add(1, '<a style="%s">%s</a>' % (styleStr, self.vals))
+    items = AresItem.Item('<H%s class="page-header" %s style="%s">' % (self.dim, self.strAttr(), styleStr))
+    items.add(1, '<a class="anchorjs-link " style="%s">%s</a>' % (styleStr, self.vals))
     items.add(0, '</H%s>' % self.dim)
     return str(items)
 
