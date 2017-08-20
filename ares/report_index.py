@@ -28,7 +28,9 @@ def report(aresObj):
 
   contentFolder, contentSize = [['Environment', 'Date', 'Size', '']], []
   for folder, folderInfo in aresObj.getFoldersInfo().items():
-    contentFolder.append([folder, folderInfo['LAST_MOD_DT'], folderInfo['SIZE'], '<i class="fa fa-trash" aria-hidden="true"></i>'])
+    iconComp = aresObj.icon('trash')
+    iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
+    contentFolder.append([folder, folderInfo['LAST_MOD_DT'], folderInfo['SIZE'], iconComp])
     contentSize.append([folder, len(aresObj.getFiles([folder]))])
   # Create a new report
 

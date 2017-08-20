@@ -523,7 +523,10 @@ def deleteFolder(report_name):
     if 'SOURCE_PATH' in postParams:
       fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['SOURCE_PATH'], postParams['FILE_NAME'])
     else:
-      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['FILE_NAME'])
+      if 'FILE_NAME' in postParams:
+        fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['FILE_NAME'])
+      else:
+        fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     shutil.rmtree(fileFullPath)
 
   return json.dumps({'FILE_NAME': request.form.get('SOURCE_PATH'), 'ENV': report_name})

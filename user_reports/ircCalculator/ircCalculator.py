@@ -25,8 +25,8 @@ def report(aresObj):
       ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]))
       info = aresObj.getFileInfo(env[2], [env[1]])
       iconComp = aresObj.icon('trash')
-      iconComp.post('click', "../delete_folder/%s" % aresObj.http['REPORT_NAME'], {'SOURCE_PATH': '%s' % env[1],
-                                                                                 'FILE_NAME': env[2]}, 'location.reload();')
+      iconComp.post('click', "../delete_folder/%s" % aresObj.http['REPORT_NAME'], {'SOURCE_PATH': env[1],
+                                                                                   'FILE_NAME': env[2]}, 'location.reload();')
 
       dataTabe.append([ahref, info['LAST_MOD_DT'], iconComp])
       testPerDay[env[1]] += 1

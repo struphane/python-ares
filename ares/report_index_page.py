@@ -49,7 +49,7 @@ def report(aresObj, localPath=None):
                       Any script can be updated in your environment / any folder can be added.
                       Please go here to get more details about the process
                     ''')
-  comp = aresObj.download()
+  comp = aresObj.icon('download')
   comp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
 
   fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME'])))
@@ -66,9 +66,9 @@ def report(aresObj, localPath=None):
   for mainScript, child in aresObj.http['SCRIPTS_CHILD']:
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
-        remov = aresObj.remove()
+        remov = aresObj.icon('trash')
         remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
-        downComp = aresObj.download()
+        downComp = aresObj.icon('download')
         downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
         fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['SCRIPTS'][script], script)))
         fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['SCRIPTS'][script], script))))
@@ -86,9 +86,9 @@ def report(aresObj, localPath=None):
 
   for script, scriptPath in aresObj.http['SCRIPTS'].items():
     if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc') and not script.endswith('zip') and not script.endswith('.svn'):
-      removComp = aresObj.remove()
+      removComp = aresObj.icon('trash')
       removComp.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, "display(data); window.location.href='../page/%s' ;" % aresObj.http['SCRIPTS_NAME'])
-      downComp = aresObj.download()
+      downComp = aresObj.icon('download')
       downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
       fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
       fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
