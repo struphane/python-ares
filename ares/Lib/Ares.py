@@ -186,7 +186,7 @@ class Report(object):
   def button(self, value, cssCls=None): return self.add(AresHtmlEvent.Button(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
-  def downloadAll(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
   # Containers section

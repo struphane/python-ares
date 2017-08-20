@@ -114,6 +114,6 @@ def report(aresObj, localPath=None):
 
   aresObj.table('Scripts Summary', scripts, cssCls="table table-hover table-bordered")
 
-  zipComp = aresObj.downloadAll()
+  zipComp = aresObj.downloadAll('Download Zip archive of this environment')
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
   return aresObj
