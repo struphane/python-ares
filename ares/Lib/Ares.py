@@ -77,7 +77,7 @@ def isExcluded(rootPath, file=None, folders=None):
 
   if folders is not None:
     folder = os.path.join(*folders)
-    if '__pycache__' in folder or folder != rootPath or folder.startswith('.svn'):
+    if '__pycache__' in folder or folder == rootPath or folder.startswith('.svn'):
       return True
 
   return False
@@ -295,7 +295,6 @@ class Report(object):
   def getFolders(self):
     """ Return the list of sub folders in tne environment """
     folders = set()
-    print(self.http['DIRECTORY'])
     for folder in os.walk(os.path.join(self.http['DIRECTORY'])):
       if isExcluded(self.http['DIRECTORY'], folders=[folder[0]]):
         continue

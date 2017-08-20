@@ -22,6 +22,7 @@ def report(aresObj):
 
   dataTabe, testPerDay = [['Folder', 'Creation Date', '']], collections.defaultdict(int)
   for folder in aresObj.getFolders():
+    print(folder)
     env = folder.split("\\")
     if len(env) == 3:
       ahref = aresObj.anchor(folder)
