@@ -66,6 +66,14 @@ def appendToLog(reportName, event, comment):
   logFile.write("%s#%s#%s#%s\n" % (event, showtime[0], showtime[1], comment))
   logFile.close()
 
+def getHttpParams(request):
+  """ Get the HTTP parameters of a request """
+  httpParams = {}
+  httpParams = dict(zip([(getValues[0], getValues[1]) for getValues in request.args.items()]))
+  for postValues in request.form.items():
+    httpParams[postValues[0]] = postValues[1]
+  return httpParams
+
 
 @report.route("/doc")
 @report.route("/dsc")
@@ -501,15 +509,12 @@ def uploadFiles(report_name):
 def deleteData(report_name):
   """ Delete a file in the report environment """
   if request.method == 'POST':
-    postParams = {}
-    for postValues in request.form.items():
-      postParams[postValues[0]] = postValues[1]
-    if 'SOURCE_PATH' in postParams:
+    requestParams = getHttpParams(request)
+    if 'SOURCE_PATH' in requestParams:
       fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['SOURCE_PATH'], postParams['FILE_NAME'])
     else:
       fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['FILE_NAME'])
     os.remove(fileFullPath)
-
   return json.dumps({'FILE_NAME': request.form.get('SOURCE_PATH'), 'ENV': report_name})
 
 @report.route("/delete_folder/<report_name>", methods = ['POST'])
@@ -517,18 +522,11 @@ def deleteFolder(report_name):
   """ Delete a file in the report environment """
   import shutil
   if request.method == 'POST':
-    postParams = {}
-    for postValues in request.form.items():
-      postParams[postValues[0]] = postValues[1]
-    if 'SOURCE_PATH' in postParams:
-      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['SOURCE_PATH'], postParams['FILE_NAME'])
+    requestParams = getHttpParams(request)
+    if 'SOURCE_PATH' in requestParams:
+      shutil.rmtree(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['SOURCE_PATH']))
     else:
-      if 'FILE_NAME' in postParams:
-        fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['FILE_NAME'])
-      else:
-        fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-    shutil.rmtree(fileFullPath)
-
+      shutil.rmtree(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
   return json.dumps({'FILE_NAME': request.form.get('SOURCE_PATH'), 'ENV': report_name})
 
 @report.route("/delete/<report_name>", methods = ['POST'])

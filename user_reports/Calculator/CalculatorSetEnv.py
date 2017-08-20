@@ -8,8 +8,7 @@ def report(aresObj):
   aresObj.title("IRC Results for %s" % aresObj.http['NODE'])
   uploadComp = aresObj.upload()
   uploadComp.js('change', '')
-  uploadComp.click()
-  uploadComp.post('click', '../upload/%s' % aresObj.http['REPORT_NAME'], {}, '', '%s/%s' % (aresObj.http['DATE'], aresObj.http['NODE']))
+  uploadComp.click(aresObj.http['REPORT_NAME'], folders=[aresObj.http['DATE'], aresObj.http['NODE']])
   button = aresObj.button("Refresh files with Live", cssCls='btn btn-info')
 
   aresObj.newline()
@@ -17,9 +16,7 @@ def report(aresObj):
   fileInfo = [['FileName', 'Last Modification Date', 'Size', '', '']]
   for file in aresObj.getFiles([aresObj.http['DATE'], aresObj.http['NODE']]):
     info = aresObj.getFileInfo(file, [aresObj.http['DATE'], aresObj.http['NODE']])
-    iconComp = aresObj.icon('trash')
-    iconComp.post('click', "../delete_file/%s" % aresObj.http['REPORT_NAME'], {'SOURCE_PATH': '%s/%s' % (aresObj.http['DATE'], aresObj.http['NODE']),
-                                                                               'FILE_NAME': file}, 'location.reload();')
+    iconComp = aresObj.icon('trash').deleteLink(aresObj.http['REPORT_NAME'], file, [aresObj.http['DATE'], aresObj.http['NODE']])
 
     downComp = aresObj.icon('download')
     downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['REPORT_NAME'], 'script': file})

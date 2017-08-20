@@ -152,6 +152,14 @@ class Icon(AresHtml.Html):
     """ Return the String representation of a line tag """
     return '<i class="fa fa-%s" style="cursor:pointer" aria-hidden="true" %s></i>' % (self.vals, self.strAttr())
 
+  def deleteLink(self, reportName, fileName, folders):
+    """ Delete the file or the folder in the dedicated folder """
+    if fileName is None:
+      self.post('click', "../delete_folder/%s" % reportName, {'SOURCE_PATH': "/".join(folders)}, 'location.reload();')
+    else:
+      self.post('click', "../delete_file/%s" % reportName, {'SOURCE_PATH': "/".join(folders), 'FILE_NAME': fileName}, 'location.reload();')
+    return self
+
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')
   #print(obj.jsEvents())
