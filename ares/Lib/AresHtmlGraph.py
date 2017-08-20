@@ -21,6 +21,7 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   """
   duration = 350
   clickFnc, clickObject = None, None
+  style = {'chartStyle': {}, 'chartAttr': {}}
 
   def __init__(self, htmlId, header, vals, cssCls=None):
     """  """
@@ -33,11 +34,23 @@ class JsGraph(AresHtmlContainer.GraphSvG):
 
   def addStyle(self, style):
     """ add style to graphs (will be added to the nv.models js function"""
-    pass
+    self.style.setdefault('chartStyle', {}).update(style)
 
-  def addAttributes(self, attributes):
-    """ add attributes to the graphs, mostly used to add/customize axis"""
-    pass
+  def addAttr(self, attr):
+    """ add attributes to graphs (will be added AFTER the nv.models js function
+    Mostly used to custom/add axis"""
+    for subObj, subAttr in attr.items():
+      self.style.setdefault('chartAttr', {}).setdefault(subObj, {}).update(subAttr)
+
+  def formatChart(self):
+    """ """
+    chartStyle, chartAttr = [], []
+    for style, attr in self.style.get('charStyle', {}).items():
+      chartStyle.append('%s(%s)' % (style, attr))
+    for subObj, attr in self.style.get('chartAttr', {}).items():
+      for subAttr, val in attr.items():
+        chartAttr.append('chart_%s.%s.%s(%s)' % (self.htmlId, subObj, subAttr, val))
+    return ('\n.'.join(chartStyle), ';'.join(chartAttr))
 
   def jsChart(self):
     """ Return the javascript fragment require to build the graph """
@@ -68,7 +81,18 @@ class JsGraph(AresHtmlContainer.GraphSvG):
     self.clickFnc = 'chart_%s.%s.dispatch.on("elementClick", function(e) {%s});' % (self.htmlId, self.clickObject, fnc)
 
 
-class Pie(JsGraph):
+class NVD3Chart(JsGraph):
+
+  chartObject = 'to be overriden'
+  jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
+
+  def jsChart(self):
+    style, attr = self.formatChart()
+    if style:
+      style = '\n.%s' % style
+    return '''nv.models.%s()%s%s; %s ''' % (self.chartObject, self.jsFrag, style, attr)
+
+class Pie(NVD3Chart):
   """
   NVD3 Wrapper for a Pie Chart object.
 
@@ -77,19 +101,11 @@ class Pie(JsGraph):
   Data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
-  showLabel, alias = 1, 'pieChart'
+  alias = 'pieChart'
   mockData = r'json\pie.json'
   clickObject = 'pie'
-
-  def jsChart(self):
-    """ Return the javascript method to use to create the Chart """
-    return '''
-              nv.models.pieChart()
-                .x(function(d){ return d[0] }).
-                y(function(d){ return d[1] }).
-                showLabels(%s);
-            ''' % self.showLabel
-
+  style = {'chartStyle': {'showLabels':'1'}}
+  chartObject = 'pieChart'
 
 class Donut(Pie):
   """
@@ -100,22 +116,9 @@ class Donut(Pie):
   mockData = r'json\pie.json'
   alias = 'donutChart'
   clickObject = 'pie'
+  style = {'chartStyle': {'showLabels': '1', 'labelThreshold': '.05)', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
 
-  def jsChart(self):
-    """ Return the javascript method to use to create the Chart """
-    return '''
-              nv.models.pieChart()
-                .x(function(d){ return d[0] ; })
-                .y(function(d){ return d[1] ; })
-                .showLabels(%s)
-                .labelThreshold(.05)
-                .labelType("percent")
-                .donut(true)
-                .donutRatio(0.35);
-           ''' % self.showLabel
-
-
-class Bar(JsGraph):
+class Bar(NVD3Chart):
   """
 
   Data format expected in the graph:
@@ -126,17 +129,8 @@ class Bar(JsGraph):
   alias = 'bar'
   clickObject = 'discretebar'
   icon = 'fa fa-bar-chart'
-
-  def jsChart(self):
-    """ """
-    return '''
-              nv.models.discreteBarChart()
-                .x(function(d) { return d[0] ; })    //Specify the data accessors.
-                .y(function(d) { return d[1] ; })
-                .staggerLabels(true)    // Too many bars and not enough room? Try staggering labels.
-                .showValues(true)       // ...instead, show the bar value right on top of each bar.
-                .transitionDuration(350);
-           '''
+  chartObject = 'discreteBarChart'
+  style = {'chartStyle': {'staggerLabels': 'true', 'showValues': 'true', 'transitionDuration': '350'} }
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -144,7 +138,7 @@ class Bar(JsGraph):
     return aresObj.bar([{"key": "Cumulative Return", "values": [1, 2, 3, 4, 5]}])
 
 
-class Line(JsGraph):
+class Line(NVD3Chart):
   """
 
   Data format expected in the graph
@@ -154,57 +148,37 @@ class Line(JsGraph):
   duration = 200
   mockData = r'json\line.json'
   alias = 'lineChart'
+  chartObject = 'lineChart'
 
-  def jsxAxix(self):
-    """ """
-    return '''
-            chart_%s.xAxis     //Chart x-axis settings
-                    .axisLabel('Time (ms)')
-                    .tickFormat(d3.format(',r'));
-           ''' % self.htmlId
-
-  def jsyAxix(self):
-    """ """
-    return '''
-            chart_%s.yAxis     //Chart y-axis settings
-                    .axisLabel('Voltage (v)')
-                    .tickFormat(d3.format('.02f'));
-           ''' % self.htmlId
-
-  def jsChart(self):
-    """ """
-    return '''
-              nv.models.lineChart()
-                .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
-                .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
-                .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
-                .showYAxis(true)        //Show the y-axis
-                .showXAxis(true)        //Show the x-axis
-              ;
-
-              %s
-
-              %s
-           ''' % (self.jsxAxix().strip(), self.jsyAxix().strip())
+  style = {'chartStyle': {'margin': '{left: 100}', 'useInteractiveGuideline': 'true', 'showLegend': 'true',
+                          'showYAxis': 'true', 'showXAxis': 'true'},
+           'chartAttr': {'xAxis': {'axisLabel': '',
+                                  'tickFormat': "d3.format(',r')"
+                                  },
+                         'yAxis': {'axisLabel': "'Voltage (v)'",
+                                   'tickFormat': "d3.format('.02f')"}
+                        }
+           }
+  oldstyle = {'chartStyle': ['margin({left: 100})', 'useInteractiveGuideline(true)', 'showLegend(true)', 'showYAxis(true)', 'showXAxis(true)'],
+           'chartAttr': ['xAxis.axisLabel', "xAxis.tickFormat(d3.format(',r'))", "yAxis.axisLabel('Voltage (v)')", "yAxis.tickFormat(d3.format('.02f'))" ]}
+  jsFrag = ''
 
 
-class StackedArea(JsGraph):
+class StackedArea(NVD3Chart):
   """ This object will output a simple stacked area chart
 
   Reference website: http://nvd3.org/examples/stackedArea.html
   """
   alias = 'stackedAreaChart'
   mockData = r'json\stackedAreaData.json'
-  withFocus = False
-  multiY = False
-  chartFunction = 'stackedAreaChart'
-  useExtraChartOptions = True
-  chartOptions = '''
-                  .useInteractiveGuideline(true)
-                  .clipEdge(true)
-                  '''
-  extraOptions = ''
-  useDefaultYAxis = True
+  chartObject = 'stackedAreaChart'
+  style = {'chartStyle': {'useInteractiveGuideline': 'true', 'clipEdge': 'true'},
+           'chartAttr': {'xAxis': {'showMaxMin': 'false',
+                                   'tickFormat' :"function(d) { return d3.time.format('%%x')(new Date(d)) }",
+                                   },
+                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
+                         }}
+
   clickObject = 'scatter'
 
   def pyDataToJs(self, localPath=None):
@@ -237,56 +211,8 @@ class StackedArea(JsGraph):
     jsData = '%s ]' % jsData
     return jsData
 
-  def addExtraOptions(self):
-    """ To be overriden in case extraOptions are used """
-    return self.extraOptions
 
-  def jsChart(self):
-    """ """
-    focusOption = ''
-    if self.withFocus:
-      focusOption = '''
-            chart_%s.x2Axis
-                .showMaxMin(false)
-                .tickFormat(function(d) { return d3.time.format('%%x')(new Date(d)) });
-          
-            chart_%s.y2Axis
-                .tickFormat(d3.format(',.2f'));''' % (self.htmlId, self.htmlId)
-    elif self.multiY:
-      focusOption = '''
-      
-            chart_%s.y2Axis
-                .tickFormat(d3.format(',.2f'));''' % (self.htmlId)
-
-    if not self.useExtraChartOptions:
-      self.chartOptions = ''
-
-    if self.useDefaultYAxis:
-      yAxis = '''chart_%s.yAxis
-                .tickFormat(d3.format(',.2f'));''' % self.htmlId
-    else:
-      yAxis = ''
-
-    return ''' 
-            nv.models.%s()
-                .x(function(d) { return d[0] })
-                .y(function(d) { return d[1] })
-                %s
-                ;
-
-            chart_%s.xAxis
-                .showMaxMin(false)
-                .tickFormat(function(d) { return d3.time.format('%%x')(new Date(d)) });
-          
-            %s
-                
-            %s
-            
-            %s
-          ''' % (self.chartFunction, self.chartOptions, self.htmlId, yAxis, focusOption, self.addExtraOptions())
-
-
-class MultiBars(StackedArea):
+class MultiBars(NVD3Chart):
   """ Simple multi bar chart
 
     http://nvd3.org/examples/multiBar.html
@@ -310,14 +236,17 @@ class MultiBars(StackedArea):
 """
 
   mockData = r'json\multiBar.json'
-  withFocus = False
-  chartFunction = 'multiBarChart'
-  useExtraChartOptions = False
+  chartObject = 'multiBarChart'
   alias = 'multiBarChart'
   clickObject = 'multibar'
+  style = {'chartAttr': {'xAxis': {'showMaxMin': 'false',
+                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",
+                                   },
+                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
+                         }}
 
 
-class LineWithFocus(StackedArea):
+class LineWithFocus(NVD3Chart):
   """ Simple line chart with a focus field to zoom in on specific parts of the chart
 
     http://nvd3.org/examples/lineWithFocus.html
@@ -342,13 +271,19 @@ class LineWithFocus(StackedArea):
   """
 
   mockData = r'json\lineWithFocus.json'
-  withFocus = True
-  chartFunction = 'lineWithFocusChart'
-  useExtraChartOptions = False
+  chartObject = 'lineWithFocusChart'
   alias = 'lineChartFocus'
 
+  style = {'chartAttr': {'xAxis': {'showMaxMin': 'false',
+                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",},
+                         'yAxis': {'tickFormat': "d3.format(',.2f')",},
+                         'x2Axis': {'showMaxMin': 'false',
+                                    'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",},
+                         'y2Axis': {'tickFormat': "d3.format(',.2f')"}
+                         }}
 
-class HorizontalBars(StackedArea):
+
+class HorizontalBars(NVD3Chart):
   """ Simple Horizontal bar chart
 
     http://nvd3.org/examples/multiBarHorizontal.html
@@ -373,18 +308,19 @@ class HorizontalBars(StackedArea):
   """
   alias = 'horizBarChart'
   mockData = r'json\horizBars.json'
-  withFocus = False
-  chartFunction = 'multiBarHorizontalChart'
-  useExtraChartOptions = True
-  chartOptions = ''' 
-                  .margin({top: 30, right: 20, bottom: 50, left: 175})
-                  .showValues(true)
-                  .tooltips(false)
-                  .showControls(false)
-                  '''
+  chartObject = 'multiBarHorizontalChart'
+
+  style = {'chartStyle': {'margin': '{top: 30, right: 20, bottom: 50, left: 175}',
+                          'showValues': 'true',
+                          'tooltips': 'false',
+                          'showControls': 'false'},
+           'chartAttr': {'xAxis': {'showMaxMin': 'false',
+                                   'tickFormat':"function(d) { return d3.time.format('%%x')(new Date(d)) }",},
+                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
+                         }}
 
 
-class ComboLineBar(StackedArea):
+class ComboLineBar(NVD3Chart):
   """
   This object will combine a line and a bar chart.
   The first item should be the line chart
@@ -395,24 +331,18 @@ class ComboLineBar(StackedArea):
   """
   alias = 'comboLineBar'
   mockData = r'json\linePlusBarData.json'
-  withFocus = False
-  chartFunction = 'linePlusBarChart'
-  multiY = True
-  interGuidelines = False
-  extraOptions = '''
-                    chart_%s.bars.forceY([0]) ;
-                    chart_%s.y1Axis.tickFormat(d3.format(',.2f')) ;
-                 '''
-  chartOptions = '''
-                    .color(d3.scale.category10().range())
-                 '''
-  useDefaultYAxis = False
+  chartObject = 'linePlusBarChart'
 
-  def addExtraOptions(self):
-    return self.extraOptions % (self.htmlId, self.htmlId)
+  style = {'chartStyle': {'color': 'd3.scale.category10().range()'},
+           'chartAttr': {'xAxis': {'showMaxMin': 'false',
+                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",
+                                   },
+                         'bars': {'forceY': '[0]'},
+                         'y1Axis': {'tickFormat': "d3.format(',.2f')"},
+                         'y2Axis': {'tickFormat': "d3.format(',.2f')"}
+                         }}
 
-
-class ScatterChart(StackedArea):
+class ScatterChart(NVD3Chart):
   """ Simple Scatter chart
 
     http://nvd3.org/livecode/index.html#codemirrorNav
@@ -436,10 +366,13 @@ class ScatterChart(StackedArea):
 
   """
   mockData = r'json\multiBar.json'
-  withFocus = False
-  chartFunction = 'scatterChart'
-  useExtraChartOptions = False
+  chartObject = 'scatterChart'
   alias = 'scatterChart'
+  style = {'chartStyle': {},
+           'chartAttr': {'xAxis': {'showMaxMin': 'false',
+                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }"},
+                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
+                         }}
 
 
 class Network(JsGraph):

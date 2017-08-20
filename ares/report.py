@@ -163,7 +163,7 @@ def report_dsc_graph():
   aresObj.iframe('http://nvd3.org/livecode/index.html')
   aresObj.title4(AresHtmlGraph.__doc__)
   for name, obj in inspect.getmembers(AresHtmlGraph):
-    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
+    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree', 'NVD3Chart']:
       aresObj.childPages[name] = '../../../child:dsc/graph/%s' % name
       comp = aresObj.anchor(name)
       comp.addLink(name, dots='.')
@@ -281,7 +281,7 @@ def run_test_graph():
 
   aresObj = Ares.Report()
   aresObj.reportName = 'Test Graphs'
-  excludeTestsLst = ['JsGraph', 'IndentedTree'] + AresTest.GRAPH['exclude']
+  excludeTestsLst = ['JsGraph', 'IndentedTree', 'NVD3Chart'] + AresTest.GRAPH['exclude']
   for name, obj in inspect.getmembers(AresHtmlGraph):
     if inspect.isclass(obj) and name not in excludeTestsLst:
       try:
