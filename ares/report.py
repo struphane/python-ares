@@ -145,7 +145,7 @@ def report_dsc_local_details():
   aresObj.childPages = getattr(report_doc_local, 'CHILD_PAGES', {})
   aresObj.reportName = None
   onload, content, js = report_doc_local.report(aresObj).html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
 @report.route("/child:dsc/graph")
 def report_dsc_graph():

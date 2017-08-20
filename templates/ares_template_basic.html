@@ -1,58 +1,16 @@
 <!doctype html>
 <html lang="en">
 	{% include 'ares_part_header.html' %}
+	
 <body oncontextmenu="return false;">
 
 <div id="wrapper">	
 	{% include 'ares_part_side_bar.html' %}
+	
 	<a href="#menu-toggle" id="menu-toggle"><i id='menu-icon' class="fa fa-chevron-circle-left fa-2x" aria-hidden="true"></i></a>
 	<!-- Page Content -->
 	<div id="page-content-wrapper">
-		<div class="row">
-			<div class="col-sm-6 col-md-2">
-				<div class="thumbnail tile tile-medium tile-midnight-blue">
-					<a href="/reports/" class="fa-links">
-						<h1>Home</h1>
-						<i class="fa fa-3x fa-home"></i>
-					</a>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-2">
-				<div class="thumbnail tile tile-medium tile-green">
-					<a href="#" class="fa-links">
-						<h1>Sucess</h1>
-						<i class="fa fa-3x fa-home"></i>
-					</a>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-2">
-				<div class="thumbnail tile tile-medium tile-blue">
-					<a href="#" class="fa-links">
-						<h1>Info</h1>
-						<i class="fa fa-3x fa-home"></i>
-					</a>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-2">
-				<div class="thumbnail tile tile-medium tile-pumpkin">
-					<a href="#" class="fa-links">
-						<h1>Warning</h1>
-						<i class="fa fa-3x fa-home"></i>
-					</a>
-				</div>
-			</div>
-			<div class="col-sm-6 col-md-2">
-				<div class="thumbnail tile tile-medium tile-red">
-					<a href="#" class="fa-links">
-						<h1>Danger</h1>
-						<i class="fa fa-3x fa-home"></i>
-					</a>
-				</div>
-			</div>
-		</div>
-
-			{{ content|safe }}
-		</div>
+		{{ content|safe }}
 	</div>
 </div>	
 <script>
