@@ -1,5 +1,9 @@
 ''' [SCRIPT COMMENT] '''
 
+DISPLAY = 'Generic Calculator'
+SHORTCUTS = [('Environments', 'CalculatorSetEnv.py'),
+             ('Calculator', 'CalculatorResults.py')]
+
 AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
 CHILD_PAGES = {'results': 'CalculatorSetEnv.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 

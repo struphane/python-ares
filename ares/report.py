@@ -252,7 +252,7 @@ def page_report(report_name):
   onload, content, js = report_index_page.report(reportObj).html()
   if scriptEnv in sys.modules:
     del sys.modules[scriptEnv]
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
+  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar='Youpi')
 
 @report.route("/")
 @report.route("/index")
@@ -298,8 +298,8 @@ def run_report(report_name):
       del sys.modules[report_name]
 
   if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js)
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
+    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar='Youpi')
+  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar='Youpi')
 
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):
