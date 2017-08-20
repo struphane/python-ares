@@ -5,19 +5,19 @@ CHILD_PAGES = {'results': 'ircCalculatorResults.py'} # Child pages call definiti
 
 def report(aresObj):
 
-  aresObj.title("IRC Results for %s" % aresObj.http['GET']['NODE'])
+  aresObj.title("IRC Results for %s" % aresObj.http['NODE'])
   uploadComp = aresObj.upload()
   uploadComp.js('change', '')
-  uploadComp.post('click', '../upload/%s' % aresObj.http['REPORT_NAME'], {}, '', '%s/%s' % (aresObj.http['GET']['DATE'], aresObj.http['GET']['NODE']))
+  uploadComp.post('click', '../upload/%s' % aresObj.http['REPORT_NAME'], {}, '', '%s/%s' % (aresObj.http['DATE'], aresObj.http['NODE']))
   button = aresObj.button("Refresh files with Live", cssCls='btn btn-info')
 
   aresObj.newline()
   aresObj.newline()
   fileInfo = [['FileName', 'Last Modification Date', 'Size', '', '']]
-  for file in aresObj.getFiles([aresObj.http['GET']['DATE'], aresObj.http['GET']['NODE']]):
-    info = aresObj.getFileInfo(file, [aresObj.http['GET']['DATE'], aresObj.http['GET']['NODE']])
+  for file in aresObj.getFiles([aresObj.http['DATE'], aresObj.http['NODE']]):
+    info = aresObj.getFileInfo(file, [aresObj.http['DATE'], aresObj.http['NODE']])
     iconComp = aresObj.icon('trash')
-    iconComp.post('click', "../delete_file/%s" % aresObj.http['REPORT_NAME'], {'SOURCE_PATH': '%s/%s' % (aresObj.http['GET']['DATE'], aresObj.http['GET']['NODE']),
+    iconComp.post('click', "../delete_file/%s" % aresObj.http['REPORT_NAME'], {'SOURCE_PATH': '%s/%s' % (aresObj.http['DATE'], aresObj.http['NODE']),
                                                                                'FILE_NAME': file}, 'location.reload();')
 
     downComp = aresObj.icon('download')
@@ -27,7 +27,7 @@ def report(aresObj):
   aresObj.table('Configuration Files', fileInfo)
 
   ahref = aresObj.anchor("Go to Computation", cssCls='btn btn-success')
-  ahref.addLink('results?NODE=%s&DATE=%s' % (aresObj.http['GET']['NODE'], aresObj.http['GET']['DATE']))
+  ahref.addLink('results?NODE=%s&DATE=%s' % (aresObj.http['NODE'], aresObj.http['DATE']))
 
   aresObj.title3('Environment Statistics')
   aresObj.pieChart('', [["One", 29],["4fdffgfd", 196]])

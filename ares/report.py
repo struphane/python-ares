@@ -372,7 +372,7 @@ def run_report(report_name):
     sys.path.append(userDirectory)
     reportObj = Ares.Report()
     for getValues in request.args.items():
-      reportObj.http['GET'][getValues[0]] = getValues[1]
+      reportObj.http[getValues[0]] = getValues[1]
     reportObj.reportName = report_name
     mod = __import__(report_name)
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
@@ -403,7 +403,7 @@ def child(report_name, script):
   """ Return the content of the attached pages """
   reportObj = Ares.Report()
   for getValues in request.args.items():
-    reportObj.http['GET'][getValues[0]] = getValues[1]
+    reportObj.http[getValues[0]] = getValues[1]
 
   onload, js, error = '', '', False
   try:
@@ -432,13 +432,13 @@ def child(report_name, script):
 
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
-@report.route("/create/env", methods = ['GET', 'POST'])
+@report.route("/create/env", methods = ['POST'])
 def ajaxCreate():
   """ Special Ajax call to set up the environment """
   reportObj = Ares.Report()
   reportObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   for postValues in request.form.items():
-    reportObj.http['POST'][postValues[0]] = postValues[1]
+    reportObj.http[postValues[0]] = postValues[1]
   return json.dumps(report_index_set.call(reportObj))
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
@@ -452,9 +452,9 @@ def ajaxCall(report_name, script):
   reportObj.http['DIRECTORY'] = userDirectory
   reportObj.reportName = report_name
   for getValues in request.args.items():
-    reportObj.http['GET'][getValues[0]] = getValues[1]
+    reportObj.http[getValues[0]] = getValues[1]
   for postValues in request.form.items():
-    reportObj.http['POST'][postValues[0]] = postValues[1]
+    reportObj.http[postValues[0]] = postValues[1]
   try:
     mod = __import__(report_name)
     result = mod.call(reportObj)

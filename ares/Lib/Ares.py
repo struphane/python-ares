@@ -87,7 +87,7 @@ class Report(object):
     self.prefix, self.directory = prefix, None
     self.content, self.jsGraph = [], []
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
-    self.htmlItems, self.jsOnLoad, self.http = {}, [], {'GET': {}, 'POST': {}}
+    self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
 
