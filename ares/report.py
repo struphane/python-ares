@@ -139,7 +139,7 @@ def report_dsc_html_details(chartName):
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
-@report.route("/child:dsc/local")
+@report.route("/doc/local")
 def report_dsc_local_details():
   aresObj = Ares.Report()
   aresObj.childPages = getattr(report_doc_local, 'CHILD_PAGES', {})
