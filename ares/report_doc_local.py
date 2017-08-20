@@ -15,7 +15,7 @@ def report(aresObj):
   aresObj.newline()
   aresObj.title3("What is ArES")
   aresObj.paragraph('''
-                      ArES is a Python reporting suit which will allow you easily to get data from differents sources based on the different
+                      ArES is a Python reporting suite which will allow you easily to get data from different sources based on the different
                       available modules in the
                     ''')
   aresObj.title3("Set up your environment")
