@@ -1,7 +1,7 @@
 ''' [SCRIPT COMMENT] '''
 
 AJAX_CALL = {} # Ajax call
-CHILD_PAGES = {'results': 'ircCalculatorResults.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
+CHILD_PAGES = {'results': 'CalculatorResults.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 def report(aresObj):
 

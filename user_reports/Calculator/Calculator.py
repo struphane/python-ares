@@ -1,7 +1,7 @@
 ''' [SCRIPT COMMENT] '''
 
 AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
-CHILD_PAGES = {'results': 'ircCalculatorSetEnv.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
+CHILD_PAGES = {'results': 'CalculatorSetEnv.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 import collections
 
