@@ -1,7 +1,8 @@
 ''' [SCRIPT COMMENT] '''
 
 DISPLAY = 'Generic Calculator'
-SHORTCUTS = [('Environments', 'CalculatorSetEnv.py'),
+SHORTCUTS = [('Configuration', 'Calculator.py'),
+             ('Environments', 'CalculatorSetEnv.py'),
              ('Calculator', 'CalculatorResults.py')]
 
 AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
