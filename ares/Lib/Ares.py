@@ -287,11 +287,15 @@ class Report(object):
         folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
     return folders
 
-  def getFoldersInfo(self):
+  def getFoldersInfo(self, subfolders=None):
     """  """
     folders = {}
-    for folder in os.listdir(self.http['DIRECTORY']):
-      filePath = os.path.join(self.http['DIRECTORY'], folder)
+    if subfolders is not None:
+      folderPath = os.path.join(self.http['DIRECTORY'], *subfolders)
+    else:
+      folderPath = self.http['DIRECTORY']
+    for folder in os.listdir(folderPath):
+      filePath = os.path.join(folderPath, folder)
       fileSize = convert_bytes(os.path.getsize(filePath))
       fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
       folders[folder] = {'SIZE': fileSize, 'LAST_MOD_DT': fileDate}

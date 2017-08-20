@@ -17,13 +17,18 @@ def report(aresObj):
 
   aresObj.container('Create Test Environment', [dateObj, nodeObj, nameObj, aresObj, button])
 
-  dataTabe, testPerDay = [['Folder']], collections.defaultdict(int)
+  dataTabe, testPerDay = [['Folder', 'Creation Date', '']], collections.defaultdict(int)
   for folder in aresObj.getFolders():
     env = folder.split("\\")
     if len(env) == 3:
       ahref = aresObj.anchor(folder)
       ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]))
-      dataTabe.append([ahref])
+      info = aresObj.getFileInfo(env[2], [env[1]])
+      iconComp = aresObj.icon('trash')
+      iconComp.post('click', "../delete_folder/%s" % aresObj.http['REPORT_NAME'], {'SOURCE_PATH': '%s' % env[1],
+                                                                                 'FILE_NAME': env[2]}, 'location.reload();')
+
+      dataTabe.append([ahref, info['LAST_MOD_DT'], iconComp])
       testPerDay[env[1]] += 1
   aresObj.bar('Tests per day', [ {"key": "Cumulative Return","values": [[k, v] for k, v in testPerDay.items()] }])
   aresObj.table('Available Environments', dataTabe)
