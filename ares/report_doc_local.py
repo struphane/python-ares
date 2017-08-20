@@ -24,13 +24,15 @@ def report(aresObj):
                       but also to deploy your scripts easily on the server. <BR />
                       The only thing to do is to click on the Download ArES link below, unzip the archive in a folder and start writing Python codes. <BR />
                     ''')
-  download = aresObj.anchor('Download ArES')
+  download = aresObj.anchor('Download ArES', cssCls='btn btn-success')
+  aresObj.newline()
+  aresObj.newline()
   download.addLink('download')
   localEnv = aresObj.img('local_env.JPG')
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('ares_download.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['', ''], [downloadPicture, localEnv]])
+  aresObj.table('', [['', ''], [downloadPicture, localEnv]])
   aresObj.newline()
   aresObj.paragraph('''
                       The framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment
@@ -53,7 +55,7 @@ def report(aresObj):
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('first_report_2.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['', ''], [localEnv, downloadPicture]])
+  aresObj.table('', [['', ''], [localEnv, downloadPicture]])
 
   aresObj.paragraph('''
                         Then add the different HTML components to your reports !!! <BR />
@@ -63,13 +65,13 @@ def report(aresObj):
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('first_report_4.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['Create your report', 'Run the Wrapper in your IDE'], [localEnv, downloadPicture]])
+  aresObj.table('', [['Create your report', 'Run the Wrapper in your IDE'], [localEnv, downloadPicture]])
 
   localEnv = aresObj.img('first_report_5.JPG')
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('first_report_6.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['Get the file', 'Open it in your web browser'], [localEnv, downloadPicture]])
+  aresObj.table('', [['Get the file', 'Open it in your web browser'], [localEnv, downloadPicture]])
 
   aresObj.paragraph('''
                         Then once your report is finalised your can upload it to our server and share it with other user. <BR />
@@ -82,7 +84,7 @@ def report(aresObj):
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('first_report_8.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['Push to the server', 'Environment Available'], [localEnv, downloadPicture]])
+  aresObj.table('', [['Push to the server', 'Environment Available'], [localEnv, downloadPicture]])
 
   aresObj.title4("Your script will be avaiable !!!")
   localEnv = aresObj.img('first_report_9.JPG')
@@ -96,7 +98,7 @@ def report(aresObj):
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('html_example.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['Python Code', 'HTML result'], [localEnv, downloadPicture]])
+  aresObj.table('', [['Python Code', 'HTML result'], [localEnv, downloadPicture]])
 
   aresObj.newline()
   aresObj.title4("Example of Python to Javascript / Ajax transform")
@@ -104,7 +106,7 @@ def report(aresObj):
   localEnv.doubleDots = 2
   downloadPicture = aresObj.img('javascript_example.JPG')
   downloadPicture.doubleDots = 2
-  aresObj.table([['Python Code', 'Javascript Result'], [localEnv, downloadPicture]])
+  aresObj.table('', [['Python Code', 'Javascript Result'], [localEnv, downloadPicture]])
 
   aresObj.paragraph('''
                         More details on the components are available on the below links
