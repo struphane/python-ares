@@ -227,7 +227,7 @@ def page_report(report_name):
       continue
 
     for pyFile in  files:
-      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
+      if Ares.isExcluded(userDirectory, file=pyFile):
         continue
 
       scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
