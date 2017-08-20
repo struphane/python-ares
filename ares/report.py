@@ -75,6 +75,13 @@ def getHttpParams(request):
     httpParams[postValues[0]] = postValues[1]
   return httpParams
 
+def noCache(f):
+  def respFunc(*args, **kwargs):
+    resp = make_response(f(*args, **kwargs))
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    resp.headers['Pragma'] = 'no-cache'
+    return resp
+  return respFunc
 
 @report.route("/doc")
 @report.route("/dsc")
@@ -533,6 +540,7 @@ def downloadReport(report_name):
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
 @report.route("/download/package")
+@noCache
 def download():
   """ Return the package in order to test the scripts """
   memory_file = io.BytesIO()
