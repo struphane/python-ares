@@ -61,7 +61,7 @@ class Table(AresHtml.Html):
 
   @classmethod
   def aresExample(cls, aresObj):
-    return aresObj.table([["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
+    return aresObj.table('Table Example', [["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
 
   def onLoadFnc(self):
     """ Return a String with the Javascript method to put in the HTML report """

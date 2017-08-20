@@ -99,6 +99,7 @@ def report_dsc_index():
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
+@report.route("/doc/html")
 @report.route("/child:dsc/html")
 def report_dsc_html():
   """ Function to return the HTML object description and a user guide """
@@ -124,7 +125,7 @@ def report_dsc_html():
 
         src = inspect.getsource(cls.aresExample).split("\n", 2)[-1].replace("return ", "")
         htmlObject.append([comp, aresObj.code(cls.__doc__), aresObj.code(src), cls.aresExample(aresObj)])
-    aresObj.table(htmlObject)
+    aresObj.table('Available HTML Components',  htmlObject)
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
@@ -147,6 +148,7 @@ def report_dsc_local_details():
   onload, content, js = report_doc_local.report(aresObj).html()
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
+@report.route("/doc/graph")
 @report.route("/child:dsc/graph")
 def report_dsc_graph():
   """ Function to return the Graph object description and a user guide """
@@ -166,7 +168,7 @@ def report_dsc_graph():
       comp = aresObj.anchor(name)
       comp.addLink(name, dots='.')
       graphObject.append([comp, aresObj.code(obj.__doc__)])
-  aresObj.table(graphObject)
+  aresObj.table('Available Graph', graphObject)
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
