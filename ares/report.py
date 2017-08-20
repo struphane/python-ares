@@ -568,9 +568,11 @@ def download():
         if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
-        folder = path.replace("%s" % libPath, "")
-        zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", pyFile))
-
+        zipArchPath = path.replace(libPath, "").lstrip("\\")
+        if zipArchPath == "":
+          zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", pyFile))
+        else:
+          zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", zipArchPath, pyFile))
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
@@ -597,8 +599,11 @@ def downloadAres():
         if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
-        folder = path.replace("%s" % libPath, "")
-        zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", pyFile))
+        zipArchPath = path.replace(libPath, "").lstrip("\\")
+        if zipArchPath == "":
+          zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", pyFile))
+        else:
+          zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", zipArchPath, pyFile))
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
