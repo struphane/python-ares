@@ -7,7 +7,7 @@ import collections
 
 def report(aresObj):
 
-  aresObj.title("IRC Results")
+  aresObj.title("Calculator Environment")
   if 'NODE' not in aresObj.http:
     dataTabe, testPerDay = [['Folder', 'Creation Date', '']], collections.defaultdict(int)
     for folder in aresObj.getFolders():
