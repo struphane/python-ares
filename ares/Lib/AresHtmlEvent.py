@@ -43,7 +43,7 @@ class ButtonRemove(AresHtml.Html):
 
   def __repr__(self):
     """ Return the String representation of a HTML Style Twitter button """
-    return '<button type="button" %s><span class="fa fa-%s">%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
+    return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
 
   @classmethod
   def aresExample(cls, aresObj):
