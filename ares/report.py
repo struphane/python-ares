@@ -499,11 +499,20 @@ def deleteFiles(report_name):
 @report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
   """ Download a specific file in a report project """
-
-  if not script.endswith(".py"):
+  requestParams = getHttpParams(request)
+  if '.' not in script:
+    # We assume it is a python script
     script = "%s.py" % script
 
-  return send_from_directory(os.path.join(config.ARES_USERS_LOCATION, report_name), script, as_attachment=True)
+  if '&' in script:
+    splitScriptPath = script.split("&")
+    userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name, *splitScriptPath[:-1])
+  else:
+    splitScriptPath = [script]
+    userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name)
+
+  print(userDirectory)
+  return send_from_directory(userDirectory, splitScriptPath[-1], as_attachment=True)
 
 @report.route("/download/dsc/json/<jsonFile>", methods = ['GET', 'POST'])
 def downloadJsonFiles(jsonFile):

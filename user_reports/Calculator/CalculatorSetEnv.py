@@ -38,7 +38,7 @@ def report(aresObj):
     iconComp = aresObj.icon('trash').deleteLink(aresObj.http['REPORT_NAME'], file, [aresObj.http['DATE'], aresObj.http['NODE']])
 
     downComp = aresObj.icon('download')
-    downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['REPORT_NAME'], 'script': file})
+    downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['REPORT_NAME'], 'script': "%s&%s&%s" % (aresObj.http['DATE'], aresObj.http['NODE'], file)})
 
     fileInfo.append([file, info['LAST_MOD_DT'], info['SIZE'], downComp, iconComp])
   aresObj.table('Configuration Files', fileInfo)
