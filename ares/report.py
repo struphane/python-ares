@@ -497,7 +497,6 @@ def deleteFiles(report_name):
 #   - To get the last version of a specific script
 # ---------------------------------------------------------------------------------------------------------
 @report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
-@noCache
 def downloadFiles(report_name, script):
   """ Download a specific file in a report project """
 
@@ -507,7 +506,6 @@ def downloadFiles(report_name, script):
   return send_from_directory(os.path.join(config.ARES_USERS_LOCATION, report_name), script, as_attachment=True)
 
 @report.route("/download/dsc/json/<jsonFile>", methods = ['GET', 'POST'])
-@noCache
 def downloadJsonFiles(jsonFile):
   if not jsonFile.endswith(".json"):
     jsonFile = "%s.json" % jsonFile
@@ -516,7 +514,6 @@ def downloadJsonFiles(jsonFile):
   return send_from_directory(mokfilePath, jsonFile, as_attachment=True)
 
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
-@noCache
 def downloadReport(report_name):
   """ Return in a Zip archive the full python package """
   memory_file = io.BytesIO()
@@ -579,7 +576,6 @@ def download():
 
 
 @report.route("/download/ares", methods = ['GET', 'POST'])
-@noCache
 def downloadAres():
   """ Download the up to date Ares package """
   memory_file = io.BytesIO()
