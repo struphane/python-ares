@@ -416,9 +416,9 @@ def deleteData(report_name):
   if request.method == 'POST':
     requestParams = getHttpParams(request)
     if 'SOURCE_PATH' in requestParams:
-      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['SOURCE_PATH'], postParams['FILE_NAME'])
+      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['SOURCE_PATH'], requestParams['FILE_NAME'])
     else:
-      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['FILE_NAME'])
+      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['FILE_NAME'])
     os.remove(fileFullPath)
   return json.dumps({'FILE_NAME': request.form.get('SOURCE_PATH'), 'ENV': report_name})
 
@@ -429,7 +429,7 @@ def deleteFolder(report_name):
   if request.method == 'POST':
     requestParams = getHttpParams(request)
     if 'SOURCE_PATH' in requestParams:
-      shutil.rmtree(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['SOURCE_PATH']))
+      shutil.rmtree(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['SOURCE_PATH']))
     else:
       shutil.rmtree(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
   return json.dumps({'FILE_NAME': request.form.get('SOURCE_PATH'), 'ENV': report_name})
