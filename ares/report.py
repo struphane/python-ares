@@ -202,7 +202,7 @@ def report_dsc_graph_details(chartName):
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
   with open(mokfilePath) as data_file:
     data = data_file.read()
-  graphCom = getattr(aresObj, object.alias)(data)
+  graphCom = getattr(aresObj, object.alias)('Graph Example', data)
   graphCom.addClick('alert(e.toSource()) ;')
 
   # Add the mock data as example
@@ -211,7 +211,7 @@ def report_dsc_graph_details(chartName):
   comp = aresObj.anchor('Data Source') #, object.mockData, 'html', {'html': '../../../download/dsc/%s' % object.mockData}, None)
   comp.addLink('graph')
   aresObj.paragraph(['You can download the input data here: ', comp])
-  compObj = aresComponents[chartName](0, data)
+  compObj = aresComponents[chartName](0, 'Graph Example', data)
   aresObj.code("%s\n" % "".join(compObj.jsEvents()['addGraph'])[:-3])
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
