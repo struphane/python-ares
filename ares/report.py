@@ -277,16 +277,18 @@ def index():
 def run_test_graph():
   import inspect
   from ares.Lib import AresHtmlGraph
+  from ares.Lib import AresTest
+
   aresObj = Ares.Report()
   aresObj.reportName = 'Test Graphs'
-  aresComponents = {}
+  excludeTestsLst = ['JsGraph', 'IndentedTree'] + AresTest.GRAPH['exclude']
   for name, obj in inspect.getmembers(AresHtmlGraph):
-    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
+    if inspect.isclass(obj) and name not in excludeTestsLst:
       try:
-        mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
+        mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, obj.mockData)
         with open(mokfilePath) as data_file:
           data = data_file.read()
-        graphCom = getattr(aresObj, object.alias)(data)
+        getattr(aresObj, obj.alias)('', data)
       except Exception as e:
         aresObj.addNotification('WARNING', 'No chart %s' % name, str(e))
   onload, content, js = report_doc_graph.report(aresObj).html()

@@ -31,6 +31,14 @@ class JsGraph(AresHtmlContainer.GraphSvG):
     """ Return the data Source converted to them be sent to the javascript layer """
     return self.vals
 
+  def addStyle(self, style):
+    """ add style to graphs (will be added to the nv.models js function"""
+    pass
+
+  def addAttributes(self, attributes):
+    """ add attributes to the graphs, mostly used to add/customize axis"""
+    pass
+
   def jsChart(self):
     """ Return the javascript fragment require to build the graph """
     raise NotImplementedError('subclasses must override jsChart()!')
