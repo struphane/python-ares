@@ -28,6 +28,7 @@ def report(aresObj):
   uploadComp = aresObj.upload().click(aresObj.http['REPORT_NAME'], folders=[aresObj.http['DATE'], aresObj.http['NODE']])
   uploadComp.js('change', '')
   button = aresObj.button("Refresh files with Live", cssCls='btn btn-info')
+  button.post('click', '../ajax/%s/testAjax2.py' % aresObj.http['REPORT_NAME'], {'LOCATION': 'LocalLibs'}, 'alert(data)')
 
   aresObj.newline()
   aresObj.newline()
