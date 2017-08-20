@@ -159,8 +159,6 @@ class Line(NVD3Chart):
                                    'tickFormat': "d3.format('.02f')"}
                         }
            }
-  oldstyle = {'chartStyle': ['margin({left: 100})', 'useInteractiveGuideline(true)', 'showLegend(true)', 'showYAxis(true)', 'showXAxis(true)'],
-           'chartAttr': ['xAxis.axisLabel', "xAxis.tickFormat(d3.format(',r'))", "yAxis.axisLabel('Voltage (v)')", "yAxis.tickFormat(d3.format('.02f'))" ]}
   jsFrag = ''
 
 
