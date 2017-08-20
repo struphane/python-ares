@@ -67,11 +67,13 @@ def report(aresObj, localPath=None):
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
         remov = aresObj.icon('trash')
+        scriptPath = aresObj.http['SCRIPTS'][script]
+        scriptLink = scriptPath.replace(aresObj.http['SCRIPTS_NAME'], "")
         remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
         downComp = aresObj.icon('download')
-        downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
-        fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['SCRIPTS'][script], script)))
-        fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['SCRIPTS'][script], script))))
+        downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
+        fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
+        fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
         ajxCall =  aresObj.http['SCRIPTS_AJAX'].get(script, [])
         divComp = aresObj.div(script)
         divComp.toolTip('%s' % os.path.join(aresObj.http['SCRIPTS'].get(script, ''), script))
@@ -87,9 +89,10 @@ def report(aresObj, localPath=None):
   for script, scriptPath in aresObj.http['SCRIPTS'].items():
     if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc') and not script.endswith('zip') and not script.endswith('.svn'):
       removComp = aresObj.icon('trash')
+      scriptLink = scriptPath.replace(aresObj.http['SCRIPTS_NAME'], "")
       removComp.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, "display(data); window.location.href='../page/%s' ;" % aresObj.http['SCRIPTS_NAME'])
       downComp = aresObj.icon('download')
-      downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
+      downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
       fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
       fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
       divComp = aresObj.div(script)

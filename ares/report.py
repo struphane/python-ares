@@ -503,7 +503,6 @@ def downloadFiles(report_name, script):
   if '.' not in script:
     # We assume it is a python script
     script = "%s.py" % script
-
   if '&' in script:
     splitScriptPath = script.split("&")
     userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name, *splitScriptPath[:-1])
