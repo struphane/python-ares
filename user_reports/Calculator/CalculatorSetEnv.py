@@ -15,7 +15,7 @@ def report(aresObj):
       env = folder.split("\\")
       if len(env) == 3:
         ahref = aresObj.anchor(folder)
-        ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]))
+        ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]), dots='../..')
         info = aresObj.getFileInfo(env[2], [env[1]])
         iconComp = aresObj.icon('trash').deleteLink(aresObj.http['REPORT_NAME'], None, [env[1], env[2]])
         dataTabe.append([ahref, info['LAST_MOD_DT'], iconComp])

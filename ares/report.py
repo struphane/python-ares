@@ -69,7 +69,8 @@ def appendToLog(reportName, event, comment):
 def getHttpParams(request):
   """ Get the HTTP parameters of a request """
   httpParams = {}
-  httpParams = dict(zip([(getValues[0], getValues[1]) for getValues in request.args.items()]))
+  for postValues in request.args.items():
+    httpParams[postValues[0]] = postValues[1]
   for postValues in request.form.items():
     httpParams[postValues[0]] = postValues[1]
   return httpParams
@@ -245,7 +246,7 @@ def page_report(report_name):
     if hasattr(mod, 'DISPLAY'):
       side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
       for name, path in getattr(mod, 'SHORTCUTS', []):
-        side_bar.append('<li><a href="/reports/run/%s">%s</a></li>' % (path.replace(".py", ""), name))
+        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
 
   except Exception as e:
     reportObj.http['SCRIPTS_DSC'] = e
@@ -302,8 +303,7 @@ def run_report(report_name):
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
     reportObj = Ares.Report()
-    for getValues in request.args.items():
-      reportObj.http[getValues[0]] = getValues[1]
+    reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
     mod = __import__(report_name)
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
@@ -318,7 +318,7 @@ def run_report(report_name):
     if hasattr(mod, 'DISPLAY'):
       side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
       for name, path in getattr(mod, 'SHORTCUTS', []):
-        side_bar.append('<li><a href="/reports/run/%s">%s</a></li>' % (path.replace(".py", ""), name))
+        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
 
     onload, content, js = aresObj.html()
   except Exception as e:
@@ -334,13 +334,12 @@ def run_report(report_name):
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
   return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
+@report.route("/sidebar/<report_name>/<script>", methods = ['GET'])
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):
   """ Return the content of the attached pages """
   reportObj = Ares.Report()
-  for getValues in request.args.items():
-    reportObj.http[getValues[0]] = getValues[1]
-
+  reportObj.http = getHttpParams(request)
   onload, js, error, side_bar = '', '', False, ''
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
@@ -362,7 +361,7 @@ def child(report_name, script):
     if hasattr(mod, 'DISPLAY'):
       side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
       for name, path in getattr(mod, 'SHORTCUTS', []):
-        side_bar.append('<li><a href="/reports/run/%s">%s</a></li>' % (path.replace(".py", ""), name))
+        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
 
   except Exception as e:
     content = traceback.format_exc()
