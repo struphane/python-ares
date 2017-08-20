@@ -368,18 +368,19 @@ def ajaxCreate():
 def ajaxCall(report_name, script):
   """ Generic Ajax call """
   onload, js, error = '', '', False
-  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  requestParams = getHttpParams(request)
+  if 'LOCATION' in requestParams:
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['LOCATION'])
+    sys.path.append(userDirectory)
+  else:
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
   reportObj = Ares.Report()
   reportObj.http['FILE'] = None
   reportObj.http['REPORT_NAME'] = report_name
   reportObj.http['DIRECTORY'] = userDirectory
   reportObj.reportName = report_name
-  for getValues in request.args.items():
-    reportObj.http[getValues[0]] = getValues[1]
-  for postValues in request.form.items():
-    reportObj.http[postValues[0]] = postValues[1]
   try:
-    mod = __import__(script)
+    mod = __import__(script.replace(".py", ""))
     result = mod.call(reportObj)
   except Exception as e:
     content = traceback.format_exc()
