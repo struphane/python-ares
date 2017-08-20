@@ -379,14 +379,14 @@ def ajaxCall(report_name, script):
   for postValues in request.form.items():
     reportObj.http[postValues[0]] = postValues[1]
   try:
-    mod = __import__(report_name)
+    mod = __import__(script)
     result = mod.call(reportObj)
   except Exception as e:
     content = traceback.format_exc()
     error = True
   finally:
-    if report_name in sys.modules:
-      del sys.modules[report_name]
+    if script in sys.modules:
+      del sys.modules[script]
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js)
 
