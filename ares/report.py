@@ -221,7 +221,7 @@ def page_report(report_name):
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
 
-  scripts = {}
+  scripts, side_bar = {}, []
   for (path, dirs, files) in os.walk(scriptEnv):
     if path != scriptEnv and not '__init__.py' in files:
       continue
@@ -240,6 +240,11 @@ def page_report(report_name):
     getChildrenFlatStruct(scriptTree, children)
     mod = __import__(reportObj.http['SCRIPTS_NAME'])
     reportObj.http['SCRIPTS_DSC'] = mod.__doc__.strip()
+    if hasattr(mod, 'DISPLAY'):
+      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
+      for name, path in getattr(mod, 'SHORTCUTS', []):
+        side_bar.append('<li><a href="/reports/run/%s">%s</a></li>' % (path.replace(".py", ""), name))
+
   except Exception as e:
     reportObj.http['SCRIPTS_DSC'] = e
 
@@ -252,7 +257,7 @@ def page_report(report_name):
   onload, content, js = report_index_page.report(reportObj).html()
   if scriptEnv in sys.modules:
     del sys.modules[scriptEnv]
-  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar='Youpi')
+  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
 @report.route("/")
 @report.route("/index")
