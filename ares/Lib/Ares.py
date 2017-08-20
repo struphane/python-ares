@@ -72,7 +72,7 @@ def isExcluded(rootPath, file=None, folders=None):
   """
   """
   if file is not None:
-    if file == '__pycache__' or file.endswith('pyc') or file.endswith('.zip') or file == 'log_ares.dat':
+    if file == '__pycache__' or file.endswith('pyc') or file.endswith('.zip') or file == 'log_ares.dat'  or file == '__init__.py':
       return True
 
   if folders is not None:
