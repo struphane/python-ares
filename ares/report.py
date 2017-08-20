@@ -11,7 +11,7 @@ import collections
 import traceback
 import time
 
-from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file
+from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response
 
 import config
 
@@ -66,6 +66,13 @@ def appendToLog(reportName, event, comment):
   logFile.write("%s#%s#%s#%s\n" % (event, showtime[0], showtime[1], comment))
   logFile.close()
 
+def noCache(f):
+  def respFunc(*args, **kwargs):
+    resp = make_response(f(*args, **kwargs))
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    resp.headers['Pragma'] = 'no-cache'
+    return resp
+  return respFunc
 
 @report.route("/doc")
 @report.route("/dsc")
@@ -253,16 +260,21 @@ def report_dsc_graph():
   aresObj = Ares.Report()
   aresObj.reportName = 'dsc/graph'
   aresObj.childPages = {}
-  graphObject = [['Class Name', 'Description']]
+  graphObject = [['Class Name', 'Description', 'Example', 'Render']]
   aresObj.title("Graph Components")
   aresObj.iframe('http://nvd3.org/livecode/index.html')
   aresObj.title4(AresHtmlGraph.__doc__)
-  for name, obj in inspect.getmembers(AresHtmlGraph):
-    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
+  for name, cls in inspect.getmembers(AresHtmlGraph):
+    if inspect.isclass(cls) and name not in ['JsGraph', 'IndentedTree']:
       aresObj.childPages[name] = '../../../child:dsc/graph/%s' % name
       comp = aresObj.anchor(name)
       comp.addLink(name, dots='.')
-      graphObject.append([comp, aresObj.code(obj.__doc__)])
+      src = inspect.getsource(cls.aresExample).split("\n", 2)[-1].replace("return ", "")
+      graphObject.append([comp, aresObj.code(cls.__doc__), src, cls.aresExample(aresObj)])
+
+
+
+
   aresObj.table(graphObject)
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
@@ -562,7 +574,9 @@ def downloadReport(report_name):
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
 @report.route("/download/package")
+@noCache
 def download():
+  print("toto")
   """ Return the package in order to test the scripts """
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
