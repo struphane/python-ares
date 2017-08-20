@@ -20,7 +20,7 @@ import config
 # Ares Framework
 from ares.Lib import Ares
 
-from ares import report_index, report_index_page, report_index_set, report_doc_local
+from ares import report_index, report_index_page, report_index_set, report_doc_local, report_doc_graph
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -271,6 +271,25 @@ def index():
   aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
   aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   onload, content, js = report_index.report(aresObj).html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
+
+@report.route("/test/graphs")
+def run_test_graph():
+  import inspect
+  from ares.Lib import AresHtmlGraph
+  aresObj = Ares.Report()
+  aresObj.reportName = 'Test Graphs'
+  aresComponents = {}
+  for name, obj in inspect.getmembers(AresHtmlGraph):
+    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
+      try:
+        mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
+        with open(mokfilePath) as data_file:
+          data = data_file.read()
+        graphCom = getattr(aresObj, object.alias)(data)
+      except Exception as e:
+        aresObj.addNotification('WARNING', 'No chart %s' % name, str(e))
+  onload, content, js = report_doc_graph.report(aresObj).html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 @report.route("/run/<report_name>", methods = ['GET'])
