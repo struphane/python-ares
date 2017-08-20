@@ -565,6 +565,11 @@ class UploadFile(AresHtml.Html):
       self.js('change', '')
     return super(UploadFile, self).jsEvents(jsEventFnc)
 
+  def click(self, reportName, jsFnc='', data=None, folders=None):
+    """ Generic upload method to send to file to a dedicated server location """
+    data = {} if data is None else data
+    self.post('click', '../upload/%s' % reportName, data, jsFnc, "/".join(folders))
+
   def post(self, evenType, url, data, jsDef, dstFolder, preAjaxJs=''):
     """
       Post method to get data directly by interacting with the page

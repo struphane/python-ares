@@ -1,6 +1,6 @@
 ''' [SCRIPT COMMENT] '''
 
-AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
+AJAX_CALL = {} # Ajax call
 CHILD_PAGES = {'results': 'ircCalculatorResults.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 def report(aresObj):
@@ -8,6 +8,7 @@ def report(aresObj):
   aresObj.title("IRC Results for %s" % aresObj.http['NODE'])
   uploadComp = aresObj.upload()
   uploadComp.js('change', '')
+  uploadComp.click()
   uploadComp.post('click', '../upload/%s' % aresObj.http['REPORT_NAME'], {}, '', '%s/%s' % (aresObj.http['DATE'], aresObj.http['NODE']))
   button = aresObj.button("Refresh files with Live", cssCls='btn btn-info')
 
