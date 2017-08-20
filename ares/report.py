@@ -483,7 +483,7 @@ def downloadReport(report_name):
     reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     for (path, dirs, files) in os.walk(reportPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % reportPath, "")
@@ -492,7 +492,7 @@ def downloadReport(report_name):
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
@@ -512,7 +512,7 @@ def download():
       zf.write(os.path.join(current_app.config['ROOT_PATH'], "static", "js", jsFile), os.path.join("js", jsFile), zipfile.ZIP_DEFLATED )
     aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
     for pyFile in os.listdir(aresModulePath):
-      if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+      if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
         continue
 
       if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
@@ -526,7 +526,7 @@ def download():
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
@@ -543,7 +543,7 @@ def downloadAres():
   aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
   with zipfile.ZipFile(memory_file, 'w') as zf:
     for pyFile in os.listdir(aresModulePath):
-      if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+      if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
         continue
 
       if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
@@ -555,7 +555,7 @@ def downloadAres():
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
@@ -569,7 +569,7 @@ def getAresFilesVersions():
   aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
   files = {}
   for pyFile in os.listdir(aresModulePath):
-    if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+    if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
       continue
 
     stat = os.stat(os.path.join(aresModulePath, pyFile))
@@ -578,7 +578,7 @@ def getAresFilesVersions():
   libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
   for (path, dirs, f) in os.walk(libPath):
     for pyFile in  f:
-      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+      if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
         continue
 
       stat = os.stat(os.path.join(libPath, pyFile))
