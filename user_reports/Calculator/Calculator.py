@@ -14,7 +14,6 @@ def report(aresObj):
   button.post('click', '/reports/folder/create',
               "{'REPORT_NAME': '%s', 'FOLDERS': %s + '/' + %s}" % (aresObj.http['FILE'], dateObj.jsVal(), nodeObj.jsVal()),
               'display(data);setTimeout(function() {location.reload();}, 1000);    ')
-
   aresObj.container('Create Test Environment', [dateObj, nodeObj, nameObj, aresObj, button])
 
   dataTabe, testPerDay = [['Folder', 'Creation Date', '']], collections.defaultdict(int)

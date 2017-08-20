@@ -569,6 +569,7 @@ class UploadFile(AresHtml.Html):
     """ Generic upload method to send to file to a dedicated server location """
     data = {} if data is None else data
     self.post('click', '../upload/%s' % reportName, data, jsFnc, "/".join(folders))
+    return self
 
   def post(self, evenType, url, data, jsDef, dstFolder, preAjaxJs=''):
     """

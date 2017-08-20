@@ -6,9 +6,8 @@ CHILD_PAGES = {'results': 'ircCalculatorResults.py'} # Child pages call definiti
 def report(aresObj):
 
   aresObj.title("IRC Results for %s" % aresObj.http['NODE'])
-  uploadComp = aresObj.upload()
+  uploadComp = aresObj.upload().click(aresObj.http['REPORT_NAME'], folders=[aresObj.http['DATE'], aresObj.http['NODE']])
   uploadComp.js('change', '')
-  uploadComp.click(aresObj.http['REPORT_NAME'], folders=[aresObj.http['DATE'], aresObj.http['NODE']])
   button = aresObj.button("Refresh files with Live", cssCls='btn btn-info')
 
   aresObj.newline()
