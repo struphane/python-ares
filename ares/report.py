@@ -274,7 +274,7 @@ def index():
 @report.route("/run/<report_name>", methods = ['GET'])
 def run_report(report_name):
   """ Run the report """
-  onload, js, error = '', '', False
+  onload, js, error, side_bar = '', '', False, ''
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
@@ -292,6 +292,11 @@ def run_report(report_name):
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
     downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
+    if hasattr(mod, 'DISPLAY'):
+      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
+      for name, path in getattr(mod, 'SHORTCUTS', []):
+        side_bar.append('<li><a href="/reports/run/%s">%s</a></li>' % (path.replace(".py", ""), name))
+
     onload, content, js = aresObj.html()
   except Exception as e:
     error = True
@@ -303,8 +308,8 @@ def run_report(report_name):
       del sys.modules[report_name]
 
   if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar='Youpi')
-  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar='Youpi')
+    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
+  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):
