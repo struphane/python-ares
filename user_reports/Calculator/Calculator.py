@@ -1,7 +1,8 @@
 ''' [SCRIPT COMMENT] '''
 
 DISPLAY = 'Generic Calculator'
-SHORTCUTS = [('Environments', 'CalculatorSetEnv.py'),
+SHORTCUTS = [('Configuration', 'Calculator.py'),
+             ('Environments', 'CalculatorSetEnv.py'),
              ('Calculator', 'CalculatorResults.py')]
 
 AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
@@ -22,6 +23,7 @@ def report(aresObj):
 
   dataTabe, testPerDay = [['Folder', 'Creation Date', '']], collections.defaultdict(int)
   for folder in aresObj.getFolders():
+    print(folder)
     env = folder.split("\\")
     if len(env) == 3:
       ahref = aresObj.anchor(folder)

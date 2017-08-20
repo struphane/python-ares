@@ -59,7 +59,6 @@ def htmlLocalFooter():
   item.add(0, '</html>')
   return str(item)
 
-
 def convert_bytes(num):
   """
   this function will convert bytes to MB.... GB... etc
@@ -68,6 +67,20 @@ def convert_bytes(num):
       if num < 1024.0:
           return "%3.1f %s" % (num, x)
       num /= 1024.0
+
+def isExcluded(rootPath, file=None, folders=None):
+  """
+  """
+  if file is not None:
+    if file == '__pycache__' or file.endswith('pyc') or file.endswith('.zip') or file == 'log_ares.dat':
+      return True
+
+  if folders is not None:
+    folder = os.path.join(*folders)
+    if '__pycache__' in folder or folder == rootPath or folder.startswith('.svn'):
+      return True
+
+  return False
 
 class Report(object):
   """
@@ -283,8 +296,10 @@ class Report(object):
     """ Return the list of sub folders in tne environment """
     folders = set()
     for folder in os.walk(os.path.join(self.http['DIRECTORY'])):
-      if not '__pycache__' in folder[0] and folder[0]  != self.http['DIRECTORY'] and not folder[0].startswith('.svn'):
-        folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
+      if isExcluded(self.http['DIRECTORY'], folders=[folder[0]]):
+        continue
+
+      folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
     return folders
 
   def getFoldersInfo(self, subfolders=None):
@@ -305,7 +320,7 @@ class Report(object):
     """ return the list of files in a given directory structure """
     files = set()
     for pyFile in os.listdir(os.path.join(self.http['DIRECTORY'], *subfolders)):
-      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
+      if isExcluded(self.http['DIRECTORY'], file=pyFile):
         continue
 
       files.add(pyFile)

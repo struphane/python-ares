@@ -107,7 +107,7 @@ class Container(Div):
 
   @classmethod
   def aresExample(cls, aresObj):
-    return aresObj.container("MyContainer")
+    return aresObj.container('', "MyContainer")
 
 
 class Split(AresHtml.Html):
