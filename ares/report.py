@@ -20,7 +20,7 @@ import config
 # Ares Framework
 from ares.Lib import Ares
 
-from ares import report_index, report_index_page, report_index_set
+from ares import report_index, report_index_page, report_index_set, report_doc_local, report_doc_graph
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -66,13 +66,15 @@ def appendToLog(reportName, event, comment):
   logFile.write("%s#%s#%s#%s\n" % (event, showtime[0], showtime[1], comment))
   logFile.close()
 
-def noCache(f):
-  def respFunc(*args, **kwargs):
-    resp = make_response(f(*args, **kwargs))
-    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    resp.headers['Pragma'] = 'no-cache'
-    return resp
-  return respFunc
+def getHttpParams(request):
+  """ Get the HTTP parameters of a request """
+  httpParams = {}
+  for postValues in request.args.items():
+    httpParams[postValues[0]] = postValues[1]
+  for postValues in request.form.items():
+    httpParams[postValues[0]] = postValues[1]
+  return httpParams
+
 
 @report.route("/doc")
 @report.route("/dsc")
@@ -98,6 +100,7 @@ def report_dsc_index():
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
+@report.route("/doc/html")
 @report.route("/child:dsc/html")
 def report_dsc_html():
   """ Function to return the HTML object description and a user guide """
@@ -123,7 +126,7 @@ def report_dsc_html():
 
         src = inspect.getsource(cls.aresExample).split("\n", 2)[-1].replace("return ", "")
         htmlObject.append([comp, aresObj.code(cls.__doc__), aresObj.code(src), cls.aresExample(aresObj)])
-    aresObj.table(htmlObject)
+    aresObj.table('Available HTML Components',  htmlObject)
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
@@ -138,119 +141,15 @@ def report_dsc_html_details(chartName):
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
-@report.route("/child:dsc/local")
+@report.route("/doc/local")
 def report_dsc_local_details():
   aresObj = Ares.Report()
+  aresObj.childPages = getattr(report_doc_local, 'CHILD_PAGES', {})
   aresObj.reportName = None
-  aresObj.childPages = {'html': 'html', 'graph': 'graph', 'download': '../download/ares'}
-  aresObj.title("How to use ArES locally")
-  aresObj.newline()
-  aresObj.title3("What is ArES")
-  aresObj.paragraph('''
-                      ArES is a Python reporting suit which will allow you easily to get data from differents sources based on the different
-                      available modules in the
-                    ''')
-  aresObj.title3("Set up your environment")
-  aresObj.paragraph('''
-                      The framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment
-                      but also to deploy your scripts easily on the server. <BR />
-                      The only thing to do is to click on the Download ArES link below, unzip the archive in a folder and start writing Python codes. <BR />
-                    ''')
-  download = aresObj.anchor('Download ArES')
-  download.addLink('download')
-  localEnv = aresObj.img('local_env.JPG')
-  localEnv.doubleDots = 2
-  downloadPicture = aresObj.img('ares_download.JPG')
-  downloadPicture.doubleDots = 2
-  aresObj.table([['', ''], [downloadPicture, localEnv]])
-  aresObj.newline()
-  aresObj.paragraph('''
-                      The framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment
-                      but also to deploy your scripts easily on the server. <BR />
-                      The only thing to do is to click on the Download ArES link, unzip the archive in a folder and start writing Python codes. <BR />
-                      The structure of the reports is very intuitive and linear. Each items is fully documented in the framework and extra links are
-                      available for advance users. <BR />
-                      ArES is only a wrapper layer between HTML5 and Javascript, so you can directly include some part of those language to enrich your
-                      components. The ArES layer will only put together your object to then build your HTML page.
-                    ''')
-  aresObj.title3("Run your first script")
-  aresObj.paragraph('''
-                        First of all create a folder with the name of your report. This name should be the name of the main script of your environment.
-                        Indeed it will be the entry point to go thought your pages interactively. <BR />
-                        Then copy the AresEmtpyReport.py from the Lib folder to your folder and rename it. This will give you the standard format
-                        expected by the framework.
+  onload, content, js = report_doc_local.report(aresObj).html()
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
-                    ''')
-  localEnv = aresObj.img('first_report_1.JPG')
-  localEnv.doubleDots = 2
-  downloadPicture = aresObj.img('first_report_2.JPG')
-  downloadPicture.doubleDots = 2
-  aresObj.table([['', ''], [localEnv, downloadPicture]])
-
-  aresObj.paragraph('''
-                        Then add the different HTML components to your reports !!! <BR />
-                        Once your report created you can run it locally and get the result in a HTML file
-                    ''')
-  localEnv = aresObj.img('first_report_3.JPG')
-  localEnv.doubleDots = 2
-  downloadPicture = aresObj.img('first_report_4.JPG')
-  downloadPicture.doubleDots = 2
-  aresObj.table([['Create your report', 'Run the Wrapper in your IDE'], [localEnv, downloadPicture]])
-
-  localEnv = aresObj.img('first_report_5.JPG')
-  localEnv.doubleDots = 2
-  downloadPicture = aresObj.img('first_report_6.JPG')
-  downloadPicture.doubleDots = 2
-  aresObj.table([['Get the file', 'Open it in your web browser'], [localEnv, downloadPicture]])
-
-  aresObj.paragraph('''
-                        Then once your report is finalised your can upload it to our server and share it with other user. <BR />
-                        The module AresWrapperDeploy.py will allow the connection with the server. The creation of files, folder and
-                        also the check of the version of your locally framework are done from script. <BR />
-                        All new features and modules developed on the server will be available either from pip or directly in the zip
-                        archive for simple tools.
-                    ''')
-  localEnv = aresObj.img('first_report_7.JPG')
-  localEnv.doubleDots = 2
-  downloadPicture = aresObj.img('first_report_8.JPG')
-  downloadPicture.doubleDots = 2
-  aresObj.table([['Push to the server', 'Environment Available'], [localEnv, downloadPicture]])
-
-  aresObj.title4("Your script will be avaiable !!!")
-  localEnv = aresObj.img('first_report_9.JPG')
-  localEnv.doubleDots = 2
-  aresObj.newline()
-  aresObj.newline()
-
-
-  aresObj.title4("Example of Python to HTML transform")
-  localEnv = aresObj.img('html_python.JPG')
-  localEnv.doubleDots = 2
-  downloadPicture = aresObj.img('html_example.JPG')
-  downloadPicture.doubleDots = 2
-  aresObj.table([['Python Code', 'HTML result'], [localEnv, downloadPicture]])
-
-  aresObj.newline()
-  aresObj.title4("Example of Python to Javascript / Ajax transform")
-  localEnv = aresObj.img('javascript_python.JPG')
-  localEnv.doubleDots = 2
-  downloadPicture = aresObj.img('javascript_example.JPG')
-  downloadPicture.doubleDots = 2
-  aresObj.table([['Python Code', 'Javascript Result'], [localEnv, downloadPicture]])
-
-  aresObj.paragraph('''
-                        More details on the components are available on the below links
-                    ''')
-  aresComp = aresObj.anchor('HTML Component documentation')
-  aresComp.addLink('html', dots='..')
-  aresObj.newline()
-  aresComp = aresObj.anchor('Graph Component documentation')
-  aresComp.addLink('graph', dots='..')
-
-  aresObj.title3("Available Modules")
-  onload, content, js = aresObj.html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
-
+@report.route("/doc/graph")
 @report.route("/child:dsc/graph")
 def report_dsc_graph():
   """ Function to return the Graph object description and a user guide """
@@ -260,22 +159,17 @@ def report_dsc_graph():
   aresObj = Ares.Report()
   aresObj.reportName = 'dsc/graph'
   aresObj.childPages = {}
-  graphObject = [['Class Name', 'Description', 'Example', 'Render']]
+  graphObject = [['Class Name', 'Description']]
   aresObj.title("Graph Components")
   aresObj.iframe('http://nvd3.org/livecode/index.html')
   aresObj.title4(AresHtmlGraph.__doc__)
-  for name, cls in inspect.getmembers(AresHtmlGraph):
-    if inspect.isclass(cls) and name not in ['JsGraph', 'IndentedTree']:
+  for name, obj in inspect.getmembers(AresHtmlGraph):
+    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree']:
       aresObj.childPages[name] = '../../../child:dsc/graph/%s' % name
       comp = aresObj.anchor(name)
       comp.addLink(name, dots='.')
-      src = inspect.getsource(cls.aresExample).split("\n", 2)[-1].replace("return ", "")
-      graphObject.append([comp, aresObj.code(cls.__doc__), src, cls.aresExample(aresObj)])
-
-
-
-
-  aresObj.table(graphObject)
+      graphObject.append([comp, aresObj.code(obj.__doc__)])
+  aresObj.table('Available Graph', graphObject)
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
@@ -330,13 +224,13 @@ def page_report(report_name):
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
 
-  scripts = {}
+  scripts, side_bar = {}, []
   for (path, dirs, files) in os.walk(scriptEnv):
     if path != scriptEnv and not '__init__.py' in files:
       continue
 
     for pyFile in  files:
-      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
+      if Ares.isExcluded(userDirectory, file=pyFile):
         continue
 
       scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
@@ -349,6 +243,11 @@ def page_report(report_name):
     getChildrenFlatStruct(scriptTree, children)
     mod = __import__(reportObj.http['SCRIPTS_NAME'])
     reportObj.http['SCRIPTS_DSC'] = mod.__doc__.strip()
+    if hasattr(mod, 'DISPLAY'):
+      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
+      for name, path in getattr(mod, 'SHORTCUTS', []):
+        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
+
   except Exception as e:
     reportObj.http['SCRIPTS_DSC'] = e
 
@@ -361,28 +260,50 @@ def page_report(report_name):
   onload, content, js = report_index_page.report(reportObj).html()
   if scriptEnv in sys.modules:
     del sys.modules[scriptEnv]
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
+  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
 @report.route("/")
 @report.route("/index")
 def index():
   """ Return the main page with the reports selection """
   aresObj = Ares.Report()
+  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+  aresObj.http['DIRECTORY'] = userDirectory
   aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
   aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   onload, content, js = report_index.report(aresObj).html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
+@report.route("/test/graphs")
+def run_test_graph():
+  import inspect
+  from ares.Lib import AresHtmlGraph
+  from ares.Lib import AresTest
+
+  aresObj = Ares.Report()
+  aresObj.reportName = 'Test Graphs'
+  excludeTestsLst = ['JsGraph', 'IndentedTree'] + AresTest.GRAPH['exclude']
+  for name, obj in inspect.getmembers(AresHtmlGraph):
+    if inspect.isclass(obj) and name not in excludeTestsLst:
+      try:
+        mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, obj.mockData)
+        with open(mokfilePath) as data_file:
+          data = data_file.read()
+        getattr(aresObj, obj.alias)('', data)
+      except Exception as e:
+        aresObj.addNotification('WARNING', 'No chart %s' % name, str(e))
+  onload, content, js = report_doc_graph.report(aresObj).html()
+  return render_template('ares_template.html', onload=onload, content=content, js=js)
+
 @report.route("/run/<report_name>", methods = ['GET'])
 def run_report(report_name):
   """ Run the report """
-  onload, js, error = '', '', False
+  onload, js, error, side_bar = '', '', False, ''
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
     reportObj = Ares.Report()
-    for getValues in request.args.items():
-      reportObj.http['GET'][getValues[0]] = getValues[1]
+    reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
     mod = __import__(report_name)
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
@@ -394,6 +315,11 @@ def run_report(report_name):
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
     downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
+    if hasattr(mod, 'DISPLAY'):
+      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
+      for name, path in getattr(mod, 'SHORTCUTS', []):
+        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
+
     onload, content, js = aresObj.html()
   except Exception as e:
     error = True
@@ -405,17 +331,16 @@ def run_report(report_name):
       del sys.modules[report_name]
 
   if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js)
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
+    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
+  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
+@report.route("/sidebar/<report_name>/<script>", methods = ['GET'])
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):
   """ Return the content of the attached pages """
   reportObj = Ares.Report()
-  for getValues in request.args.items():
-    reportObj.http['GET'][getValues[0]] = getValues[1]
-
-  onload, js, error = '', '', False
+  reportObj.http = getHttpParams(request)
+  onload, js, error, side_bar = '', '', False, ''
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
@@ -431,49 +356,58 @@ def child(report_name, script):
     downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     onload, content, js = aresObj.html()
+
+    mod = __import__(report_name)
+    if hasattr(mod, 'DISPLAY'):
+      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
+      for name, path in getattr(mod, 'SHORTCUTS', []):
+        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
+
+  except Exception as e:
+    content = traceback.format_exc()
+    error = True
+  finally:
+    for py in [report_name, script]:
+      if py in sys.modules:
+        del sys.modules[py]
+  if error:
+    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
+
+  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar=side_bar)
+
+@report.route("/create/env", methods = ['POST'])
+def ajaxCreate():
+  """ Special Ajax call to set up the environment """
+  reportObj = Ares.Report()
+  reportObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+  for postValues in request.form.items():
+    reportObj.http[postValues[0]] = postValues[1]
+  return json.dumps(report_index_set.call(reportObj))
+
+@report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
+def ajaxCall(report_name, script):
+  """ Generic Ajax call """
+  onload, js, error = '', '', False
+  requestParams = getHttpParams(request)
+  if 'LOCATION' in requestParams:
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['LOCATION'])
+    sys.path.append(userDirectory)
+  else:
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  reportObj = Ares.Report()
+  reportObj.http['FILE'] = None
+  reportObj.http['REPORT_NAME'] = report_name
+  reportObj.http['DIRECTORY'] = userDirectory
+  reportObj.reportName = report_name
+  try:
+    mod = __import__(script.replace(".py", ""))
+    result = mod.call(reportObj)
   except Exception as e:
     content = traceback.format_exc()
     error = True
   finally:
     if script in sys.modules:
       del sys.modules[script]
-  if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js)
-
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
-
-@report.route("/create/env", methods = ['GET', 'POST'])
-def ajaxCreate():
-  """ Special Ajax call to set up the environment """
-  reportObj = Ares.Report()
-  reportObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  for postValues in request.form.items():
-    reportObj.http['POST'][postValues[0]] = postValues[1]
-  return json.dumps(report_index_set.call(reportObj))
-
-@report.route("/ajax/<report_name>", methods = ['GET', 'POST'])
-def ajaxCall(report_name):
-  """ Generic Ajax call """
-  onload, js, error = '', '', False
-  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-  reportObj = Ares.Report()
-  reportObj.http['FILE'] = None
-  reportObj.http['REPORT_NAME'] = report_name
-  reportObj.http['DIRECTORY'] = userDirectory
-  reportObj.reportName = report_name
-  for getValues in request.args.items():
-    reportObj.http['GET'][getValues[0]] = getValues[1]
-  for postValues in request.form.items():
-    reportObj.http['POST'][postValues[0]] = postValues[1]
-  try:
-    mod = __import__(report_name)
-    result = mod.call(reportObj)
-  except Exception as e:
-    content = traceback.format_exc()
-    error = True
-  finally:
-    if report_name in sys.modules:
-      del sys.modules[report_name]
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js)
 
@@ -487,6 +421,7 @@ def uploadFiles(report_name):
     postParams = {}
     for postValues in request.form.items():
       postParams[postValues[0]] = postValues[1]
+
     for filename, fileType in request.files.items():
       file = request.files[filename]
       if 'DESTINATION' in postParams:
@@ -505,6 +440,30 @@ def uploadFiles(report_name):
         zf.close()
       result.append(filename)
   return json.dumps(result)
+
+@report.route("/delete_file/<report_name>", methods = ['POST'])
+def deleteData(report_name):
+  """ Delete a file in the report environment """
+  if request.method == 'POST':
+    requestParams = getHttpParams(request)
+    if 'SOURCE_PATH' in requestParams:
+      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['SOURCE_PATH'], requestParams['FILE_NAME'])
+    else:
+      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['FILE_NAME'])
+    os.remove(fileFullPath)
+  return json.dumps({'FILE_NAME': request.form.get('SOURCE_PATH'), 'ENV': report_name})
+
+@report.route("/delete_folder/<report_name>", methods = ['POST'])
+def deleteFolder(report_name):
+  """ Delete a file in the report environment """
+  import shutil
+  if request.method == 'POST':
+    requestParams = getHttpParams(request)
+    if 'SOURCE_PATH' in requestParams:
+      shutil.rmtree(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['SOURCE_PATH']))
+    else:
+      shutil.rmtree(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name))
+  return json.dumps({'FILE_NAME': request.form.get('SOURCE_PATH'), 'ENV': report_name})
 
 @report.route("/delete/<report_name>", methods = ['POST'])
 def deleteFiles(report_name):
@@ -555,7 +514,7 @@ def downloadReport(report_name):
     reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     for (path, dirs, files) in os.walk(reportPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % reportPath, "")
@@ -564,7 +523,7 @@ def downloadReport(report_name):
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
@@ -574,9 +533,7 @@ def downloadReport(report_name):
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
 @report.route("/download/package")
-@noCache
 def download():
-  print("toto")
   """ Return the package in order to test the scripts """
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
@@ -586,7 +543,7 @@ def download():
       zf.write(os.path.join(current_app.config['ROOT_PATH'], "static", "js", jsFile), os.path.join("js", jsFile), zipfile.ZIP_DEFLATED )
     aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
     for pyFile in os.listdir(aresModulePath):
-      if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+      if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
         continue
 
       if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
@@ -600,7 +557,7 @@ def download():
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
@@ -617,7 +574,7 @@ def downloadAres():
   aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
   with zipfile.ZipFile(memory_file, 'w') as zf:
     for pyFile in os.listdir(aresModulePath):
-      if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+      if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
         continue
 
       if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
@@ -629,7 +586,7 @@ def downloadAres():
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
-        if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
@@ -643,7 +600,7 @@ def getAresFilesVersions():
   aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
   files = {}
   for pyFile in os.listdir(aresModulePath):
-    if '__pycache__' in pyFile or pyFile.endswith('pyc'):
+    if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
       continue
 
     stat = os.stat(os.path.join(aresModulePath, pyFile))
@@ -652,7 +609,7 @@ def getAresFilesVersions():
   libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
   for (path, dirs, f) in os.walk(libPath):
     for pyFile in  f:
-      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip'):
+      if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
         continue
 
       stat = os.stat(os.path.join(libPath, pyFile))

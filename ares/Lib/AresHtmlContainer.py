@@ -50,6 +50,7 @@ class IFrame(AresHtml.Html):
     <p>Your browser does not support iframes.</p>
     </iframe>''' % (self.vals, styleStr)
 
+
 class ListBadge(AresHtml.Html):
   """
   HTML List
@@ -85,12 +86,28 @@ class Container(Div):
   Default class parameters
     - CSS Default Class = container
   """
-  cssCls, alias = 'container', 'container'
+  cssCls, alias = 'container-fluid', 'container'
   reference = 'https://getbootstrap.com/docs/3.3/css/'
+
+  def __init__(self, htmlId, header, vals, cssCls=None):
+    """  """
+    super(Container, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
+
+  def __repr__(self):
+    """ Return the String representation of a HTML List """
+    item = AresItem.Item('<div class="panel panel-success">') #% self.strAttr())
+    item.add(2, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+    item.add(2, '<div class="panel-body">')
+    for val in self.vals:
+      item.add(3, val)
+    item.add(2, '</div>')
+    item.add(1, '</div>')
+    return str(item)
 
   @classmethod
   def aresExample(cls, aresObj):
-    return aresObj.container("MyContainer")
+    return aresObj.container('', "MyContainer")
 
 
 class Split(AresHtml.Html):
@@ -113,13 +130,15 @@ class Split(AresHtml.Html):
 
   def __repr__(self):
     """ Return the HTML display of a split container"""
-    res = AresItem.Item('<div %s>' % self.strAttr())
-    res.add(1, '%s<div class="row">')
+    res = AresItem.Item('<div class="panel panel-success">')
+    res.add(1, '<div %s>' % self.strAttr())
+    res.add(1, '<BR/><div class="row">')
     for htmObj in self.vals:
       res.add(2, '<div class="col-lg-%s">' % self.col_lg)
       res.add(3, str(htmObj))
       res.add(2, '</div>')
     res.add(1, '</div>')
+    res.add(0, '</div>')
     res.add(0, '</div>')
     return str(res)
 
@@ -137,15 +156,19 @@ class GraphSvG(AresHtml.Html):
     - width, height = 960, 500 (for the SVG component)
   """
   cssCls = 'span4'
-  width, height = 960, 500
+  width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
+  icon = 'fa fa-pie-chart'
 
   def __repr__(self):
     """ Return the String representation of a DIV containing a SVG tag """
-    items = AresItem.Item("<div %s>" % self.strAttr())
-    items.add(1, '<svg width="%s" height="%s"></svg>' % (self.width, self.height))
-    items.add(0, '</div>')
-    return str(items)
+    item = AresItem.Item('<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
+    item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
+    item.add(1, '<div class="panel-body" style="width:100%%;height:100%%;" %s>' % self.strAttr())
+    item.add(1, '<svg style="width:100%;height:100%;"></svg>')
+    item.add(0, '</div>')
+    item.add(0, '</div>')
+    return str(item)
 
   def jsRef(self):
     """ Return the javascript SVG reference """

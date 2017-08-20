@@ -59,7 +59,6 @@ def htmlLocalFooter():
   item.add(0, '</html>')
   return str(item)
 
-
 def convert_bytes(num):
   """
   this function will convert bytes to MB.... GB... etc
@@ -68,6 +67,20 @@ def convert_bytes(num):
       if num < 1024.0:
           return "%3.1f %s" % (num, x)
       num /= 1024.0
+
+def isExcluded(rootPath, file=None, folders=None):
+  """
+  """
+  if file is not None:
+    if file == '__pycache__' or file.endswith('pyc') or file.endswith('.zip') or file == 'log_ares.dat':
+      return True
+
+  if folders is not None:
+    folder = os.path.join(*folders)
+    if '__pycache__' in folder or folder == rootPath or folder.startswith('.svn'):
+      return True
+
+  return False
 
 class Report(object):
   """
@@ -87,7 +100,7 @@ class Report(object):
     self.prefix, self.directory = prefix, None
     self.content, self.jsGraph = [], []
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
-    self.htmlItems, self.jsOnLoad, self.http = {}, [], {'GET': {}, 'POST': {}}
+    self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
 
@@ -105,6 +118,7 @@ class Report(object):
       print("Notification %s not recognized !" % notif)
       print("Allowed notification %s" % self.definedNotif.keys())
       raise Exception("Notification Type should belong to one of the above category")
+
     alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
     alertObject = alertCls(self.countItems, title, value, self.countNotif, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
     self.htmlItems[alertObject.htmlId] = alertObject
@@ -170,6 +184,7 @@ class Report(object):
   def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def newline(self, cssCls=None): return self.add(AresHtmlText.Newline(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def line(self, cssCls=None): return self.add(AresHtmlText.Line(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
   # Title section
   def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
@@ -184,17 +199,17 @@ class Report(object):
   def button(self, value, cssCls=None): return self.add(AresHtmlEvent.Button(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
-  def downloadAll(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
+  def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def table(self, values, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def table(self, header, values, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def container(self, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def grid(self, values, cssCls=None): return self.add(AresHtmlContainer.Split(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -203,18 +218,18 @@ class Report(object):
   def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Chart section
-  def bar(self, values, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def pieChart(self, values, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def donutChart(self, values, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def lineChart(self, values, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def cloudChart(self, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def tree(self, values, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def comboLineBar(self, values, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def scatterChart(self, values, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def stackedAreaChart(self, values, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def multiBarChart(self, values, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def lineChartFocus(self, values, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
-  def horizBarChart(self, values, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def bar(self, header, values, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def pieChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def donutChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def lineChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def comboLineBar(self, header, values, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def scatterChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def stackedAreaChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def multiBarChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def lineChartFocus(self, header, values, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
+  def horizBarChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
 
   # File HTML Section
   def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
@@ -223,7 +238,7 @@ class Report(object):
   # Anchor section
   def anchor(self, value='', cssCls=None):
     return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
-  def input(self, value, cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
 
   # ---------------------------------------------------
@@ -281,23 +296,42 @@ class Report(object):
     """ Return the list of sub folders in tne environment """
     folders = set()
     for folder in os.walk(os.path.join(self.http['DIRECTORY'])):
-      if not '__pycache__' in folder[0] and folder[0]  != self.http['DIRECTORY'] and not folder[0].startswith('.svn'):
-        folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
+      if isExcluded(self.http['DIRECTORY'], folders=[folder[0]]):
+        continue
+
+      folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
+    return folders
+
+  def getFoldersInfo(self, subfolders=None):
+    """  """
+    folders = {}
+    if subfolders is not None:
+      folderPath = os.path.join(self.http['DIRECTORY'], *subfolders)
+    else:
+      folderPath = self.http['DIRECTORY']
+    for folder in os.listdir(folderPath):
+      filePath = os.path.join(folderPath, folder)
+      fileSize = convert_bytes(os.path.getsize(filePath))
+      fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
+      folders[folder] = {'SIZE': fileSize, 'LAST_MOD_DT': fileDate}
     return folders
 
   def getFiles(self, subfolders):
     """ return the list of files in a given directory structure """
     files = set()
     for pyFile in os.listdir(os.path.join(self.http['DIRECTORY'], *subfolders)):
-      if pyFile == '__pycache__' or pyFile.endswith('pyc') or pyFile.endswith('.zip') or pyFile == 'log_ares.dat':
+      if isExcluded(self.http['DIRECTORY'], file=pyFile):
         continue
 
       files.add(pyFile)
     return files
 
-  def getFileInfo(self, subfolders, fileName):
+  def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """
-    filePath = os.path.join(self.http['DIRECTORY'], *subfolders)
+    if subfolders is None:
+      filePath = self.http['DIRECTORY']
+    else:
+      filePath = os.path.join(self.http['DIRECTORY'], *subfolders)
     filePath = os.path.join(filePath, fileName)
     fileSize = convert_bytes(os.path.getsize(filePath))
     fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))

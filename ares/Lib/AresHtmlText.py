@@ -53,7 +53,7 @@ class Paragraph(AresHtml.Html):
 class Title(AresHtml.Html):
   """ Python Wrapper to the HTML H1 Tag """
   dim, alias = 1, 'title'
-  default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none', 'text-align': 'center'}
+  default = {'color': '#398438', 'font-family': 'anchorjs-icons', 'font-style': 'normal', 'font-varian': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   def addStyle(self, name, value):
@@ -67,8 +67,8 @@ class Title(AresHtml.Html):
     if not hasattr(self, 'style'):
       self.style = dict(self.default)
     styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
-    items = AresItem.Item('<H%s %s style="%s">' % (self.dim, self.strAttr(), styleStr))
-    items.add(1, '<a style="%s">%s</a>' % (styleStr, self.vals))
+    items = AresItem.Item('<H%s class="page-header" %s style="%s">' % (self.dim, self.strAttr(), styleStr))
+    items.add(1, '<a class="anchorjs-link " style="%s">%s</a>' % (styleStr, self.vals))
     items.add(0, '</H%s>' % self.dim)
     return str(items)
 
@@ -79,6 +79,7 @@ class Title(AresHtml.Html):
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.title("Level 1 Title")
+
 
 class Title2(Title):
   """ Python Wrapper to the HTML H2 Tag """
@@ -141,6 +142,23 @@ class Line(AresHtml.Html):
     return aresObj.line()
 
 
+class Icon(AresHtml.Html):
+  """
+  """
+  reference = 'http://fontawesome.io/icons/'
+  alias = 'icon'
+
+  def __repr__(self):
+    """ Return the String representation of a line tag """
+    return '<i class="fa fa-%s" style="cursor:pointer" aria-hidden="true" %s></i>' % (self.vals, self.strAttr())
+
+  def deleteLink(self, reportName, fileName, folders):
+    """ Delete the file or the folder in the dedicated folder """
+    if fileName is None:
+      self.post('click', "../delete_folder/%s" % reportName, {'SOURCE_PATH': "/".join(folders)}, 'location.reload();')
+    else:
+      self.post('click', "../delete_file/%s" % reportName, {'SOURCE_PATH': "/".join(folders), 'FILE_NAME': fileName}, 'location.reload();')
+    return self
 
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')

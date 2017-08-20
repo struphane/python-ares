@@ -30,13 +30,13 @@ class Modal(AresHtml.Html):
 
   def __repr__(self):
     """ Return the String representation of a HTML Modal Object """
-    item = AresItem.Item('<a data-toggle="modal" data-target="#%s" style="cursor: pointer">%s</a>' % (self.htmlId, self.name), self.incIndent)
-    item.add(0, '<div %s role="dialog">' % self.strAttr())
-    item.add(1, '<div class="modal-dialog modal-sm">')
+    item = AresItem.Item('<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#%s" style="cursor: pointer">%s</button>' % (self.htmlId, self.name), self.incIndent)
+    item.add(0, '<div %s role="dialog" tabindex="-1" role="dialog" aria-labelledby="%sTitle" aria-hidden="true">' % (self.strAttr(), self.htmlId))
+    item.add(1, '<div class="modal-dialog" role="document">')
     item.add(2, '<div class="modal-content">')
     item.add(3, '<div class="modal-header">')
     item.add(4, '<button type="button" class="close" data-dismiss="modal">&times;</button>')
-    item.add(4, '<h4 class="modal-title">%s</h4>' % self.modal_header)
+    item.add(4, '<h4 class="modal-title" id="%sTitle">%s</h4>' % (self.htmlId, self.modal_header))
     item.add(3, '</div>')
     item.add(3, '<div class="modal-body">')
     for val in self.vals:

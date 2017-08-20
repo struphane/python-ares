@@ -20,7 +20,7 @@ class Button(AresHtml.Html):
 
   def __repr__(self):
     """ Return the String representation of HTML button """
-    return '<button %s type="button">%s</button>' % (self.strAttr(), self.vals)
+    return '<button %s type="button" style="margin-bottom:10px;">%s</button>' % (self.strAttr(), self.vals)
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -43,7 +43,7 @@ class ButtonRemove(AresHtml.Html):
 
   def __repr__(self):
     """ Return the String representation of a HTML Style Twitter button """
-    return '<button type="button" %s><span class="fa fa-%s"></span></button>' % (self.strAttr(), self.glyphicon)
+    return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -185,7 +185,7 @@ class Input(AresHtml.Html):
     """ Return the String representation of a HTML Input object """
     item = AresItem.Item('<div class="form-group">', self.incIndent)
     item.add(1, '<label for="%s">%s:</label>' % (self.vals.replace(" ", "").lower(), self.vals))
-    item.add(2, '<input type="text" %s>' % (self.strAttr()))
+    item.add(2, '<input type="text" style="width:100%%" %s>' %  self.strAttr())
     item.add(0, '</div>')
     return str(item)
 
@@ -406,8 +406,8 @@ class DatePicker(AresHtml.Html):
   def __repr__(self):
     """ Return the String representation of a Date picker object """
     if '-' in self.dflt:
-      return '<p>%s: <input type="text" %s value="%s"></p>' % (self.vals, self.strAttr(), self.dflt)
-    return '<p>%s: <input type="text" %s></p>' % (self.vals, self.strAttr())
+      return '<p><strong>%s: </strong><input type="text" %s value="%s"></p>' % (self.vals, self.strAttr(), self.dflt)
+    return '<p><strong>%s: </strong><input type="text" style="width:100%%" %s></p>' % (self.vals, self.strAttr())
 
   def onLoadFnc(self):
     """ Start the Date picker transformation when the document is loaded """
@@ -537,23 +537,39 @@ class UploadFile(AresHtml.Html):
 
   def __repr__(self):
     """ Display the file upload object """
-    items = AresItem.Item('<div class="form-group row"><label class="custom-file col-sm-3 col-form-label">')
-    items.add(1, '<input type="file" %s>' % self.strAttr())
-    items.add(1, '<span class="custom-file-control" id="file_%s"></span>' % self.htmlId)
-    items.add(0, '</label><div class="form-group mx-sm-3"><input class="form-control" type="text" id="value_%s" readonly></div>' % self.htmlId)
-    items.add(0, '<button type="button" id="button_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o"></span></button></div>' % self.htmlId)
+    self.headerBox = 'Select a file '
+    items = AresItem.Item('<div class="panel panel-success">')
+    items.add(1, '<div class="panel-heading">')
+    items.add(2, '<strong><i class="fa fa-file" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
+    items.add(1, '</div>')
+    items.add(1, '<div class="panel-body">')
+    items.add(2, '<div class="col-lg-7" style="padding:5px">')
+    items.add(3, '<label class="btn btn-default btn-file" style="width:100%%; height:100%%" id="value_%s">' % self.htmlId)
+    items.add(4, 'Browse a file<input type="file" style="display: none;"  %s>' % self.strAttr())
+    items.add(3, '</label>')
+    items.add(3, '<button type="button" id="button_%s" class="btn btn-success" style="height:35px"><span class="fa fa-check-square-o">&nbsp;Upload</span></button>' % self.htmlId)
+    items.add(2, '</div>')
+    items.add(1, '</div>')
+    items.add(0, '</div>')
     return str(items)
 
   def js(self, evenType, jsDef):
     """ Add a Javascript Event to an HTML object """
     if evenType == 'change':
-      jsDef = '$("#value_%s").val(%s); %s' % (self.htmlId, self.jsVal(), jsDef)
+      # .replace(/\\/g, "/").replace(/.*\//, "")
+      jsDef = 'var input = %s; $("#value_%s").text(%s).append(input); %s' % (self.jsRef(), self.htmlId,  self.jsVal(), jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
 
   def jsEvents(self, jsEventFnc=None):
     if not self.jsEvent:
       self.js('change', '')
     return super(UploadFile, self).jsEvents(jsEventFnc)
+
+  def click(self, reportName, jsFnc='', data=None, folders=None):
+    """ Generic upload method to send to file to a dedicated server location """
+    data = {} if data is None else data
+    self.post('click', '../upload/%s' % reportName, data, jsFnc, "/".join(folders))
+    return self
 
   def post(self, evenType, url, data, jsDef, dstFolder, preAjaxJs=''):
     """
@@ -566,7 +582,6 @@ class UploadFile(AresHtml.Html):
       #jsDef = '$("#value_%s").val(%s); %s' % (self.htmlId, self.jsVal(), jsDef)
       jsRef = "$('#button_%s')" % self.htmlId
     jsDef = '''
-
         var file = $('#%s').prop('files')[0]; // FileList object.
         var form_data = new FormData();
         form_data.append('file_0', file);

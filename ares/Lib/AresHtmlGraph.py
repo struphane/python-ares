@@ -21,11 +21,23 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   """
   duration = 350
   clickFnc, clickObject = None, None
-  width, height = 960, 500
+
+  def __init__(self, htmlId, header, vals, cssCls=None):
+    """  """
+    super(JsGraph, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
     return self.vals
+
+  def addStyle(self, style):
+    """ add style to graphs (will be added to the nv.models js function"""
+    pass
+
+  def addAttributes(self, attributes):
+    """ add attributes to the graphs, mostly used to add/customize axis"""
+    pass
 
   def jsChart(self):
     """ Return the javascript fragment require to build the graph """
@@ -37,8 +49,6 @@ class JsGraph(AresHtmlContainer.GraphSvG):
       jsEventFnc = self.jsEventFnc
     jGraphAttr = {'src': self.jsRef(), 'htmlId': self.htmlId, 'duration': self.duration}
     self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart().strip(), self.dataFnc())
-    self.jsEvent['addGraph'].width = self.width
-    self.jsEvent['addGraph'].height = self.height
     if self.clickFnc is not None:
       self.jsEvent['addGraph'].click(self.clickFnc)
     for jEventType, jsEvent in self.jsEvent.items():
@@ -115,6 +125,7 @@ class Bar(JsGraph):
   mockData = r'json\bar.json'
   alias = 'bar'
   clickObject = 'discretebar'
+  icon = 'fa fa-bar-chart'
 
   def jsChart(self):
     """ """

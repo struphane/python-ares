@@ -49,7 +49,7 @@ def report(aresObj, localPath=None):
                       Any script can be updated in your environment / any folder can be added.
                       Please go here to get more details about the process
                     ''')
-  comp = aresObj.download()
+  comp = aresObj.icon('download')
   comp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
 
   fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME'])))
@@ -66,11 +66,9 @@ def report(aresObj, localPath=None):
   for mainScript, child in aresObj.http['SCRIPTS_CHILD']:
     for i, script in enumerate([mainScript, child]):
       if script not in displayedScript:
-        remov = aresObj.remove()
-        print("##########")
-        print(aresObj.http['SCRIPTS_PATH'])
+        remov = aresObj.icon('trash')
         remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
-        downComp = aresObj.download()
+        downComp = aresObj.icon('download')
         downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
         fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['SCRIPTS'][script], script)))
         fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['SCRIPTS'][script], script))))
@@ -88,9 +86,9 @@ def report(aresObj, localPath=None):
 
   for script, scriptPath in aresObj.http['SCRIPTS'].items():
     if script not in displayedScript and script != '__pycache__' and not script.endswith('pyc') and not script.endswith('zip') and not script.endswith('.svn'):
-      removComp = aresObj.remove()
+      removComp = aresObj.icon('trash')
       removComp.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, "display(data); window.location.href='../page/%s' ;" % aresObj.http['SCRIPTS_NAME'])
-      downComp = aresObj.download()
+      downComp = aresObj.icon('download')
       downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': script})
       fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
       fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
@@ -100,25 +98,22 @@ def report(aresObj, localPath=None):
       scriptUpdate = fileDate if fileDate > scriptUpdate else scriptUpdate
 
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
-  #dropComp = aresObj.dropfile('Drop you files here')
-  #dropComp.reportName = aresObj.http['SCRIPTS_NAME']
-  inFile = aresObj.readFile('log_ares.dat')
-  six.next(inFile)
   activity = collections.defaultdict(int)
-  for line in inFile:
-    splitLine = line.strip().split("#")
-    activity[splitLine[1]] += 1
-  inFile.close()
+  inFile = aresObj.readFile('log_ares.dat')
+  if inFile is not None:
+    six.next(inFile)
+    for line in inFile:
+      splitLine = line.strip().split("#")
+      activity[splitLine[1]] += 1
+    inFile.close()
   content = []
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
-  aresObj.title4('Deployments count')
-  graphObj = aresObj.bar([ {"key": "Cumulative Return","values": content }])
+  graphObj = aresObj.bar('Deployments count', [ {"key": "Cumulative Return","values": content }])
   graphObj.height = 200
 
-  aresObj.title4('Summary')
-  aresObj.table(scripts, cssCls="table table-hover table-bordered")
+  aresObj.table('Scripts Summary', scripts, cssCls="table table-hover table-bordered")
 
-  zipComp = aresObj.downloadAll()
+  zipComp = aresObj.downloadAll('Download Zip archive of this environment')
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
   return aresObj
