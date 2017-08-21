@@ -22,9 +22,9 @@ def report(aresObj):
   aresInput.autocomplete(foldersReports)
   aresButton = aresObj.button("Open Report Section", 'btn btn-success')
   aresButton.js('click', 'window.location.href="/reports/page/" + %s; return false;' % aresInput.jsVal())
-  modal = aresObj.modal('click on the link to create a new report section')
+  #modal = aresObj.modal('click on the link to create a new report section')
 
-  aresObj.container('Create Environment', [aresInput, aresButton, modal])
+  aresObj.container('Create Environment', [aresInput, aresButton])
 
   contentFolder, contentSize = [['Environment', 'Date', 'Size', '']], []
   for folder, folderInfo in aresObj.getFoldersInfo().items():
@@ -37,8 +37,8 @@ def report(aresObj):
   aresObj.bar('Scripts per folder', [ {"key": "Cumulative Return","values": contentSize }])
   createReport = aresObj.button("Create the Report", 'btn btn-primary')
   inputModal = aresObj.input("Report Name", '')
-  aresObj.addTo(modal, inputModal)
-  aresObj.addTo(modal, createReport)
+  #aresObj.addTo(modal, inputModal)
+  #aresObj.addTo(modal, createReport)
   createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.jsVal(), 'display(data);')
   tableComp = aresObj.table('Existing Reports', contentFolder)
   pieComp = aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
