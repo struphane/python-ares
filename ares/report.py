@@ -405,6 +405,7 @@ def ajaxCall(report_name, script):
   reportObj.http['FILE'] = None
   reportObj.http['REPORT_NAME'] = report_name
   reportObj.http['DIRECTORY'] = userDirectory
+  reportObj.http.update(requestParams)
   reportObj.reportName = report_name
   try:
     mod = __import__(script.replace(".py", ""))
@@ -651,13 +652,12 @@ def getAresFilesVersions():
 def create_folder():
   """ This REST service will create a file in a given env """
   reportObj = Ares.Report()
-  for postValues in request.form.items():
-    reportObj.http['POST'][postValues[0]] = postValues[1]
-  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['POST']['REPORT_NAME'])
-  subfolders = reportObj.http['POST']['FOLDERS'].split("/")
+  reportObj.http.update(getHttpParams(request))
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['REPORT_NAME'])
+  subfolders = reportObj.http['FOLDERS'].split("/")
   subDirectories = os.path.join(reportObj.http['DIRECTORY'], *subfolders)
   if not os.path.exists(subDirectories):
     os.makedirs(subDirectories)
-    appendToLog(reportObj.http['POST']['REPORT_NAME'], 'FOLDER_CREATION', reportObj.http['POST']['FOLDERS'])
+    appendToLog(reportObj.http['REPORT_NAME'], 'FOLDER_CREATION', reportObj.http['FOLDERS'])
   return json.dumps('Folders created in the env %s' % reportObj.http['POST']['REPORT_NAME'])
 

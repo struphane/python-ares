@@ -77,7 +77,7 @@ def isExcluded(rootPath, file=None, folders=None):
 
   if folders is not None:
     folder = os.path.join(*folders)
-    if '__pycache__' in folder or folder == rootPath or folder.startswith('.svn'):
+    if '__pycache__' in folder or folder == rootPath or '.svn' in folder:
       return True
 
   return False
@@ -299,7 +299,8 @@ class Report(object):
       if isExcluded(self.http['DIRECTORY'], folders=[folder[0]]):
         continue
 
-      folders.add(folder[0].replace(self.http['DIRECTORY'], ''))
+      fPath = list(os.path.split(folder[0].lstrip("\\").replace(self.http['DIRECTORY'], '').lstrip("\\")))
+      folders.add(tuple(fPath[1:])) if fPath[0] == '' else folders.add(tuple(fPath))
     return folders
 
   def getFoldersInfo(self, subfolders=None):

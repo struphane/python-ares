@@ -9,6 +9,7 @@ AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
 CHILD_PAGES = {'results': 'CalculatorSetEnv.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 import collections
+import os
 
 def report(aresObj):
   aresObj.title('IRC Calculator')
@@ -23,15 +24,13 @@ def report(aresObj):
 
   dataTabe, testPerDay = [['Folder', 'Creation Date', '']], collections.defaultdict(int)
   for folder in aresObj.getFolders():
-    print(folder)
-    env = folder.split("\\")
-    if len(env) == 3:
-      ahref = aresObj.anchor(folder)
-      ahref.addLink('results?NODE=%s&DATE=%s' % (env[2], env[1]))
-      info = aresObj.getFileInfo(env[2], [env[1]])
-      iconComp = aresObj.icon('trash').deleteLink(aresObj.http['REPORT_NAME'], None, [env[1], env[2]])
+    if len(folder) == 2:
+      ahref = aresObj.anchor(os.path.join(*folder))
+      ahref.addLink('results?NODE=%s&DATE=%s' % (folder[1], folder[0]))
+      info = aresObj.getFileInfo(folder[1], [folder[0]])
+      iconComp = aresObj.icon('trash').deleteLink(aresObj.http['REPORT_NAME'], None, [folder[0], folder[1]])
       dataTabe.append([ahref, info['LAST_MOD_DT'], iconComp])
-      testPerDay[env[1]] += 1
+      testPerDay[folder[0]] += 1
   aresObj.bar('Tests per day', [ {"key": "Cumulative Return","values": [[k, v] for k, v in testPerDay.items()] }])
   aresObj.table('Available Environments', dataTabe)
   return aresObj
