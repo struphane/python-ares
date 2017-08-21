@@ -31,7 +31,7 @@ class Modal(AresHtml.Html):
   def __repr__(self):
     """ Return the String representation of a HTML Modal Object """
     item = AresItem.Item('<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#%s" style="cursor: pointer">%s</button>' % (self.htmlId, self.name), self.incIndent)
-    item.add(0, '<div %s role="dialog" tabindex="-1" role="dialog" aria-labelledby="%sTitle" aria-hidden="true">' % (self.strAttr(), self.htmlId))
+    item.add(0, '<div %s tabindex="-1" role="dialog" aria-labelledby="%sTitle" aria-hidden="true">' % (self.strAttr(), self.htmlId))
     item.add(1, '<div class="modal-dialog" role="document">')
     item.add(2, '<div class="modal-content">')
     item.add(3, '<div class="modal-header">')
