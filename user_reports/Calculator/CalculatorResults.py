@@ -20,7 +20,6 @@ def report(aresObj):
         dataTabe.append([ahref, info['LAST_MOD_DT'], iconComp])
         testPerDay[folder[0]] += 1
     aresObj.table('Available Environments', dataTabe)
-
     return aresObj
 
   aresObj.title("IRC Results for %s" % aresObj.http['NODE'])

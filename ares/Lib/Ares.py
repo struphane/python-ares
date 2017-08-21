@@ -149,6 +149,9 @@ class Report(object):
 
   def supp(self, htmlObjs):
     """ Unregister the HTML component to the Ares object """
+    if htmlObjs is None:
+      return htmlObjs
+
     if isinstance(htmlObjs, list):
       for htmlObj in htmlObjs:
         if isinstance(htmlObj, list):
@@ -177,14 +180,15 @@ class Report(object):
   # This part is done in python 3 in order to ensure users will put the right type of objects
   # del self.content[self.content.index(val.htmlId)]
   # ---------------------------------------------------------------------------------------------------------
-  def text(self, value, cssCls=None): return self.add(AresHtmlText.Text(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
-  def code(self, value, cssCls=None): return self.add(AresHtmlText.Code(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
-  def paragraph(self, value, cssCls=None): return self.add(AresHtmlText.Paragraph(self.getNext(), self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Paragraph(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def dropzone(self, value, cssCls=None): return self.add(AresHtmlEvent.DropZone(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def newline(self, cssCls=None): return self.add(AresHtmlText.Newline(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def line(self, cssCls=None): return self.add(AresHtmlText.Line(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def number(self, value, cssCls=None): return self.add(AresHtmlText.Numeric(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
   # Title section
   def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar

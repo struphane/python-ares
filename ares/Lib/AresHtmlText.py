@@ -3,6 +3,8 @@
 """
 
 import json
+import locale
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 
@@ -11,10 +13,18 @@ class Text(AresHtml.Html):
   """ Python Wrapper to the FONT HTNL Tag """
   reference = 'https://www.w3schools.com/tags/tag_font.asp'
   alias = 'text'
+  htmlComp = None
+
+  def __init__(self, htmlId, vals, cssCls=None, htmlComp=None):
+    super(Text, self).__init__(htmlId, vals, cssCls)
+    self.htmlComp = htmlComp
 
   def __repr__(self):
     """ Return the String representation of a Text HTML tag """
-    return '<font %s>%s</font>' % (self.strAttr(), self.vals)
+    html = '<font %s>%s</font>' % (self.strAttr(), self.vals)
+    if self.htmlComp is not None:
+      html = html.format(*self.htmlComp)
+    return html
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -25,10 +35,18 @@ class Code(AresHtml.Html):
   """ Python Wrapper to the Bootsrap CODE Tag """
   reference = 'https://v4-alpha.getbootstrap.com/content/code/'
   alias = 'code'
+  htmlComp = None
+
+  def __init__(self, htmlId, vals, cssCls=None, htmlComp=None):
+    super(Code, self).__init__(htmlId, vals, cssCls)
+    self.htmlComp = htmlComp
 
   def __repr__(self):
     """ Return the String representation of a Code HTML tag """
-    return '<pre><code %s>%s</code></pre>' % (self.strAttr(), self.vals)
+    html = '<pre><code %s>%s</code></pre>' % (self.strAttr(), self.vals)
+    if self.htmlComp is not None:
+      html = html.format(*self.htmlComp)
+    return html
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -39,11 +57,19 @@ class Paragraph(AresHtml.Html):
   """ Python Wrapper to the HTML P Tag """
   reference = "https://www.w3schools.com/html/html_styles.asp"
   alias = 'paragraph'
+  htmlComp = None
+
+  def __init__(self, htmlId, vals, cssCls=None, htmlComp=None):
+    super(Paragraph, self).__init__(htmlId, vals, cssCls)
+    self.htmlComp = htmlComp
 
   def __repr__(self):
-    """ Return the HTML string for a paragraph including or not some other html object """
+    """ Return the String representation of a Code HTML tag """
     val = " ".join([str(val) for val in self.vals]) if isinstance(self.vals, list) else self.vals
-    return '<p %s>%s</p>' % (self.strAttr(), val)
+    html = '<p %s>%s</p>' % (self.strAttr(), val)
+    if self.htmlComp is not None:
+      html = html.format(*self.htmlComp)
+    return html
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -161,8 +187,24 @@ class Icon(AresHtml.Html):
       self.post('click', "../delete_file/%s" % reportName, json.dumps({'SOURCE_PATH': "/".join(folders), 'FILE_NAME': fileName}), 'location.reload();')
     return self
 
+
+class Numeric(AresHtml.Html):
+  """ Reprsents a figure in a nice display """
+  alias = 'number'
+  reference = ''
+
+  def __repr__(self):
+    """ Return the String representation of a line tag """
+    locale.setlocale(locale.LC_ALL, '')
+    html = "<font %s>{:,d}/font>" % self.strAttr()
+    return html.format(self.vals)
+
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')
   #print(obj.jsEvents())
   print('\n'.join(obj.onLoad()))
   #print(obj.__repr__())
+
+  Numeric(1, 34455656)
+  objText = Paragraph(0, "Youpi {0}", htmlComp=[Numeric(1, 34455656)])
+  print(objText.__repr__())
