@@ -8,6 +8,7 @@ Please make sure that all the CSS information are defined in a CSS class
 Aliases must be unique
 """
 
+import json
 import collections
 import warnings
 import functools
@@ -112,7 +113,7 @@ class Html(object):
       Post method to get data directly by interacting with the page
       https://api.jquery.com/jquery.post/
     """
-    jsDef = '%s $.post("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
+    jsDef = '%s $.post("%s", %s, function(data) { %s } );' % (preAjaxJs, url, json.dumps(data), jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
 
   def json(self, evenType, url, data, jsDef):
@@ -120,7 +121,7 @@ class Html(object):
       Special function to input Json data
       http://api.jquery.com/jquery.getjson/
     """
-    jsDef = '$.getJSON("%s", %s, function(data) { %s });' % (url, data, jsDef)
+    jsDef = '$.getJSON("%s", %s, function(data) { %s });' % (url, json.dumps(data), jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
 
   def jsVal(self):

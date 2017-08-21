@@ -267,7 +267,7 @@ def page_report(report_name):
   onload, content, js = report_index_page.report(reportObj).html()
   if scriptEnv in sys.modules:
     del sys.modules[scriptEnv]
-  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
 @report.route("/")
 @report.route("/index")
@@ -279,7 +279,7 @@ def index():
   aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
   aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   onload, content, js = report_index.report(aresObj).html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
 @report.route("/test/graphs")
 def run_test_graph():
@@ -300,7 +300,7 @@ def run_test_graph():
       except Exception as e:
         aresObj.addNotification('WARNING', 'No chart %s' % name, str(e))
   onload, content, js = report_doc_graph.report(aresObj).html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
 @report.route("/run/<report_name>", methods = ['GET'])
 def run_report(report_name):
@@ -339,7 +339,7 @@ def run_report(report_name):
 
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
-  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar=side_bar)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
 @report.route("/sidebar/<report_name>/<script>", methods = ['GET'])
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
@@ -380,7 +380,7 @@ def child(report_name, script):
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
-  return render_template('ares_template.html', onload=onload, content=content, js=js, side_bar=side_bar)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
 @report.route("/create/env", methods = ['POST'])
 def ajaxCreate():
@@ -496,6 +496,7 @@ def deleteFiles(report_name):
 #   - To get the full report updated package
 #   - To get the last version of a specific script
 # ---------------------------------------------------------------------------------------------------------
+@noCache
 @report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
   """ Download a specific file in a report project """
@@ -509,10 +510,9 @@ def downloadFiles(report_name, script):
   else:
     splitScriptPath = [script]
     userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name)
-
-  print(userDirectory)
   return send_from_directory(userDirectory, splitScriptPath[-1], as_attachment=True)
 
+@noCache
 @report.route("/download/dsc/json/<jsonFile>", methods = ['GET', 'POST'])
 def downloadJsonFiles(jsonFile):
   if not jsonFile.endswith(".json"):
@@ -521,6 +521,7 @@ def downloadJsonFiles(jsonFile):
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'json')
   return send_from_directory(mokfilePath, jsonFile, as_attachment=True)
 
+@noCache
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
   """ Return in a Zip archive the full python package """
@@ -547,8 +548,8 @@ def downloadReport(report_name):
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
-@report.route("/download/package")
 @noCache
+@report.route("/download/package")
 def download():
   """ Return the package in order to test the scripts """
   memory_file = io.BytesIO()
@@ -584,7 +585,7 @@ def download():
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
-
+@noCache
 @report.route("/download/ares", methods = ['GET', 'POST'])
 def downloadAres():
   """ Download the up to date Ares package """

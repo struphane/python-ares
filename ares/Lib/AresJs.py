@@ -7,7 +7,9 @@ reference website: http://api.jquery.com/jquery.ajax/
 
 """
 
+import json
 import six
+
 from ares.Lib import AresItem
 
 
@@ -82,7 +84,7 @@ class JD3Graph(object):
     else:
       jsChart = chart
 
-    self.jGraphAttr.update({'chart': str(jsChart)[1:].strip(), 'data': data})
+    self.jGraphAttr.update({'chart': str(jsChart)[1:].strip(), 'data': json.dumps(data)})
 
   def __repr__(self):
     """ """
