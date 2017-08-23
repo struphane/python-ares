@@ -205,6 +205,7 @@ class Report(object):
   def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def generatePdf(self, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self.getNext(), "", cssCls), sys._getframe().f_code.co_name)
 
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
