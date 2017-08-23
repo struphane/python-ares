@@ -599,6 +599,16 @@ class UploadFile(AresHtml.Html):
     return aresObj.upload("MyFile")
 
 
+class GeneratePdf(ButtonRemove):
+  alias = "generatePdf"
+  glyphicon, cssCls = "book", "btn btn-danger"
+  source = r"http://pdfmake.org/#/gettingstarted"
+
+  def __init__(self, htmlId, vals, cssCls=None):
+    super(GeneratePdf, self).__init__(htmlId, vals, cssCls)
+    self.jsEvent["var"] = "var docDefinition = { content: 'This is an sample PDF printed with pdfMake' };"
+    self.jsEvent["click"] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), "click", " pdfMake.createPdf(docDefinition).download('optionalName.pdf');")
+
 if __name__ == '__main__':
   obj = DropZone(0, 'Drop files here')
   print('\n'.join(obj.jsEvents()))

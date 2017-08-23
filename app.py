@@ -39,3 +39,6 @@ app.register_blueprint(report)
 
 from saturn.saturn import saturn
 app.register_blueprint(saturn)
+
+from mrflex.monitoring import mrflex_monitoring
+app.register_blueprint(mrflex_monitoring)
