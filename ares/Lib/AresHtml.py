@@ -66,6 +66,11 @@ class Html(object):
     """ Property to get the HTML ID of a python HTML object """
     return "%s_%s" % (self.__class__.__name__.lower(), self.__htmlId)
 
+  @property
+  def jqId(self):
+    """ Property to get the HTML ID of a python HTML object """
+    return '$("#%s")' % self.htmlId
+
   def addClass(self, cssCls, replace=False):
     """ Change the CSS Style of the HTML object """
     self.attr['class'] = cssCls if replace else "%s %s" % (self.attr['class'], cssCls)

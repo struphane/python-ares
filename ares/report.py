@@ -659,5 +659,5 @@ def create_folder():
   if not os.path.exists(subDirectories):
     os.makedirs(subDirectories)
     appendToLog(reportObj.http['REPORT_NAME'], 'FOLDER_CREATION', reportObj.http['FOLDERS'])
-  return json.dumps('Folders created in the env %s' % reportObj.http['POST']['REPORT_NAME'])
+  return json.dumps('Folders created in the env %s' % reportObj.http['REPORT_NAME'])
 
