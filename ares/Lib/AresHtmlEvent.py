@@ -155,7 +155,7 @@ class A(AresHtml.Html):
     """
     if preloading:
       jsDef = "preloader(); %s" % jsDef
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, "%s window.location = '%s' ;" % (jsDef, self.link), jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, "%s window.location = '%s' ;" % (jsDef, self.link), jsDef)
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -175,7 +175,7 @@ class Input(AresHtml.Html):
 
   def autocomplete(self, values):
     """ Fill the auto completion box with a data source """
-    self.jsEvent['autocomplete'] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), 'autocomplete', 'source: %s' % values)
+    self.jsEvent['autocomplete'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'autocomplete', 'source: %s' % values)
 
   def addVal(self, dflt):
     """ Add a default value to this object """
@@ -265,7 +265,8 @@ class TextArea(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-  def jsVal(self):
+  @property
+  def val(self):
     """ Return the Javascript Value - return the val of the textarea object """
     return '$("#%s").val()' % self.htmlId
 
@@ -273,7 +274,8 @@ class TextArea(AresHtml.Html):
     """ Update the textarea value - set the value of the textarea object """
     return '$("#%s").html(%s)' % (self.htmlId, val)
 
-  def jsRef(self):
+  @property
+  def jqId(self):
     """ Function to return the Jquery reference to the Html object """
     return '$("#%s_button")' % self.htmlId
 
@@ -313,7 +315,8 @@ class DropDown(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-  def jsRef(self):
+  @property
+  def jqId(self):
     """ Return the javascript reference to the dropdown li item """
     return '$("#%s .dropdown-menu li")' % self.htmlId
 
@@ -377,7 +380,7 @@ class Slider(AresHtml.Html):
 
   def onloadFnc(self):
     """ Use the Jquery UI property to change the DIV in slider object """
-    return AresItem.Item.indents(2, '%s.slider();' % self.jsRef())
+    return AresItem.Item.indents(2, '%s.slider();' % self.jqId)
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -411,7 +414,7 @@ class DatePicker(AresHtml.Html):
 
   def onLoadFnc(self):
     """ Start the Date picker transformation when the document is loaded """
-    return AresItem.Item.indents(2, "$( function() {%s.datepicker({dateFormat: 'yy-mm-dd'} ); } );" % self.jsRef())
+    return AresItem.Item.indents(2, "$( function() {%s.datepicker({dateFormat: 'yy-mm-dd'} ); } );" % self.jqId)
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -557,8 +560,8 @@ class UploadFile(AresHtml.Html):
     """ Add a Javascript Event to an HTML object """
     if evenType == 'change':
       # .replace(/\\/g, "/").replace(/.*\//, "")
-      jsDef = 'var input = %s; $("#value_%s").text(%s).append(input); %s' % (self.jsRef(), self.htmlId,  self.jsVal(), jsDef)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
+      jsDef = 'var input = %s; $("#value_%s").text(%s).append(input); %s' % (self.jqId, self.htmlId,  self.val, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
 
   def jsEvents(self, jsEventFnc=None):
     if not self.jsEvent:
@@ -577,7 +580,7 @@ class UploadFile(AresHtml.Html):
       https://api.jquery.com/jquery.post/
 
     """
-    jsRef = self.jsRef()
+    jsRef = self.jqId
     if evenType == 'click':
       #jsDef = '$("#value_%s").val(%s); %s' % (self.htmlId, self.jsVal(), jsDef)
       jsRef = "$('#button_%s')" % self.htmlId

@@ -12,6 +12,8 @@ import json
 import collections
 import warnings
 import functools
+import six
+
 from ares.Lib import AresJs
 from ares.Lib import AresItem
 
@@ -68,8 +70,13 @@ class Html(object):
 
   @property
   def jqId(self):
-    """ Property to get the HTML ID of a python HTML object """
+    """ Property to get the Jquery ID of a python HTML object """
     return '$("#%s")' % self.htmlId
+
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML objec in a python HTML object """
+    return '%s.val()' % self.jqId
 
   def addClass(self, cssCls, replace=False):
     """ Change the CSS Style of the HTML object """
@@ -93,7 +100,18 @@ class Html(object):
 
   def js(self, evenType, jsDef):
     """ Add a Javascript Event to an HTML object """
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
+
+  def update(self, data):
+    """ """
+    return '%s.html(%s);' % (self.jqId, data)
+
+  def jsLinkTo(self, htmlObjs):
+    """ """
+    for jqEven in self.jsEvent.values():
+      for htmlObj in htmlObjs:
+        jqEven.extendJsFnc(htmlObj.update(self.val))
+    print self.jsEvent
 
   # ---------------------------------------------------------------------------------------------------------
   #                                          AJAX SECTION
@@ -110,32 +128,27 @@ class Html(object):
       Get method to get data directly by interacting with the page
       https://api.jquery.com/jquery.get/
     """
+    data = 'eval(%s)' % data if isinstance(data, six.text_type) else json.dumps(data)
     jsDef = '%s $.get("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
   def post(self, evenType, url, data, jsDef, preAjaxJs=''):
     """
       Post method to get data directly by interacting with the page
       https://api.jquery.com/jquery.post/
     """
-    jsDef = '%s $.post("%s", %s, function(data) { %s } );' % (preAjaxJs, url, json.dumps(data), jsDef)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
+    data = 'eval(%s)' % data if isinstance(data, six.text_type) else json.dumps(data)
+    jsDef = '%s $.post("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
   def json(self, evenType, url, data, jsDef):
     """
       Special function to input Json data
       http://api.jquery.com/jquery.getjson/
     """
-    jsDef = '$.getJSON("%s", %s, function(data) { %s });' % (url, json.dumps(data), jsDef)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), evenType, jsDef, data=data, url=url)
-
-  def jsVal(self):
-    """ Return the Javascript Value """
-    return '%s.val()' % self.jsRef()
-
-  def jsRef(self):
-    """ Function to return the Jquery reference to the Html object """
-    return '$("#%s")' % self.htmlId
+    data = 'eval(%s)' % data if isinstance(data, six.text_type) else json.dumps(data)
+    jsDef = '$.getJSON("%s", %s, function(data) { %s });' % (url, data, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
   def onLoadFnc(self):
     """ Return a String with the Javascript method to put in the HTML report """

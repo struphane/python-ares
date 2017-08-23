@@ -15,7 +15,8 @@ class Div(AresHtml.Html):
     """ Return the HMTL object of for div """
     return '<div %s>%s</div>' % (self.strAttr(), self.vals)
 
-  def jsVal(self):
+  @property
+  def val(self):
     """ Return the Javascript Value """
     return '$("#%s").html()' % self.htmlId
 
@@ -125,12 +126,13 @@ class Split(AresHtml.Html):
     - col_lg = 6
   """
   cssCls, alias = "container-fluid", 'grid'
+  gridCss = 'panel panel-success'
   col_lg = 6
   reference = 'https://getbootstrap.com/docs/3.3/css/'
 
   def __repr__(self):
     """ Return the HTML display of a split container"""
-    res = AresItem.Item('<div class="panel panel-success">')
+    res = AresItem.Item('<div %s>' % 'class="%s"' % self.gridCss if self.gridCss is not None else '')
     res.add(1, '<div %s>' % self.strAttr())
     res.add(1, '<BR/><div class="row">')
     for htmObj in self.vals:
@@ -170,7 +172,8 @@ class GraphSvG(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-  def jsRef(self):
+  @property
+  def jqId(self):
     """ Return the javascript SVG reference """
     return '$("#%s svg")' % self.htmlId
 

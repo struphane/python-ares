@@ -48,6 +48,19 @@ class JQueryEvents(object):
     self.jsAttr = {'src': jsSrcRef, 'eventType': eventType, 'fnc': jsItemFnc, 'htmlId': htmlId,
                    'data': data, 'url': url}
 
+  def extendJsFnc(self, jsFnc):
+    """ Add the extr actions to the even function """
+    if isinstance(jsFnc, six. text_type) or isinstance(jsFnc, str): # to be compatible with unicode in python 2
+      splitFnc = jsFnc.strip().split("\n")
+      items = AresItem.Item(splitFnc[0].strip())
+      for line in splitFnc[1:]:
+        items.add(0, line.strip())
+      jsItemFnc = items
+    else:
+      jsItemFnc = jsFnc
+
+    self.jsAttr['fnc'] = self.jsAttr['fnc'].join(jsItemFnc)
+
   def __repr__(self):
     """  Return the String representation of the Javascripts methods """
     self.jsAttr['fnc'].incIndent = 2

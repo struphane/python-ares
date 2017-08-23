@@ -22,6 +22,12 @@ class Item(list):
     """ Append the value to the underlying list with the relevant number of indents """
     self.append((countIndent, val))
 
+  def join(self, itemObj):
+    """ Join tzo Ite, objects """
+    for item in itemObj:
+      self.append(item)
+    return self
+
   def __repr__(self):
     """ Display the String object """
     return "\n%s" % "\n".join(["%s%s" % ("".join(int(cnt + self.incIndent) * [self.indent]), val) for cnt, val in self])

@@ -2,7 +2,6 @@
 
 """
 
-import json
 import locale
 
 from ares.Lib import AresHtml
@@ -182,9 +181,10 @@ class Icon(AresHtml.Html):
   def deleteLink(self, reportName, fileName, folders):
     """ Delete the file or the folder in the dedicated folder """
     if fileName is None:
-      self.post('click', "../delete_folder/%s" % reportName, json.dumps({'SOURCE_PATH': "/".join(folders)}), 'location.reload();')
+      self.post('click', "../delete_folder/%s" % reportName, {'SOURCE_PATH': "/".join(folders)}, 'location.reload();')
     else:
-      self.post('click', "../delete_file/%s" % reportName, json.dumps({'SOURCE_PATH': "/".join(folders), 'FILE_NAME': fileName}), 'location.reload();')
+      self.post('click', "../delete_file/%s" % reportName, {'SOURCE_PATH': "/".join(folders), 'FILE_NAME': fileName},
+                'location.reload();')
     return self
 
 
@@ -197,7 +197,7 @@ class Numeric(AresHtml.Html):
     """ Return the String representation of a line tag """
     locale.setlocale(locale.LC_ALL, '')
     html = "<font %s>{:,d}/font>" % self.strAttr()
-    return html.format(self.vals)
+    return html.format(int(float(self.vals)))
 
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')
