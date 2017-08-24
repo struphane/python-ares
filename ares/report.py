@@ -305,7 +305,7 @@ def run_test_graph():
 @report.route("/run/<report_name>", methods = ['GET'])
 def run_report(report_name):
   """ Run the report """
-  onload, js, error, side_bar = '', '', False, ''
+  onload, js, error, side_bar = '', '', False, []
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
@@ -347,7 +347,7 @@ def child(report_name, script):
   """ Return the content of the attached pages """
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
-  onload, js, error, side_bar = '', '', False, ''
+  onload, js, error, side_bar = '', '', False, []
   try:
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
     sys.path.append(userDirectory)
@@ -380,7 +380,7 @@ def child(report_name, script):
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
 @report.route("/create/env", methods = ['POST'])
 def ajaxCreate():

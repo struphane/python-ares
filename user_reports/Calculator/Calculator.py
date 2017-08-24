@@ -18,7 +18,7 @@ def report(aresObj):
   nameObj = aresObj.input('Name')
   button = aresObj.button("Create Environment")
   button.post('click', '/reports/folder/create',
-              "{'REPORT_NAME': '%s', 'FOLDERS': %s + '/' + %s}" % (aresObj.http['FILE'], dateObj.jsVal(), nodeObj.jsVal()),
+              "{'REPORT_NAME': '%s', 'FOLDERS': %s + '/' + %s}" % (aresObj.http['FILE'], dateObj.val, nodeObj.val),
               'display(data);setTimeout(function() {location.reload();}, 1000);    ')
   aresObj.container('Create Test Environment', [dateObj, nodeObj, nameObj, aresObj, button])
 
