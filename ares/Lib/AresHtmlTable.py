@@ -16,17 +16,30 @@ class Table(AresHtml.Html):
   """
   cssCls, alias = 'table', 'table'
   refernce = 'https://www.w3schools.com/css/css_table.asp'
+  filt, filtId = None, None
 
   def __init__(self, htmlId, header, vals, cssCls=None):
     """  """
     super(Table, self).__init__(htmlId, vals, cssCls)
     self.headerBox = header
 
+  def filters(self, colsDict):
+    """ Store the different filters possible on the recordSet """
+    items = AresItem.Item()
+    self.filtId = {}
+    for colName, idCol in colsDict.items():
+      filterId = '%s_%s' % (self.htmlId, idCol)
+      items.add(0, "%s: <input id='%s' name='%s' type='text'>" % (colName, filterId, filterId))
+      self.filtId[filterId] = idCol
+    self.filt = items
+
   def __str__(self):
     """ Return the String representation of a HTML table """
     item = AresItem.Item('<div class="panel panel-success">', self.incIndent)
     item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
     item.add(1, '<div class="panel-body">')
+    if self.filt is not None:
+      item.join(self.filt)
     item.add(1,'<table %s>' % self.strAttr())
     item.add(1, '<thead>')
     item.add(2, '<tr>')
@@ -82,5 +95,63 @@ class Table(AresHtml.Html):
   def onLoadFnc(self):
     """ Return a String with the Javascript method to put in the HTML report """
     item = AresItem.Item("var %s;" % self.htmlId)
-    item.add(0, "$(document).ready(function() {%s = %s.DataTable();} );" % (self.htmlId, self.jqId) )
+    item.add(0, "$(document).ready(function() {")
+    item.add(1, "%s = %s.DataTable() ;" % (self.htmlId, self.jqId))
+    item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
+    item.add(2, "%s.draw() ;" % self.htmlId)
+    item.add(1, "} );")
+    item.add(0, "} );")
+
+    # Add the event on the filters
+    item.add(0, "$.fn.dataTable.ext.search.push(")
+    item.add(1, "function(settings, data, dataIndex){")
+    item.add(2, "if( ( data[1].includes($('#tablerec_1_CCY').val()) ) || ($('#tablerec_1_CCY').val() == '')) return true ;")
+    item.add(2, "return false ;")
+    item.add(1, "}")
+    item.add(0, ") ;")
+    return str(item)
+
+
+class TableRec(Table):
+  """
+  Python wrqpper of the HTMO version using recordSet as input.
+  No difference witht the parent class except the fact that the input is based on something bigger than the ones thet
+  we will potentially dusplay
+
+  """
+  cssCls, alias = 'table', 'tableRec'
+  reference = ''
+
+  def __init__(self, htmlId, headerBox, vals, header, cssCls=None):
+    """ Create a Python HTNL table based on a recordSet """
+    super(TableRec, self).__init__(htmlId, headerBox, vals, cssCls)
+    self.header = header
+    self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
+
+  def __str__(self):
+    """ Return the string representation of a HTML table """
+    item = AresItem.Item(None, self.incIndent)
+    if self.headerBox is not None:
+      item.add(0, '<div class="panel panel-success">')
+      item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+      item.add(1, '<div class="panel-body">')
+    if self.filt is not None:
+      item.join(self.filt)
+    item.add(0, '<table %s>' % self.strAttr())
+    item.add(1, '<thead>')
+    item.add(2, '<tr>')
+    for col in self.header:
+      item.add(3, '<th>%s</th>' % self.header[col])
+    item.add(2, '</tr>')
+    item.add(1, '</thead>')
+    item.add(1, '<tbody>')
+    for rec in self.vals:
+      item.add(1, '<tr>')
+      item.add(2, self.rowTmpl % rec)
+      item.add(1, '</tr>')
+    item.add(1, '</tbody>')
+    item.add(0, '</table>')
+    if self.headerBox is not None:
+      item.add(0, '</div>')
+      item.add(0, '</div>')
     return str(item)

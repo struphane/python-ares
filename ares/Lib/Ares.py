@@ -211,6 +211,7 @@ class Report(object):
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def table(self, header, values, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def tableRec(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.TableRec(self.getNext(), headerBox, self.supp(values), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
