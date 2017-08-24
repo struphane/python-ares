@@ -15,11 +15,11 @@ body {
     position: fixed;
     color: white;
     padding: 5px;
-    background-color: #000000;
+    background-color: #303030;
 }
 #menu-toggle:hover, #menu-toggle:active {
     text-decoration: none;
-    background-color: #000000;
+    background-color: #303030;
     outline: none;
 }
 
@@ -44,7 +44,7 @@ body {
     height: 100%;
     margin-left: -250px;
     overflow-y: auto;
-    background: #000;
+    background: #303030;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;

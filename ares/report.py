@@ -323,7 +323,7 @@ def run_report(report_name):
     downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     if hasattr(mod, 'DISPLAY'):
-      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
+      side_bar = ['<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % mod.DISPLAY]
       for name, path in getattr(mod, 'SHORTCUTS', []):
         side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
 
@@ -366,7 +366,7 @@ def child(report_name, script):
 
     mod = __import__(report_name)
     if hasattr(mod, 'DISPLAY'):
-      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
+      side_bar = ['<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % mod.DISPLAY]
       for name, path in getattr(mod, 'SHORTCUTS', []):
         side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
 
