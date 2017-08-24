@@ -60,7 +60,7 @@ class JsGraph(AresHtmlContainer.GraphSvG):
     """ It is not possible to have sub HTML items in a graph object """
     if jsEventFnc is None:
       jsEventFnc = self.jsEventFnc
-    jGraphAttr = {'src': self.jsRef(), 'htmlId': self.htmlId, 'duration': self.duration}
+    jGraphAttr = {'src': self.jqId, 'htmlId': self.htmlId, 'duration': self.duration}
     self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart().strip(), self.dataFnc())
     if self.clickFnc is not None:
       self.jsEvent['addGraph'].click(self.clickFnc)
@@ -68,7 +68,8 @@ class JsGraph(AresHtmlContainer.GraphSvG):
       jsEventFnc[jEventType].add(str(jsEvent))
     return jsEventFnc
 
-  def jsRef(self):
+  @property
+  def jqId(self):
     """ Function to return the Jquery reference to the Html object """
     return 'select("#%s svg")' % self.htmlId
 
