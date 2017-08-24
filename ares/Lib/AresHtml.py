@@ -107,7 +107,7 @@ class Html(object):
     return '%s.html(%s);' % (self.jqId, data)
 
   def jsLinkTo(self, htmlObjs):
-    """ """
+    """ Send the data to the different HTML objects in order to update them """
     for jqEven in self.jsEvent.values():
       for htmlObj in htmlObjs:
         jqEven.extendJsFnc(htmlObj.update(self.val))
