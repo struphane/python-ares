@@ -10,7 +10,7 @@ def index():
 
 def index_report():
     aresObj = Ares.Report()
-    aresObj.reportNamex = "Mrflex Monitoring"
+    aresObj.reportName = "Mrflex Monitoring"
     aresObj.title("Mrflex Monitoring")
 
     # Number of scripts per type
