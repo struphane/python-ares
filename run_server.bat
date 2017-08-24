@@ -1,5 +1,1 @@
-
-
-call C:\Python35\python.exe run.py
-
-PAUSE
+call python run.py

@@ -205,7 +205,7 @@ class Report(object):
   def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def generatePdf(self, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self.getNext(), "", cssCls), sys._getframe().f_code.co_name)
+  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name) # hack: I need the full aresObj to generate the pdf, hence I pass self and not self.getNext() as param
 
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
@@ -239,10 +239,8 @@ class Report(object):
   # File HTML Section
   def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
 
-
   # Anchor section
-  def anchor(self, value='', cssCls=None):
-    return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
+  def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
 

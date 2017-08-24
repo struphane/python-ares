@@ -5,6 +5,7 @@
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
+from datetime import datetime
 
 class Button(AresHtml.Html):
   """
@@ -616,13 +617,19 @@ class UploadFile(AresHtml.Html):
 
 class GeneratePdf(ButtonRemove):
   alias = "generatePdf"
-  glyphicon, cssCls = "book", "btn btn-danger"
+  glyphicon, cssCls = "book", "btn btn-default"
   source = r"http://pdfmake.org/#/gettingstarted"
 
-  def __init__(self, htmlId, vals, cssCls=None):
-    super(GeneratePdf, self).__init__(htmlId, vals, cssCls)
+  def __init__(self, aresObj, fileName=None, cssCls=None): # Hack: I need the whole aresObj as param since I need to retrieve everything that has been created so far
+    super(GeneratePdf, self).__init__(aresObj.getNext(), "", cssCls)
+
+    if fileName is None:
+      fileName = "%s_%s" % (aresObj.reportName if hasattr(aresObj, "reportName") else "ares_export", datetime.now())
+
     self.jsEvent["var"] = "var docDefinition = { content: 'This is an sample PDF printed with pdfMake' };"
-    self.jsEvent["click"] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), "click", " pdfMake.createPdf(docDefinition).download('optionalName.pdf');")
+    self.jsEvent["click"] = AresJs.JQueryEvents(self.htmlId, '$("#%s")' % self.htmlId, "click", "pdfMake.createPdf(docDefinition).download('%s.pdf');" % fileName)
+
+
 
 if __name__ == '__main__':
   obj = DropZone(0, 'Drop files here')

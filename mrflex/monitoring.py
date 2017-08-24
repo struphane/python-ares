@@ -1,16 +1,16 @@
 from flask import Blueprint, render_template
 from ares.Lib import Ares
 
-mrflex_monitoring = Blueprint("mrflex_monitoring", __name__, url_prefix='/mrflex')
+monitoringBP = Blueprint("monitoring", __name__, url_prefix='/monitoring')
 
-@mrflex_monitoring.route("/")
+@monitoringBP.route("/")
 def index():
     onload, content, js = index_report()
     return render_template("ares_template.html", onload=onload, content=content, js=js)
 
 def index_report():
     aresObj = Ares.Report()
-    aresObj.reportName = "Mrflex Monitoring"
+    aresObj.reportNamex = "Mrflex Monitoring"
     aresObj.title("Mrflex Monitoring")
 
     # Number of scripts per type
