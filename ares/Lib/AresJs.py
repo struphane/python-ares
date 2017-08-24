@@ -37,7 +37,7 @@ class JQueryEvents(object):
       print('In the function is not implemented yet please have a look at the call in AreHtml.py')
       raise Exception('%s not defined for this %s!' % (eventType, self.__class__))
 
-    if isinstance(jsFnc, six. text_type) or isinstance(jsFnc, str): # to be compatible with unicode in python 2
+    if isinstance(jsFnc, six.text_type) or isinstance(jsFnc, str): # to be compatible with unicode in python 2
       splitFnc = jsFnc.strip().split("\n")
       items = AresItem.Item(splitFnc[0].strip())
       for line in splitFnc[1:]:

@@ -5,6 +5,8 @@
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
+from datetime import datetime
+import json
 
 class Button(AresHtml.Html):
   """
@@ -616,13 +618,36 @@ class UploadFile(AresHtml.Html):
 
 class GeneratePdf(ButtonRemove):
   alias = "generatePdf"
-  glyphicon, cssCls = "book", "btn btn-danger"
+  glyphicon, cssCls = "book", "btn btn-default"
   source = r"http://pdfmake.org/#/gettingstarted"
 
-  def __init__(self, htmlId, vals, cssCls=None):
-    super(GeneratePdf, self).__init__(htmlId, vals, cssCls)
-    self.jsEvent["var"] = "var docDefinition = { content: 'This is an sample PDF printed with pdfMake' };"
-    self.jsEvent["click"] = AresJs.JQueryEvents(self.htmlId, self.jsRef(), "click", " pdfMake.createPdf(docDefinition).download('optionalName.pdf');")
+  def __init__(self, aresObj, fileName=None, cssCls=None): # Hack: I need the whole aresObj as param since I need to retrieve everything that has been created so far
+    super(GeneratePdf, self).__init__(aresObj.getNext(), "", cssCls)
+
+    if fileName is None:
+      fileName = "%s_%s" % (aresObj.reportName.strip().replace(" ", "_") if hasattr(aresObj, "reportName") else "ares_export", datetime.now())
+
+    content = []
+    styles = {"Title": {"fontSize": 22, "bold": "true", "italic": "true", "alignment": "left"}}
+    for htmlId in aresObj.content:
+      htmlObj = aresObj.htmlItems[htmlId]
+      content.append({"text": htmlObj.vals, "style": htmlObj.__class__.__name__})
+    varName = "%s_Content" % self.htmlId
+    varTxt = "var %s = %s;" % (varName, json.dumps({"content": content, "style": styles}))
+
+    """
+    var generatepdf_2_Content = {content: [{text: 'Mrflex Monitoring', style: 'Title'}],
+                             styles: {Title: {fontSize: 40, bold: true, italic: true}}};
+
+      $("#generatepdf_2").on("click", function(event)
+      {
+          pdfMake.createPdf(generatepdf_2_Content).download('Mrflex_Monitoring_2017-08-24 23:28:20.011011.pdf');
+      }
+      );
+    """
+    self.jsEvent["var"] = varTxt#"var docDefinition = { content: 'This is an sample PDF printed with pdfMake' };"
+    self.jsEvent["click"] = AresJs.JQueryEvents(self.htmlId, '$("#%s")' % self.htmlId, "click", "pdfMake.createPdf(%s).download('%s.pdf');" % (varName, fileName))
+
 
 if __name__ == '__main__':
   obj = DropZone(0, 'Drop files here')

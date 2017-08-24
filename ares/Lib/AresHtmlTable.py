@@ -41,14 +41,27 @@ class Table(AresHtml.Html):
     if self.filt is not None:
       item.join(self.filt)
     item.add(1,'<table %s>' % self.strAttr())
+
+    # Header
     item.add(1, '<thead>')
-    item.add(2, '<tr>')
-    for header in self.vals[0]:
-      item.add(3, '<th>%s</th>' % header)
-    item.add(2, '</tr>')
-    item.add(1, '</thead>')
+    header = self.vals.get("header")
+    if header is None: # no header
+      header = []
+    elif not isinstance(header[0], list): # one-line header > I convert to a list of header lines (to process the same way as multiline header)
+      header = [header]
+    for headerLine in header:
+      item.add(2, "<tr>")
+      for col in headerLine:
+        if isinstance(col, tuple):
+          item.add(3, "<th %s>%s</th>" % (col[1], col[0]))
+        else:
+          item.add(3, "<th>%s</th>" % col)
+      item.add(2, "</tr>")
+    item.add(1, "</thead>")
+
+    # Body
     item.add(1, '<tbody>')
-    for row in self.vals[1:]:
+    for row in self.vals.get("body", []):
       item.add(1, '<tr>')
       for val in row:
         item.add(2, "<td>%s</td>" % val)
