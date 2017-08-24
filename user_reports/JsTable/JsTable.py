@@ -19,12 +19,20 @@ def report(aresObj):
 
   button = aresObj.button('Change Graph')
   button.js('click', '''
+                        
+                        //alert( $('#tablerec_1').DataTable().$('tr', {"filter":"applied"}).toSource() ); ;
+                        
+                        $("#tablerec_1").dataTable().$('tr', {"filter":"applied"}).each( function () {
+                            //var v1 = $(this).find("td:eq(0)").text();
+                            var v1 = $(this).text().split("\\n");
+                            alert(v1.toSource()) ;
+                            } );
+
                         var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
                         d3.select("#pie_3 svg").datum([['TROIS', 3], ['DEUX', 2]]).transition().duration(500).call(pie) ;
 
                         //nv.utils.windowResize(chart.update);
                         
-                        alert( $('#tablerec_1').rows.length ); ;
                       ''')
 
   aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
