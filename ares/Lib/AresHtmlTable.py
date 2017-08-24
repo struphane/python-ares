@@ -110,18 +110,20 @@ class Table(AresHtml.Html):
     item = AresItem.Item("var %s;" % self.htmlId)
     item.add(0, "$(document).ready(function() {")
     item.add(1, "%s = %s.DataTable() ;" % (self.htmlId, self.jqId))
-    item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
-    item.add(2, "%s.draw() ;" % self.htmlId)
-    item.add(1, "} );")
+    if self.filtId is not None:
+      item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
+      item.add(2, "%s.draw() ;" % self.htmlId)
+      item.add(1, "} );")
     item.add(0, "} );")
 
-    # Add the event on the filters
-    item.add(0, "$.fn.dataTable.ext.search.push(")
-    item.add(1, "function(settings, data, dataIndex){")
-    item.add(2, "if( ( data[1].includes($('#tablerec_1_CCY').val()) ) || ($('#tablerec_1_CCY').val() == '')) return true ;")
-    item.add(2, "return false ;")
-    item.add(1, "}")
-    item.add(0, ") ;")
+    if self.filtId is not None:
+      # Add the event on the filters
+      item.add(0, "$.fn.dataTable.ext.search.push(")
+      item.add(1, "function(settings, data, dataIndex){")
+      item.add(2, "if( ( data[1].includes($('#tablerec_1_CCY').val()) ) || ($('#tablerec_1_CCY').val() == '')) return true ;")
+      item.add(2, "return false ;")
+      item.add(1, "}")
+      item.add(0, ") ;")
     return str(item)
 
 

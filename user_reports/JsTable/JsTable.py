@@ -24,6 +24,7 @@ def report(aresObj):
 
                         //nv.utils.windowResize(chart.update);
                         
+                        alert( $('#tablerec_1').rows.length ); ;
                       ''')
 
   aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
