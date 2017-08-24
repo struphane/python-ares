@@ -22,7 +22,7 @@ class Table(AresHtml.Html):
     super(Table, self).__init__(htmlId, vals, cssCls)
     self.headerBox = header
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a HTML table """
     item = AresItem.Item('<div class="panel panel-success">', self.incIndent)
     item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)

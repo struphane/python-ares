@@ -28,7 +28,7 @@ class Modal(AresHtml.Html):
     """ Add an HTML object to the modal """
     self.vals.append(htmlObj)
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a HTML Modal Object """
     item = AresItem.Item('<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#%s" style="cursor: pointer">%s</button>' % (self.htmlId, self.name), self.incIndent)
     item.add(0, '<div %s tabindex="-1" role="dialog" aria-labelledby="%sTitle" aria-hidden="true">' % (self.strAttr(), self.htmlId))

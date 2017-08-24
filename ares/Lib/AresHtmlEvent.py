@@ -18,7 +18,7 @@ class Button(AresHtml.Html):
   alias, cssCls = 'button', 'btn btn-success'
   reference = 'https://www.w3schools.com/tags/tag_button.asp'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of HTML button """
     return '<button %s type="button" style="margin-bottom:10px;">%s</button>' % (self.strAttr(), self.vals)
 
@@ -56,7 +56,7 @@ class ButtonRemove(AresHtml.Html):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'remove'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a HTML Style Twitter button """
     return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
 
@@ -154,7 +154,7 @@ class A(AresHtml.Html):
       link = "%s.html" % childReport
     self.link = link
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a Anchor HTML object """
     if self.link is None:
       self.link = '#' if self.jsEvent is not None else self.link
@@ -196,7 +196,7 @@ class Input(AresHtml.Html):
     """ Add a default value to this object """
     self.attr['value'] = dflt
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a HTML Input object """
     item = AresItem.Item('<div class="form-group">', self.incIndent)
     item.add(1, '<label for="%s">%s:</label>' % (self.vals.replace(" ", "").lower(), self.vals))
@@ -232,7 +232,7 @@ class Comment(AresHtml.Html):
     """ Add a default value to this object """
     self.dflt = dflt
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a HTML Comment input section """
     item = AresItem.Item('<div class="form-group">', self.incIndent)
     item.add(1, '<label for="%s">%s:</label>' % (self.vals.replace(" ", "").lower(), self.vals))
@@ -268,7 +268,7 @@ class TextArea(AresHtml.Html):
     """ Add a default value to this object """
     self.dflt = dflt
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the item with a text area and a button """
     item = AresItem.Item('<div class="input-group">')
     item.add(1, '<textarea %s rows="%s" style="resize:none">%s</textarea>' % (self.strAttr(), self.rows, self.dflt))
@@ -319,7 +319,7 @@ class DropDown(AresHtml.Html):
   title, cssCls = 'Title', 'dropdown'
   alias = 'dropdown'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the HTML String of a Drop Down list """
     item = AresItem.Item('<div %s>' % self.strAttr())
     item.add(1, '<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">%s<span class="caret"></span></button>' % self.title)
@@ -358,7 +358,7 @@ class Select(AresHtml.Html):
   # TODO: Extend the python object to handle multi select and all the cool features
   alias, cssCls = 'select', 'selectpicker'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the HTML string for a select """
     item = AresItem.Item('<select %s>' % self.strAttr(), self.incIndent)
     for group, vals in self.vals:
@@ -389,7 +389,7 @@ class Slider(AresHtml.Html):
   requirements = ['jquery-ui.js']
   alias = 'slider'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the HMTL object of for div """
     return '<div %s>%s</div>' % (self.strAttr(), self.vals)
 
@@ -421,7 +421,7 @@ class DatePicker(AresHtml.Html):
     """ Add a default value to this object """
     self.dflt = dflt
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a Date picker object """
     if '-' in self.dflt:
       return '<p><strong>%s: </strong><input type="text" %s value="%s"></p>' % (self.vals, self.strAttr(), self.dflt)
@@ -468,7 +468,7 @@ class DropZone(AresHtml.Html):
               $('#list').html('<ul>' + output.join('') + '</ul>');
           ''')
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the Drop Zone component """
     return '<div style="border: 1px dotted black;text-align:center;padding:20px;background-color:#479E47" %s>%s</div>' % (self.strAttr(), self.vals)
 
@@ -517,7 +517,7 @@ class DropFile(AresHtml.Html):
     ajaxObject.success('location.href = "/reports/page/%s";' % self.reportName)
     return ajaxObject.ajax('form_data')
 
-  def __repr__(self):
+  def __str__(self):
     """
     """
     self.js('drop', '''
@@ -553,7 +553,7 @@ class UploadFile(AresHtml.Html):
   alias = 'upload'
   clss = 'custom-file-input'
 
-  def __repr__(self):
+  def __str__(self):
     """ Display the file upload object """
     self.headerBox = 'Select a file '
     items = AresItem.Item('<div class="panel panel-success">')
@@ -628,9 +628,9 @@ if __name__ == '__main__':
   obj = DropZone(0, 'Drop files here')
   print('\n'.join(obj.jsEvents()))
   print('\n'.join(obj.onLoad()))
-  print(obj.__repr__())
+  print(obj)
 
   obj = DatePicker(0, 'Drop files here')
   print('\n'.join(obj.jsEvents()))
   print('\n'.join(obj.onLoad()))
-  print(obj.__repr__())
+  print(obj)

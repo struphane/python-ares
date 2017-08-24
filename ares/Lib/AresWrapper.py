@@ -35,7 +35,7 @@ JS = ['jquery-3.2.1.min.js',
       'bootstrap-select.min.js',
       'd3.v3.js',
       'nv.d3.js', # The mimifyed version does not contain indentedTree objects. https://stackoverflow.com/questions/35452946/not-running-minimal-example-of-indentedtree
-      'd3.layout.cloud.js' # world cloud chart
+      'd3.layout.cloud.js', # world cloud chart
       ]
 
 

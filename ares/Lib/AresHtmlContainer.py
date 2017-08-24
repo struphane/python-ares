@@ -11,7 +11,7 @@ class Div(AresHtml.Html):
   reference = 'https://www.w3schools.com/tags/tag_div.asp'
   alias = 'div'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the HMTL object of for div """
     return '<div %s>%s</div>' % (self.strAttr(), self.vals)
 
@@ -42,7 +42,7 @@ class IFrame(AresHtml.Html):
       self.style = dict(self.default)
     self.style[name] = value
 
-  def __repr__(self):
+  def __str__(self):
     """ Return an iFrame Tag """
     if not hasattr(self, 'style'):
       self.style = dict(self.default)
@@ -67,7 +67,7 @@ class ListBadge(AresHtml.Html):
   reference = 'https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp'
   alias = 'listbadge'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a HTML List """
     item = AresItem.Item('<ul %s>' % self.strAttr())
     for label, cnt in self.vals:
@@ -95,7 +95,7 @@ class Container(Div):
     super(Container, self).__init__(htmlId, vals, cssCls)
     self.headerBox = header
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a HTML List """
     item = AresItem.Item('<div class="panel panel-success">') #% self.strAttr())
     item.add(2, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
@@ -130,7 +130,7 @@ class Split(AresHtml.Html):
   col_lg = 6
   reference = 'https://getbootstrap.com/docs/3.3/css/'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the HTML display of a split container"""
     res = AresItem.Item('<div %s>' % 'class="%s"' % self.gridCss if self.gridCss is not None else '')
     res.add(1, '<div %s>' % self.strAttr())
@@ -162,7 +162,7 @@ class GraphSvG(AresHtml.Html):
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a DIV containing a SVG tag """
     item = AresItem.Item('<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
     item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
@@ -188,7 +188,7 @@ class Graph(AresHtml.Html):
   cssCls = 'span4'
   reference = 'http://getbootstrap.com/2.3.2/scaffolding.html'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the Graph container for D3 and DVD3 """
     return '<div %s></div>\n' % self.strAttr()
 
@@ -203,7 +203,7 @@ class Network(AresHtml.Html):
   dim = None
   cssCls = 'container-fluid'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the Graph container for D3 and DVD3 """
     items = AresItem.Item('<div %s>' % self.strAttr())
     items.add(1, '<div class="row">')
@@ -227,7 +227,7 @@ class Tabs(AresHtml.Html):
   title, alias = 'Home', 'tabs'
   cssCls = 'nav nav-tabs'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the HTML representation of a Tabular object """
     item = AresItem.Item('<ul %s>' % self.strAttr())
     item.add(1, '<li class="active"><a href="#">%s</a></li>' % self.title)
@@ -254,7 +254,7 @@ class Image(AresHtml.Html):
   reference = 'https://www.w3schools.com/bootstrap/bootstrap_ref_css_images.asp'
   doubleDots = 1
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the HTML representation of a Tabular object """
     doubleDotsPath = "/".join([".." for i in range(self.doubleDots)])
     return ' <img src="%s/static/images/%s" class="img-responsive" %s> ' % (doubleDotsPath, self.vals, self.strAttr())

@@ -28,7 +28,7 @@ class Item(list):
       self.append(item)
     return self
 
-  def __repr__(self):
+  def __str__(self):
     """ Display the String object """
     return "\n%s" % "\n".join(["%s%s" % ("".join(int(cnt + self.incIndent) * [self.indent]), val) for cnt, val in self])
 

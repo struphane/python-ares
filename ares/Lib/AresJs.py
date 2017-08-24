@@ -61,7 +61,7 @@ class JQueryEvents(object):
 
     self.jsAttr['fnc'] = self.jsAttr['fnc'].join(jsItemFnc)
 
-  def __repr__(self):
+  def __str__(self):
     """  Return the String representation of the Javascripts methods """
     self.jsAttr['fnc'].incIndent = 2
     jsFnc = str(self.jsAttr['fnc'])[1:] # remove the empty line at the top
@@ -99,7 +99,7 @@ class JD3Graph(object):
 
     self.jGraphAttr.update({'chart': str(jsChart)[1:].strip(), 'data': json.dumps(data)})
 
-  def __repr__(self):
+  def __str__(self):
     """ """
     res = AresItem.Item()
     res.add(1, 'var chart_%(htmlId)s = %(chart)s' % self.jGraphAttr)

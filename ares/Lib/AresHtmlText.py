@@ -18,7 +18,7 @@ class Text(AresHtml.Html):
     super(Text, self).__init__(htmlId, vals, cssCls)
     self.htmlComp = htmlComp
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a Text HTML tag """
     html = '<font %s>%s</font>' % (self.strAttr(), self.vals)
     if self.htmlComp is not None:
@@ -40,7 +40,7 @@ class Code(AresHtml.Html):
     super(Code, self).__init__(htmlId, vals, cssCls)
     self.htmlComp = htmlComp
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a Code HTML tag """
     html = '<pre><code %s>%s</code></pre>' % (self.strAttr(), self.vals)
     if self.htmlComp is not None:
@@ -62,7 +62,7 @@ class Paragraph(AresHtml.Html):
     super(Paragraph, self).__init__(htmlId, vals, cssCls)
     self.htmlComp = htmlComp
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a Code HTML tag """
     val = " ".join([str(val) for val in self.vals]) if isinstance(self.vals, list) else self.vals
     html = '<p %s>%s</p>' % (self.strAttr(), val)
@@ -88,7 +88,7 @@ class Title(AresHtml.Html):
       self.style = dict(self.default)
     self.style[name] = value
 
-  def __repr__(self):
+  def __str__(self):
     """ Return a header HTML Tag """
     if not hasattr(self, 'style'):
       self.style = dict(self.default)
@@ -145,7 +145,7 @@ class Newline(AresHtml.Html):
   reference = 'https://www.w3schools.com/tags/tag_br.asp'
   alias = 'newline'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a new line tag """
     return '<br />'
 
@@ -159,7 +159,7 @@ class Line(AresHtml.Html):
   reference = 'https://www.w3schools.com/tags/tag_hr.asp'
   alias = 'line'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a line tag """
     return '<hr %s/><hr %s/>' % (self.strAttr(), self.strAttr())
 
@@ -174,7 +174,7 @@ class Icon(AresHtml.Html):
   reference = 'http://fontawesome.io/icons/'
   alias = 'icon'
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a line tag """
     return '<i class="fa fa-%s" style="cursor:pointer" aria-hidden="true" %s></i>' % (self.vals, self.strAttr())
 
@@ -193,7 +193,7 @@ class Numeric(AresHtml.Html):
   alias = 'number'
   reference = ''
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of a line tag """
     locale.setlocale(locale.LC_ALL, '')
     html = "<font %s>{:,d}/font>" % self.strAttr()
@@ -203,8 +203,8 @@ if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')
   #print(obj.jsEvents())
   print('\n'.join(obj.onLoad()))
-  #print(obj.__repr__())
+  #print(obj)
 
   Numeric(1, 34455656)
   objText = Paragraph(0, "Youpi {0}", htmlComp=[Numeric(1, 34455656)])
-  print(objText.__repr__())
+  print(objText)

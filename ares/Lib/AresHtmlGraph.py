@@ -535,4 +535,4 @@ if __name__ == '__main__':
 
   print(obj.jsEvents())
   print('\n'.join(obj.onLoad()))
-  print(obj.__repr__())
+  print(obj)

@@ -94,9 +94,9 @@ class Html(object):
     """ Return the string line with all the attributes """
     return 'id="%s" %s' % (self.htmlId, " ".join(['%s="%s"' % (key, val) for key, val in self.attr.items()]))
 
-  def __repr__(self):
+  def __str__(self):
     """ Return the String representation of an Python HTML object """
-    raise NotImplementedError('subclasses must override __repr__()!')
+    raise NotImplementedError('subclasses must override __str__()!')
 
   def js(self, evenType, jsDef):
     """ Add a Javascript Event to an HTML object """
@@ -111,7 +111,7 @@ class Html(object):
     for jqEven in self.jsEvent.values():
       for htmlObj in htmlObjs:
         jqEven.extendJsFnc(htmlObj.update(self.val))
-    print self.jsEvent
+    print(self.jsEvent)
 
   # ---------------------------------------------------------------------------------------------------------
   #                                          AJAX SECTION
@@ -189,7 +189,7 @@ class Html(object):
 
   def html(self):
     """ Return the onload, the HTML object and the javascript events """
-    return self.onLoad(), self.__repr__(), self.jsEvents()
+    return self.onLoad(), str(self), self.jsEvents()
 
   @classmethod
   def aresExample(cls, aresObj):

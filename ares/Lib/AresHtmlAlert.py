@@ -36,7 +36,7 @@ class DangerAlert(AresHtml.Html):
     if backgroundColor:
       self.backgroundColor = backgroundColor
 
-  def __repr__(self):
+  def __str__(self):
     """ """
     if self.closeButton:
       items = AresItem.Item('<div class="alert %s %s notif fade in" style="top:%spx">' % (self.cssCls, 'alert-dismissable', self.countNotif * 70))
