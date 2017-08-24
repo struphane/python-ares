@@ -103,7 +103,7 @@ class Html(object):
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
 
   def update(self, data):
-    """ """
+    """ Update the content of an HTML component """
     return '%s.html(%s);' % (self.jqId, data)
 
   def jsLinkTo(self, htmlObjs):
@@ -132,7 +132,7 @@ class Html(object):
     jsDef = '%s $.get("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
-  def post(self, evenType, url, data, jsDef, preAjaxJs=''):
+  def post(self, evenType, url, data, jsDef, preAjaxJs='', redirectUrl=''):
     """
       Post method to get data directly by interacting with the page
       https://api.jquery.com/jquery.post/

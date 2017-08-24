@@ -62,8 +62,16 @@ class Table(AresHtml.Html):
   def update(self, newRecordSet):
     """ Refresh the table object with the new recordSet Data """
     item = AresItem.Item("%s.clear();" % self.htmlId)
-    item.add(0, "%s.split().forEach(function(element){" % newRecordSet)
-    item.add(1, "%s.row.add([element]).draw(false) ;" % (self.htmlId))
+    if isinstance(newRecordSet, str):
+      # In this case we assume that data are received from a String
+      # Rows should be # delimited
+      # Columns should be , delimited
+      item.add(0, "%s.split('#').forEach(function(element){" % newRecordSet)
+      item.add(1, "%s.row.add(element.split(',')).draw(false) ;" % (self.htmlId))
+    else:
+      # here we assume that we receive a list of list to add to the table
+      item.add(0, "%s.forEach(function(element){" % newRecordSet)
+      item.add(1, "%s.row.add(element).draw(false) ;" % (self.htmlId))
     item.add(0, "}) ;")
     return str(item)
 

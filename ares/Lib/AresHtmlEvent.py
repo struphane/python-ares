@@ -26,6 +26,21 @@ class Button(AresHtml.Html):
   def aresExample(cls, aresObj):
     return aresObj.button("MyButton")
 
+  def post(self, evenType, url, data, jsDef='', preAjaxJs='', redirectUrl=''):
+    """
+      Post method to get data directly by interacting with the page
+      https://api.jquery.com/jquery.post/
+    """
+    # Part dedicated to run before the Ajax call
+    preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
+    preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
+    preAjax.add(0, preAjaxJs)
+
+    # Items to add during the ajax call
+    itemAjax = AresItem.Item(jsDef)
+    itemAjax.add(0, "%s.html(%s) ;" % (self.jqId, self.htmlId))
+    super(Button, self).post(evenType, url, data, str(itemAjax), str(preAjax), redirectUrl)
+
 
 class ButtonRemove(AresHtml.Html):
   """
