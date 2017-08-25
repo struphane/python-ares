@@ -15,7 +15,7 @@ def report(aresObj):
   for i in range(5):
     recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010), 'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
   table = aresObj.tableRec('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value'})
-  table.filters({'Currency': 'CCY', 'Portfolio': 'PTF'})
+  table.filters({'Currency': 'CCY'})
 
   pie = aresObj.pieChart('Folders', [])
 
