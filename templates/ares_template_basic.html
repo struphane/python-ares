@@ -18,14 +18,6 @@
             $('#temp-message').fadeOut( 4000 );
         }
 
-        function getDataFromRecordSet(data, cols) {
-			filterData = [];
-			for (var i = 0, len = data.length; i < len; i++) {
-				filterData.push([data[i][cols[0]], data[i][cols[1]]]);
-			}
-			return filterData;
-		};
-
     {{ onload|safe }}
     </script>
 </head>
