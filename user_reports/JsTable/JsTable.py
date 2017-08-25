@@ -46,9 +46,9 @@ def report(aresObj):
                           recordSet.push(rec) ;
                         } );
                         
-                        var filterRecordSet = getDataFromRecordSet(recordSet, ['Currency', 'Value']) ;
+                        var filterRecordSet = getDataFromRecordSet(recordSet, [%s, 'Value']) ;
                         var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
                         d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;
 
-                     ''' % (table.htmlId, table.htmlId, pie.jqId))
+                     ''' % (table.htmlId, table.htmlId, pie.jqCategory, pie.jqId))
   return aresObj

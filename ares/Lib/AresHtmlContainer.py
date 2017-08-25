@@ -167,6 +167,18 @@ class GraphSvG(AresHtml.Html):
     item = AresItem.Item('<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
     item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
     item.add(1, '<div class="panel-body" style="width:100%%;height:100%%;" %s>' % self.strAttr())
+
+    item.add(2, 'Category')
+    item.add(2, '<select id="%s_col_selector" class ="selectpicker">' % self.htmlId)
+    item.add(3, '<option>Portfolio</option>')
+    item.add(3, '<option>Currency</option>')
+    item.add(2, '</select>')
+
+    item.add(2, 'Value')
+    item.add(2, '<select id="%s_val_selector" class ="selectpicker">' % self.htmlId)
+    item.add(3, '<option>Value</option>')
+    item.add(2, '</select>')
+
     item.add(1, '<svg style="width:100%;height:100%;"></svg>')
     item.add(0, '</div>')
     item.add(0, '</div>')
@@ -176,6 +188,10 @@ class GraphSvG(AresHtml.Html):
   def jqId(self):
     """ Return the javascript SVG reference """
     return '$("#%s svg")' % self.htmlId
+
+  @property
+  def jqCategory(self):
+    return '$("#%s_col_selector option:selected").text()'% self.htmlId
 
 
 class Graph(AresHtml.Html):

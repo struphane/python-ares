@@ -1,5 +1,5 @@
 /*
- 
+
  */
 
 function getDict(dict, key, dflt){
