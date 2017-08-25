@@ -15,7 +15,7 @@ def report(aresObj):
   for i in range(5):
     recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010), 'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
   table = aresObj.tableRec('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value'})
-  table.filters({'Currency': 'CCY'})
+  table.filters({'Currency': 'CCY', 'Portfolio': 'PTF'})
 
   '''
     //$("#tablerec_1").dataTable().$('tr', {"filter":"applied"}).each( function () {
@@ -24,10 +24,10 @@ def report(aresObj):
                          //   alert(v1.toSource()) ;
                          //   } );
   '''
-  
+
   pie = aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
 
-  button = aresObj.button('Change Graph')
+  button = aresObj.button('Change Graph (Ajax)')
   button.post('click', '../ajax/JsTable/testAjax.py', {},
               '''
                 var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
@@ -35,4 +35,28 @@ def report(aresObj):
 
               ''' % pie.jqId)
 
+
+  button = aresObj.button('Change Graph (Js)')
+  button.js('click', '''
+                        var nRow = $('#tablerec_1 thead tr')[0] ;
+                        headers = [] ;
+                        for (var i = 0, len = nRow.cells.length; i < len; i++) {
+                          headers.push(nRow.cells[i].innerText) ;
+                        };
+                        
+                        recordSet = [] ;
+                        $("#tablerec_1").dataTable().$('tr', {"filter":"applied"}).each( function () {
+                          var row = $(this).text().split("\\n");
+                          rec = {};
+                          for (var i = 0, len = headers.length; i < len; i++) {
+                            rec[headers[i]] = row[i+1] ; 
+                          }
+                          recordSet.push(rec) ;
+                        } );
+                        
+                        var filterRecordSet = getDataFromRecordSet(recordSet, ['Portfolio', 'Value']) ;
+                        var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
+                        d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;
+
+                     ''' % pie.jqId)
   return aresObj
