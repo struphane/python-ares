@@ -17,15 +17,7 @@ def report(aresObj):
   table = aresObj.tableRec('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value'})
   table.filters({'Currency': 'CCY', 'Portfolio': 'PTF'})
 
-  '''
-    //$("#tablerec_1").dataTable().$('tr', {"filter":"applied"}).each( function () {
-                            //var v1 = $(this).find("td:eq(0)").text();
-                        //    var v1 = $(this).text().split("\\n");
-                         //   alert(v1.toSource()) ;
-                         //   } );
-  '''
-
-  pie = aresObj.pieChart('Folders', [['UN', 1], ['DEUX', 2]])
+  pie = aresObj.pieChart('Folders', [])
 
   button = aresObj.button('Change Graph (Ajax)')
   button.post('click', '../ajax/JsTable/testAjax.py', {},
@@ -38,14 +30,14 @@ def report(aresObj):
 
   button = aresObj.button('Change Graph (Js)')
   button.js('click', '''
-                        var nRow = $('#tablerec_1 thead tr')[0] ;
+                        var nRow = $('#%s thead tr')[0] ;
                         headers = [] ;
                         for (var i = 0, len = nRow.cells.length; i < len; i++) {
                           headers.push(nRow.cells[i].innerText) ;
                         };
                         
                         recordSet = [] ;
-                        $("#tablerec_1").dataTable().$('tr', {"filter":"applied"}).each( function () {
+                        $("#%s").dataTable().$('tr', {"filter":"applied"}).each( function () {
                           var row = $(this).text().split("\\n");
                           rec = {};
                           for (var i = 0, len = headers.length; i < len; i++) {
@@ -58,5 +50,5 @@ def report(aresObj):
                         var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
                         d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;
 
-                     ''' % pie.jqId)
+                     ''' % (table.htmlId, table.htmlId, pie.jqId))
   return aresObj
