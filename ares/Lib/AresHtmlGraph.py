@@ -93,6 +93,7 @@ class NVD3Chart(JsGraph):
       style = '\n.%s' % style
     return '''nv.models.%s()%s%s; %s ''' % (self.chartObject, self.jsFrag, style, attr)
 
+
 class Pie(NVD3Chart):
   """
   NVD3 Wrapper for a Pie Chart object.
@@ -105,7 +106,7 @@ class Pie(NVD3Chart):
   alias = 'pieChart'
   mockData = r'json\pie.json'
   clickObject = 'pie'
-  style = {'chartStyle': {'showLabels':'1'}}
+  style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
 
 class Donut(Pie):
