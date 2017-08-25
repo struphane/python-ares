@@ -193,6 +193,11 @@ class GraphSvG(AresHtml.Html):
   def jqCategory(self):
     return '$("#%s_col_selector option:selected").text()'% self.htmlId
 
+  @property
+  def jqValue(self):
+    return '$("#%s_val_selector option:selected").text()' % self.htmlId
+
+
 
 class Graph(AresHtml.Html):
   """
