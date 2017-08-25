@@ -21,11 +21,12 @@ def report(aresObj):
 
   button = aresObj.button('Change Graph (Ajax)')
   button.post('click', '../ajax/JsTable/testAjax.py', {},
-              '''
+              '''   
+                var filterRecordSet = getDataFromRecordSet(JSON.parse(data), [%s, %s]) ;
                 var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
-                d3.%s.datum(JSON.parse(data)).transition().duration(500).call(pie) ;
+                d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;
 
-              ''' % pie.jqId)
+              ''' % (pie.jqCategory, pie.jqValue, pie.jqId))
 
 
   button = aresObj.button('Change Graph (Js)')
