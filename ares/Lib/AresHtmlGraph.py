@@ -109,6 +109,14 @@ class Pie(NVD3Chart):
   style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
 
+  def update(self, data):
+    """ Update the content of an HTML component """
+    item = AresItem.Item("var filterRecordSet = getDataFromRecordSet(%s, [%s, %s]) ;" % (data, self.jqCategory, self.jqValue))
+    item.add(0, "var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });")
+    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;" % self.jqId)
+    return str(item)
+
+
 class Donut(Pie):
   """
 

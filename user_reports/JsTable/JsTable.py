@@ -13,11 +13,16 @@ def report(aresObj):
   CCYS = ['EUR', 'GBP', 'USD']
   recordSet = []
   for i in range(5):
-    recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010), 'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
-  table = aresObj.tableRec('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value'})
+    recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010),
+                      'VAL2': random.uniform(0, 100),
+                      'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
+  table = aresObj.tableRec('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
   table.filters({'Currency': 'CCY'})
 
-  pie = aresObj.pieChart('Folders', [])
+  pie = aresObj.pieChart('Folders', {})
+  pie.recordSet = recordSet
+  pie.selectCategory(['Portfolio', 'Currency'], table)
+  pie.selectValues(['Value', 'Value 2'], table)
 
   button = aresObj.button('Change Graph (Ajax)')
   button.post('click', '../ajax/JsTable/testAjax.py', {},
