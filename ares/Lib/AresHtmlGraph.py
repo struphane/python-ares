@@ -22,6 +22,7 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   duration = 350
   clickFnc, clickObject = None, None
   style = {'chartStyle': {}, 'chartAttr': {}}
+  pyDataSource = None
 
   def __init__(self, htmlId, header, vals, cssCls=None):
     """  """
@@ -81,11 +82,30 @@ class JsGraph(AresHtmlContainer.GraphSvG):
     """ Add Click function on a graph """
     self.clickFnc = 'chart_%s.%s.dispatch.on("elementClick", function(e) {%s});' % (self.htmlId, self.clickObject, fnc)
 
+  def linkTo(self, dataSource):
+    """ Add a link to the datasource to remove the need to specify that in the selectors"""
+    self.pyDataSource = dataSource
+    dataSource.jsLinkTo([self]) #all datasource should have a jsLinkTo function (see AresHtmlTable)
+
 
 class NVD3Chart(JsGraph):
 
   chartObject = 'to be overriden'
   jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
+
+
+  def __init__(self, htmlId, header, vals, mapCols, selectors, cssCls=None):
+    """ selectors is a tuple with the category first and the value list second """
+    super(JsGraph, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
+    self.selectors = selectors #add to add this as argument to specify which columns to select on for values and catgories
+    self.mapCols = mapCols
+
+  def __str__(self):
+    """ override the str function to make sure we can add the selectors at the end when the datasource is set """
+    self.selectCategory(self.selectors[0][0], self.selectors[0], self.pyDataSource)
+    self.selectValues(self.selectors[1][0], self.selectors[1], self.pyDataSource)
+    return super(JsGraph, self).__str__()
 
   def jsChart(self):
     style, attr = self.formatChart()
@@ -109,11 +129,6 @@ class Pie(NVD3Chart):
   style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
 
-  def __init__(self, htmlId, header, vals, mapCols, cssCls=None):
-    """  """
-    super(JsGraph, self).__init__(htmlId, vals, cssCls)
-    self.headerBox = header
-    self.mapCols = mapCols
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
@@ -159,12 +174,6 @@ class Bar(NVD3Chart):
   chartObject = 'discreteBarChart'
   style = {'chartStyle': {'staggerLabels': 'true', 'showValues': 'true',
                           'transitionDuration': '350'} }
-
-  def __init__(self, htmlId, header, vals, mapCols, cssCls=None):
-    """  """
-    super(JsGraph, self).__init__(htmlId, vals, cssCls)
-    self.headerBox = header
-    self.mapCols = mapCols
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """

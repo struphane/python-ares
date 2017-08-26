@@ -122,7 +122,8 @@ class Table(AresHtml.Html):
 
   def jsLinkTo(self, htmlObjs):
     """ Send the data to the different HTML objects in order to update them """
-    self.linkedObjs = []
+    if not self.linkedObjs:
+      self.linkedObjs = []
     for htmlObj in htmlObjs:
       self.linkedObjs.append(htmlObj.update(self.getData()))
 

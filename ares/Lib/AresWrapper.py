@@ -25,6 +25,7 @@ CSS = ['jquery-ui.css',
        'bootstrap-theme.min.css',
        'nv.d3.css',
        'bootstrap-select.min.css',
+       'jquery.dataTables.min.css',
        #'svg.css'
        ]
 
@@ -34,6 +35,9 @@ JS = ['jquery-3.2.1.min.js',
       'bootstrap.min.js',
       'bootstrap-select.min.js',
       'd3.v3.js',
+      'ares.js',
+      'jquery.dataTables.min.js',
+      'npm.js',
       'nv.d3.js', # The mimifyed version does not contain indentedTree objects. https://stackoverflow.com/questions/35452946/not-running-minimal-example-of-indentedtree
       'd3.layout.cloud.js', # world cloud chart
       ]
