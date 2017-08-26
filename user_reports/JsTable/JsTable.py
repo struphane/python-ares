@@ -25,7 +25,6 @@ def report(aresObj):
   pie.selectValues('Value 2', ['Value', 'Value 2'], table)
 
   bar = aresObj.bar('Test', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
-  bar.selectFilter("USD", 'CCY', recordSet)
   bar.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   bar.selectValues('Value 2', ['Value', 'Value 2'], table)
 
