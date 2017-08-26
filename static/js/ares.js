@@ -24,6 +24,7 @@ function getDataFromRecordSet(data, cols) {
     return filterData;
 };
 
+
 function getRecordSetFromTable(htmlTableId){
     // Return a list of dictionaries from a DataTable object
     // The recordSet will be based on the selected (displayed) data and the portfolio
@@ -32,7 +33,6 @@ function getRecordSetFromTable(htmlTableId){
     for (var i = 0, len = nRow.cells.length; i < len; i++) {
       headers.push(nRow.cells[i].innerText) ;
     };
-
     recordSet = [] ;
     $('#' + htmlTableId + '').dataTable().$('tr', {"filter": "applied"}).each( function () {
       var row = $(this).text().split("\n");

@@ -29,7 +29,13 @@ class Table(AresHtml.Html):
     self.filtId = {}
     for colName, idCol in colsDict.items():
       filterId = '%s_%s' % (self.htmlId, idCol)
-      items.add(0, "%s: <input id='%s' name='%s' type='text'>" % (colName, filterId, filterId))
+
+      items.add(0, '<div class="form-group">')
+      items.add(1, '<label for="%s">%s:</label>' % (filterId, colName))
+      items.add(2, "<input type='text' id='%s' name='%s' style='width:100%%'>" % (filterId, filterId))
+      items.add(0, '</div>')
+
+      #items.add(0, "%s: <input id='%s' name='%s' type='text'>" % (colName, filterId, filterId))
       self.filtId[filterId] = idCol
     self.filt = items
 
@@ -100,6 +106,14 @@ class Table(AresHtml.Html):
       item.add(1, "%s.row.add(element).draw(false) ;" % (self.htmlId))
     item.add(0, "}) ;")
     return str(item)
+
+  def getData(self):
+    """
+    Returns a javascript recordSet
+    This line should not have ; at the end as it is only a fragment that will be added to the
+    middle of another javascript line
+    """
+    return "getRecordSetFromTable('%s')" % self.htmlId
 
   @classmethod
   def aresExample(cls, aresObj):

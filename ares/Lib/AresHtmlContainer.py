@@ -161,7 +161,7 @@ class GraphSvG(AresHtml.Html):
   width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
-  categories, values = None, None
+  categories, values, filterVal = None, None, None
 
   def __str__(self):
     """ Return the String representation of a DIV containing a SVG tag """
@@ -170,6 +170,8 @@ class GraphSvG(AresHtml.Html):
     item.add(1, '<div class="panel-body" style="width:100%%;height:100%%;" %s>' % self.strAttr())
 
     # Add the pointers for the display
+    if self.filterVal is not None:
+      item.join(self.filterVal)
     if self.categories is not None:
       item.join(self.categories)
     if self.values is not None:
@@ -180,23 +182,44 @@ class GraphSvG(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-  def selectCategory(self, categories, pyDataSrc):
+  def selectFilter(self, selectedCategory, recordSetCol, recordSet):
+    """ Return the filter used to retrieve the data from the recordSet """
+    item = AresItem.Item('Filter')
+    vals = set()
+    for rec in recordSet:
+      vals.add(rec[recordSetCol])
+    item.add(2, '<select id="%s_filt_selector" class ="selectpicker">' % self.htmlId)
+    for val in vals:
+      if selectedCategory == val:
+        item.add(3, '<option selected>%s</option>' % val)
+      else:
+        item.add(3, '<option>%s</option>' % val)
+    item.add(2, '</select>')
+    self.filterVal = item
+
+  def selectCategory(self, selectedCategory, categories, pyDataSrc):
     """ Return the category to be selected in the graph display """
     item = AresItem.Item('Category')
     item.add(2, '<select id="%s_col_selector" class ="selectpicker">' % self.htmlId)
     for cat in categories:
-      item.add(3, '<option>%s</option>' % cat)
+      if selectedCategory == cat:
+        item.add(3, '<option selected>%s</option>' % cat)
+      else:
+        item.add(3, '<option>%s</option>' % cat)
     item.add(2, '</select>')
     self.categories = item
     self.jsEvent['cat-change'] = AresJs.JQueryEvents("%s_col_selector" % self.htmlId, "$('#%s_col_selector')" % self.htmlId,
                                                      'change', self.update(pyDataSrc.getData()), '')
 
-  def selectValues(self, values, pyDataSrc):
+  def selectValues(self, selectedValue, values, pyDataSrc):
     """ Return the value to be selected in the graph display """
     item = AresItem.Item('Value')
     item.add(2, '<select id="%s_val_selector" class ="selectpicker">' % self.htmlId)
-    for cat in values:
-      item.add(3, '<option>%s</option>' % cat)
+    for val in values:
+      if selectedValue == val:
+        item.add(3, '<option selected>%s</option>' % val)
+      else:
+        item.add(3, '<option>%s</option>' % val)
     item.add(2, '</select>')
     self.values = item
     self.jsEvent['val-change'] = AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,

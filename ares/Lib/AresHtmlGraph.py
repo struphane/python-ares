@@ -109,6 +109,22 @@ class Pie(NVD3Chart):
   style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
 
+  def __init__(self, htmlId, header, vals, mapCols, cssCls=None):
+    """  """
+    super(JsGraph, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
+    self.mapCols = mapCols
+
+  def dataFnc(self):
+    """ Return the data Source converted to them be sent to the javascript layer """
+    recordSet = []
+    for rec in self.vals:
+      newRec = {}
+      for key, val in rec.items():
+        newRec[self.mapCols[key]] = val
+      recordSet.append(newRec)
+    return "getDataFromRecordSet(%s, [%s, %s])" % (recordSet, self.jqCategory, self.jqValue)
+
   def update(self, data):
     """ Update the content of an HTML component """
     item = AresItem.Item("var filterRecordSet = getDataFromRecordSet(%s, [%s, %s]) ;" % (data, self.jqCategory, self.jqValue))
@@ -128,6 +144,7 @@ class Donut(Pie):
   clickObject = 'pie'
   style = {'chartStyle': {'showLabels': '1', 'labelThreshold': '.05)', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
 
+
 class Bar(NVD3Chart):
   """
 
@@ -140,7 +157,31 @@ class Bar(NVD3Chart):
   clickObject = 'discretebar'
   icon = 'fa fa-bar-chart'
   chartObject = 'discreteBarChart'
-  style = {'chartStyle': {'staggerLabels': 'true', 'showValues': 'true', 'transitionDuration': '350'} }
+  style = {'chartStyle': {'staggerLabels': 'true', 'showValues': 'true',
+                          'transitionDuration': '350'} }
+
+  def __init__(self, htmlId, header, vals, mapCols, cssCls=None):
+    """  """
+    super(JsGraph, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
+    self.mapCols = mapCols
+
+  def dataFnc(self):
+    """ Return the data Source converted to them be sent to the javascript layer """
+    recordSet = []
+    for rec in self.vals:
+      newRec = {}
+      for key, val in rec.items():
+        newRec[self.mapCols[key]] = val
+      recordSet.append(newRec)
+    return '[{"key": %s, "values": getDataFromRecordSet(%s, [%s, %s])}]' % (self.jqCategory, recordSet, self.jqCategory, self.jqValue)
+
+  def update(self, data):
+    """ Update the content of an HTML component """
+    item = AresItem.Item("var filterRecordSet = [{'key': %s, 'values': getDataFromRecordSet(%s, [%s, %s])}] ;" % (self.jqCategory, data, self.jqCategory, self.jqValue))
+    item.add(0, "var pie = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % self.chartObject)
+    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;" % self.jqId)
+    return str(item)
 
   @classmethod
   def aresExample(cls, aresObj):

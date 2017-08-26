@@ -4,6 +4,7 @@ CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py
 
 import string
 import random
+import json
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for _ in range(size))
@@ -19,10 +20,14 @@ def report(aresObj):
   table = aresObj.tableRec('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
   table.filters({'Currency': 'CCY'})
 
-  pie = aresObj.pieChart('Folders', {})
-  pie.recordSet = recordSet
-  pie.selectCategory(['Portfolio', 'Currency'], table)
-  pie.selectValues(['Value', 'Value 2'], table)
+  pie = aresObj.donutChart('Folders', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
+  pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
+  pie.selectValues('Value 2', ['Value', 'Value 2'], table)
+
+  bar = aresObj.bar('Test', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
+  bar.selectFilter("USD", 'CCY', recordSet)
+  bar.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
+  bar.selectValues('Value 2', ['Value', 'Value 2'], table)
 
   button = aresObj.button('Change Graph (Ajax)')
   button.post('click', '../ajax/JsTable/testAjax.py', {},

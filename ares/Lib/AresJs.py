@@ -97,7 +97,7 @@ class JD3Graph(object):
     else:
       jsChart = chart
 
-    self.jGraphAttr.update({'chart': str(jsChart)[1:].strip(), 'data': json.dumps(data)})
+    self.jGraphAttr.update({'chart': str(jsChart)[1:].strip(), 'data': data})
 
   def __str__(self):
     """ """
