@@ -111,7 +111,6 @@ class Html(object):
     for jqEven in self.jsEvent.values():
       for htmlObj in htmlObjs:
         jqEven.extendJsFnc(htmlObj.update(self.val))
-    print(self.jsEvent)
 
   # ---------------------------------------------------------------------------------------------------------
   #                                          AJAX SECTION

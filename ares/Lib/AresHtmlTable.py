@@ -17,6 +17,7 @@ class Table(AresHtml.Html):
   cssCls, alias = 'table', 'table'
   refernce = 'https://www.w3schools.com/css/css_table.asp'
   filt, filtId = None, None
+  linkedObjs = None
 
   def __init__(self, htmlId, header, vals, cssCls=None):
     """  """
@@ -119,6 +120,12 @@ class Table(AresHtml.Html):
   def aresExample(cls, aresObj):
     return aresObj.table('Table Example', [["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
 
+  def jsLinkTo(self, htmlObjs):
+    """ Send the data to the different HTML objects in order to update them """
+    self.linkedObjs = []
+    for htmlObj in htmlObjs:
+      self.linkedObjs.append(htmlObj.update(self.getData()))
+
   def onLoadFnc(self):
     """ Return a String with the Javascript method to put in the HTML report """
     item = AresItem.Item("var %s;" % self.htmlId)
@@ -127,10 +134,11 @@ class Table(AresHtml.Html):
                   %s = %s.DataTable(
                     {"fnDrawCallback": function( oSettings ) {
                                           // Add the linked functions here
+                                          %s
                                         }
                     }
                   ) ;
-                ''' % (self.htmlId, self.jqId))
+                ''' % (self.htmlId, self.jqId, "\n".join(self.linkedObjs)))
     if self.filtId is not None:
       item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
       item.add(2, "%s.draw() ;" % self.htmlId)
