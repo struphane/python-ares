@@ -5,7 +5,7 @@ CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py
 import string
 import random
 import json
-import Lib.FlexFnc
+# import Lib.FlexFnc
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for _ in range(size))
@@ -18,24 +18,60 @@ def report(aresObj):
     recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010),
                       'VAL2': random.uniform(0, 100),
                       'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
-  table = aresObj.tableRec('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
+  table = aresObj.table('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
   table.filters({'Currency': 'CCY'})
 
   selectors = (['Portfolio', 'Currency'], ['Value', 'Value 2'])
 
-  pie = aresObj.donutChart('Folders', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+  pie = aresObj.pieChart('Folders', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
   pie.linkTo(table)
 
-  vignet = aresObj.vignet("Super", "Voici le contenu de mq vignette", recordSet, Lib.FlexFnc.recSum, 'VAL2')
-  row = aresObj.row([table, pie])
-  row.extend(pie)
+
+  donut = aresObj.donutChart('Folders', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+  donut.linkTo(table)
+  # vignet = aresObj.vignet("Super", "Voici le contenu de mq vignette", recordSet, Lib.FlexFnc.recSum, 'VAL2')
+  # row = aresObj.row([table, pie])
+  # row.extend(pie)
 
   bar = aresObj.bar('Test', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+  lineChart = aresObj.lineChart('Test', recordSet,
+                    {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+
+  stackedAreaChart = aresObj.stackedAreaChart('Test', recordSet,
+                    {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+
+  stackedAreaChart.delAttr('xAxis', 'tickFormat')
+  lineChartFocus = aresObj.lineChartFocus('Test', recordSet,
+                                 {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value',
+                                  'VAL2': 'Value 2'}, selectors)
+
+
+  lineChartFocus.delAttr('xAxis', 'tickFormat')
+  lineChartFocus.delAttr('x2Axis', 'tickFormat')
+  comboLineBar = aresObj.comboLineBar('Test', recordSet,
+                                 {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value',
+                                  'VAL2': 'Value 2'}, selectors)
+  comboLineBar.linkTo(table)
+  comboLineBar.delAttr('xAxis', 'tickFormat')
+  multiBarChart = aresObj.multiBarChart('Test', recordSet,
+                                      {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value',
+                                       'VAL2': 'Value 2'}, selectors)
+  multiBarChart.linkTo(table)
+
+  multiBarChart.delAttr('xAxis', 'tickFormat')
+  horizBarChart = aresObj.horizBarChart('Test', recordSet,
+                    {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+
+  horizBarChart.delAttr('xAxis', 'tickFormat')
   # bar.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # bar.selectValues('Value 2', ['Value', 'Value 2'], table)
   bar.linkTo(table)
+  lineChart.linkTo(table)
+  stackedAreaChart.linkTo(table)
+  lineChartFocus.linkTo(table)
+  horizBarChart.linkTo(table)
 
   # table.jsLinkTo([pie, bar])
   button = aresObj.button('Change Graph (Ajax)')

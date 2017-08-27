@@ -9,6 +9,7 @@ from ares.Lib import AresItem
 class Table(AresHtml.Html):
   """
   Python Wrapper to the HTML TABLE, TH, TR, TD tags
+  using recordSet as input
 
   Default class parameters
     - CSS Default Class = table
@@ -19,10 +20,12 @@ class Table(AresHtml.Html):
   filt, filtId = None, None
   linkedObjs = None
 
-  def __init__(self, htmlId, header, vals, cssCls=None):
+  def __init__(self, htmlId, headerBox, vals, header, cssCls=None):
     """  """
     super(Table, self).__init__(htmlId, vals, cssCls)
     self.headerBox = header
+    self.header = header
+    self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
 
   def filters(self, colsDict):
     """ Store the different filters possible on the recordSet """
@@ -41,43 +44,33 @@ class Table(AresHtml.Html):
     self.filt = items
 
   def __str__(self):
-    """ Return the String representation of a HTML table """
-    item = AresItem.Item('<div class="panel panel-success">', self.incIndent)
-    item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
-    item.add(1, '<div class="panel-body">')
+    """ Return the string representation of a HTML table """
+    item = AresItem.Item(None, self.incIndent)
+    if self.headerBox is not None:
+      item.add(0, '<div class="panel panel-success">')
+      item.add(1,
+               '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+      item.add(1, '<div class="panel-body">')
     if self.filt is not None:
       item.join(self.filt)
-    item.add(1,'<table %s>' % self.strAttr())
-
-    # Header
+    item.add(0, '<table %s>' % self.strAttr())
     item.add(1, '<thead>')
-    header = self.vals.get("header")
-    if header is None: # no header
-      header = []
-    elif not isinstance(header[0], list): # one-line header > I convert to a list of header lines (to process the same way as multiline header)
-      header = [header]
-    for headerLine in header:
-      item.add(2, "<tr>")
-      for col in headerLine:
-        if isinstance(col, tuple):
-          item.add(3, "<th %s>%s</th>" % (col[1], col[0]))
-        else:
-          item.add(3, "<th>%s</th>" % col)
-      item.add(2, "</tr>")
-    item.add(1, "</thead>")
-
-    # Body
+    item.add(2, '<tr>')
+    for col in self.header:
+      item.add(3, '<th>%s</th>' % self.header[col])
+    item.add(2, '</tr>')
+    item.add(1, '</thead>')
     item.add(1, '<tbody>')
-    for row in self.vals.get("body", []):
+    for rec in self.vals:
       item.add(1, '<tr>')
-      for val in row:
-        item.add(2, "<td>%s</td>" % val)
+      item.add(2, self.rowTmpl % rec)
       item.add(1, '</tr>')
     item.add(1, '</tbody>')
     item.add(0, '</table>')
-    item.add(0, '</div>')
-    item.add(0, '</div>')
-    return str(item)
+    if self.headerBox is not None:
+      item.add(0, '</div>')
+      item.add(0, '</div>')
+      return str(item)
 
   def jsEvents(self, jsEventFnc=None):
     """ Function to get the Javascript methods for this object and all the underlying objects """
@@ -154,49 +147,4 @@ class Table(AresHtml.Html):
       item.add(2, "return false ;")
       item.add(1, "}")
       item.add(0, ") ;")
-    return str(item)
-
-
-class TableRec(Table):
-  """
-  Python wrqpper of the HTMO version using recordSet as input.
-  No difference witht the parent class except the fact that the input is based on something bigger than the ones thet
-  we will potentially dusplay
-
-  """
-  cssCls, alias = 'table', 'tableRec'
-  reference = ''
-
-  def __init__(self, htmlId, headerBox, vals, header, cssCls=None):
-    """ Create a Python HTNL table based on a recordSet """
-    super(TableRec, self).__init__(htmlId, headerBox, vals, cssCls)
-    self.header = header
-    self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
-
-  def __str__(self):
-    """ Return the string representation of a HTML table """
-    item = AresItem.Item(None, self.incIndent)
-    if self.headerBox is not None:
-      item.add(0, '<div class="panel panel-success">')
-      item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
-      item.add(1, '<div class="panel-body">')
-    if self.filt is not None:
-      item.join(self.filt)
-    item.add(0, '<table %s>' % self.strAttr())
-    item.add(1, '<thead>')
-    item.add(2, '<tr>')
-    for col in self.header:
-      item.add(3, '<th>%s</th>' % self.header[col])
-    item.add(2, '</tr>')
-    item.add(1, '</thead>')
-    item.add(1, '<tbody>')
-    for rec in self.vals:
-      item.add(1, '<tr>')
-      item.add(2, self.rowTmpl % rec)
-      item.add(1, '</tr>')
-    item.add(1, '</tbody>')
-    item.add(0, '</table>')
-    if self.headerBox is not None:
-      item.add(0, '</div>')
-      item.add(0, '</div>')
     return str(item)

@@ -224,21 +224,6 @@ class GraphSvG(AresHtml.Html):
     return '$("#%s_val_selector option:selected").text()' % self.htmlId
 
 
-class Graph(AresHtml.Html):
-  """
-  Wrapper to create a graph container
-
-  Default class parameters
-    - CSS Default Class = span4 (for the DIV component)
-  """
-  cssCls = 'span4'
-  reference = 'http://getbootstrap.com/2.3.2/scaffolding.html'
-
-  def __str__(self):
-    """ Return the Graph container for D3 and DVD3 """
-    return '<div %s></div>\n' % self.strAttr()
-
-
 class Network(AresHtml.Html):
   """
   Wrapper to create a Network graph container

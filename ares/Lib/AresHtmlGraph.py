@@ -9,7 +9,7 @@ from ares.Lib import AresHtmlContainer
 from ares.Lib import AresItem
 from ares.Lib import AresJs
 
-class JsGraph(AresHtmlContainer.GraphSvG):
+class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   """
 
   the variable self.htmlId will directly refer to the parent Div tag.
@@ -23,15 +23,46 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   clickFnc, clickObject = None, None
   style = {'chartStyle': {}, 'chartAttr': {}}
   pyDataSource = None
+  chartObject = 'to be overriden'
+  jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
 
-  def __init__(self, htmlId, header, vals, cssCls=None):
-    """  """
-    super(JsGraph, self).__init__(htmlId, vals, cssCls)
+
+  def __init__(self, htmlId, header, vals, mapCols, selectors, cssCls=None):
+    """ selectors is a tuple with the category first and the value list second """
+    super(JsNvD3Graph, self).__init__(htmlId, vals, cssCls)
     self.headerBox = header
+    self.selectors = selectors #add to add this as argument to specify which columns to select on for values and catgories
+    self.mapCols = mapCols
+
+  def __str__(self):
+    """ override the str function to make sure we can add the selectors at the end when the datasource is set """
+    self.selectCategory(self.selectors[0][0], self.selectors[0], self.pyDataSource)
+    self.selectValues(self.selectors[1][0], self.selectors[1], self.pyDataSource)
+    return super(JsNvD3Graph, self).__str__()
+
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return self.vals
+    recordSet = []
+    for rec in self.vals:
+      newRec = {}
+      for key, val in rec.items():
+        newRec[self.mapCols[key]] = val
+      recordSet.append(newRec)
+    return '[{"key": %s, "values": getDataFromRecordSet(%s, [%s, %s])}]' % (self.jqCategory, recordSet, self.jqCategory, self.jqValue)
+
+  def update(self, data):
+    """ Update the content of an HTML component """
+    item = AresItem.Item("var filterRecordSet = [{'key': %s, 'values': getDataFromRecordSet(%s, [%s, %s])}] ;" % (self.jqCategory, data, self.jqCategory, self.jqValue))
+    item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
+    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;" % self.jqId)
+    return str(item)
+
+  def jsChart(self):
+    style, attr = self.formatChart()
+    if style:
+      style = '\n.%s' % style
+    return '''nv.models.%s()%s%s; %s ''' % (self.chartObject, self.jsFrag, style, attr)
 
   def addStyle(self, style):
     """ add style to graphs (will be added to the nv.models js function"""
@@ -43,19 +74,27 @@ class JsGraph(AresHtmlContainer.GraphSvG):
     for subObj, subAttr in attr.items():
       self.style.setdefault('chartAttr', {}).setdefault(subObj, {}).update(subAttr)
 
+  def getChartDefaultStyle(self):
+    """ """
+    return self.style
+
+  def delStyle(self, style):
+    """ """
+    self.style['charStyle'].pop(style, None)
+
+  def delAttr(self, axis, attr):
+    """ """
+    self.style['chartAttr'].get(axis, {}).pop(attr, None)
+
   def formatChart(self):
     """ """
     chartStyle, chartAttr = [], []
-    for style, attr in self.style.get('charStyle', {}).items():
+    for style, attr in self.style.get('chartStyle', {}).items():
       chartStyle.append('%s(%s)' % (style, attr))
     for subObj, attr in self.style.get('chartAttr', {}).items():
       for subAttr, val in attr.items():
         chartAttr.append('chart_%s.%s.%s(%s)' % (self.htmlId, subObj, subAttr, val))
     return ('\n.'.join(chartStyle), ';'.join(chartAttr))
-
-  def jsChart(self):
-    """ Return the javascript fragment require to build the graph """
-    raise NotImplementedError('subclasses must override jsChart()!')
 
   def jsEvents(self, jsEventFnc=None):
     """ It is not possible to have sub HTML items in a graph object """
@@ -85,36 +124,15 @@ class JsGraph(AresHtmlContainer.GraphSvG):
   def linkTo(self, dataSource):
     """ Add a link to the datasource to remove the need to specify that in the selectors"""
     self.pyDataSource = dataSource
-    dataSource.jsLinkTo([self]) #all datasource should have a jsLinkTo function (see AresHtmlTable)
+    try:
+      dataSource.jsLinkTo([self]) #all datasource should have a jsLinkTo function (see AresHtmlTable)
+    except Exception as e:
+      print(e)
+      print('Please use a data source that has a jsLinkTo attribute')
 
 
-class NVD3Chart(JsGraph):
 
-  chartObject = 'to be overriden'
-  jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
-
-
-  def __init__(self, htmlId, header, vals, mapCols, selectors, cssCls=None):
-    """ selectors is a tuple with the category first and the value list second """
-    super(JsGraph, self).__init__(htmlId, vals, cssCls)
-    self.headerBox = header
-    self.selectors = selectors #add to add this as argument to specify which columns to select on for values and catgories
-    self.mapCols = mapCols
-
-  def __str__(self):
-    """ override the str function to make sure we can add the selectors at the end when the datasource is set """
-    self.selectCategory(self.selectors[0][0], self.selectors[0], self.pyDataSource)
-    self.selectValues(self.selectors[1][0], self.selectors[1], self.pyDataSource)
-    return super(JsGraph, self).__str__()
-
-  def jsChart(self):
-    style, attr = self.formatChart()
-    if style:
-      style = '\n.%s' % style
-    return '''nv.models.%s()%s%s; %s ''' % (self.chartObject, self.jsFrag, style, attr)
-
-
-class Pie(NVD3Chart):
+class Pie(JsNvD3Graph):
   """
   NVD3 Wrapper for a Pie Chart object.
 
@@ -140,14 +158,6 @@ class Pie(NVD3Chart):
       recordSet.append(newRec)
     return "getDataFromRecordSet(%s, [%s, %s])" % (recordSet, self.jqCategory, self.jqValue)
 
-  def update(self, data):
-    """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = getDataFromRecordSet(%s, [%s, %s]) ;" % (data, self.jqCategory, self.jqValue))
-    item.add(0, "var pie = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % self.chartObject)
-    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;" % self.jqId)
-    return str(item)
-
-
 class Donut(Pie):
   """
 
@@ -157,10 +167,11 @@ class Donut(Pie):
   mockData = r'json\pie.json'
   alias = 'donutChart'
   clickObject = 'pie'
-  style = {'chartStyle': {'showLabels': '1', 'labelThreshold': '.05)', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
+  style = {'chartStyle': {'showLabels': '1',
+                          'labelThreshold': '.05', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
 
 
-class Bar(NVD3Chart):
+class Bar(JsNvD3Graph):
   """
 
   Data format expected in the graph:
@@ -175,30 +186,13 @@ class Bar(NVD3Chart):
   style = {'chartStyle': {'staggerLabels': 'true', 'showValues': 'true',
                           'transitionDuration': '350'} }
 
-  def dataFnc(self):
-    """ Return the data Source converted to them be sent to the javascript layer """
-    recordSet = []
-    for rec in self.vals:
-      newRec = {}
-      for key, val in rec.items():
-        newRec[self.mapCols[key]] = val
-      recordSet.append(newRec)
-    return '[{"key": %s, "values": getDataFromRecordSet(%s, [%s, %s])}]' % (self.jqCategory, recordSet, self.jqCategory, self.jqValue)
-
-  def update(self, data):
-    """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = [{'key': %s, 'values': getDataFromRecordSet(%s, [%s, %s])}] ;" % (self.jqCategory, data, self.jqCategory, self.jqValue))
-    item.add(0, "var pie = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % self.chartObject)
-    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;" % self.jqId)
-    return str(item)
-
   @classmethod
   def aresExample(cls, aresObj):
     #return aresObj.bar([{"key": "Cumulative Return", "values": [{ "label": "One","value" : 29.765957771107},  {"label": "Four", "value": 196.45946739256}]}])
     return aresObj.bar([{"key": "Cumulative Return", "values": [1, 2, 3, 4, 5]}])
 
 
-class Line(NVD3Chart):
+class Line(JsNvD3Graph):
   """
 
   Data format expected in the graph
@@ -219,10 +213,9 @@ class Line(NVD3Chart):
                                    'tickFormat': "d3.format('.02f')"}
                         }
            }
-  jsFrag = ''
 
 
-class StackedArea(NVD3Chart):
+class StackedArea(JsNvD3Graph):
   """ This object will output a simple stacked area chart
 
   Reference website: http://nvd3.org/examples/stackedArea.html
@@ -232,45 +225,15 @@ class StackedArea(NVD3Chart):
   chartObject = 'stackedAreaChart'
   style = {'chartStyle': {'useInteractiveGuideline': 'true', 'clipEdge': 'true'},
            'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat' :"function(d) { return d3.time.format('%%x')(new Date(d)) }",
+                                   # 'tickFormat' :"function(d) { return d3.time.format('%%x')(new Date(d)) }",
                                    },
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
 
   clickObject = 'scatter'
 
-  def pyDataToJs(self, localPath=None):
-    """
-    """
-    if self.useMocked:
-      if hasattr(self, 'mockData'):
-        mockFile = open(self.mockData, 'r')
-        self.pyData = eval(mockFile.read())
 
-      else:
-        raise Exception('No mock data defined for this chart')
-
-    jsData = '['
-    for rec in self.pyData:
-      keys = rec.keys()
-      jsData = '%s {"key": "%s", "values" : [' % (jsData, rec['key'])
-      for value in rec['values']:
-        jsData = '%s [%s, %s], ' % (jsData, str(value[0]), str(value[1]))
-
-      jsData = '%s ]' % jsData
-      if len(keys) > 2:
-        for key in keys:
-          if key not in ('key', 'values'):
-            if rec[key][0] == 'str':
-              jsData = '%s, "%s": "%s" ' % (jsData, key, rec[key][1])
-            else:
-              jsData = '%s, "%s": %s ' % (jsData, key, rec[key][1])
-      jsData = '%s },' % jsData
-    jsData = '%s ]' % jsData
-    return jsData
-
-
-class MultiBars(NVD3Chart):
+class MultiBars(JsNvD3Graph):
   """ Simple multi bar chart
 
     http://nvd3.org/examples/multiBar.html
@@ -304,7 +267,7 @@ class MultiBars(NVD3Chart):
                          }}
 
 
-class LineWithFocus(NVD3Chart):
+class LineWithFocus(JsNvD3Graph):
   """ Simple line chart with a focus field to zoom in on specific parts of the chart
 
     http://nvd3.org/examples/lineWithFocus.html
@@ -341,7 +304,8 @@ class LineWithFocus(NVD3Chart):
                          }}
 
 
-class HorizontalBars(NVD3Chart):
+
+class HorizontalBars(JsNvD3Graph):
   """ Simple Horizontal bar chart
 
     http://nvd3.org/examples/multiBarHorizontal.html
@@ -378,7 +342,8 @@ class HorizontalBars(NVD3Chart):
                          }}
 
 
-class ComboLineBar(NVD3Chart):
+
+class ComboLineBar(JsNvD3Graph):
   """
   This object will combine a line and a bar chart.
   The first item should be the line chart
@@ -400,7 +365,9 @@ class ComboLineBar(NVD3Chart):
                          'y2Axis': {'tickFormat': "d3.format(',.2f')"}
                          }}
 
-class ScatterChart(NVD3Chart):
+
+
+class ScatterChart(JsNvD3Graph):
   """ Simple Scatter chart
 
     http://nvd3.org/livecode/index.html#codemirrorNav
@@ -433,7 +400,7 @@ class ScatterChart(NVD3Chart):
                          }}
 
 
-class Network(JsGraph):
+class Network(JsNvD3Graph):
   """
 
   Reference website: https://github.com/nylen/d3-process-map
@@ -447,7 +414,7 @@ class Network(JsGraph):
     return "\n".join(res)
 
 
-class IndentedTree(JsGraph):
+class IndentedTree(JsNvD3Graph):
   """
   Data expected:
     [ (label, url, values), (label, url, dataKeys)]
@@ -505,7 +472,7 @@ class IndentedTree(JsGraph):
           '''
 
 
-class WordCloud(JsGraph):
+class WordCloud(JsNvD3Graph):
   """
 
   This module will require the javascript module: d3.layout.cloud.js
