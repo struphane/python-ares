@@ -184,6 +184,7 @@ class Report(object):
   # This part is done in python 3 in order to ensure users will put the right type of objects
   # del self.content[self.content.index(val.htmlId)]
   # ---------------------------------------------------------------------------------------------------------
+  def vignet(self, header, text, value, cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self.getNext(), header, text, self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Paragraph(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)

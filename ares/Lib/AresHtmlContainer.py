@@ -319,13 +319,31 @@ class Row(AresHtml.Html):
 
   def __str__(self):
     """ Return the HTML display of a split container"""
-    res = AresItem.Item('<div %s>' % 'class="%s"' % self.gridCss if self.gridCss is not None else '')
+    res = AresItem.Item('<div %s>' % self.strAttr())
     res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[0])
     res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[1])
     res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[2])
     res.add(0, '</div>')
     return str(res)
 
+
+class Vignet(AresHtml.Html):
+  """ """
+
+  cssCls, alias = "panel panel-success", 'vignet'
+
+  def __init__(self, htmlId, title, content, vals, cssCls=None):
+    super(Vignet, self).__init__(htmlId, vals, cssCls)
+    self.title = title
+    self.text = content
+
+  def __str__(self):
+    res = AresItem.Item('<div %s style="padding:5px">' % self.strAttr())
+    res.add(1, "<p><strong>%s</strong></p>" % self.title)
+    res.add(1, "<p>%s</p>" % self.text)
+    res.add(1, "<p><h1><center>%s</center></h1></p>" % self.vals)
+    res.add(0, "</div>")
+    return str(res)
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])
