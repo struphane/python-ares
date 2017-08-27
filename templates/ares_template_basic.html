@@ -44,11 +44,11 @@
         else {$("#menu-icon").removeClass('fa-chevron-circle-right').addClass("fa fa-chevron-circle-left fa-2x");}
         $("#wrapper").toggleClass("toggled");
     });
-    if ($(window).width() > 960) {
-        $("#wrapper").toggleClass("toggled");
-    } else {
+    //if ($(window).width() > 960) {
+    //    $("#wrapper").toggleClass("toggled");
+    //} else {
         $("#menu-icon").removeClass('fa-chevron-circle-left').addClass("fa fa-chevron-circle-right fa-2x");
-    }
+    //}
 </script>
 	<script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/map-graph.js') }}"></script>	
     <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/geometry.js') }}"></script>

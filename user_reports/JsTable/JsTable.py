@@ -39,6 +39,7 @@ def report(aresObj):
   lineChart = aresObj.lineChart('Test', recordSet,
                     {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
 
+  aresObj.row([pie, donut, bar])
   stackedAreaChart = aresObj.stackedAreaChart('Test', recordSet,
                     {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
 
