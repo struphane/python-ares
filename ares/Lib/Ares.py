@@ -248,6 +248,10 @@ class Report(object):
   def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
+  # Designer objects
+  def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self.getNext(), 'Put your text here', cssCls), sys._getframe().f_code.co_name)
+  def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self.getNext(), 'Drop here', cssCls), sys._getframe().f_code.co_name)
+  def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self.getNext(), vals, cssCls), sys._getframe().f_code.co_name)
 
   # ---------------------------------------------------
   #    Action on files and folders reaad and write
