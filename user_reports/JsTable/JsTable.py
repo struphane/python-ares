@@ -5,6 +5,7 @@ CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py
 import string
 import random
 import json
+import Lib.FlexFnc
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for _ in range(size))
@@ -27,8 +28,9 @@ def report(aresObj):
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
   pie.linkTo(table)
 
-  vignet = aresObj.vignet("Super", "Voici le contenu de mq vignette", "$22M")
-  aresObj.row([table, pie, vignet])
+  vignet = aresObj.vignet("Super", "Voici le contenu de mq vignette", recordSet, Lib.FlexFnc.recSum, 'VAL2')
+  row = aresObj.row([table, pie])
+  row.extend(pie)
 
   bar = aresObj.bar('Test', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
   # bar.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)

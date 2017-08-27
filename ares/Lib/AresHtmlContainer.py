@@ -311,28 +311,52 @@ class Image(AresHtml.Html):
 
 
 class Row(AresHtml.Html):
-  """ """
+  """
+
+  """
   cssCls, alias = "row", 'row'
   gridCss = 'panel panel-success'
-  col_lg = 6
   reference = 'https://getbootstrap.com/docs/3.3/css/'
+
+  def __init__(self, htmlId, hltmObjs, cssCls=None):
+    if len(hltmObjs) > 3:
+      raise Exception('Row object can only display maximum 3 components')
+
+    if len(hltmObjs) == 3:
+      vals = [('col-6 col-md-4', htmlObj) for htmlObj in hltmObjs]
+    elif len(hltmObjs) == 2:
+      vals = [('col-xs-6', htmlObj) for htmlObj in hltmObjs]
+    super(Row, self).__init__(htmlId, vals, cssCls)
+
+  def extend(self, component):
+    """ Extend one of the objects on to columns """
+    tempVals = []
+    for size, htmlOjb in self.vals:
+      if component.htmlId == htmlOjb.htmlId:
+        tempVals.append(('col-xs-12 col-md-8', htmlOjb))
+      else:
+        tempVals.append(('col-xs-6 col-md-4', htmlOjb))
+    self.vals = tempVals
 
   def __str__(self):
     """ Return the HTML display of a split container"""
     res = AresItem.Item('<div %s>' % self.strAttr())
-    res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[0])
-    res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[1])
-    res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[2])
+    for css, htmlObj in self.vals:
+      res.add(1, '<div class="%s">%s</div>' % (css, htmlObj))
     res.add(0, '</div>')
     return str(res)
 
 
 class Vignet(AresHtml.Html):
-  """ """
+  """
+  Vignet to display a value for a given recordset.
+  This Vignet can be
+  """
 
   cssCls, alias = "panel panel-success", 'vignet'
 
-  def __init__(self, htmlId, title, content, vals, cssCls=None):
+  def __init__(self, htmlId, title, content, recordSet, fnc, col, cssCls=None):
+    vals = fnc(recordSet, col)
     super(Vignet, self).__init__(htmlId, vals, cssCls)
     self.title = title
     self.text = content
