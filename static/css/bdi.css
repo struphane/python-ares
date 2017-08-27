@@ -1,4 +1,12 @@
 
+
+#wrapper {
+    margin-top: 60px ;
+    background-color: #EAEAEA ;
+    font-family: Arial, sans-serif ;
+    Font-Size: 10px ;
+}
+
 .bdiBar-download {
     position: fixed;
     right: 5px;

@@ -8,6 +8,8 @@
 	{% include 'ares_part_header.html' %}
 
     <script>
+        // https://powerbi.microsoft.com/en-us/documentation/powerbi-service-dashboard-tiles/
+
         function preloader() {
             $('#loading').show();
         }
@@ -22,7 +24,7 @@
     </script>
 </head>
 <body oncontextmenu="return false;">
-
+    {% include 'ares_part_navbar.html' %}
 <div id="wrapper">	
 	{% include 'ares_part_side_bar.html' %}
 	
@@ -32,6 +34,7 @@
 		{{ content|safe }}
 	</div>
 </div>	
+
 <script>
     {{ js|safe }}
 
