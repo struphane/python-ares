@@ -6,6 +6,7 @@
 
 body {
     overflow-x: hidden;
+    background-color: #EAEAEA ;
 }
 
 #menu-toggle {
@@ -25,6 +26,11 @@ body {
 
 
 #wrapper {
+    margin-top: 60px ;
+    background-color: #EAEAEA ;
+    font-family: Arial, sans-serif ;
+    Font-Size: 10px ;
+
     padding-left: 0;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
@@ -118,6 +124,10 @@ body {
 @media(min-width:768px) {
     #wrapper {
         padding-left: 0;
+        margin-top: 60px ;
+        background-color: #EAEAEA;
+        font-family: Arial, sans-serif ;
+        Font-Size: 10px ;
     }
     #wrapper.toggled {
         padding-left: 250px;
