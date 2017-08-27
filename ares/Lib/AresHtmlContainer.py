@@ -310,6 +310,22 @@ class Image(AresHtml.Html):
     return aresObj.img("../../../static/images/sample_img.jpg")
 
 
+class Row(AresHtml.Html):
+  """ """
+  cssCls, alias = "row", 'row'
+  gridCss = 'panel panel-success'
+  col_lg = 6
+  reference = 'https://getbootstrap.com/docs/3.3/css/'
+
+  def __str__(self):
+    """ Return the HTML display of a split container"""
+    res = AresItem.Item('<div %s>' % 'class="%s"' % self.gridCss if self.gridCss is not None else '')
+    res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[0])
+    res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[1])
+    res.add(1, '<div class="col-6 col-md-4">%s</div>' % self.vals[2])
+    res.add(0, '</div>')
+    return str(res)
+
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])

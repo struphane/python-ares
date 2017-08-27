@@ -30,6 +30,7 @@ def report(aresObj):
   # bar.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # bar.selectValues('Value 2', ['Value', 'Value 2'], table)
   bar.linkTo(table)
+  aresObj.row([table, pie, bar])
   # table.jsLinkTo([pie, bar])
   button = aresObj.button('Change Graph (Ajax)')
   button.post('click', '../ajax/JsTable/testAjax.py', {},

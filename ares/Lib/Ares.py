@@ -164,7 +164,11 @@ class Report(object):
                 pass
         else:
           if hasattr(htmlObj, 'htmlId'):
-            del self.content[self.content.index(htmlObj.htmlId)]
+            try:
+              del self.content[self.content.index(htmlObj.htmlId)]
+            except:
+              print("PROBLEME")
+              pass
     else:
       if hasattr(htmlObjs, 'htmlId'):
         del self.content[self.content.index(htmlObjs.htmlId)]
@@ -217,6 +221,7 @@ class Report(object):
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def grid(self, values, cssCls=None): return self.add(AresHtmlContainer.Split(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
