@@ -217,14 +217,14 @@ class Tabs(AresHtml.Html):
     - CSS Default Class = nav nav-tabs
     - title = Home
   """
-  title, alias = 'Home', 'tabs'
+  alias = 'tabs'
   cssCls = 'nav nav-tabs'
 
   def __str__(self):
     """ Return the HTML representation of a Tabular object """
     item = AresItem.Item('<ul %s>' % self.strAttr())
-    item.add(1, '<li class="active"><a href="#">%s</a></li>' % self.title)
-    for val in self.vals:
+    item.add(1, '<li class="active"><a href="#">%s</a></li>' % self.vals[0])
+    for val in self.vals[1:]:
       item.add(2, '<li><a href="#">%s</a></li>' % val)
     item.add(0, '</ul>')
     return str(item)
@@ -300,12 +300,24 @@ class Row(AresHtml.Html):
     for jEventType, jsEvent in self.jsEvent.items():
       jsEventFnc[jEventType].add(str(jsEvent))
 
-    for row in self.vals:
-      for val in row:
-        if hasattr(val, 'jsEvent'):
-          getattr(val, 'jsEvents')(jsEventFnc)
+    for _, val in self.vals:
+      if hasattr(val, 'jsEvent'):
+        getattr(val, 'jsEvents')(jsEventFnc)
     return jsEventFnc
 
+  def onLoad(self, loadFnc=None):
+    """ Functions to get all the onload items for this object and all the underlying object """
+    if loadFnc is None:
+      loadFnc = self.jsOnLoad
+    fnc = self.onLoadFnc()
+    if fnc is not None:
+      loadFnc.add(fnc)
+
+    for _, val in self.vals:
+      if hasattr(val, 'onLoad'):
+        getattr(val, 'onLoad')(loadFnc)
+        print loadFnc
+    return loadFnc
 
 class Vignet(AresHtml.Html):
   """
@@ -328,6 +340,7 @@ class Vignet(AresHtml.Html):
     res.add(1, "<p><h1><center>%s</center></h1></p>" % self.vals)
     res.add(0, "</div>")
     return str(res)
+
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])

@@ -6,6 +6,8 @@ CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py
 def report(aresObj):
   # Write your report here
   aresObj.aresInput()
-  aresObj.aresDragItems(['Super', 'Youpi'])
+  drags = aresObj.aresDragItems(['Super', 'Youpi'])
   aresObj.aresDataSource()
+  tabs = aresObj.tabs(['HTML', 'Python'])
+  aresObj.row([drags, tabs])
   return aresObj
