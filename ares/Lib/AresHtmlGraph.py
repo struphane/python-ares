@@ -26,7 +26,6 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   chartObject = 'to be overriden'
   jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
 
-
   def __init__(self, htmlId, header, vals, mapCols, selectors, cssCls=None):
     """ selectors is a tuple with the category first and the value list second """
     super(JsNvD3Graph, self).__init__(htmlId, vals, cssCls)
@@ -40,14 +39,13 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
     self.selectValues(self.selectors[1][0], self.selectors[1], self.pyDataSource)
     return super(JsNvD3Graph, self).__str__()
 
-
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
     recordSet = []
     for rec in self.vals:
       newRec = {}
-      for key, val in rec.items():
-        newRec[self.mapCols[key]] = val
+      for key, fomatKey in self.mapCols.items():
+        newRec[fomatKey] = rec[key]
       recordSet.append(newRec)
     return '[{"key": %s, "values": getDataFromRecordSet(%s, [%s, %s])}]' % (self.jqCategory, recordSet, self.jqCategory, self.jqValue)
 
@@ -153,8 +151,8 @@ class Pie(JsNvD3Graph):
     recordSet = []
     for rec in self.vals:
       newRec = {}
-      for key, val in rec.items():
-        newRec[self.mapCols[key]] = val
+      for key, fomatKey in self.mapCols.items():
+        newRec[fomatKey] = rec[key]
       recordSet.append(newRec)
     return "getDataFromRecordSet(%s, [%s, %s])" % (recordSet, self.jqCategory, self.jqValue)
 

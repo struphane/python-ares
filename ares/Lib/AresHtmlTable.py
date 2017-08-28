@@ -23,7 +23,7 @@ class Table(AresHtml.Html):
   def __init__(self, htmlId, headerBox, vals, header, cssCls=None):
     """  """
     super(Table, self).__init__(htmlId, vals, cssCls)
-    self.headerBox = header
+    self.headerBox = headerBox
     self.header = header
     self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
 
@@ -80,7 +80,7 @@ class Table(AresHtml.Html):
       jsEventFnc[jEventType].add(str(jsEvent))
 
     for row in self.vals:
-      for val in row:
+      for val in row.values():
         if hasattr(val, 'jsEvent'):
           getattr(val, 'jsEvents')(jsEventFnc)
     return jsEventFnc

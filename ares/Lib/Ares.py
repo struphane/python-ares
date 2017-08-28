@@ -147,6 +147,18 @@ class Report(object):
     self.content.append(htmlObj.htmlId)
     return htmlObj
 
+  def suppRec(self, recordSet):
+    for rec in recordSet:
+      for val in rec.values():
+        if hasattr(val, 'htmlId'):
+          try:
+            del self.content[self.content.index(val.htmlId)]
+          except:
+            print("PROBLEME")
+            pass
+
+    return recordSet
+
   def supp(self, htmlObjs):
     """ Unregister the HTML component to the Ares object """
     if htmlObjs is None:
@@ -215,7 +227,7 @@ class Report(object):
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def table(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.supp(values), header, cssCls), sys._getframe().f_code.co_name)
+  def table(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.suppRec(values), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)

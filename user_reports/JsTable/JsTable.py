@@ -35,7 +35,8 @@ def report(aresObj):
   # row = aresObj.row([table, pie])
   # row.extend(pie)
 
-  bar = aresObj.bar('Test', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+  bar = aresObj.bar('Test', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'},
+                    selectors)
   lineChart = aresObj.lineChart('Test', recordSet,
                     {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
 
