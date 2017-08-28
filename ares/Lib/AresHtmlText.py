@@ -100,7 +100,7 @@ class Title(AresHtml.Html):
 
   def onLoadFnc(self):
     """ Activate the Jquery Tooltips """
-    return "$( document ).tooltip();"
+    return "$( function() { $( document ).tooltip() ; }) ;"
 
   @classmethod
   def aresExample(cls, aresObj):

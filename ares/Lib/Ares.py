@@ -378,5 +378,5 @@ class Report(object):
         else:
           jsSection.append("\n".join(jsFncs))
 
-    jsSection.append("nv.addGraph(function() {\n %s });" % "\n".join(jsGraphs))
+    jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n".join(jsGraphs))
     return "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

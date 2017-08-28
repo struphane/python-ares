@@ -22,7 +22,7 @@ class Div(AresHtml.Html):
 
   def onLoadFnc(self):
     """ Activate the Jquery tooltips display """
-    return "$( document ).tooltip();"
+    return "$( function() { $( document ).tooltip() ; }) ;"
 
   @classmethod
   def aresExample(cls, aresObj):
