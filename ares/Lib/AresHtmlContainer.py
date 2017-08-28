@@ -299,7 +299,6 @@ class Row(AresHtml.Html):
       jsEventFnc = self.jsEventFnc
     for jEventType, jsEvent in self.jsEvent.items():
       jsEventFnc[jEventType].add(str(jsEvent))
-
     for _, val in self.vals:
       if hasattr(val, 'jsEvent'):
         getattr(val, 'jsEvents')(jsEventFnc)
@@ -312,12 +311,11 @@ class Row(AresHtml.Html):
     fnc = self.onLoadFnc()
     if fnc is not None:
       loadFnc.add(fnc)
-
     for _, val in self.vals:
       if hasattr(val, 'onLoad'):
         getattr(val, 'onLoad')(loadFnc)
-        print loadFnc
     return loadFnc
+
 
 class Vignet(AresHtml.Html):
   """
