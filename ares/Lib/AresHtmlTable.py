@@ -124,15 +124,18 @@ class Table(AresHtml.Html):
     """ Return a String with the Javascript method to put in the HTML report """
     item = AresItem.Item("var %s;" % self.htmlId)
     item.add(0, "$(document).ready(function() {")
-    item.add(1, '''
-                  %s = %s.DataTable(
-                    {"fnDrawCallback": function( oSettings ) {
-                                          // Add the linked functions here
-                                          %s
-                                        }
-                    }
-                  ) ;
-                ''' % (self.htmlId, self.jqId, "\n".join(self.linkedObjs)))
+    if self.linkedObjs is not None:
+      item.add(1, '''
+                    %s = %s.DataTable(
+                      {"fnDrawCallback": function( oSettings ) {
+                                            // Add the linked functions here
+                                            %s
+                                          }
+                      }
+                    ) ;
+                  ''' % (self.htmlId, self.jqId, "\n".join(self.linkedObjs)))
+    else:
+      item.add(1, ''' %s = %s.DataTable( ''' % (self.htmlId, self.jqId))
     if self.filtId is not None:
       item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
       item.add(2, "%s.draw() ;" % self.htmlId)

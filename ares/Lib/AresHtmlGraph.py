@@ -53,7 +53,7 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
     """ Update the content of an HTML component """
     item = AresItem.Item("var filterRecordSet = [{'key': %s, 'values': getDataFromRecordSet(%s, [%s, %s])}] ;" % (self.jqCategory, data, self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
-    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;" % self.jqId)
+    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
 
   def jsChart(self):

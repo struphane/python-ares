@@ -72,7 +72,7 @@ def report(aresObj, localPath=None):
         scriptLink = scriptPath.replace(aresObj.http['SCRIPTS_NAME'], "")
         remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
         downComp = aresObj.icon('download')
-        downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
+        downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s' ;" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
         fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
         fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
         ajxCall =  aresObj.http['SCRIPTS_AJAX'].get(script, [])
@@ -124,7 +124,7 @@ def report(aresObj, localPath=None):
                                   ['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download',
                                    'delete'])),
                          (['Script Name'], ['Size']))
-                         
+
   graphObj.linkTo(tableComp)
   graphObj.height = 200
 
