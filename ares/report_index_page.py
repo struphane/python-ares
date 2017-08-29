@@ -120,12 +120,11 @@ def report(aresObj, localPath=None):
                                       'delete'])),
                             cssCls="table table-hover table-bordered")
   graphObj = aresObj.bar('Deployments count', recordSet,
-                         dict(zip(['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'],
-                                  ['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download',
-                                   'delete'])),
-                         (['Script Name'], ['Size']))
+                         dict(zip(['Size', 'Modification Date'],
+                                  ['Size', 'Modification Date'])),
+                         (['Modification Date'], ['Size']))
   graphObj.linkTo(tableComp)
-  graphObj.height = 200
+  #graphObj.height = 200
 
   zipComp = aresObj.downloadAll('Download Zip archive of this environment')
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
