@@ -155,6 +155,12 @@ class Pie(JsNvD3Graph):
       recordSet.append(newRec)
     return "getDataFromRecordSet(%s, [%s, %s])" % (recordSet, self.jqCategory, self.jqValue)
 
+  def update(self, data):
+    """ Update the content of an HTML component """
+    item = AresItem.Item("var filter_%s = getDataFromRecordSet(%s, [%s, %s]) ;" % (self.htmlId, data, self.jqCategory, self.jqValue))
+    item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
+    item.add(0, "d3.%s.datum(filter_%s).transition().duration(500).call(%s) ; " % (self.jqId, self.htmlId, self.chartObject))
+    return str(item)
 
 class Donut(Pie):
   """
