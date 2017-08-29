@@ -50,7 +50,7 @@ def report(aresObj, localPath=None):
                       Please go here to get more details about the process
                     ''')
   comp = aresObj.icon('download')
-  comp.js('click', "alert('');window.location.href='../download/%(report_name)s/%(script)s' ;" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
+  comp.js('click', "window.location.href='../download/%(report_name)s/%(script)s' ;" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
 
   fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME'])))
   fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME']))))
@@ -124,7 +124,6 @@ def report(aresObj, localPath=None):
                                   ['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download',
                                    'delete'])),
                          (['Script Name'], ['Size']))
-
   graphObj.linkTo(tableComp)
   graphObj.height = 200
 

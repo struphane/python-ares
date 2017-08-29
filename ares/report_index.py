@@ -48,6 +48,6 @@ def report(aresObj):
   pieComp = aresObj.pieChart('Folders', content, {'folderName': 'Folder Name', 'FolderFiles': 'Count Files'},
                             (['Folder Name'], ['Count Files']))
   pieComp.linkTo(tableComp)
-  tableComp.jsLinkTo([barComp, pieComp])
+  #tableComp.jsLinkTo([barComp, pieComp])
   aresObj.row([pieComp, tableComp])
   return aresObj

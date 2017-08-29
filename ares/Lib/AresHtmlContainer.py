@@ -119,7 +119,7 @@ class GraphSvG(AresHtml.Html):
     - CSS Default Class = span4 (for the DIV component)
     - width, height = 960, 500 (for the SVG component)
   """
-  cssCls = 'span4'
+  cssCls = 'panel-body span4'
   width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
@@ -129,7 +129,7 @@ class GraphSvG(AresHtml.Html):
     """ Return the String representation of a DIV containing a SVG tag """
     item = AresItem.Item('<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
     item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
-    item.add(1, '<div class="panel-body" style="width:95%%;height:95%%;" %s>' % self.strAttr())
+    item.add(1, '<div style="width:95%%;height:95%%;" %s>' % self.strAttr())
 
     # Add the pointers for the display
     if self.categories is not None:
