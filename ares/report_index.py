@@ -35,8 +35,8 @@ def report(aresObj):
                     'FolderFiles': len(aresObj.getFiles([folder])), 'delete': iconComp})
 
   # Create a new report
-  tableComp = aresObj.table('Existing Reports', content, {'folderName': 'Folder Name', 'Date': 'Last Modification',
-                                                          'Size': 'Size in Ko', 'delete': ''})
+  tableComp = aresObj.table('Existing Reports', content, {'folderName': 'Folder Name', 'FolderFiles': 'Count Files',
+                                                          'Date': 'Last Modification', 'Size': 'Size in Ko', 'delete': ''})
   barComp = aresObj.bar('Scripts per folder', content, {'folderName': 'Folder Name', 'FolderFiles': 'Count Files'},
                         (['Folder Name'], ['Count Files']))
   barComp.linkTo(tableComp)
