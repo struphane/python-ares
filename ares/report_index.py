@@ -45,9 +45,8 @@ def report(aresObj):
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)
   createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.val, 'display(data);')
-  pieComp = aresObj.pieChart('Folders', content, {'folderName': 'Folder Name', 'FolderFiles': 'Count Files'},
+  pieComp = aresObj.pie('Folders', content, {'folderName': 'Folder Name', 'FolderFiles': 'Count Files'},
                             (['Folder Name'], ['Count Files']))
   pieComp.linkTo(tableComp)
-  #tableComp.jsLinkTo([barComp, pieComp])
   aresObj.row([pieComp, tableComp])
   return aresObj

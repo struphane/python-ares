@@ -123,9 +123,13 @@ def report(aresObj, localPath=None):
                          dict(zip(['Size', 'Modification Date'],
                                   ['Size', 'Modification Date'])),
                          (['Modification Date'], ['Size']))
+  pieObj = aresObj.pie('Deployments count', recordSet,
+                         dict(zip(['Size', 'Modification Date'],
+                                  ['Size', 'Modification Date'])),
+                         (['Modification Date'], ['Size']))
   graphObj.linkTo(tableComp)
-  #graphObj.height = 200
-
+  pieObj.linkTo(tableComp)
+  aresObj.row([graphObj, pieObj])
   zipComp = aresObj.downloadAll('Download Zip archive of this environment')
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
   return aresObj

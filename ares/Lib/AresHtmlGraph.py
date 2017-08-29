@@ -139,7 +139,7 @@ class Pie(JsNvD3Graph):
   Data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
-  alias = 'pieChart'
+  alias = 'pie'
   mockData = r'json\pie.json'
   clickObject = 'pie'
   style = {'chartStyle': {'showLabels': '1'}}
@@ -169,7 +169,7 @@ class Donut(Pie):
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   mockData = r'json\pie.json'
-  alias = 'donutChart'
+  alias = 'donut'
   clickObject = 'pie'
   style = {'chartStyle': {'showLabels': '1',
                           'labelThreshold': '.05', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
