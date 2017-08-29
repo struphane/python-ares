@@ -145,7 +145,6 @@ class Pie(JsNvD3Graph):
   style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
 
-
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
     recordSet = []
@@ -155,6 +154,7 @@ class Pie(JsNvD3Graph):
         newRec[fomatKey] = rec[key]
       recordSet.append(newRec)
     return "getDataFromRecordSet(%s, [%s, %s])" % (recordSet, self.jqCategory, self.jqValue)
+
 
 class Donut(Pie):
   """
