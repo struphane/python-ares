@@ -22,7 +22,6 @@ function getDataFromRecordSet(data, cols) {
         filterData.push([key, tmpDict[key]]);
     }
 
-    console.log(filterData);
     return filterData;
 };
 
