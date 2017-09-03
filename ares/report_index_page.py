@@ -50,7 +50,7 @@ def report(aresObj, localPath=None):
                       Please go here to get more details about the process
                     ''')
   comp = aresObj.icon('download')
-  comp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
+  comp.js('click', "window.location.href='../download/%(report_name)s/%(script)s' ;" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
 
   fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME'])))
   fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME']))))
@@ -59,8 +59,9 @@ def report(aresObj, localPath=None):
   ajxCall =  aresObj.http['SCRIPTS_AJAX'].get('%s.py' % aresObj.http['SCRIPTS_NAME'], [])
   for call in ajxCall:
     displayedScript[call] = True
-  scripts = [['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'],
-             [scriptComp, fileSize, fileDate,  '', ''.join(ajxCall), comp, '']]
+  hearder = ['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete']
+  recordSet = []
+  recordSet.append(dict(zip(hearder, [scriptComp, fileSize, fileDate,  '', ''.join(ajxCall), comp, ''])))
   scriptUpdate = fileDate
   displayedScript['%s.py' % aresObj.http['SCRIPTS_NAME']] = True
   for mainScript, child in aresObj.http['SCRIPTS_CHILD']:
@@ -71,7 +72,7 @@ def report(aresObj, localPath=None):
         scriptLink = scriptPath.replace(aresObj.http['SCRIPTS_NAME'], "")
         remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
         downComp = aresObj.icon('download')
-        downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
+        downComp.js('click', "window.location.href='../download/%(report_name)s/%(script)s' ;" % {'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
         fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
         fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
         ajxCall =  aresObj.http['SCRIPTS_AJAX'].get(script, [])
@@ -80,9 +81,10 @@ def report(aresObj, localPath=None):
         for call in ajxCall:
           displayedScript[call] = True
         if i == 1:
-          scripts.append([divComp, fileSize, fileDate, mainScript, "".join(ajxCall), downComp, remov])
+          row = [divComp, fileSize, fileDate, mainScript, "".join(ajxCall), downComp, remov]
         else:
-          scripts.append([script, fileSize, fileDate, '', "".join(ajxCall), downComp, remov])
+          row = [script, fileSize, fileDate, '', "".join(ajxCall), downComp, remov]
+        recordSet.append(dict(zip(hearder, row)))
         displayedScript[script] = True
         scriptUpdate = fileDate if fileDate > scriptUpdate else scriptUpdate
 
@@ -97,7 +99,7 @@ def report(aresObj, localPath=None):
       fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
       divComp = aresObj.div(script)
       divComp.toolTip(os.path.join(scriptPath, script))
-      scripts.append([divComp, fileSize, fileDate, '', '', downComp, removComp])
+      recordSet.append(dict(zip(hearder, [divComp, fileSize, fileDate, '', '', downComp, removComp])))
       scriptUpdate = fileDate if fileDate > scriptUpdate else scriptUpdate
 
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
@@ -112,11 +114,22 @@ def report(aresObj, localPath=None):
   content = []
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
-  graphObj = aresObj.bar('Deployments count', [ {"key": "Cumulative Return","values": content }])
-  graphObj.height = 200
-
-  aresObj.table('Scripts Summary', scripts, cssCls="table table-hover table-bordered")
-
+  tableComp = aresObj.table('Scripts Summary', recordSet,
+                            dict(zip(['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'],
+                                     ['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download',
+                                      'delete'])),
+                            cssCls="table table-hover table-bordered")
+  graphObj = aresObj.bar('Deployments count', recordSet,
+                         dict(zip(['Size', 'Modification Date'],
+                                  ['Size', 'Modification Date'])),
+                         (['Modification Date'], ['Size']))
+  pieObj = aresObj.pie('Deployments count', recordSet,
+                         dict(zip(['Size', 'Modification Date'],
+                                  ['Size', 'Modification Date'])),
+                         (['Modification Date'], ['Size']))
+  graphObj.linkTo(tableComp)
+  pieObj.linkTo(tableComp)
+  aresObj.row([graphObj, pieObj])
   zipComp = aresObj.downloadAll('Download Zip archive of this environment')
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
   return aresObj

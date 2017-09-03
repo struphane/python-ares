@@ -147,6 +147,18 @@ class Report(object):
     self.content.append(htmlObj.htmlId)
     return htmlObj
 
+  def suppRec(self, recordSet):
+    for rec in recordSet:
+      for val in rec.values():
+        if hasattr(val, 'htmlId'):
+          try:
+            del self.content[self.content.index(val.htmlId)]
+          except:
+            print("PROBLEME")
+            pass
+
+    return recordSet
+
   def supp(self, htmlObjs):
     """ Unregister the HTML component to the Ares object """
     if htmlObjs is None:
@@ -215,12 +227,11 @@ class Report(object):
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def table(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.supp(values), header, cssCls), sys._getframe().f_code.co_name)
+  def table(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.suppRec(values), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def grid(self, values, cssCls=None): return self.add(AresHtmlContainer.Split(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -230,8 +241,8 @@ class Report(object):
 
   # Chart section
   def bar(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def pieChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def donutChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def pie(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def donut(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
   def lineChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
   def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
   def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
@@ -249,6 +260,10 @@ class Report(object):
   def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
+  # Designer objects
+  def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self.getNext(), 'Put your text here', cssCls), sys._getframe().f_code.co_name)
+  def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self.getNext(), 'Drop here', cssCls), sys._getframe().f_code.co_name)
+  def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self.getNext(), vals, cssCls), sys._getframe().f_code.co_name)
 
   # ---------------------------------------------------
   #    Action on files and folders reaad and write
@@ -363,5 +378,5 @@ class Report(object):
         else:
           jsSection.append("\n".join(jsFncs))
 
-    jsSection.append("nv.addGraph(function() {\n %s });" % "\n".join(jsGraphs))
+    jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n".join(jsGraphs))
     return "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

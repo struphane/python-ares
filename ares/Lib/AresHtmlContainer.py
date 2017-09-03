@@ -22,7 +22,7 @@ class Div(AresHtml.Html):
 
   def onLoadFnc(self):
     """ Activate the Jquery tooltips display """
-    return "$( document ).tooltip();"
+    return "$( function() { $( document ).tooltip() ; }) ;"
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -111,44 +111,6 @@ class Container(Div):
     return aresObj.container('', "MyContainer")
 
 
-class Split(AresHtml.Html):
-  """
-  Wrapper for a bootstrap Grid
-
-  This container will allow users to display object on the same line
-  It is perfect to encapsulate other HTML object
-
-  For example
-    ['A', 'B']
-
-  Default class parameters
-    - cssCls = container-fluid
-    - col_lg = 6
-  """
-  cssCls, alias = "container-fluid", 'grid'
-  gridCss = 'panel panel-success'
-  col_lg = 6
-  reference = 'https://getbootstrap.com/docs/3.3/css/'
-
-  def __str__(self):
-    """ Return the HTML display of a split container"""
-    res = AresItem.Item('<div %s>' % 'class="%s"' % self.gridCss if self.gridCss is not None else '')
-    res.add(1, '<div %s>' % self.strAttr())
-    res.add(1, '<BR/><div class="row">')
-    for htmObj in self.vals:
-      res.add(2, '<div class="col-lg-%s">' % self.col_lg)
-      res.add(3, str(htmObj))
-      res.add(2, '</div>')
-    res.add(1, '</div>')
-    res.add(0, '</div>')
-    res.add(0, '</div>')
-    return str(res)
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.grid(['A', 'B'])
-
-
 class GraphSvG(AresHtml.Html):
   """
   Python Wrapper to a DIV tag with a SVG
@@ -157,7 +119,7 @@ class GraphSvG(AresHtml.Html):
     - CSS Default Class = span4 (for the DIV component)
     - width, height = 960, 500 (for the SVG component)
   """
-  cssCls = 'span4'
+  cssCls = 'panel-body span4'
   width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
@@ -167,7 +129,7 @@ class GraphSvG(AresHtml.Html):
     """ Return the String representation of a DIV containing a SVG tag """
     item = AresItem.Item('<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
     item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
-    item.add(1, '<div class="panel-body" style="width:100%%;height:100%%;" %s>' % self.strAttr())
+    item.add(1, '<div style="width:95%%;height:95%%;" %s>' % self.strAttr())
 
     # Add the pointers for the display
     if self.categories is not None:
@@ -261,14 +223,14 @@ class Tabs(AresHtml.Html):
     - CSS Default Class = nav nav-tabs
     - title = Home
   """
-  title, alias = 'Home', 'tabs'
+  alias = 'tabs'
   cssCls = 'nav nav-tabs'
 
   def __str__(self):
     """ Return the HTML representation of a Tabular object """
     item = AresItem.Item('<ul %s>' % self.strAttr())
-    item.add(1, '<li class="active"><a href="#">%s</a></li>' % self.title)
-    for val in self.vals:
+    item.add(1, '<li class="active"><a href="#">%s</a></li>' % self.vals[0])
+    for val in self.vals[1:]:
       item.add(2, '<li><a href="#">%s</a></li>' % val)
     item.add(0, '</ul>')
     return str(item)
@@ -337,6 +299,29 @@ class Row(AresHtml.Html):
     res.add(0, '</div>')
     return str(res)
 
+  def jsEvents(self, jsEventFnc=None):
+    """ Function to get the Javascript methods for this object and all the underlying objects """
+    if jsEventFnc is None:
+      jsEventFnc = self.jsEventFnc
+    for jEventType, jsEvent in self.jsEvent.items():
+      jsEventFnc[jEventType].add(str(jsEvent))
+    for _, val in self.vals:
+      if hasattr(val, 'jsEvent'):
+        getattr(val, 'jsEvents')(jsEventFnc)
+    return jsEventFnc
+
+  def onLoad(self, loadFnc=None):
+    """ Functions to get all the onload items for this object and all the underlying object """
+    if loadFnc is None:
+      loadFnc = self.jsOnLoad
+    fnc = self.onLoadFnc()
+    if fnc is not None:
+      loadFnc.add(fnc)
+    for _, val in self.vals:
+      if hasattr(val, 'onLoad'):
+        getattr(val, 'onLoad')(loadFnc)
+    return loadFnc
+
 
 class Vignet(AresHtml.Html):
   """
@@ -359,6 +344,7 @@ class Vignet(AresHtml.Html):
     res.add(1, "<p><h1><center>%s</center></h1></p>" % self.vals)
     res.add(0, "</div>")
     return str(res)
+
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])

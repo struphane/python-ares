@@ -100,7 +100,7 @@ class Title(AresHtml.Html):
 
   def onLoadFnc(self):
     """ Activate the Jquery Tooltips """
-    return "$( document ).tooltip();"
+    return "$( function() { $( document ).tooltip() ; }) ;"
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -198,6 +198,66 @@ class Numeric(AresHtml.Html):
     locale.setlocale(locale.LC_ALL, '')
     html = "<font %s>{:,d}/font>" % self.strAttr()
     return html.format(int(float(self.vals)))
+
+# --------------------------------------------------------------------
+# Object dedicated to be used
+#      - To show an example of an HTML object
+#      - In the designer to create the reports on the web interface
+# --------------------------------------------------------------------
+class TextInput(AresHtml.Html):
+  """ special HTML object in charge of changing properties when double clicked """
+  alias = 'aresInput'
+
+  def __str__(self):
+    """ Return the html string representation """
+    items = AresItem.Item('<div ondblclick="$(\'#in_%s\').show() ; $(this).hide() ;" %s>%s</div>' % (self.htmlId, self.strAttr(), self.vals))
+    items.add(0, '<input type="text" id="in_%s" value="%s" style="display:none;" onblur="$(\'#%s\').html($(this).val()); $(\'#%s\').show() ; $(this).hide()">' % (self.htmlId, self.vals, self.htmlId, self.htmlId))
+    return str(items)
+
+
+class DataSource(AresHtml.Html):
+  """ special HTML object in charge of changing properties when double clicked """
+  alias = 'aresDataSource'
+  cssCls = 'ui-widget-header'
+
+  def __str__(self):
+    """ Return the html string representation """
+    items = AresItem.Item(' <div %s><p>%s</p></div>' % (self.strAttr(), self.vals))
+    return str(items)
+
+
+  def onLoadFnc(self):
+    """ Set the area droppable """
+    return '''$( function() {
+                  %s.droppable({
+                      drop: function( event, ui ) {
+                        $( this )
+                          .addClass( "ui-state-highlight" )
+                          .find( "p" )
+                            .html( "Dropped!" );
+                      }
+                    });
+              } );
+           ''' % self.jqId
+
+
+class DragItems(AresHtml.Html):
+  """ special HTML object in charge of changing properties when double clicked """
+  alias = 'aresDragItems'
+  cssCls = 'ui-widget-content'
+
+  def __str__(self):
+    """ Return the html string representation """
+    items = AresItem.Item(' <div %s>' % self.strAttr())
+    for val in self.vals:
+      items.add(1, "  <p>%s</p>" % val)
+    items.add(9, "</div>")
+    return str(items)
+
+  def onLoadFnc(self):
+    """ Set the items draggable """
+    return "$( function() { $('#%s p').draggable(); } );" % self.htmlId
+
 
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')

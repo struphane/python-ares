@@ -23,7 +23,7 @@ class Table(AresHtml.Html):
   def __init__(self, htmlId, headerBox, vals, header, cssCls=None):
     """  """
     super(Table, self).__init__(htmlId, vals, cssCls)
-    self.headerBox = header
+    self.headerBox = headerBox
     self.header = header
     self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
 
@@ -80,7 +80,7 @@ class Table(AresHtml.Html):
       jsEventFnc[jEventType].add(str(jsEvent))
 
     for row in self.vals:
-      for val in row:
+      for val in row.values():
         if hasattr(val, 'jsEvent'):
           getattr(val, 'jsEvents')(jsEventFnc)
     return jsEventFnc
@@ -122,17 +122,20 @@ class Table(AresHtml.Html):
 
   def onLoadFnc(self):
     """ Return a String with the Javascript method to put in the HTML report """
-    item = AresItem.Item("var %s;" % self.htmlId)
-    item.add(0, "$(document).ready(function() {")
-    item.add(1, '''
-                  %s = %s.DataTable(
-                    {"fnDrawCallback": function( oSettings ) {
-                                          // Add the linked functions here
-                                          %s
-                                        }
-                    }
-                  ) ;
-                ''' % (self.htmlId, self.jqId, "\n".join(self.linkedObjs)))
+    #item = AresItem.Item("var %s;" % self.htmlId)
+    item = AresItem.Item("$(document).ready(function() {")
+    if self.linkedObjs is not None:
+      item.add(1, '''
+                    %s.DataTable(
+                      {"fnDrawCallback": function( oSettings ) {
+                                            // Add the linked functions here
+                                            %s
+                                          }
+                      }
+                    ) ;
+                  ''' % (self.jqId, "\n".join(self.linkedObjs)))
+    else:
+      item.add(1, ''' %s = %s.DataTable( ''' % (self.htmlId, self.jqId))
     if self.filtId is not None:
       item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
       item.add(2, "%s.draw() ;" % self.htmlId)
@@ -143,7 +146,7 @@ class Table(AresHtml.Html):
       # Add the event on the filters
       item.add(0, "$.fn.dataTable.ext.search.push(")
       item.add(1, "function(settings, data, dataIndex){")
-      item.add(2, "if( ( data[1].includes($('#tablerec_1_CCY').val()) ) || ($('#tablerec_1_CCY').val() == '')) return true ;")
+      item.add(2, "if( ( data[1].includes($('#table_1_CCY').val()) ) || ($('#table_1_CCY').val() == '')) return true ;")
       item.add(2, "return false ;")
       item.add(1, "}")
       item.add(0, ") ;")
