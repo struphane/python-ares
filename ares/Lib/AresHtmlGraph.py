@@ -36,8 +36,8 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def __str__(self):
     """ override the str function to make sure we can add the selectors at the end when the datasource is set """
-    self.selectCategory(self.selectors[0][0], self.selectors[0], self.pyDataSource)
-    self.selectValues(self.selectors[1][0], self.selectors[1], self.pyDataSource)
+    self.selectCategory(self.selectors['selectedCats'], self.selectors['categories'], self.pyDataSource)
+    self.selectValues(self.selectors['selectedVals'], self.selectors['values'], self.pyDataSource)
     return super(JsNvD3Graph, self).__str__()
 
 
@@ -49,13 +49,13 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
       for key, val in rec.items():
         newRec[self.mapCols[key]] = val
       recordSet.append(newRec)
-    return '[{"key": %s, "values": getDataFromRecordSet(%s, [%s, %s])}]' % (self.jqCategory, recordSet, self.jqCategory, self.jqValue)
+    return "buildJsRecordSet(%s, %s, %s)" % (recordSet, self.jqCategory, self.jqValue)
 
   def update(self, data):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = [{'key': %s, 'values': getDataFromRecordSet(%s, [%s, %s])}] ;" % (self.jqCategory, data, self.jqCategory, self.jqValue))
+    item = AresItem.Item("var filterRecordSet = buildJsRecordSet(%s, %s, %s) ;" % (data, self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
-    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;" % self.jqId)
+    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
 
   def jsChart(self):

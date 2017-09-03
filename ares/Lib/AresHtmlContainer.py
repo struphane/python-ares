@@ -183,9 +183,12 @@ class GraphSvG(AresHtml.Html):
   def selectCategory(self, selectedCategory, categories, pyDataSrc):
     """ Return the category to be selected in the graph display """
     item = AresItem.Item('Category')
-    item.add(2, '<select id="%s_col_selector" class ="selectpicker">' % self.htmlId)
+    if len(selectedCategory) > 1:
+      item.add(2, '<select id="%s_col_selector" class ="selectpicker" multiple="true">' % self.htmlId)
+    else:
+      item.add(2, '<select id="%s_col_selector" class ="selectpicker">' % self.htmlId)
     for cat in categories:
-      if selectedCategory == cat:
+      if cat in selectedCategory:
         item.add(3, '<option selected>%s</option>' % cat)
       else:
         item.add(3, '<option>%s</option>' % cat)
@@ -197,9 +200,12 @@ class GraphSvG(AresHtml.Html):
   def selectValues(self, selectedValue, values, pyDataSrc):
     """ Return the value to be selected in the graph display """
     item = AresItem.Item('Value')
-    item.add(2, '<select id="%s_val_selector" class ="selectpicker">' % self.htmlId)
+    if len(selectedValue) > 1:
+      item.add(2, '<select id="%s_val_selector" class ="selectpicker" multiple="true">' % self.htmlId)
+    else:
+      item.add(2, '<select id="%s_val_selector" class ="selectpicker">' % self.htmlId)
     for val in values:
-      if selectedValue == val:
+      if val in selectedValue:
         item.add(3, '<option selected>%s</option>' % val)
       else:
         item.add(3, '<option>%s</option>' % val)
@@ -216,12 +222,12 @@ class GraphSvG(AresHtml.Html):
   @property
   def jqCategory(self):
     """ Returns the selected category for the graph """
-    return '$("#%s_col_selector option:selected").text()'% self.htmlId
+    return '$("#%s_col_selector option:selected")'% self.htmlId
 
   @property
   def jqValue(self):
     """ Return the selected value to use for the graph """
-    return '$("#%s_val_selector option:selected").text()' % self.htmlId
+    return '$("#%s_val_selector option:selected")' % self.htmlId
 
 
 class Network(AresHtml.Html):

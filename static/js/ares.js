@@ -24,6 +24,31 @@ function getDataFromRecordSet(data, cols) {
     return filterData;
 };
 
+function buildJsRecordSet(data, categories, selectedVals) {
+    // new function to allow for multiple series to be passed to the graph
+    series = [];
+    values = [];
+
+    categories.each(function() {
+        series.push($(this).val());
+    });
+
+    selectedVals.each(function() {
+        values.push($(this).val());
+    });
+
+    seriesLen = series.length;
+
+    recSet = [];
+    for (i = 0; i < seriesLen; i++)
+    {
+        var seriesDict = {"key": series[i], "values": getDataFromRecordSet(data, [series[i], values[i]])};
+        recSet.push(seriesDict);
+    }
+
+    return recSet;
+}
+
 
 function getRecordSetFromTable(htmlTableId){
     // Return a list of dictionaries from a DataTable object
