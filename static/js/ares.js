@@ -21,8 +21,23 @@ function getDataFromRecordSet(data, cols) {
     for (var key in tmpDict) {
         filterData.push([key, tmpDict[key]]);
     }
+
+    console.log(filterData);
     return filterData;
 };
+
+function wrapperSimpleCharts(data, categories, selectedVals) {
+
+    categories.each(function() {
+        key = $(this).text();
+    });
+
+    selectedVals.each(function() {
+        val = $(this).text();
+    });
+
+    return getDataFromRecordSet(data, [key, val]);
+}
 
 function buildJsRecordSet(data, categories, selectedVals) {
     // new function to allow for multiple series to be passed to the graph

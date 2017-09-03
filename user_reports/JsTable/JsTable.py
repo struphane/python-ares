@@ -15,32 +15,33 @@ def report(aresObj):
   CCYS = ['EUR', 'GBP', 'USD']
   recordSet = []
   for i in range(5):
-    recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010),
+    recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010), 'PTF2': random.randint(900, 1005),
                       'VAL2': random.uniform(0, 100),
+                      'VAL3': random.uniform(0, 320),
                       'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
-  table = aresObj.table('My Table', recordSet, {'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'})
-  table.filters({'Currency': 'CCY'})
+  table = aresObj.table('My Table', recordSet, {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'})
+  # table.filters({'Currency': 'CCY'})
 
-  selectors = (['Portfolio', 'Currency'], ['Value', 'Value 2'])
+  selectors = {'categories': ['Portfolio', 'Currency', 'Portfolio 2'], 'selectedCats': ['Portfolio'], 'values': ['Value', 'Value 2', 'Value 3'], 'selectedVals': ['Value']}
 
-  pie = aresObj.pieChart('Folders', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+  pie = aresObj.pieChart('Folders', recordSet, {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
   pie.linkTo(table)
 
 
-  donut = aresObj.donutChart('Folders', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+  donut = aresObj.donutChart('Folders', recordSet, {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
   donut.linkTo(table)
   # vignet = aresObj.vignet("Super", "Voici le contenu de mq vignette", recordSet, Lib.FlexFnc.recSum, 'VAL2')
   # row = aresObj.row([table, pie])
   # row.extend(pie)
 
-  bar = aresObj.bar('Test', recordSet, {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+  bar = aresObj.bar('Test', recordSet, {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
   lineChart = aresObj.lineChart('Test', recordSet,
-                    {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+                    {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
 
   stackedAreaChart = aresObj.stackedAreaChart('Test', recordSet,
-                    {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+                    {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
 
   stackedAreaChart.delAttr('xAxis', 'tickFormat')
   lineChartFocus = aresObj.lineChartFocus('Test', recordSet,
@@ -55,14 +56,15 @@ def report(aresObj):
                                   'VAL2': 'Value 2'}, selectors)
   comboLineBar.linkTo(table)
   comboLineBar.delAttr('xAxis', 'tickFormat')
+  selects = {'categories': ['Portfolio', 'Currency', 'Portfolio 2'], 'selectedCats': ['Portfolio', 'Portfolio 2'], 'values': ['Value', 'Value 2', 'Value 3'], 'selectedVals': ['Value', 'Value 3']}
   multiBarChart = aresObj.multiBarChart('Test', recordSet,
                                       {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value',
-                                       'VAL2': 'Value 2'}, selectors)
+                                       'VAL2': 'Value 2'}, selects)
   multiBarChart.linkTo(table)
 
   multiBarChart.delAttr('xAxis', 'tickFormat')
   horizBarChart = aresObj.horizBarChart('Test', recordSet,
-                    {'ID': 'DEAL', 'PTF': 'Portfolio', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2'}, selectors)
+                    {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selects)
 
   horizBarChart.delAttr('xAxis', 'tickFormat')
   # bar.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
@@ -73,10 +75,10 @@ def report(aresObj):
   lineChartFocus.linkTo(table)
   horizBarChart.linkTo(table)
 
-  # table.jsLinkTo([pie, bar])
+  table.jsLinkTo([pie, bar])
   button = aresObj.button('Change Graph (Ajax)')
   button.post('click', '../ajax/JsTable/testAjax.py', {},
-              '''   
+              '''
                 var filterRecordSet = getDataFromRecordSet(JSON.parse(data), [%s, %s]) ;
                 var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
                 d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;
@@ -91,17 +93,17 @@ def report(aresObj):
                         for (var i = 0, len = nRow.cells.length; i < len; i++) {
                           headers.push(nRow.cells[i].innerText) ;
                         };
-                        
+
                         recordSet = [] ;
                         $("#%s").dataTable().$('tr', {"filter":"applied"}).each( function () {
                           var row = $(this).text().split("\\n");
                           rec = {};
                           for (var i = 0, len = headers.length; i < len; i++) {
-                            rec[headers[i]] = row[i+1] ; 
+                            rec[headers[i]] = row[i+1] ;
                           }
                           recordSet.push(rec) ;
                         } );
-                        
+
                         var filterRecordSet = getDataFromRecordSet(recordSet, [%s, %s]) ;
                         var pie = nv.models.pieChart().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });
                         d3.%s.datum(filterRecordSet).transition().duration(500).call(pie) ;
