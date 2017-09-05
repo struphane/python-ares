@@ -142,7 +142,7 @@ class Pie(JsNvD3Graph):
   Data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
-  alias = 'pieChart'
+  alias = 'pie'
   mockData = r'json\pie.json'
   clickObject = 'pie'
   style = {'chartStyle': {'showLabels': '1'}}
@@ -164,6 +164,7 @@ class Pie(JsNvD3Graph):
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
+
 
 class Donut(Pie):
   """
