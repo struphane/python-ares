@@ -40,7 +40,6 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
     self.selectValues(self.selectors['selectedVals'], self.selectors['values'], self.pyDataSource)
     return super(JsNvD3Graph, self).__str__()
 
-
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
     recordSet = []
@@ -50,7 +49,6 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
         newRec[self.mapCols.get(key, key)] = val
       recordSet.append(newRec)
     return "buildJsRecordSet(%s, %s, %s)" % (recordSet, self.jqCategory, self.jqValue)
-
 
   def update(self, data):
     """ Update the content of an HTML component """
@@ -130,6 +128,9 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
     except Exception as e:
       print(e)
       print('Please use a data source that has a jsLinkTo attribute')
+
+
+
 
 
 
@@ -312,7 +313,6 @@ class LineWithFocus(JsNvD3Graph):
                          }}
 
 
-
 class HorizontalBars(JsNvD3Graph):
   """ Simple Horizontal bar chart
 
@@ -350,7 +350,6 @@ class HorizontalBars(JsNvD3Graph):
                          }}
 
 
-
 class ComboLineBar(JsNvD3Graph):
   """
   This object will combine a line and a bar chart.
@@ -372,7 +371,6 @@ class ComboLineBar(JsNvD3Graph):
                          'y1Axis': {'tickFormat': "d3.format(',.2f')"},
                          'y2Axis': {'tickFormat': "d3.format(',.2f')"}
                          }}
-
 
 
 class ScatterChart(JsNvD3Graph):
