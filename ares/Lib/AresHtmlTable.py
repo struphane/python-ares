@@ -20,11 +20,14 @@ class Table(AresHtml.Html):
   filt, filtId = None, None
   linkedObjs = None
 
-  def __init__(self, htmlId, headerBox, vals, header, cssCls=None):
+  def __init__(self, htmlId, headerBox, vals, header=[], cssCls=None):
     """  """
     super(Table, self).__init__(htmlId, vals, cssCls)
     self.headerBox = headerBox
-    self.header = header
+    if len(header) > 0 and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
+      self.header = [header]
+    else: # we have a header on several lines, nothing to do
+      self.header = header
     self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
 
   def filters(self, colsDict):
@@ -46,27 +49,38 @@ class Table(AresHtml.Html):
   def __str__(self):
     """ Return the string representation of a HTML table """
     item = AresItem.Item(None, self.incIndent)
+
     if self.headerBox is not None:
       item.add(0, '<div class="panel panel-success">')
-      item.add(1,
-               '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+      item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
       item.add(1, '<div class="panel-body">')
+
     if self.filt is not None:
       item.join(self.filt)
     item.add(0, '<table %s>' % self.strAttr())
-    item.add(1, '<thead>')
-    item.add(2, '<tr>')
-    for col in self.header:
-      item.add(3, '<th>%s</th>' % self.header[col])
-    item.add(2, '</tr>')
-    item.add(1, '</thead>')
-    item.add(1, '<tbody>')
+
+    for headerLine in self.header:
+      item.add(2, "<tr>")
+      for col in headerLine:
+        colname = col.get("colName")
+        attrs = ""
+        colspan = col.get("colSpan")
+        rowspan = col.get("rowSpan")
+        if colspan: attrs = '%s colspan="%s"' % (attrs, colspan)
+        if rowspan: attrs = '%s rowspan="%s"' % (attrs, rowspan)
+        item.add(3, "<th%s>%s<tr>" % (attrs, colname))
+      item.add(2, "<tr>")
+    item.add(1, "</thead>")
+
+    rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col.get("key", col.get("colName")) for col in self.header[-1]])
+    item.add(1, "<tbody>")
     for rec in self.vals:
-      item.add(1, '<tr>')
-      item.add(2, self.rowTmpl % rec)
-      item.add(1, '</tr>')
-    item.add(1, '</tbody>')
-    item.add(0, '</table>')
+      item.add(2, "<tr>")
+      item.add(3, rowTmpl % rec)
+      item.add(2, "</tr>")
+    item.add(1, "</tbody>")
+    item.add(0, "</table>")
+
     if self.headerBox is not None:
       item.add(0, '</div>')
       item.add(0, '</div>')
