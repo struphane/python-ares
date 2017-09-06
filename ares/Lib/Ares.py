@@ -24,6 +24,7 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 import os
 import sys
 import time
+import inspect
 import collections
 
 from ares.Lib import AresHtmlContainer
@@ -243,6 +244,7 @@ class Report(object):
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def col(self, values, cssCls=None): return self.add(AresHtmlContainer.Col(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
@@ -274,6 +276,16 @@ class Report(object):
   def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self.getNext(), 'Put your text here', cssCls), sys._getframe().f_code.co_name)
   def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self.getNext(), 'Drop here', cssCls), sys._getframe().f_code.co_name)
   def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self.getNext(), vals, cssCls), sys._getframe().f_code.co_name)
+
+  def components(self):
+    """
+    """
+    comp = []
+    for aresModule in [AresHtmlText]:
+      for name, cls in inspect.getmembers(aresModule):
+        if inspect.isclass(cls) and cls.alias is not None:
+          comp.append(cls.alias)
+    return comp
 
   # ---------------------------------------------------
   #    Action on files and folders reaad and write

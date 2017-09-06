@@ -61,3 +61,10 @@
     background-color: #f3f3f3;
     padding: 10px;
 }
+
+.page {
+    background-color: white ;
+    border: 1px solid black ;
+    height: 900px;
+    width: 700px;
+}

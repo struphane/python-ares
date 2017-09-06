@@ -323,6 +323,43 @@ class Row(AresHtml.Html):
     return loadFnc
 
 
+class Col(AresHtml.Html):
+  """
+
+  """
+  alias = 'col'
+
+  def __str__(self):
+    """ Return the HTML display of a split container"""
+    res = AresItem.Item('')
+    for htmlObj in self.vals:
+      res.add(1, str(htmlObj))
+    return str(res)
+
+  def jsEvents(self, jsEventFnc=None):
+    """ Function to get the Javascript methods for this object and all the underlying objects """
+    if jsEventFnc is None:
+      jsEventFnc = self.jsEventFnc
+    for jEventType, jsEvent in self.jsEvent.items():
+      jsEventFnc[jEventType].add(str(jsEvent))
+    for val in self.vals:
+      if hasattr(val, 'jsEvent'):
+        getattr(val, 'jsEvents')(jsEventFnc)
+    return jsEventFnc
+
+  def onLoad(self, loadFnc=None):
+    """ Functions to get all the onload items for this object and all the underlying object """
+    if loadFnc is None:
+      loadFnc = self.jsOnLoad
+    fnc = self.onLoadFnc()
+    if fnc is not None:
+      loadFnc.add(fnc)
+    for val in self.vals:
+      if hasattr(val, 'onLoad'):
+        getattr(val, 'onLoad')(loadFnc)
+    return loadFnc
+
+
 class Vignet(AresHtml.Html):
   """
   Vignet to display a value for a given recordset.
