@@ -25,7 +25,7 @@ def report(aresObj):
                                                 {'key': 'VAL', 'colName': 'Value'},
                                                 {'key': 'VAL2', 'colName': 'Value 2'},
                                                 {'key': 'VAL3', 'colName': 'Value 3'}])
-  # table.filters({'Currency': 'CCY'})
+  table.filters(['Currency', 'Portfolio'])
 
   selectors = {'categories': ['Portfolio', 'Currency', 'Portfolio 2'], 'selectedCats': ['Portfolio'], 'values': ['Value', 'Value 2', 'Value 3'], 'selectedVals': ['Value']}
 

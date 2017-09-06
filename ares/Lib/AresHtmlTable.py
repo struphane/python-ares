@@ -37,18 +37,17 @@ class Table(AresHtml.Html):
         self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (col.get("key", col.get("colName")), col.get("colName")))
     self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
 
-  def filters(self, colsDict):
+  def filters(self, cols):
     """ Store the different filters possible on the recordSet """
     items = AresItem.Item()
     self.filtId = {}
-    for colName, idCol in colsDict.items():
-      filterId = '%s_%s' % (self.htmlId, idCol)
+    for colName in cols:
+      filterId = '%s_%s' % (self.htmlId, colName.replace(" ", ""))
       items.add(0, '<div class="form-group">')
       items.add(1, '<label for="%s">%s:</label>' % (filterId, colName))
-      items.add(1, "<input type='text' id='%s' name='%s' style='width:100%%'>" % (filterId, filterId))
+      items.add(1, "<input type='text' id='%s' class='filter_%s' style='width:100%%'>" % (filterId, self.htmlId))
       items.add(0, '</div>')
-      #items.add(0, "%s: <input id='%s' name='%s' type='text'>" % (colName, filterId, filterId))
-      self.filtId[filterId] = idCol
+      self.filtId[filterId] = colName
     self.filt = items
 
   def __str__(self):
@@ -147,7 +146,7 @@ class Table(AresHtml.Html):
                                      }
                   ) ;''' % (self.htmlId, self.jqId, self.recordSetId, ",".join(self.recordSetHeader)))
     if self.filtId is not None:
-      item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
+      item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)
       item.add(1, "} );")
     item.add(0, "} );")
@@ -156,8 +155,17 @@ class Table(AresHtml.Html):
       # Add the event on the filters
       item.add(0, "$.fn.dataTable.ext.search.push(")
       item.add(1, "function(settings, data, dataIndex){")
-      item.add(2, "if( ( data[1].includes($('#table_1_CCY').val()) ) || ($('#table_1_CCY').val() == '')) return true ;")
-      item.add(2, "return false ;")
+      item.add(2, "var validLine = true ;")
+      for filtId, colName in self.filtId.items():
+        for headerLine in self.header:
+          for i, col in enumerate(headerLine):
+            if colName == col.get("colName"):
+              item.add(2, "if ( ( $('#%s').val() != '') && ( validLine != false ) ) {" % filtId)
+              item.add(3, "if ( data[%s].includes( $('#%s').val() ) ) {" % (i, filtId))
+              item.add(4, "validLine = true ; ")
+              item.add(3, "} else { validLine = false ; }")
+              item.add(2, "}")
+      item.add(2, "return validLine ;")
       item.add(1, "}")
       item.add(0, ") ;")
     return str(item)
