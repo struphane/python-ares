@@ -20,14 +20,21 @@ class Table(AresHtml.Html):
   filt, filtId = None, None
   linkedObjs = None
 
-  def __init__(self, htmlId, headerBox, vals, header=[], cssCls=None):
-    """  """
+  def __init__(self, htmlId, headerBox, vals, header=None, cssCls=None):
+    """
+
+    """
     super(Table, self).__init__(htmlId, vals, cssCls)
     self.headerBox = headerBox
-    if len(header) > 0 and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
+    self.recordSetId = id(vals)
+    self.recordSetHeader = []
+    if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     else: # we have a header on several lines, nothing to do
       self.header = header
+    for headerLine in self.header:
+      for col in headerLine:
+        self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (col.get("key", col.get("colName")), col.get("colName")))
     self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
 
   def filters(self, colsDict):
@@ -36,12 +43,10 @@ class Table(AresHtml.Html):
     self.filtId = {}
     for colName, idCol in colsDict.items():
       filterId = '%s_%s' % (self.htmlId, idCol)
-
       items.add(0, '<div class="form-group">')
       items.add(1, '<label for="%s">%s:</label>' % (filterId, colName))
-      items.add(2, "<input type='text' id='%s' name='%s' style='width:100%%'>" % (filterId, filterId))
+      items.add(1, "<input type='text' id='%s' name='%s' style='width:100%%'>" % (filterId, filterId))
       items.add(0, '</div>')
-
       #items.add(0, "%s: <input id='%s' name='%s' type='text'>" % (colName, filterId, filterId))
       self.filtId[filterId] = idCol
     self.filt = items
@@ -54,33 +59,9 @@ class Table(AresHtml.Html):
       item.add(0, '<div class="panel panel-success">')
       item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
       item.add(1, '<div class="panel-body">')
-
     if self.filt is not None:
       item.join(self.filt)
-    item.add(0, '<table %s>' % self.strAttr())
-
-    for headerLine in self.header:
-      item.add(2, "<tr>")
-      for col in headerLine:
-        colname = col.get("colName")
-        attrs = ""
-        colspan = col.get("colSpan")
-        rowspan = col.get("rowSpan")
-        if colspan: attrs = '%s colspan="%s"' % (attrs, colspan)
-        if rowspan: attrs = '%s rowspan="%s"' % (attrs, rowspan)
-        item.add(3, "<th%s>%s<tr>" % (attrs, colname))
-      item.add(2, "<tr>")
-    item.add(1, "</thead>")
-
-    rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col.get("key", col.get("colName")) for col in self.header[-1]])
-    item.add(1, "<tbody>")
-    for rec in self.vals:
-      item.add(2, "<tr>")
-      item.add(3, rowTmpl % rec)
-      item.add(2, "</tr>")
-    item.add(1, "</tbody>")
-    item.add(0, "</table>")
-
+    item.add(0, '<table %s></table>' % self.strAttr())
     if self.headerBox is not None:
       item.add(0, '</div>')
       item.add(0, '</div>')
@@ -141,15 +122,30 @@ class Table(AresHtml.Html):
     if self.linkedObjs is not None:
       item.add(1, '''
                     %s.DataTable(
-                      {"fnDrawCallback": function( oSettings ) {
+                      {
+                        data: recordSet_%s ,
+                        columns: [
+                                    %s
+                              ],
+                        fixedHeader: true,
+                        fnDrawCallback: function( oSettings ) {
                                             // Add the linked functions here
                                             %s
-                                          }
+                                        }
                       }
                     ) ;
-                  ''' % (self.jqId, "\n".join(self.linkedObjs)))
+                  ''' % (self.jqId, self.recordSetId, ",".join(self.recordSetHeader), "\n".join(self.linkedObjs)))
     else:
-      item.add(1, ''' %s = %s.DataTable( ''' % (self.htmlId, self.jqId))
+      item.add(1, '''
+                  %s = %s.DataTable(
+                                     {
+                                        data: recordSet_%s ,
+                                        columns: [
+                                                    %s
+                                              ],
+                                        fixedHeader: true
+                                     }
+                  ) ;''' % (self.htmlId, self.jqId, self.recordSetId, ",".join(self.recordSetHeader)))
     if self.filtId is not None:
       item.add(1, "$('%s').keyup(function(){" % ", ".join(["#%s" % id for id in self.filtId]))
       item.add(2, "%s.draw() ;" % self.htmlId)

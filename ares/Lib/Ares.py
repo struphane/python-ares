@@ -103,6 +103,7 @@ class Report(object):
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
+    self.jsRegistered = {}
 
   def structure(self):
     return self.content
@@ -191,6 +192,15 @@ class Report(object):
     self.supp(htmlObj)
     container.addVal(htmlObj)
 
+  def register(self, recordSet):
+    """
+
+    """
+    if id(recordSet) not in self.jsRegistered:
+      self.jsRegistered[id(recordSet)] = recordSet
+    return recordSet
+
+
   # ---------------------------------------------------------------------------------------------------------
   # Section dedicated to map the functions call to the HTML Component
   # This part is done in python 3 in order to ensure users will put the right type of objects
@@ -227,7 +237,7 @@ class Report(object):
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def table(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.suppRec(values), header, cssCls), sys._getframe().f_code.co_name)
+  def table(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.register(self.suppRec(values)), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -369,6 +379,8 @@ class Report(object):
     onloadParts, htmlParts, jsSection, jsGraphs = set(), [], [], []
     for htmlId in self.content:
       jsOnload, html, js = self.htmlItems[htmlId].html()
+      for ref, data in self.jsRegistered.items():
+        onloadParts.add("        var recordSet_%s = %s ;" % (ref, data))
       for onloadFnc in jsOnload:
         onloadParts.add(onloadFnc)
       htmlParts.append(html)
