@@ -83,6 +83,15 @@ def isExcluded(rootPath, file=None, folders=None):
 
   return False
 
+def moduleFromAlias(alias):
+  for aresModule in [AresHtmlText]:
+      for name, cls in inspect.getmembers(aresModule):
+        if inspect.isclass(cls) and cls.alias is not None and alias == cls.alias:
+          return cls
+
+  return None
+
+
 class Report(object):
   """
 
@@ -278,8 +287,7 @@ class Report(object):
   def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self.getNext(), vals, cssCls), sys._getframe().f_code.co_name)
 
   def components(self):
-    """
-    """
+    """ Get the list of component available in the framework """
     comp = []
     for aresModule in [AresHtmlText]:
       for name, cls in inspect.getmembers(aresModule):

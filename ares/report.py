@@ -489,6 +489,17 @@ def deleteFiles(report_name):
     appendToLog(report_name, 'DELETE', request.form.get('SCRIPT'))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
+@report.route("/components/<component>:<compId>")
+def designerComponent(component, compId):
+  """
+
+  """
+  print compId
+  print component
+  print Ares.moduleFromAlias(component)
+  print Ares.moduleFromAlias(component).aresDesigner(compId)
+  return json.dumps('')
+
 # ---------------------------------------------------------------------------------------------------------
 #                                          DOWNLOAD SECTION
 #

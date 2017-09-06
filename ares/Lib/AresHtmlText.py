@@ -106,6 +106,12 @@ class Title(AresHtml.Html):
   def aresExample(cls, aresObj):
     return aresObj.title("Level 1 Title")
 
+  @classmethod
+  def aresDesigner(cls, id):
+    """ Return a header HTML Tag for the Designer """
+    obj = cls(id, 'Put your text her')
+    return str(obj)
+
 
 class Title2(Title):
   """ Python Wrapper to the HTML H2 Tag """
@@ -228,6 +234,7 @@ class DataSource(AresHtml.Html):
   def onLoadFnc(self):
     """ Set the area droppable """
     return '''$( function() {
+                  var droppedItem = 0 ; // This variable will be used in order to set the ID in the python
                   %s.droppable({
                       drop: function( event, ui ) {
                         event.preventDefault();
@@ -237,6 +244,7 @@ class DataSource(AresHtml.Html):
                         // $( this ).find( "p" ).html( "Dropped!" );
                         $( this ).append(dragId);
                         $('#' + dragId).text(sourceValue);
+                        droppedItem++ ;
                       }
                     });
               } );
