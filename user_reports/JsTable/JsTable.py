@@ -5,7 +5,7 @@ CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py
 import string
 import random
 import json
-# import Lib.FlexFnc
+import Lib.FlexFnc
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for _ in range(size))
@@ -25,9 +25,8 @@ def report(aresObj):
                                                 {'key': 'VAL', 'colName': 'Value'},
                                                 {'key': 'VAL2', 'colName': 'Value 2'},
                                                 {'key': 'VAL3', 'colName': 'Value 3'}])
-  table.filters(['Currency', 'Portfolio'])
+  table.filters(['Currency', 'Portfolio', 'Portfolio 2'])
 
-  selectors = {'categories': ['Portfolio', 'Currency', 'Portfolio 2'], 'selectedCats': ['Portfolio'], 'values': ['Value', 'Value 2', 'Value 3'], 'selectedVals': ['Value']}
 
   #pie = aresObj.pieChart('Folders', recordSet, {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
