@@ -225,20 +225,22 @@ class DataSource(AresHtml.Html):
     items = AresItem.Item(' <div %s><p>%s</p></div>' % (self.strAttr(), self.vals))
     return str(items)
 
-
   def onLoadFnc(self):
     """ Set the area droppable """
     return '''$( function() {
                   %s.droppable({
                       drop: function( event, ui ) {
-                        $( this )
-                          .addClass( "ui-state-highlight" )
-                          .find( "p" )
-                            .html( "Dropped!" );
+                        event.preventDefault();
+                        if ($('#%s p').text() == '%s') {$('#%s p').text('') ;}
+                        var dragId = $(ui.draggable).attr('id') ;
+                        var sourceValue = $(ui.draggable).text() ;
+                        // $( this ).find( "p" ).html( "Dropped!" );
+                        $( this ).append(dragId);
+                        $('#' + dragId).text(sourceValue);
                       }
                     });
               } );
-           ''' % self.jqId
+           ''' % (self.jqId, self.htmlId, self.vals, self.htmlId)
 
 
 class DragItems(AresHtml.Html):
@@ -248,9 +250,9 @@ class DragItems(AresHtml.Html):
 
   def __str__(self):
     """ Return the html string representation """
-    items = AresItem.Item(' <div %s>' % self.strAttr())
+    items = AresItem.Item(' <div style="cursor:pointer;width:200px" %s>' % self.strAttr())
     for val in self.vals:
-      items.add(1, "  <p>%s</p>" % val)
+      items.add(1, "  <p id='%s_%s' align='center' style='width:100%%;padding:3px'>%s</p>" % (self.htmlId, val, val) )
     items.add(9, "</div>")
     return str(items)
 
