@@ -202,11 +202,19 @@ class Report(object):
     self.supp(htmlObj)
     container.addVal(htmlObj)
 
-  def register(self, recordSet):
+  def register(self, recordSet, header):
     """
 
     """
+    strFct = []
+    for headerRow in header:
+      if headerRow.get("type") == 'object':
+        strFct.append(headerRow.get('key', headerRow['colName']) )
     if id(recordSet) not in self.jsRegistered:
+      if strFct:
+        for rec in recordSet:
+          for col in strFct:
+            rec[col] = str(rec[col])
       self.jsRegistered[id(recordSet)] = recordSet
     return recordSet
 
@@ -247,7 +255,7 @@ class Report(object):
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def table(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.register(self.suppRec(values)), header, cssCls), sys._getframe().f_code.co_name)
+  def table(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -261,8 +269,8 @@ class Report(object):
   def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Chart section
-  def bar(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def pie(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def bar(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def pie(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def donut(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
   def lineChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
   def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)

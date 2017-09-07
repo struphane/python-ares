@@ -27,17 +27,16 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
 
 
-  def __init__(self, htmlId, header, vals, mapCols, selectors, cssCls=None):
+  def __init__(self, htmlId, header, vals, recordSetDef, cssCls=None):
     """ selectors is a tuple with the category first and the value list second """
     super(JsNvD3Graph, self).__init__(htmlId, vals, cssCls)
     self.headerBox = header
-    self.selectors = selectors #add to add this as argument to specify which columns to select on for values and catgories
-    self.mapCols = mapCols
+    self.mapCols = dict([(col['key'], col['colName']) for col in recordSetDef])
 
   def __str__(self):
     """ override the str function to make sure we can add the selectors at the end when the datasource is set """
-    self.selectCategory(self.selectors['selectedCats'], self.selectors['categories'], self.pyDataSource)
-    self.selectValues(self.selectors['selectedVals'], self.selectors['values'], self.pyDataSource)
+    #self.selectCategory(self.selectors['selectedCats'], self.selectors['categories'], self.pyDataSource)
+    #self.selectValues(self.selectors['selectedVals'], self.selectors['values'], self.pyDataSource)
     return super(JsNvD3Graph, self).__str__()
 
   def dataFnc(self):

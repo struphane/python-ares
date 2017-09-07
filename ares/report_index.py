@@ -34,23 +34,29 @@ def report(aresObj):
     content.append({'folderName': folder, 'Date': folderInfo['LAST_MOD_DT'], 'Size': folderInfo['SIZE'],
                     'FolderFiles': len(aresObj.getFiles([folder])), 'delete': iconComp})
 
-  # Create a new report
-  tableComp = aresObj.table('Existing Reports', content, [{'key': 'folderName', 'colName': 'Folder Name'},
-                                                          {'key': 'FolderFiles', 'colName': 'Count Files'},
-                                                          {'key': 'Date', 'colName': 'Last Modification'},
-                                                          {'key': 'Size', 'colName': 'Size in Ko'},
-                                                          {'key': 'delete', 'colName': ''}])
-  barComp = aresObj.bar('Scripts per folder', content,
-                        {'folderName': 'Folder Name', 'FolderFiles': 'Count Files'},
-                        (['Folder Name'], ['Count Files']))
-  barComp.linkTo(tableComp)
-  createReport = aresObj.button("Create the Report", 'btn btn-primary')
-  inputModal = aresObj.input("Report Name", '')
-  aresObj.addTo(modal, inputModal)
-  aresObj.addTo(modal, createReport)
-  createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.val, 'display(data);')
-  pieComp = aresObj.pie('Folders', content, {'folderName': 'Folder Name', 'FolderFiles': 'Count Files'},
-                            (['Folder Name'], ['Count Files']))
-  pieComp.linkTo(tableComp)
-  aresObj.row([pieComp, tableComp])
+  # Create a new report # 'Existing Reports',
+  tableComp = aresObj.table(content, [{'key': 'folderName', 'colName': 'Folder Name'},
+                                      {'key': 'FolderFiles', 'colName': 'Count Files'},
+                                      {'key': 'Date', 'colName': 'Last Modification'},
+                                      {'key': 'Size', 'colName': 'Size in Ko'},
+                                      {'key': 'delete', 'colName': '', 'type': 'object'}], 'Existing Reports')
+  tableComp.filters(['Folder Name'])
+  # barComp = aresObj.bar('Scripts per folder', content, [{'key': 'folderName', 'colName': 'Folder Name'},
+  #                                                         {'key': 'FolderFiles', 'colName': 'Count Files'},
+  #                                                         {'key': 'Date', 'colName': 'Last Modification'},
+  #                                                         {'key': 'Size', 'colName': 'Size in Ko'},
+  #                                                         {'key': 'delete', 'colName': ''}])
+  # barComp.linkTo(tableComp)
+  # createReport = aresObj.button("Create the Report", 'btn btn-primary')
+  # inputModal = aresObj.input("Report Name", '')
+  # aresObj.addTo(modal, inputModal)
+  # aresObj.addTo(modal, createReport)
+  # createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.val, 'display(data);')
+  # pieComp = aresObj.pie('Folders', content, [{'key': 'folderName', 'colName': 'Folder Name'},
+  #                                             {'key': 'FolderFiles', 'colName': 'Count Files'},
+  #                                             {'key': 'Date', 'colName': 'Last Modification'},
+  #                                             {'key': 'Size', 'colName': 'Size in Ko'},
+  #                                             {'key': 'delete', 'colName': ''}])
+  # pieComp.linkTo(tableComp)
+  # aresObj.row([pieComp, tableComp])
   return aresObj

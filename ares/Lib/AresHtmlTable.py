@@ -24,6 +24,7 @@ class Table(AresHtml.Html):
     """
 
     """
+    print vals
     super(Table, self).__init__(htmlId, vals, cssCls)
     self.headerBox = headerBox
     self.recordSetId = id(vals)
@@ -53,7 +54,6 @@ class Table(AresHtml.Html):
   def __str__(self):
     """ Return the string representation of a HTML table """
     item = AresItem.Item(None, self.incIndent)
-
     if self.headerBox is not None:
       item.add(0, '<div class="panel panel-success">')
       item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
@@ -64,7 +64,7 @@ class Table(AresHtml.Html):
     if self.headerBox is not None:
       item.add(0, '</div>')
       item.add(0, '</div>')
-      return str(item)
+    return str(item)
 
   def jsEvents(self, jsEventFnc=None):
     """ Function to get the Javascript methods for this object and all the underlying objects """
