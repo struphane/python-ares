@@ -129,6 +129,7 @@ class GraphSvG(AresHtml.Html):
     """ selectors is a tuple with the category first and the value list second """
     super(GraphSvG, self).__init__(htmlId, vals, cssCls)
     self.headerBox = header
+    self.recordSetId = id(vals)
     self.header = recordSetDef
 
   def __str__(self):
@@ -167,8 +168,8 @@ class GraphSvG(AresHtml.Html):
         item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
     item.add(2, '</select>')
     self.categories = item
-    #self.jsEvent['cat-change'] = AresJs.JQueryEvents("%s_col_selector" % self.htmlId, "$('#%s_col_selector')" % self.htmlId,
-    #                                                 'change', self.update(pyDataSrc.getData()), '')
+    self.jsEvent['cat-change'] = AresJs.JQueryEvents("%s_col_selector" % self.htmlId, "$('#%s_col_selector')" % self.htmlId,
+                                                     'change', self.update(self.vals), '')
 
   def selectValues(self):
     """ Return the value to be selected in the graph display """
@@ -185,13 +186,18 @@ class GraphSvG(AresHtml.Html):
           item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
     item.add(2, '</select>')
     self.values = item
-    #self.jsEvent['val-change'] = AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,
-    #                                                 'change', self.update(pyDataSrc.getData()), '')
+    self.jsEvent['val-change'] = AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,
+                                                     'change', self.update(self.vals), '')
 
   @property
   def jqId(self):
     """ Returns the javascript SVG reference """
     return '$("#%s svg")' % self.htmlId
+
+  @property
+  def jqRecordSet(self):
+    """ Returns the javascript SVG reference """
+    return 'recordSet_%s' % self.recordSetId
 
   @property
   def jqCategory(self):

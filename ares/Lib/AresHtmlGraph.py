@@ -28,19 +28,11 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    colCat, colVal = None, None
-    for col in self.header:
-      if col.get('selected'):
-        if col.get('type') == 'number':
-          colVal = col.get('key', col['colName'])
-        else:
-          colCat = col.get('key', col['colName'])
-
-    return "buildJsRecordSet(%s, %s, %s)" % (self.vals, colCat, colVal)
+    return "buildJsRecordSet(%s, %s, %s)" % (self.vals, self.jqCategory, self.jqValue)
 
   def update(self, data):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = buildJsRecordSet(%s, %s, %s) ;" % (data, self.jqCategory, self.jqValue))
+    item = AresItem.Item("var filterRecordSet = buildJsRecordSet(%s, %s, %s) ;" % (self.jqRecordSet, self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)

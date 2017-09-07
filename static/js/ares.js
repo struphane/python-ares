@@ -42,7 +42,6 @@ function buildJsRecordSet(data, categories, selectedVals) {
     // new function to allow for multiple series to be passed to the graph
     series = [];
     values = [];
-
     categories.each(function() {
         series.push($(this).val());
     });
@@ -50,7 +49,6 @@ function buildJsRecordSet(data, categories, selectedVals) {
     selectedVals.each(function() {
         values.push($(this).val());
     });
-
     seriesLen = series.length;
 
     recSet = [];
