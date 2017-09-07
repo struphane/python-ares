@@ -127,8 +127,9 @@ class Pie(JsNvD3Graph):
 
   def update(self, data):
     """ Update the content of an HTML component """
+    chartStyle = ['%s(%s)' % (style, attr) for style, attr in self.style.get('chartStyle', {}).items()]
     item = AresItem.Item("var filterRecordSet = wrapperSimpleCharts(%s, %s, %s) ;" % (self.jqRecordSet, self.jqCategory, self.jqValue))
-    item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
+    item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; }).%s;" % (self.chartObject, self.chartObject, ".".join(chartStyle)))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
 
@@ -146,8 +147,7 @@ class Donut(Pie):
   mockData = r'json\pie.json'
   alias = 'donut'
   clickObject = 'pie'
-  style = {'chartStyle': {'showLabels': '1',
-                          'labelThreshold': '.05', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
+  style = {'chartStyle': {'showLabels': '1', 'labelThreshold': '.05', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
 
 
 class Bar(JsNvD3Graph):
