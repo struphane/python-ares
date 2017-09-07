@@ -28,7 +28,7 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return "buildJsRecordSet(%s, %s, %s)" % (self.vals, self.jqCategory, self.jqValue)
+    return "buildJsRecordSet(%s, %s, %s)" % (self.jqRecordSet, self.jqCategory, self.jqValue)
 
   def update(self, data):
     """ Update the content of an HTML component """
@@ -54,7 +54,7 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
       self.style.setdefault('chartAttr', {}).setdefault(subObj, {}).update(subAttr)
 
   def getChartDefaultStyle(self):
-    """ """
+    """ Return the chart default Style """
     return self.style
 
   def delStyle(self, style):
@@ -132,6 +132,10 @@ class Pie(JsNvD3Graph):
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
 
+  def dataFnc(self):
+    """ Return the data Source converted to them be sent to the javascript layer """
+    return "wrapperSimpleCharts(%s, %s, %s)" % (self.jqRecordSet, self.jqCategory, self.jqValue)
+
 
 class Donut(Pie):
   """
@@ -140,7 +144,7 @@ class Donut(Pie):
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   mockData = r'json\pie.json'
-  alias = 'donutChart'
+  alias = 'donut'
   clickObject = 'pie'
   style = {'chartStyle': {'showLabels': '1',
                           'labelThreshold': '.05', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }

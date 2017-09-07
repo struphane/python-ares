@@ -52,7 +52,7 @@ def report(aresObj):
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)
   createReport.post('click', "./create/env" , "{'REPORT': %s}" % inputModal.val, 'display(data);')
-  pieComp = aresObj.pie(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
+  pieComp = aresObj.donut(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
                                   {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
                                   {'key': 'Date', 'colName': 'Last Modification'},
                                   {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},

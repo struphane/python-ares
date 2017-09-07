@@ -26,15 +26,15 @@ function getDataFromRecordSet(data, cols) {
 };
 
 function wrapperSimpleCharts(data, categories, selectedVals) {
-
+    var key ;
+    var val ;
     categories.each(function() {
-        key = $(this).text();
+        key = $(this).val();
     });
 
     selectedVals.each(function() {
-        val = $(this).text();
+        val = $(this).val();
     });
-
     return getDataFromRecordSet(data, [key, val]);
 }
 

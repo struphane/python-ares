@@ -271,7 +271,7 @@ class Report(object):
   # Chart section
   def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def pie(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def donut(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def donut(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def lineChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
   def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
   def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
