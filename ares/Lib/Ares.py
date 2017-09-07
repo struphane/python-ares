@@ -26,6 +26,7 @@ import sys
 import time
 import inspect
 import collections
+import json
 
 from ares.Lib import AresHtmlContainer
 from ares.Lib import AresHtmlEvent
@@ -408,7 +409,7 @@ class Report(object):
     for htmlId in self.content:
       jsOnload, html, js = self.htmlItems[htmlId].html()
       for ref, data in self.jsRegistered.items():
-        onloadParts.add("        var recordSet_%s = %s ;" % (ref, data))
+        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data)))
       for onloadFnc in jsOnload:
         onloadParts.add(onloadFnc)
       htmlParts.append(html)

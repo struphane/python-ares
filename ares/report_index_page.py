@@ -59,9 +59,17 @@ def report(aresObj, localPath=None):
   ajxCall =  aresObj.http['SCRIPTS_AJAX'].get('%s.py' % aresObj.http['SCRIPTS_NAME'], [])
   for call in ajxCall:
     displayedScript[call] = True
-  hearder = ['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete']
+
+  header = [{'key': 'script_name', 'colName': 'Script Name', 'type': 'object'},
+            {'key': 'size', 'colName': 'Size'},
+            {'key': 'lst_mod_dt', 'colName': 'Modification Date'},
+            {'key': 'ajax', 'colName': 'Ajax'},
+            {'key': 'download', 'colName': 'Download', 'type': 'object'},
+            {'key': 'delete', 'colName': 'Delete', 'type': 'object'}]
+
   recordSet = []
-  recordSet.append(dict(zip(hearder, [scriptComp, fileSize, fileDate,  '', ''.join(ajxCall), comp, ''])))
+  recordSet.append({'script': '%s.py' % aresObj.http['SCRIPTS_NAME'], 'script_name': scriptComp, 'size': fileSize,
+                    'lst_mod_dt': fileDate, 'ajax': ''.join(ajxCall), 'download': comp, 'delete': '', 'parent': ''})
   scriptUpdate = fileDate
   displayedScript['%s.py' % aresObj.http['SCRIPTS_NAME']] = True
   for mainScript, child in aresObj.http['SCRIPTS_CHILD']:
@@ -81,10 +89,10 @@ def report(aresObj, localPath=None):
         for call in ajxCall:
           displayedScript[call] = True
         if i == 1:
-          row = [divComp, fileSize, fileDate, mainScript, "".join(ajxCall), downComp, remov]
+          row = {'script': script, 'script_name': divComp, 'size': fileSize, 'lst_mod_dt': fileDate, 'ajax': ''.join(ajxCall), 'download': downComp, 'delete': remov}
         else:
-          row = [script, fileSize, fileDate, '', "".join(ajxCall), downComp, remov]
-        recordSet.append(dict(zip(hearder, row)))
+          row = {'script': script, 'script_name': script, 'size': fileSize, 'lst_mod_dt': fileDate, 'ajax': ''.join(ajxCall), 'download': downComp, 'delete': remov}
+        recordSet.append(row)
         displayedScript[script] = True
         scriptUpdate = fileDate if fileDate > scriptUpdate else scriptUpdate
 
@@ -99,7 +107,7 @@ def report(aresObj, localPath=None):
       fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
       divComp = aresObj.div(script)
       divComp.toolTip(os.path.join(scriptPath, script))
-      recordSet.append(dict(zip(hearder, [divComp, fileSize, fileDate, '', '', downComp, removComp])))
+      recordSet.append({'script': script, 'script_name': divComp, 'size': fileSize, 'lst_mod_dt': fileDate, 'ajax': '', 'download': downComp, 'delete': removComp})
       scriptUpdate = fileDate if fileDate > scriptUpdate else scriptUpdate
 
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
@@ -114,21 +122,28 @@ def report(aresObj, localPath=None):
   content = []
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
-  tableComp = aresObj.table('Scripts Summary', recordSet,
-                            dict(zip(['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download', 'delete'],
-                                     ['Script Name', 'Size', 'Modification Date', 'Parent', 'Ajax', 'download',
-                                      'delete'])),
-                            cssCls="table table-hover table-bordered")
-  graphObj = aresObj.bar('Deployments count', recordSet,
-                         dict(zip(['Size', 'Modification Date'],
-                                  ['Size', 'Modification Date'])),
-                         (['Modification Date'], ['Size']))
-  pieObj = aresObj.pie('Deployments count', recordSet,
-                         dict(zip(['Size', 'Modification Date'],
-                                  ['Size', 'Modification Date'])),
-                         (['Modification Date'], ['Size']))
-  graphObj.linkTo(tableComp)
-  pieObj.linkTo(tableComp)
+
+
+
+  tableComp = aresObj.table(recordSet, header, 'Scripts Summary', cssCls="table table-hover table-bordered")
+  graphObj = aresObj.bar(recordSet,
+                          [{'key': 'script', 'colName': 'Script Name', 'type': 'object'},
+                           {'key': 'size', 'colName': 'Size', 'selected': True, 'type': 'number'},
+                           {'key': 'lst_mod_dt', 'colName': 'Modification Date', 'selected': True},
+                           {'key': 'ajax', 'colName': 'Ajax'},
+                           {'key': 'download', 'colName': 'Download', 'type': 'object'},
+                           {'key': 'delete', 'colName': 'Delete', 'type': 'object'}], 'Activity Dates')
+
+  pieObj = aresObj.pie(recordSet,
+                       [{'key': 'script', 'colName': 'Script Name', 'type': 'object', 'selected': True},
+                        {'key': 'size', 'colName': 'Size', 'selected': True, 'type': 'number'},
+                        {'key': 'lst_mod_dt', 'colName': 'Modification Date'},
+                        {'key': 'ajax', 'colName': 'Ajax'},
+                        {'key': 'download', 'colName': 'Download', 'type': 'object'},
+                        {'key': 'delete', 'colName': 'Delete', 'type': 'object'}], 'Files Size')
+
+  # graphObj.linkTo(tableComp)
+  # pieObj.linkTo(tableComp)
   aresObj.row([graphObj, pieObj])
   zipComp = aresObj.downloadAll('Download Zip archive of this environment')
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
