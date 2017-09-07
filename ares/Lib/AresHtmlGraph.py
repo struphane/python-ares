@@ -110,10 +110,6 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
       print('Please use a data source that has a jsLinkTo attribute')
 
 
-
-
-
-
 class Pie(JsNvD3Graph):
   """
   NVD3 Wrapper for a Pie Chart object.
@@ -129,19 +125,9 @@ class Pie(JsNvD3Graph):
   style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
 
-  def dataFnc(self):
-    """ Return the data Source converted to them be sent to the javascript layer """
-    recordSet = []
-    for rec in self.vals:
-      newRec = {}
-      for key, val in rec.items():
-        newRec[self.mapCols.get(key, key)] = val
-      recordSet.append(newRec)
-    return "wrapperSimpleCharts(%s, %s, %s)" % (recordSet, self.jqCategory, self.jqValue)
-
   def update(self, data):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = wrapperSimpleCharts(%s, %s, %s) ;" % (data, self.jqCategory, self.jqValue))
+    item = AresItem.Item("var filterRecordSet = wrapperSimpleCharts(%s, %s, %s) ;" % (self.jqRecordSet, self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
