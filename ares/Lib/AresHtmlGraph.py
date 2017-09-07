@@ -26,28 +26,17 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   chartObject = 'to be overriden'
   jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
 
-
-  def __init__(self, htmlId, header, vals, recordSetDef, cssCls=None):
-    """ selectors is a tuple with the category first and the value list second """
-    super(JsNvD3Graph, self).__init__(htmlId, vals, cssCls)
-    self.headerBox = header
-    self.mapCols = dict([(col['key'], col['colName']) for col in recordSetDef])
-
-  def __str__(self):
-    """ override the str function to make sure we can add the selectors at the end when the datasource is set """
-    #self.selectCategory(self.selectors['selectedCats'], self.selectors['categories'], self.pyDataSource)
-    #self.selectValues(self.selectors['selectedVals'], self.selectors['values'], self.pyDataSource)
-    return super(JsNvD3Graph, self).__str__()
-
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    recordSet = []
-    for rec in self.vals:
-      newRec = {}
-      for key, val in rec.items():
-        newRec[self.mapCols.get(key, key)] = val
-      recordSet.append(newRec)
-    return "buildJsRecordSet(%s, %s, %s)" % (recordSet, self.jqCategory, self.jqValue)
+    colCat, colVal = None, None
+    for col in self.header:
+      if col.get('selected'):
+        if col.get('type') == 'number':
+          colVal = col.get('key', col['colName'])
+        else:
+          colCat = col.get('key', col['colName'])
+
+    return "buildJsRecordSet(%s, %s, %s)" % (self.vals, colCat, colVal)
 
   def update(self, data):
     """ Update the content of an HTML component """

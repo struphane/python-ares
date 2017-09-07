@@ -269,7 +269,7 @@ class Report(object):
   def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Chart section
-  def bar(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def pie(self, headerBox, values, header, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def donut(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
   def lineChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)

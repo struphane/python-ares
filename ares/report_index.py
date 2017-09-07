@@ -41,11 +41,11 @@ def report(aresObj):
                                       {'key': 'Size', 'colName': 'Size in Ko'},
                                       {'key': 'delete', 'colName': '', 'type': 'object'}], 'Existing Reports')
   tableComp.filters(['Folder Name'])
-  # barComp = aresObj.bar('Scripts per folder', content, [{'key': 'folderName', 'colName': 'Folder Name'},
-  #                                                         {'key': 'FolderFiles', 'colName': 'Count Files'},
-  #                                                         {'key': 'Date', 'colName': 'Last Modification'},
-  #                                                         {'key': 'Size', 'colName': 'Size in Ko'},
-  #                                                         {'key': 'delete', 'colName': ''}])
+  barComp = aresObj.bar(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
+                                  {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
+                                  {'key': 'Date', 'colName': 'Last Modification'},
+                                  {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
+                                  {'key': 'delete', 'colName': ''}], 'Scripts per folder')
   # barComp.linkTo(tableComp)
   # createReport = aresObj.button("Create the Report", 'btn btn-primary')
   # inputModal = aresObj.input("Report Name", '')

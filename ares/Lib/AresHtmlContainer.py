@@ -125,56 +125,68 @@ class GraphSvG(AresHtml.Html):
   icon = 'fa fa-pie-chart'
   categories, values = None, None
 
+  def __init__(self, htmlId, header, vals, recordSetDef, cssCls=None):
+    """ selectors is a tuple with the category first and the value list second """
+    super(GraphSvG, self).__init__(htmlId, vals, cssCls)
+    self.headerBox = header
+    self.header = recordSetDef
+
   def __str__(self):
     """ Return the String representation of a DIV containing a SVG tag """
-    item = AresItem.Item('<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
-    item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
-    item.add(1, '<div style="width:95%%;height:95%%;" %s>' % self.strAttr())
+    self.selectCategory()
+    self.selectValues()
+
+    item = AresItem.Item('')
+    if self.headerBox is not None:
+      item.add(0, '<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
+      item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
+      item.add(1, '<div style="width:95%%;height:95%%;" %s>' % self.strAttr())
 
     # Add the pointers for the display
     if self.categories is not None:
       item.join(self.categories)
     if self.values is not None:
       item.join(self.values)
-
     item.add(1, '<svg style="width:100%;height:100%;"></svg>')
-    item.add(0, '</div>')
-    item.add(0, '</div>')
+    if self.headerBox is not None:
+      item.add(0, '</div>')
+      item.add(0, '</div>')
     return str(item)
 
-  def selectCategory(self, selectedCategory, categories, pyDataSrc):
+  def selectCategory(self):
     """ Return the category to be selected in the graph display """
     item = AresItem.Item('Category')
-    if len(selectedCategory) > 1:
-      item.add(2, '<select id="%s_col_selector" class ="selectpicker" multiple="true">' % self.htmlId)
-    else:
-      item.add(2, '<select id="%s_col_selector" class ="selectpicker">' % self.htmlId)
-    for cat in categories:
-      if cat in selectedCategory:
-        item.add(3, '<option selected>%s</option>' % cat)
+    # To early to think about the multi select
+    #if len(selectedCategory) > 1:
+    #  item.add(2, '<select id="%s_col_selector" class ="selectpicker" multiple="true">' % self.htmlId)
+    item.add(2, '<select id="%s_col_selector" class ="selectpicker">' % self.htmlId)
+    for headerLine in self.header:
+      if headerLine.get('selected') and headerLine.get('type') != 'number':
+        item.add(3, '<option value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
       else:
-        item.add(3, '<option>%s</option>' % cat)
+        item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
     item.add(2, '</select>')
     self.categories = item
-    self.jsEvent['cat-change'] = AresJs.JQueryEvents("%s_col_selector" % self.htmlId, "$('#%s_col_selector')" % self.htmlId,
-                                                     'change', self.update(pyDataSrc.getData()), '')
+    #self.jsEvent['cat-change'] = AresJs.JQueryEvents("%s_col_selector" % self.htmlId, "$('#%s_col_selector')" % self.htmlId,
+    #                                                 'change', self.update(pyDataSrc.getData()), '')
 
-  def selectValues(self, selectedValue, values, pyDataSrc):
+  def selectValues(self):
     """ Return the value to be selected in the graph display """
     item = AresItem.Item('Value')
-    if len(selectedValue) > 1:
-      item.add(2, '<select id="%s_val_selector" class ="selectpicker" multiple="true">' % self.htmlId)
-    else:
-      item.add(2, '<select id="%s_val_selector" class ="selectpicker">' % self.htmlId)
-    for val in values:
-      if val in selectedValue:
-        item.add(3, '<option selected>%s</option>' % val)
-      else:
-        item.add(3, '<option>%s</option>' % val)
+    # To early to think about the multi select
+    #if len(selectedValue) > 1:
+    #  item.add(2, '<select id="%s_val_selector" class ="selectpicker" multiple="true">' % self.htmlId)
+    item.add(2, '<select id="%s_val_selector" class ="selectpicker">' % self.htmlId)
+    for headerLine in self.header:
+      if headerLine.get('type') == 'number':
+        if headerLine.get('selected'):
+          item.add(3, '<option value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
+        else:
+          item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
     item.add(2, '</select>')
     self.values = item
-    self.jsEvent['val-change'] = AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,
-                                                     'change', self.update(pyDataSrc.getData()), '')
+    #self.jsEvent['val-change'] = AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,
+    #                                                 'change', self.update(pyDataSrc.getData()), '')
 
   @property
   def jqId(self):

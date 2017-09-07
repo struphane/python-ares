@@ -24,7 +24,6 @@ class Table(AresHtml.Html):
     """
 
     """
-    print vals
     super(Table, self).__init__(htmlId, vals, cssCls)
     self.headerBox = headerBox
     self.recordSetId = id(vals)
