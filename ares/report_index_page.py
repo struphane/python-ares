@@ -123,24 +123,16 @@ def report(aresObj, localPath=None):
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
 
-
-
   tableComp = aresObj.table(recordSet, header, 'Scripts Summary', cssCls="table table-hover table-bordered")
   graphObj = aresObj.bar(recordSet,
                           [{'key': 'script', 'colName': 'Script Name', 'type': 'object'},
                            {'key': 'size', 'colName': 'Size', 'selected': True, 'type': 'number'},
-                           {'key': 'lst_mod_dt', 'colName': 'Modification Date', 'selected': True},
-                           {'key': 'ajax', 'colName': 'Ajax'},
-                           {'key': 'download', 'colName': 'Download', 'type': 'object'},
-                           {'key': 'delete', 'colName': 'Delete', 'type': 'object'}], 'Activity Dates')
+                           {'key': 'lst_mod_dt', 'colName': 'Modification Date', 'selected': True}], 'Activity Dates')
 
   pieObj = aresObj.pie(recordSet,
                        [{'key': 'script', 'colName': 'Script Name', 'type': 'object', 'selected': True},
                         {'key': 'size', 'colName': 'Size', 'selected': True, 'type': 'number'},
-                        {'key': 'lst_mod_dt', 'colName': 'Modification Date'},
-                        {'key': 'ajax', 'colName': 'Ajax'},
-                        {'key': 'download', 'colName': 'Download', 'type': 'object'},
-                        {'key': 'delete', 'colName': 'Delete', 'type': 'object'}], 'Files Size')
+                        {'key': 'lst_mod_dt', 'colName': 'Modification Date'}], 'Files Size')
 
   # graphObj.linkTo(tableComp)
   # pieObj.linkTo(tableComp)
