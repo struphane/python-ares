@@ -2,6 +2,7 @@
 
 """
 
+import os
 import locale
 
 from ares.Lib import AresHtml
@@ -287,13 +288,27 @@ class Wiki(AresHtml.Html):
 
   def __str__(self):
     """ Return the html string representation """
-    items = AresItem.Item('<div class="page">')
+    items = AresItem.Item('<div class="page" style="margin-left:25%;margin-right:25%">')
+    commentFiles = {}
+    configPath = os.path.join(self.http['DIRECTORY'], 'config', self.dataSourceName)
+    for pyFile in os.listdir(configPath):
+      configFile = open(os.path.join(configPath, pyFile))
+      content = configFile.read()
+      if content != '':
+        commentFiles[pyFile.replace(".cfg", "")] = content
+      configFile.close()
+    print commentFiles
     for i, val in enumerate(self.vals):
       objectId = "%s_%s" % (self.htmlId, i)
       items.add(1, '<div style="white-space: pre;" ondblclick="$(\'#in_%s\').show() ; $(\'#in_cmmt_%s\').focus()" id="%s">%s</div>' % (objectId, objectId, objectId, val))
-      items.add(1, '<div id="in_%s" style="display:none;">' % objectId)
-      items.add(2, '<textarea class="bubble_cmmt" id="in_cmmt_%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;"></textarea>' % (objectId, objectId))
-      items.add(2, '<button type="button" class="btn btn-success" style="margin-bottom:10px;" onclick="save_cmmt($(this), $(\'#in_cmmt_%s\')) ;">Save</button>' % objectId)
+      inCmmtId = 'in_cmmt_%s' % objectId
+      if inCmmtId in commentFiles:
+        items.add(1, '<div id="in_%s">' % objectId)
+        items.add(2, '<textarea class="bubble_cmmt" id="%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;">%s</textarea>' % (inCmmtId, objectId, commentFiles[inCmmtId]))
+      else:
+        items.add(1, '<div id="in_%s" style="display:none;">' % objectId)
+        items.add(2, '<textarea class="bubble_cmmt" id="%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;"></textarea>' % (inCmmtId, objectId))
+      items.add(2, '<button type="button" class="btn btn-success" style="margin-bottom:10px;margin-left:5px" onclick="save_cmmt($(this), $(\'#in_cmmt_%s\')) ;">Save</button>' % objectId)
       items.add(2, '<button type="button" id="in_cmmt_%s_cl" class="btn btn-danger" style="margin-bottom:10px;" onclick="cancel_cmmt($(\'#in_%s\'), $(\'#in_cmmt_%s\')) ;">Cancel</button>' % (objectId, objectId, objectId))
       items.add(1, '</div>')
     items.add(0, '</div>')
