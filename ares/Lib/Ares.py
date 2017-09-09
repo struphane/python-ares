@@ -235,6 +235,7 @@ class Report(object):
   def line(self, cssCls=None): return self.add(AresHtmlText.Line(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def number(self, value, cssCls=None): return self.add(AresHtmlText.Numeric(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def wiki(self, aresObj, dataSourceName, value, cssCls=None): return self.add(AresHtmlText.Wiki(self.getNext(), dataSourceName, value, aresObj, cssCls), sys._getframe().f_code.co_name)
 
   # Title section
   def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
