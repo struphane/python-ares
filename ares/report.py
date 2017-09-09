@@ -362,7 +362,6 @@ def launch(report_name, script_name):
     reportObj.http['FILE'] = script_name
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
-    print mod
     aresObj = mod.report(reportObj)
     downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
