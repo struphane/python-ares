@@ -26,4 +26,5 @@ class Script(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of a Anchor HTML object """
-    return render_template_string('<a href="{{ url_for(\'ares.launch\', report_name=\'%s\', script_name=\'%s\') }}">%s</a>' % (self.kwargs.get('report_name'), self.kwargs.get('script_name'), self.vals), **self.kwargs)
+    values = ["%s='%s'" % (key, val) for key, val in self.kwargs.items() if key not in ('cssCls', )]
+    return render_template_string('<a href="{{ url_for(\'ares.launch\', %s ) }}">%s</a>' % (",".join(values), self.vals), **self.kwargs)
