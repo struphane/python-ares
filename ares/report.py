@@ -503,6 +503,7 @@ def configFile(report_name):
     commentFile = open(os.path.join(userDirectory, "%s.cfg" % requestParams['key']), "w")
     commentFile.write(requestParams['val'])
     commentFile.close()
+  return json.dumps('')
 
 @report.route("/components/<component>:<compId>")
 def designerComponent(component, compId):
