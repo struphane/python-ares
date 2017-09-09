@@ -489,6 +489,21 @@ def deleteFiles(report_name):
     appendToLog(report_name, 'DELETE', request.form.get('SCRIPT'))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
+@report.route("/json/<report_name>", methods=['POST'])
+def configFile(report_name):
+  """
+  Write a Json configuration file
+  """
+  if request.method == 'POST':
+    requestParams = getHttpParams(request)
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, "config", requestParams['source'])
+    if not os.path.exists(userDirectory):
+      os.makedirs(userDirectory)
+    # 
+    commentFile = open(os.path.join(userDirectory, "%s.cfg" % requestParams['key']), "w")
+    commentFile.write(requestParams['val'])
+    commentFile.close()
+
 @report.route("/components/<component>:<compId>")
 def designerComponent(component, compId):
   """
