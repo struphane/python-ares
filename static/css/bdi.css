@@ -65,6 +65,18 @@
 .page {
     background-color: white ;
     border: 1px solid black ;
-    height: 900px;
+    min-height: 900px;
     width: 700px;
+    overflow: auto;
+}
+
+.bubble_cmmt {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    margin: 10px;
+    width: 650px;
+    font-style: italic;
+    outline: none !important;
+    box-shadow: 0 0 3px #719ECE;
 }
