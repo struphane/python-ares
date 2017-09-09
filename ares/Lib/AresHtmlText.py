@@ -287,15 +287,16 @@ class Wiki(AresHtml.Html):
 
   def __str__(self):
     """ Return the html string representation """
-    items = AresItem.Item()
+    items = AresItem.Item('<div class="page">')
     for i, val in enumerate(self.vals):
       objectId = "%s_%s" % (self.htmlId, i)
-      items.add(0, '<div ondblclick="$(\'#in_%s\').show() ;" id="%s">%s</div>' % (objectId, objectId, val))
-      items.add(0, '<div id="in_%s" style="display:none;">' % objectId)
-      items.add(1, '<input type="text" id="in_cmmt_%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;">' % (objectId, objectId))
-      items.add(1, '<button type="button" style="margin-bottom:10px;" onclick="save($(this), $(\'#in_cmmt_%s\')) ;">Save</button>' % objectId)
-      items.add(1, '<button type="button" style="margin-bottom:10px;" onclick="save($(this), $(\'#in_cmmt_%s\')) ;">Cancel</button>' % objectId)
-      items.add(0, '</div>')
+      items.add(1, '<div style="white-space: pre;" ondblclick="$(\'#in_%s\').show() ; $(\'#in_cmmt_%s\').focus()" id="%s">%s</div>' % (objectId, objectId, objectId, val))
+      items.add(1, '<div id="in_%s" style="display:none;">' % objectId)
+      items.add(2, '<textarea class="bubble_cmmt" id="in_cmmt_%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;"></textarea>' % (objectId, objectId))
+      items.add(2, '<button type="button" class="btn btn-success" style="margin-bottom:10px;" onclick="save_cmmt($(this), $(\'#in_cmmt_%s\')) ;">Save</button>' % objectId)
+      items.add(2, '<button type="button" id="in_cmmt_%s_cl" class="btn btn-danger" style="margin-bottom:10px;" onclick="cancel_cmmt($(\'#in_%s\'), $(\'#in_cmmt_%s\')) ;">Cancel</button>' % (objectId, objectId, objectId))
+      items.add(1, '</div>')
+    items.add(0, '</div>')
     return str(items)
 
   @property
@@ -310,12 +311,19 @@ class Wiki(AresHtml.Html):
     return """
             function leaveBox(box, cmmt) {
               if (cmmt.val() == '') { box.hide() ; }
-            }
+            } ;
             
-            function save(button, cmmt) {
-              alert(cmmt.attr('id')) ;
-              $.post("/reports/json/%s", {val: cmmt.val(), key: cmmt.attr('id'), source: '%s'}, function(data) { alert(data) ; } );
-              button.hide();
+            function save_cmmt(button, cmmt) {
+              $.post("/reports/json/%s", {val: cmmt.val(), key: cmmt.attr('id'), source: '%s'}, function(data) {
+                button.hide();
+                $('#'+ cmmt.attr('id')).attr('readonly','readonly');
+                $('#'+ cmmt.attr('id') +'_cl').hide();
+              } );
+            } ;
+            
+            function cancel_cmmt(box, cmmt) {
+              cmmt.val('');
+              box.hide() ;
             }
            """ % (self.http['REPORT_NAME'], self.dataSourceName)
 
