@@ -291,13 +291,14 @@ class Wiki(AresHtml.Html):
     items = AresItem.Item('<div class="page" style="margin-left:25%;margin-right:25%">')
     commentFiles = {}
     configPath = os.path.join(self.http['DIRECTORY'], 'config', self.dataSourceName)
+    if not os.path.exists(configPath):
+      os.makedirs(configPath)
     for pyFile in os.listdir(configPath):
       configFile = open(os.path.join(configPath, pyFile))
       content = configFile.read()
       if content != '':
         commentFiles[pyFile.replace(".cfg", "")] = content
       configFile.close()
-    print commentFiles
     for i, val in enumerate(self.vals):
       objectId = "%s_%s" % (self.htmlId, i)
       items.add(1, '<div style="white-space: pre;" ondblclick="$(\'#in_%s\').show() ; $(\'#in_cmmt_%s\').focus()" id="%s">%s</div>' % (objectId, objectId, objectId, val))

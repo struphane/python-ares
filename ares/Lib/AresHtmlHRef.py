@@ -18,7 +18,7 @@ class Script(AresHtml.Html):
   Class to link a script to another sub script in a report
   In this class no Javascript is used in the click event
   """
-  alias = 'script'
+  alias, cssCls = 'script', 'btn btn-success'
 
   def __init__(self, htmlId, vals, **kwargs):
     super(Script, self).__init__(htmlId, vals, kwargs.get('cssCls'))
@@ -26,5 +26,30 @@ class Script(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of a Anchor HTML object """
-    values = ["%s='%s'" % (key, val) for key, val in self.kwargs.items() if key not in ('cssCls', )]
-    return render_template_string('<a href="{{ url_for(\'ares.launch\', %s ) }}">%s</a>' % (",".join(values), self.vals), **self.kwargs)
+    values, needJs, jsData = [], False, []
+    for key, data in self.kwargs.items():
+      if key not in ('cssCls', ):
+        if issubclass(data.__class__, AresHtml.Html):
+          # In this case we cannot have the parameters hard coded
+          # So we need to use Javascript and the Ajax Get and Post features to deduce it on the fly
+          jsData.append("'%s=' + %s" % (key, data.val))
+          needJs = True
+
+        else:
+          values.append("%s='%s'" % (key, data))
+
+    if needJs:
+      self.jsEvent['click'] = render_template_string(
+        '''
+          %s.on("click", function (event){  
+                var baseUrl = "{{ url_for(\'ares.launch\', %s ) }}";
+                var ullUrl = baseUrl + "?" + %s ;
+                window.location.href = ullUrl ;
+            }
+          ) ;
+        ''' % (self.jqId, ",".join(values), "&".join(jsData)),
+        **self.kwargs)
+
+      return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
+
+    return render_template_string('<a %s href="{{ url_for(\'ares.launch\', %s ) }}">%s</a>' % (self.strAttr(), ",".join(values), self.vals), **self.kwargs)
