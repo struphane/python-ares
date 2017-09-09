@@ -269,6 +269,56 @@ class DragItems(AresHtml.Html):
     return "$( function() { $('#%s p').draggable(); } );" % self.htmlId
 
 
+class Wiki(AresHtml.Html):
+  """
+  This object is very special and this is dedicated to manage comments
+  People using this object will be able to create simpe json text file with comments for each line
+
+  The idea of this report is to expose some information and then to alloww users to be able to update it
+  The extra information will be done on dedicated files and later they can be included to the scripts
+  """
+  alias = 'wiki'
+
+  def __init__(self, htmlId, dataSourceName, vals, aresObj, cssCls=None):
+    """ Init override in order to store the Ares Object (only the parameters"""
+    super(Wiki, self).__init__(htmlId, vals, cssCls)
+    self.http = aresObj.http
+    self.dataSourceName = dataSourceName
+
+  def __str__(self):
+    """ Return the html string representation """
+    items = AresItem.Item()
+    for i, val in enumerate(self.vals):
+      objectId = "%s_%s" % (self.htmlId, i)
+      items.add(0, '<div ondblclick="$(\'#in_%s\').show() ;" id="%s">%s</div>' % (objectId, objectId, val))
+      items.add(0, '<div id="in_%s" style="display:none;">' % objectId)
+      items.add(1, '<input type="text" id="in_cmmt_%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;">' % (objectId, objectId))
+      items.add(1, '<button type="button" style="margin-bottom:10px;" onclick="save($(this), $(\'#in_cmmt_%s\')) ;">Save</button>' % objectId)
+      items.add(1, '<button type="button" style="margin-bottom:10px;" onclick="save($(this), $(\'#in_cmmt_%s\')) ;">Cancel</button>' % objectId)
+      items.add(0, '</div>')
+    return str(items)
+
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML objec in a python HTML object """
+    return None
+
+  def onLoadFnc(self):
+    """
+
+    """
+    return """
+            function leaveBox(box, cmmt) {
+              if (cmmt.val() == '') { box.hide() ; }
+            }
+            
+            function save(button, cmmt) {
+              alert(cmmt.attr('id')) ;
+              $.post("/reports/json/%s", {val: cmmt.val(), key: cmmt.attr('id'), source: '%s'}, function(data) { alert(data) ; } );
+              button.hide();
+            }
+           """ % (self.http['REPORT_NAME'], self.dataSourceName)
+
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')
   #print(obj.jsEvents())
