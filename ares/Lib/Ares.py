@@ -290,7 +290,7 @@ class Report(object):
 
   # Anchor section
   def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
-  def child(self, value, **kwargs): return self.add(AresHtmlHRef.Child(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def script(self, value, **kwargs): return self.add(AresHtmlHRef.Script(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
   # Designer objects

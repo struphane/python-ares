@@ -13,17 +13,17 @@ from ares.Lib import AresHtml
 from flask import render_template_string
 
 
-class Child(AresHtml.Html):
+class Script(AresHtml.Html):
   """
   Class to link a script to another sub script in a report
   In this class no Javascript is used in the click event
   """
-  alias = 'child'
+  alias = 'script'
 
   def __init__(self, htmlId, vals, **kwargs):
-    super(Child, self).__init__(htmlId, vals, kwargs.get('cssCls'))
+    super(Script, self).__init__(htmlId, vals, kwargs.get('cssCls'))
     self.kwargs = kwargs
 
   def __str__(self):
     """ Return the String representation of a Anchor HTML object """
-    return render_template_string('<a href="{{ url_for(\'ares.run_report\', report_name=\'%s\') }}">%s</a>' % (self.kwargs.get('report_name'), self.vals), **self.kwargs)
+    return render_template_string('<a href="{{ url_for(\'ares.launch\', report_name=\'%s\', script_name=\'%s\') }}">%s</a>' % (self.kwargs.get('report_name'), self.kwargs.get('script_name'), self.vals), **self.kwargs)
