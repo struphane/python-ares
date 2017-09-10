@@ -555,10 +555,10 @@ def designerComponent(component, compId):
   """
 
   """
-  print compId
-  print component
-  print Ares.moduleFromAlias(component)
-  print Ares.moduleFromAlias(component).aresDesigner(compId)
+  print(compId)
+  print(component)
+  print(Ares.moduleFromAlias(component))
+  print(Ares.moduleFromAlias(component).aresDesigner(compId))
   return json.dumps('')
 
 # ---------------------------------------------------------------------------------------------------------
