@@ -208,18 +208,26 @@ class Report(object):
     """
 
     """
-    strFct = []
+    strFct, newRecordSet = [], []
     for headerRow in header:
       if headerRow.get("type") == 'object':
         strFct.append(headerRow.get('key', headerRow['colName']) )
     if id(recordSet) not in self.jsRegistered:
       if strFct:
+        newRecordSet = []
         for rec in recordSet:
+          fullRec = dict(rec)
           for col in strFct:
+            fullRec["__%s" % col] = rec[col]
+            fullRec[col] = str(rec[col])
             rec[col] = str(rec[col])
+          newRecordSet.append(fullRec)
+        self.jsRegistered[id(recordSet)] = recordSet
+        self.jsRegistered[id(newRecordSet)] = recordSet
+        return newRecordSet
+
       self.jsRegistered[id(recordSet)] = recordSet
     return recordSet
-
 
   # ---------------------------------------------------------------------------------------------------------
   # Section dedicated to map the functions call to the HTML Component
@@ -289,9 +297,13 @@ class Report(object):
   def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
 
   # Anchor section
-  def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
-  def script(self, value, **kwargs): return self.add(AresHtmlHRef.Script(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  #def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
+  def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+
 
   # Designer objects
   def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self.getNext(), 'Put your text here', cssCls), sys._getframe().f_code.co_name)

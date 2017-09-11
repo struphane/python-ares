@@ -5,6 +5,7 @@
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
+
 from datetime import datetime
 import json
 
@@ -124,7 +125,7 @@ class ButtonOk(ButtonRemove):
     return aresObj.ok("OK Button")
 
 
-class A(AresHtml.Html):
+class __A(AresHtml.Html):
   """
   Wrapper for a Anchor HTML tag
 

@@ -13,15 +13,16 @@ from ares.Lib import AresHtml
 from flask import render_template_string
 
 
-class Script(AresHtml.Html):
+class A(AresHtml.Html):
   """
   Class to link a script to another sub script in a report
   In this class no Javascript is used in the click event
   """
-  alias, cssCls = 'script', 'btn btn-success'
+  alias, cssCls = 'anchor', 'btn btn-success'
+  flask = 'ares.launch'
 
   def __init__(self, htmlId, vals, **kwargs):
-    super(Script, self).__init__(htmlId, vals, kwargs.get('cssCls'))
+    super(A, self).__init__(htmlId, vals, kwargs.get('cssCls'))
     self.kwargs = kwargs
 
   def __str__(self):
@@ -42,14 +43,38 @@ class Script(AresHtml.Html):
       self.jsEvent['click'] = render_template_string(
         '''
           %s.on("click", function (event){  
-                var baseUrl = "{{ url_for(\'ares.launch\', %s ) }}";
+                var baseUrl = "{{ url_for(\'%s\', %s ) }}";
                 var ullUrl = baseUrl + "?" + %s ;
                 window.location.href = ullUrl ;
             }
           ) ;
-        ''' % (self.jqId, ",".join(values), "&".join(jsData)),
-        **self.kwargs)
-
+        ''' % (self.jqId, self.flask, ",".join(values), "&".join(jsData)), **self.kwargs)
       return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
 
-    return render_template_string('<a %s href="{{ url_for(\'ares.launch\', %s ) }}">%s</a>' % (self.strAttr(), ",".join(values), self.vals), **self.kwargs)
+    return render_template_string('<a %s href="{{ url_for(\'%s\', %s ) }}">%s</a>' % (self.strAttr(), self.flask, ",".join(values), self.vals), **self.kwargs)
+
+
+class ScriptPage(A):
+  """
+  Class to link a script to another sub script in a report
+  In this class no Javascript is used in the click event
+  """
+  alias, cssCls = 'main', ''
+  flask = 'ares.page_generic'
+
+
+class Download(A):
+  """
+
+  """
+  alias, cssCls = 'anchor_download', 'fa fa-download'
+  flask = 'ares.downloadFiles'
+
+
+class CreateEnv(A):
+  """
+
+  """
+  alias, cssCls = 'anchor_set_env', 'btn btn-primary'
+  flask = 'ares.ajaxCreate'
+
