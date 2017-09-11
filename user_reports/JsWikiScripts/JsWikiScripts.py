@@ -9,7 +9,7 @@ def report(aresObj):
   """
 
   """
-  aresObj.title("BDI Wiki Scripts")
+  aresObj.title("Wiki Scripts")
   aresObj.title2("What is this section for ?")
   aresObj.paragraph('''
                       In this section you will be able to get some details about the scripts but also you will be able to
@@ -26,5 +26,5 @@ def report(aresObj):
                       Please select a script and then press view comments
                     ''')
   input = aresObj.input("")
-  aresObj.script('View Comments', **{'report_name': 'JsWikiScripts', 'script_name': 'JsWikiScriptCmmts', 'script': input})
+  aresObj.anchor('View Comments', **{'report_name': 'JsWikiScripts', 'script_name': 'JsWikiScriptCmmts', 'script': input})
   return aresObj
