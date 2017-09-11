@@ -44,11 +44,12 @@ class A(AresHtml.Html):
         '''
           %s.on("click", function (event){  
                 var baseUrl = "{{ url_for(\'%s\', %s ) }}";
-                var ullUrl = baseUrl + "?" + %s ;
+                if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + %s ; }
+                else { var ullUrl = baseUrl + "?" + %s ; }
                 window.location.href = ullUrl ;
             }
           ) ;
-        ''' % (self.jqId, self.flask, ",".join(values), "&".join(jsData)), **self.kwargs)
+        ''' % (self.jqId, self.flask, ",".join(values), "+ '&' +".join(jsData), "+ '&' +".join(jsData)), **self.kwargs)
       return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
 
     return render_template_string('<a %s href="{{ url_for(\'%s\', %s ) }}">%s</a>' % (self.strAttr(), self.flask, ",".join(values), self.vals), **self.kwargs)
@@ -77,4 +78,13 @@ class CreateEnv(A):
   """
   alias, cssCls = 'anchor_set_env', 'btn btn-primary'
   flask = 'ares.ajaxCreate'
+
+
+class AddScript(A):
+    """
+
+    """
+    alias, cssCls = 'anchor_add_scripts', 'btn btn-primary'
+    flask = 'ares.addScripts'
+
 

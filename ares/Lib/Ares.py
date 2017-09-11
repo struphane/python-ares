@@ -269,7 +269,8 @@ class Report(object):
   def table(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def select(self, values, selected=None, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), selected, cssCls), sys._getframe().f_code.co_name)
+  def select_group(self, values, cssCls=None): return self.add(AresHtmlEvent.SelectWithGroup(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def col(self, values, cssCls=None): return self.add(AresHtmlContainer.Col(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -301,6 +302,7 @@ class Report(object):
   def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_add_scripts(self, value, **kwargs): return self.add(AresHtmlHRef.AddScript(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
 
