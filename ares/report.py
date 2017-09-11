@@ -10,6 +10,7 @@ import io
 import collections
 import traceback
 import time
+import shutil
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response
 
@@ -441,6 +442,33 @@ def ajaxCreate():
   reportObj.http = getHttpParams(request)
   reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   return json.dumps(report_index_set.call(reportObj))
+
+@report.route("/add/file", methods = ['POST', 'GET'])
+def addScripts():
+  """ Special Ajax call to set up the environment """
+  reportObj = Ares.Report()
+  reportObj.http = getHttpParams(request)
+  if reportObj.http['script_type'] == 'Report':
+    scriptName = reportObj.http['script'] if reportObj.http['script'].endswith(".py") else "%s.py" % reportObj.http['script']
+    scriptPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'])
+    shutil.copyfile(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl', 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
+    logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'log_ares.dat'), 'a')
+    showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
+    logFile.write("CREATE_SCRIPT#%s#%s#%s\n" % (showtime[0], showtime[1], scriptName))
+    logFile.close()
+  elif reportObj.http['script_type'] == 'Service':
+    ajaxPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'ajax')
+    if not os.path.exists(ajaxPath):
+      os.makedirs(ajaxPath)
+    scriptName = reportObj.http['script'] if reportObj.http['script'].endswith(".py") else "%s.py" % reportObj.http['script']
+    outFile = open(os.path.join(ajaxPath, scriptName), "w")
+    outFile.close()
+    logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'log_ares.dat'), 'a')
+    showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
+    logFile.write("CREATE_SERVICE#%s#%s#%s\n" % (showtime[0], showtime[1], scriptName))
+    logFile.close()
+  return json.dumps('Ok')
+
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):

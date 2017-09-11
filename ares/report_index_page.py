@@ -109,6 +109,14 @@ def report(aresObj, localPath=None):
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
 
   modal = aresObj.modal('Add a script')
+  inputModal = aresObj.input("Script Name", '')
+  selectReport = aresObj.select(["Report", "Service"], selected="Report")
+  createReport = aresObj.anchor_add_scripts('Add', **{'script': inputModal, 'report_name': aresObj.http['SCRIPTS_NAME'], 'script_type': selectReport})
+
+  aresObj.addTo(modal, inputModal)
+  aresObj.addTo(modal, selectReport)
+  aresObj.addTo(modal, createReport)
+
   aresObj.newline()
   aresObj.newline()
 
