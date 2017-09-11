@@ -10,10 +10,10 @@ import time
 
 def call(aresObj):
   """ """
-  path = os.path.join(aresObj.http['USER_PATH'], aresObj.http['REPORT'])
+  path = os.path.join(aresObj.http['DIRECTORY'], aresObj.http['report_name'])
   if not os.path.exists(path):
       os.makedirs(path)
-      fileFullPath = os.path.join(path, "%s.py" % aresObj.http['REPORT'])
+      fileFullPath = os.path.join(path, "%s.py" % aresObj.http['report_name'])
       reportFile = open(fileFullPath, "w")
       reportFile.write("''' [SCRIPT COMMENT] \n\n")
       reportFile.write(" >>>> Important variables \n")
@@ -32,11 +32,11 @@ def call(aresObj):
       reportFile = open(os.path.join(path, "log_ares.dat"), "w")
       reportFile.write("EVENT#DAY#TIME#COMMENT\n")
       showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
-      reportFile.write("FOLDER CREATION#%s#%s#%s\n" % (showtime[0], showtime[1], aresObj.http['REPORT']))
+      reportFile.write("FOLDER CREATION#%s#%s#%s\n" % (showtime[0], showtime[1], aresObj.http['report_name']))
       reportFile.close()
       with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
-        zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), "%s.py" % aresObj.http['REPORT']))
-      return '%s - Report created' % aresObj.http['REPORT']
+        zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), "%s.py" % aresObj.http['report_name']))
+      return '%s - Report created' % aresObj.http['report_name']
 
   else:
-    return '%s - Already exist' % aresObj.http['REPORT']
+    return '%s - Already exist' % aresObj.http['report_name']

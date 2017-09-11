@@ -269,6 +269,13 @@ def page_report(report_name):
     del sys.modules[scriptEnv]
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
+@report.route("/page_dyn")
+def page_generic():
+  """ Generic link to the main page """
+  requestParams = getHttpParams(request)
+  return page_report(requestParams['report_name'])
+
+
 @report.route("/")
 @report.route("/index")
 def index():
@@ -427,13 +434,12 @@ def child(report_name, script):
 
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
-@report.route("/create/env", methods = ['POST'])
+@report.route("/create/env", methods = ['POST', 'GET'])
 def ajaxCreate():
   """ Special Ajax call to set up the environment """
   reportObj = Ares.Report()
-  reportObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  for postValues in request.form.items():
-    reportObj.http[postValues[0]] = postValues[1]
+  reportObj.http = getHttpParams(request)
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   return json.dumps(report_index_set.call(reportObj))
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
@@ -555,10 +561,10 @@ def designerComponent(component, compId):
   """
 
   """
-  print(compId)
-  print(component)
-  print(Ares.moduleFromAlias(component))
-  print(Ares.moduleFromAlias(component).aresDesigner(compId))
+  print compId
+  print component
+  print Ares.moduleFromAlias(component)
+  print Ares.moduleFromAlias(component).aresDesigner(compId)
   return json.dumps('')
 
 # ---------------------------------------------------------------------------------------------------------
@@ -578,7 +584,7 @@ def downloadFiles(report_name, script):
     # We assume it is a python script
     script = "%s.py" % script
   if '&' in script:
-    splitScriptPath = script.split("&")
+    splitScriptPath = script.strip("\\").split("&")
     userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name, *splitScriptPath[:-1])
   else:
     splitScriptPath = [script]
