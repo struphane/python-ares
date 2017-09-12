@@ -1,5 +1,6 @@
 """ Python Module to define all the HTML component dedicated to display tables
 
+
 """
 
 from ares.Lib import AresHtml
@@ -8,8 +9,11 @@ from ares.Lib import AresItem
 
 class Table(AresHtml.Html):
   """
-  Python Wrapper to the HTML TABLE, TH, TR, TD tags
-  using recordSet as input
+  Python Wrapper to the HTML TABLE
+  In order to build dynamic tables we use the javascript module DataTable
+
+  The python RecordSet will be used in the __init__ even if the datatable
+  will use the javascript reference of the recordSet object registered by Ares
 
   Default class parameters
     - CSS Default Class = table
@@ -34,8 +38,12 @@ class Table(AresHtml.Html):
       self.header = header
     for headerLine in self.header:
       for col in headerLine:
-        self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (col.get("key", col.get("colName")), col.get("colName")))
+        self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
     self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
+
+  def recKey(self, col):
+    """ Return the record Key taken into accounr th possible user options """
+    return col.get("key", col.get("colName"))
 
   def filters(self, cols):
     """ Store the different filters possible on the recordSet """
@@ -72,10 +80,21 @@ class Table(AresHtml.Html):
     for jEventType, jsEvent in self.jsEvent.items():
       jsEventFnc[jEventType].add(str(jsEvent))
 
-    for row in self.vals:
-      for val in row.values():
-        if hasattr(val, 'jsEvent'):
-          getattr(val, 'jsEvents')(jsEventFnc)
+    # Retrieve the list of all the columns objects
+    # Those objects should be taken into account for any special javascript function
+    colObj = []
+    for headerLine in self.header:
+      for col in headerLine:
+        if col.get('type') == 'object':
+          colObj.append(self.recKey(col))
+    # Second Loop to extract the Javascript fragements
+    # This will be added to the HTML page
+    if colObj:
+      for row in self.vals:
+        for col in colObj:
+          rawCol = "__%s" % col
+          if hasattr(row[rawCol], 'jsEvent'):
+            getattr(row[rawCol], 'jsEvents')(jsEventFnc)
     return jsEventFnc
 
   def update(self, newRecordSet):

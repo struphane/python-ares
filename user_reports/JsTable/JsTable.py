@@ -19,12 +19,13 @@ def report(aresObj):
                       'VAL2': random.uniform(0, 100),
                       'VAL3': random.uniform(0, 320),
                       'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
-  table = aresObj.table('My Table', recordSet, [{'key': 'PTF', 'colName': 'Portfolio'},
+  table = aresObj.table(recordSet, [{'key': 'PTF', 'colName': 'Portfolio'},
                                                 {'key': 'PTF2', 'colName': 'Portfolio 2'},
                                                 {'key': 'CCY', 'colName': 'Currency'},
                                                 {'key': 'VAL', 'colName': 'Value'},
                                                 {'key': 'VAL2', 'colName': 'Value 2'},
-                                                {'key': 'VAL3', 'colName': 'Value 3'}])
+                                                {'key': 'VAL3', 'colName': 'Value 3'}],
+                        'Test Table')
   table.filters(['Currency', 'Portfolio', 'Portfolio 2'])
 
 

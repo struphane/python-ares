@@ -36,6 +36,7 @@ from ares.Lib import AresHtmlGraph
 from ares.Lib import AresHtmlAlert
 from ares.Lib import AresHtmlModal
 from ares.Lib import AresItem
+from ares.Lib import AresHtmlHRef
 
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
@@ -207,18 +208,26 @@ class Report(object):
     """
 
     """
-    strFct = []
+    strFct, newRecordSet = [], []
     for headerRow in header:
       if headerRow.get("type") == 'object':
         strFct.append(headerRow.get('key', headerRow['colName']) )
     if id(recordSet) not in self.jsRegistered:
       if strFct:
+        newRecordSet = []
         for rec in recordSet:
+          fullRec = dict(rec)
           for col in strFct:
+            fullRec["__%s" % col] = rec[col]
+            fullRec[col] = str(rec[col])
             rec[col] = str(rec[col])
+          newRecordSet.append(fullRec)
+        self.jsRegistered[id(recordSet)] = recordSet
+        self.jsRegistered[id(newRecordSet)] = recordSet
+        return newRecordSet
+
       self.jsRegistered[id(recordSet)] = recordSet
     return recordSet
-
 
   # ---------------------------------------------------------------------------------------------------------
   # Section dedicated to map the functions call to the HTML Component
@@ -235,6 +244,7 @@ class Report(object):
   def line(self, cssCls=None): return self.add(AresHtmlText.Line(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
   def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
   def number(self, value, cssCls=None): return self.add(AresHtmlText.Numeric(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  def wiki(self, aresObj, dataSourceName, value, cssCls=None): return self.add(AresHtmlText.Wiki(self.getNext(), dataSourceName, value, aresObj, cssCls), sys._getframe().f_code.co_name)
 
   # Title section
   def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
@@ -259,7 +269,8 @@ class Report(object):
   def table(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def select(self, values, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def select(self, values, selected=None, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), selected, cssCls), sys._getframe().f_code.co_name)
+  def select_group(self, values, cssCls=None): return self.add(AresHtmlEvent.SelectWithGroup(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def col(self, values, cssCls=None): return self.add(AresHtmlContainer.Col(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -287,8 +298,14 @@ class Report(object):
   def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
 
   # Anchor section
-  def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
+  #def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
+  def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_add_scripts(self, value, **kwargs): return self.add(AresHtmlHRef.AddScript(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+
 
   # Designer objects
   def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self.getNext(), 'Put your text here', cssCls), sys._getframe().f_code.co_name)

@@ -141,8 +141,7 @@ class GraphSvG(AresHtml.Html):
     if self.headerBox is not None:
       item.add(0, '<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
       item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
-      item.add(1, '<div style="width:95%%;height:95%%;" %s>' % self.strAttr())
-
+    item.add(1, '<div style="width:95%%;height:95%%;" %s>' % self.strAttr())
     # Add the pointers for the display
     if self.categories is not None:
       item.join(self.categories)
@@ -151,7 +150,7 @@ class GraphSvG(AresHtml.Html):
     item.add(1, '<svg style="width:100%;height:100%;"></svg>')
     if self.headerBox is not None:
       item.add(0, '</div>')
-      item.add(0, '</div>')
+    item.add(0, '</div>')
     return str(item)
 
   def selectCategory(self):
@@ -160,7 +159,8 @@ class GraphSvG(AresHtml.Html):
     # To early to think about the multi select
     #if len(selectedCategory) > 1:
     #  item.add(2, '<select id="%s_col_selector" class ="selectpicker" multiple="true">' % self.htmlId)
-    item.add(2, '<select id="%s_col_selector" class ="selectpicker">' % self.htmlId)
+    style = '' if len(self.header) > 2 else 'style="display:none"'
+    item.add(2, '<select id="%s_col_selector" class ="selectpicker" %s>' % (self.htmlId, style))
     for headerLine in self.header:
       if headerLine.get('selected') and headerLine.get('type') != 'number':
         item.add(3, '<option value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
@@ -177,7 +177,8 @@ class GraphSvG(AresHtml.Html):
     # To early to think about the multi select
     #if len(selectedValue) > 1:
     #  item.add(2, '<select id="%s_val_selector" class ="selectpicker" multiple="true">' % self.htmlId)
-    item.add(2, '<select id="%s_val_selector" class ="selectpicker">' % self.htmlId)
+    style = '' if len(self.header) > 2 else 'style="display:none"'
+    item.add(2, '<select id="%s_val_selector" class ="selectpicker" %s>' % (self.htmlId, style))
     for headerLine in self.header:
       if headerLine.get('type') == 'number':
         if headerLine.get('selected'):

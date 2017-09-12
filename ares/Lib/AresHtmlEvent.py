@@ -5,6 +5,7 @@
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
+
 from datetime import datetime
 import json
 
@@ -124,7 +125,7 @@ class ButtonOk(ButtonRemove):
     return aresObj.ok("OK Button")
 
 
-class A(AresHtml.Html):
+class __A(AresHtml.Html):
   """
   Wrapper for a Anchor HTML tag
 
@@ -359,6 +360,45 @@ class Select(AresHtml.Html):
   """
   # TODO: Extend the python object to handle multi select and all the cool features
   alias, cssCls = 'select', 'selectpicker'
+
+  def __init__(self, htmlId, vals, selected, cssCls=None):
+    """ Instanciate the object and store the selected item """
+    super(Select, self).__init__(htmlId, vals, cssCls)
+    self.selected = selected
+
+  def __str__(self):
+    """ Return the HTML string for a select """
+    item = AresItem.Item('<select %s>' % self.strAttr(), self.incIndent)
+    for v in self.vals:
+      if v == self.selected:
+        item.add(2, '<option selected>%s</option>' % v)
+      else:
+        item.add(2, '<option>%s</option>' % v)
+    item.add(0, '</select>')
+    return str(item)
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.select([('Node', ['GBC', 'BNPPAR'])])
+
+
+class SelectWithGroup(AresHtml.Html):
+  """
+  Basic wrapper to the Select HTML Tag
+    https://silviomoreto.github.io/bootstrap-select/examples/
+
+  For example to get a change on the Select Box Item in the
+  Javascript call back method
+    - alert($(this).val()) ;
+
+  For example
+    [('Fruit', ['Apple', 'Banana'])]
+
+  Default class parameters
+  cssCls = selectpicker
+  """
+  # TODO: Extend the python object to handle multi select and all the cool features
+  alias, cssCls = 'select_group', 'selectpicker'
 
   def __str__(self):
     """ Return the HTML string for a select """

@@ -2,6 +2,7 @@
 
 """
 
+import os
 import locale
 
 from ares.Lib import AresHtml
@@ -268,6 +269,79 @@ class DragItems(AresHtml.Html):
     """ Set the items draggable """
     return "$( function() { $('#%s p').draggable(); } );" % self.htmlId
 
+
+class Wiki(AresHtml.Html):
+  """
+  This object is very special and this is dedicated to manage comments
+  People using this object will be able to create simpe json text file with comments for each line
+
+  The idea of this report is to expose some information and then to alloww users to be able to update it
+  The extra information will be done on dedicated files and later they can be included to the scripts
+  """
+  alias = 'wiki'
+
+  def __init__(self, htmlId, dataSourceName, vals, aresObj, cssCls=None):
+    """ Init override in order to store the Ares Object (only the parameters"""
+    super(Wiki, self).__init__(htmlId, vals, cssCls)
+    self.http = aresObj.http
+    self.dataSourceName = dataSourceName
+
+  def __str__(self):
+    """ Return the html string representation """
+    items = AresItem.Item('<div class="page" style="margin-left:25%;margin-right:25%">')
+    commentFiles = {}
+    configPath = os.path.join(self.http['DIRECTORY'], 'config', self.dataSourceName)
+    if not os.path.exists(configPath):
+      os.makedirs(configPath)
+    for pyFile in os.listdir(configPath):
+      configFile = open(os.path.join(configPath, pyFile))
+      content = configFile.read()
+      if content != '':
+        commentFiles[pyFile.replace(".cfg", "")] = content
+      configFile.close()
+    for i, val in enumerate(self.vals):
+      objectId = "%s_%s" % (self.htmlId, i)
+      items.add(1, '<div style="white-space: pre;" ondblclick="$(\'#in_%s\').show() ; $(\'#in_cmmt_%s\').focus()" id="%s">%s</div>' % (objectId, objectId, objectId, val))
+      inCmmtId = 'in_cmmt_%s' % objectId
+      if inCmmtId in commentFiles:
+        items.add(1, '<div id="in_%s">' % objectId)
+        items.add(2, '<textarea class="bubble_cmmt" id="%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;">%s</textarea>' % (inCmmtId, objectId, commentFiles[inCmmtId]))
+      else:
+        items.add(1, '<div id="in_%s" style="display:none;">' % objectId)
+        items.add(2, '<textarea class="bubble_cmmt" id="%s" onblur="leaveBox($(\'#in_%s\'), $(this)) ;"></textarea>' % (inCmmtId, objectId))
+      items.add(2, '<button type="button" class="btn btn-success" style="margin-bottom:10px;margin-left:5px" onclick="save_cmmt($(this), $(\'#in_cmmt_%s\')) ;">Save</button>' % objectId)
+      items.add(2, '<button type="button" id="in_cmmt_%s_cl" class="btn btn-danger" style="margin-bottom:10px;" onclick="cancel_cmmt($(\'#in_%s\'), $(\'#in_cmmt_%s\')) ;">Cancel</button>' % (objectId, objectId, objectId))
+      items.add(1, '</div>')
+    items.add(0, '</div>')
+    return str(items)
+
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML objec in a python HTML object """
+    return None
+
+  def onLoadFnc(self):
+    """
+
+    """
+    return """
+            function leaveBox(box, cmmt) {
+              if (cmmt.val() == '') { box.hide() ; }
+            } ;
+            
+            function save_cmmt(button, cmmt) {
+              $.post("/reports/json/%s", {val: cmmt.val(), key: cmmt.attr('id'), source: '%s'}, function(data) {
+                button.hide();
+                $('#'+ cmmt.attr('id')).attr('readonly','readonly');
+                $('#'+ cmmt.attr('id') +'_cl').hide();
+              } );
+            } ;
+            
+            function cancel_cmmt(box, cmmt) {
+              cmmt.val('');
+              box.hide() ;
+            }
+           """ % (self.http['REPORT_NAME'], self.dataSourceName)
 
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')

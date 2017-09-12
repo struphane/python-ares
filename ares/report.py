@@ -10,6 +10,7 @@ import io
 import collections
 import traceback
 import time
+import shutil
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response
 
@@ -269,6 +270,13 @@ def page_report(report_name):
     del sys.modules[scriptEnv]
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
+@report.route("/page_dyn")
+def page_generic():
+  """ Generic link to the main page """
+  requestParams = getHttpParams(request)
+  return page_report(requestParams['report_name'])
+
+
 @report.route("/")
 @report.route("/index")
 def index():
@@ -341,6 +349,51 @@ def run_report(report_name):
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
+@report.route("/launch/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
+@report.route("/launch/<report_name>/<script_name>", methods = ['GET', 'POST'])
+def launch(report_name, script_name):
+  """ Run the report """
+  onload, js, error, side_bar = '', '', False, []
+  try:
+    if script_name is None:
+      script_name = report_name
+    # add the folder directory to the python path in order to run the script
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+    sys.path.append(userDirectory)
+
+    reportObj = Ares.Report()
+    reportObj.http = getHttpParams(request)
+    reportObj.reportName = report_name
+    mod = __import__(script_name) # run the report
+    reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
+    # Set some environments variables which can be used in the report
+    reportObj.http['FILE'] = script_name
+    reportObj.http['REPORT_NAME'] = report_name
+    reportObj.http['DIRECTORY'] = userDirectory
+    aresObj = mod.report(reportObj)
+    downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
+    downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
+    downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
+    downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
+    if hasattr(mod, 'DISPLAY'):
+      side_bar = ['<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % mod.DISPLAY]
+      for name, path in getattr(mod, 'SHORTCUTS', []):
+        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
+
+    onload, content, js = aresObj.html()
+  except Exception as e:
+    error = True
+    content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
+    content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
+  finally:
+    # Try to unload the module
+    if report_name in sys.modules:
+      del sys.modules[report_name]
+
+  if error:
+    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
+
 @report.route("/sidebar/<report_name>/<script>", methods = ['GET'])
 @report.route("/child:<report_name>/<script>", methods = ['GET'])
 def child(report_name, script):
@@ -382,14 +435,40 @@ def child(report_name, script):
 
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
-@report.route("/create/env", methods = ['POST'])
+@report.route("/create/env", methods = ['POST', 'GET'])
 def ajaxCreate():
   """ Special Ajax call to set up the environment """
   reportObj = Ares.Report()
-  reportObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  for postValues in request.form.items():
-    reportObj.http[postValues[0]] = postValues[1]
+  reportObj.http = getHttpParams(request)
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   return json.dumps(report_index_set.call(reportObj))
+
+@report.route("/add/file", methods = ['POST', 'GET'])
+def addScripts():
+  """ Special Ajax call to set up the environment """
+  reportObj = Ares.Report()
+  reportObj.http = getHttpParams(request)
+  if reportObj.http['script_type'] == 'Report':
+    scriptName = reportObj.http['script'] if reportObj.http['script'].endswith(".py") else "%s.py" % reportObj.http['script']
+    scriptPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'])
+    shutil.copyfile(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl', 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
+    logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'log_ares.dat'), 'a')
+    showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
+    logFile.write("CREATE_SCRIPT#%s#%s#%s\n" % (showtime[0], showtime[1], scriptName))
+    logFile.close()
+  elif reportObj.http['script_type'] == 'Service':
+    ajaxPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'ajax')
+    if not os.path.exists(ajaxPath):
+      os.makedirs(ajaxPath)
+    scriptName = reportObj.http['script'] if reportObj.http['script'].endswith(".py") else "%s.py" % reportObj.http['script']
+    outFile = open(os.path.join(ajaxPath, scriptName), "w")
+    outFile.close()
+    logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'log_ares.dat'), 'a')
+    showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
+    logFile.write("CREATE_SERVICE#%s#%s#%s\n" % (showtime[0], showtime[1], scriptName))
+    logFile.close()
+  return json.dumps('Ok')
+
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
@@ -489,6 +568,22 @@ def deleteFiles(report_name):
     appendToLog(report_name, 'DELETE', request.form.get('SCRIPT'))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
+@report.route("/json/<report_name>", methods=['POST'])
+def configFile(report_name):
+  """
+  Write a Json configuration file
+  """
+  if request.method == 'POST':
+    requestParams = getHttpParams(request)
+    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, "config", requestParams['source'])
+    if not os.path.exists(userDirectory):
+      os.makedirs(userDirectory)
+    # 
+    commentFile = open(os.path.join(userDirectory, "%s.cfg" % requestParams['key']), "w")
+    commentFile.write(requestParams['val'])
+    commentFile.close()
+  return json.dumps('')
+
 @report.route("/components/<component>:<compId>")
 def designerComponent(component, compId):
   """
@@ -517,7 +612,7 @@ def downloadFiles(report_name, script):
     # We assume it is a python script
     script = "%s.py" % script
   if '&' in script:
-    splitScriptPath = script.split("&")
+    splitScriptPath = script.strip("\\").split("&")
     userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name, *splitScriptPath[:-1])
   else:
     splitScriptPath = [script]
