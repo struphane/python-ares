@@ -13,6 +13,7 @@ import time
 import shutil
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response
+from click import echo
 
 import config
 
@@ -20,8 +21,9 @@ import config
 
 # Ares Framework
 from ares.Lib import Ares
+from ares.Lib import AresLog
 
-from ares import report_index, report_index_page, report_index_set, report_doc_local, report_doc_graph
+from ares import report_index, report_index_page, report_doc_local, report_doc_graph
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -74,6 +76,7 @@ def getHttpParams(request):
     httpParams[postValues[0]] = postValues[1]
   for postValues in request.form.items():
     httpParams[postValues[0]] = postValues[1]
+  httpParams['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   return httpParams
 
 def noCache(f):
@@ -437,38 +440,63 @@ def child(report_name, script):
 
 @report.route("/create/env", methods = ['POST', 'GET'])
 def ajaxCreate():
-  """ Special Ajax call to set up the environment """
+  """ Special Ajax call to set up the environment
+
+  This service will create the environment and also add an emtpy report.
+  The log file will be produce and the zip archive with the history will be defined
+  """
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
   reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  return json.dumps(report_index_set.call(reportObj))
+  reportObj.http['ARES_TMPL'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl')
+  scriptName = "%s.py" % reportObj.http['report_name']
+  scriptPath = os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'])
+  log = AresLog.AresLog(current_app.config['ROOT_PATH'], reportObj.http['report_name'], config)
+  if not os.path.exists(scriptPath):
+    os.makedirs(scriptPath)
+    log.createFolder()
+    shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
+    log.addScript('Report', scriptName)
+    fileFullPath = os.path.join(scriptPath, scriptName)
+    with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
+      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
+    return json.dumps("New environment created: %s" % scriptName)
+
+  return json.dumps("Existing Environment")
 
 @report.route("/add/file", methods = ['POST', 'GET'])
 def addScripts():
-  """ Special Ajax call to set up the environment """
+  """
+  Special Ajax call to set up the environment
+
+  """
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
+  echo(reportObj.http)
+  log = AresLog.AresLog(current_app.config['ROOT_PATH'], reportObj.http['report_name'], config)
+  tmplPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl')
   if reportObj.http['script_type'] == 'Report':
     scriptName = reportObj.http['script'] if reportObj.http['script'].endswith(".py") else "%s.py" % reportObj.http['script']
-    scriptPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'])
-    shutil.copyfile(os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl', 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
-    logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'log_ares.dat'), 'a')
-    showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
-    logFile.write("CREATE_SCRIPT#%s#%s#%s\n" % (showtime[0], showtime[1], scriptName))
-    logFile.close()
+    shutil.copyfile(os.path.join(tmplPath, 'tmpl_report.py'), os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'], scriptName))
+    log.addScript(reportObj.http['script_type'], scriptName)
+    fileFullPath = os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'], scriptName)
+    with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
+      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
+    return json.dumps('New Script added: %s' % scriptName)
+
   elif reportObj.http['script_type'] == 'Service':
     ajaxPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'ajax')
     if not os.path.exists(ajaxPath):
       os.makedirs(ajaxPath)
     scriptName = reportObj.http['script'] if reportObj.http['script'].endswith(".py") else "%s.py" % reportObj.http['script']
-    outFile = open(os.path.join(ajaxPath, scriptName), "w")
-    outFile.close()
-    logFile = open(os.path.join(config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'log_ares.dat'), 'a')
-    showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
-    logFile.write("CREATE_SERVICE#%s#%s#%s\n" % (showtime[0], showtime[1], scriptName))
-    logFile.close()
-  return json.dumps('Ok')
+    shutil.copyfile(os.path.join(tmplPath, 'tmpl_service.py'), os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'], 'ajax', scriptName))
+    log.addScript(reportObj.http['script_type'], scriptName)
+    fileFullPath = os.path.join(ajaxPath, scriptName)
+    with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
+      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
+    return json.dumps('New Script added: %s' % scriptName)
 
+  return json.dumps("No Event %s defined..." % reportObj.http['script_type'])
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):

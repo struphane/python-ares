@@ -37,7 +37,7 @@ from ares.Lib import AresHtmlAlert
 from ares.Lib import AresHtmlModal
 from ares.Lib import AresItem
 from ares.Lib import AresHtmlHRef
-
+from ares.Lib import AresLog
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
