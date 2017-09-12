@@ -9,6 +9,9 @@ from ares.Lib import AresJs
 from datetime import datetime
 import json
 
+from flask import render_template_string
+
+
 class Button(AresHtml.Html):
   """
   Python wrapper to the HTML Button component
@@ -29,20 +32,28 @@ class Button(AresHtml.Html):
   def aresExample(cls, aresObj):
     return aresObj.button("MyButton")
 
-  def post(self, evenType, url, data, jsDef='', preAjaxJs='', redirectUrl=''):
+  def post(self, evenType, url, **kwargs):
     """
       Post method to get data directly by interacting with the page
       https://api.jquery.com/jquery.post/
     """
     # Part dedicated to run before the Ajax call
+
+    jsData = []
+    for key, data in kwargs.items():
+      if key not in ('cssCls', ):
+        if issubclass(data.__class__, AresHtml.Html):
+          jsData.append("%s: %s" % (key, data.val))
+
+    url = render_template_string('''{{ url_for(\'%s\') }}''' % url)
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
-    preAjax.add(0, preAjaxJs)
+    preAjax.add(0, kwargs.get('preAjaxJs', ''))
 
     # Items to add during the ajax call
-    itemAjax = AresItem.Item(jsDef)
+    itemAjax = AresItem.Item(kwargs.get('jsDef', ''))
     itemAjax.add(0, "%s.html(%s) ;" % (self.jqId, self.htmlId))
-    super(Button, self).post(evenType, url, data, str(itemAjax), str(preAjax), redirectUrl)
+    super(Button, self).post(evenType, url, "{%s}" % ",".join(jsData), str(itemAjax), str(preAjax), kwargs.get('redirectUrl', ''))
 
 
 class ButtonRemove(AresHtml.Html):

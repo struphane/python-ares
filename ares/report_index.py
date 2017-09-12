@@ -69,7 +69,8 @@ def report(aresObj):
   # barComp.linkTo(tableComp)
 
   inputModal = aresObj.input("Report Name", '')
-  createReport = aresObj.anchor_set_env('Create the Report', **{'report_name': inputModal})
+  createReport = aresObj.button('Create the Report')
+  createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal})
 
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)

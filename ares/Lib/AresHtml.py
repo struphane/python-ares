@@ -136,7 +136,7 @@ class Html(object):
       Post method to get data directly by interacting with the page
       https://api.jquery.com/jquery.post/
     """
-    data = 'eval(%s)' % data if isinstance(data, six.text_type) else json.dumps(data)
+    data = '%s' % data if isinstance(data, (six.text_type, str)) else json.dumps(data)
     jsDef = '%s $.post("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
