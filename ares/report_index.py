@@ -36,6 +36,7 @@ def report(aresObj):
   aresInput.autocomplete(foldersReports)
   aresButton = aresObj.main('Open Report Section', **{'report_name': aresInput, 'cssCls': 'btn btn-success'})
   modal = aresObj.modal('click on the link to create a new report section')
+  modal.modal_header = "Set New Environment"
   grid = aresObj.row([aresButton, modal])
   grid.gridCss = None
   aresObj.container('Create Environment', [aresInput, grid])
@@ -70,7 +71,7 @@ def report(aresObj):
 
   inputModal = aresObj.input("Report Name", '')
   createReport = aresObj.button('Create the Report')
-  createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal})
+  createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal, 'js': "%s.modal('toggle') ; display(data) ;" % modal.jqId})
 
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)

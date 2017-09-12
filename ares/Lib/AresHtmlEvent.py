@@ -50,10 +50,8 @@ class Button(AresHtml.Html):
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     preAjax.add(0, kwargs.get('preAjaxJs', ''))
 
-    # Items to add during the ajax call
-    itemAjax = AresItem.Item(kwargs.get('jsDef', ''))
-    itemAjax.add(0, "%s.html(%s) ;" % (self.jqId, self.htmlId))
-    super(Button, self).post(evenType, url, "{%s}" % ",".join(jsData), str(itemAjax), str(preAjax), kwargs.get('redirectUrl', ''))
+    super(Button, self).post(evenType, url, "{%s}" % ",".join(jsData), "%s ; %s.html('%s') ;" % (kwargs.get('js', ''), self.jqId, self.vals),
+    str(preAjax), kwargs.get('redirectUrl', ''))
 
 
 class ButtonRemove(AresHtml.Html):
