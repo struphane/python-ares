@@ -617,10 +617,10 @@ def designerComponent(component, compId):
   """
 
   """
-  print compId
-  print component
-  print Ares.moduleFromAlias(component)
-  print Ares.moduleFromAlias(component).aresDesigner(compId)
+  echo(compId)
+  echo(component)
+  echo(Ares.moduleFromAlias(component))
+  echo(Ares.moduleFromAlias(component).aresDesigner(compId))
   return json.dumps('')
 
 # ---------------------------------------------------------------------------------------------------------
@@ -794,4 +794,3 @@ def create_folder():
     os.makedirs(subDirectories)
     appendToLog(reportObj.http['REPORT_NAME'], 'FOLDER_CREATION', reportObj.http['FOLDERS'])
   return json.dumps('Folders created in the env %s' % reportObj.http['REPORT_NAME'])
-

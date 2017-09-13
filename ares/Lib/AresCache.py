@@ -14,6 +14,9 @@ def index():
 
 from datetime import datetime, timedelta
 
+from click import echo
+
+
 class AresCache(dict):
 
     def __init__(self, *args, **kwargs):
@@ -55,15 +58,15 @@ if __name__ == '__main__':
 
     @caching
     def foo(a, b):
-        print("Calculate %s * %s" % (a, b))
+        echo("Calculate %s * %s" % (a, b))
         return a * b
 
-    print(aresCache)
-    print(foo(1,3))
-    print(aresCache)
-    print(foo(1,3))
-    print(aresCache)
+    echo(aresCache)
+    echo(foo(1,3))
+    echo(aresCache)
+    echo(foo(1,3))
+    echo(aresCache)
 
     time.sleep(15)
-    print(foo(1,3))
-    print(aresCache)
+    echo(foo(1,3))
+    echo(aresCache)

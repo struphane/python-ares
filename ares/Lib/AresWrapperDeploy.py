@@ -12,6 +12,8 @@ import requests
 import json
 import os
 
+from click import echo
+
 reportName = 'HelloWorld'
 projectLocalPath = os.path.join(os.getcwd(), reportName)
 filename = 'HelloWorld.py'
@@ -30,19 +32,19 @@ def uploadFile(filename):
   files = {'file': open(r"%s\%s" % (projectLocalPath, filename))}
   response = requests.post(postUrlDeploy, files=files)
   if response.status_code == 500:
-    print("########################################")
-    print("The environment is potentially missing")
-    print("########################################")
+    echo("########################################")
+    echo("The environment is potentially missing")
+    echo("########################################")
     if withEnvCreation:
       response = requests.post(postUrlCreate, {'REPORT': reportName})
       files = {'file': open(r"%s\%s" % (projectLocalPath, filename))}
       response = requests.post(postUrlDeploy, files=files)
-      print(response)
+      echo(response)
 
 def createFolders(folders):
   """ Create a folder on the server """
   response = requests.post(postUrlFolderCreate, {'REPORT_NAME': reportName, 'FOLDERS': "/".join(folders)})
-  print(response)
+  echo(response)
 
 def getPackageVersion():
   """  Check the version of the files on the server to ensure that the framework runs with the last version
@@ -52,7 +54,7 @@ def getPackageVersion():
   """
   # TODO add the comparison in the RIskLab shared folder
   response = requests.post(postUrlScriptVersion)
-  print(json.loads(response.text))
+  echo(json.loads(response.text))
 
 #createFolders(['aa', 'bb'])
 uploadFile(filename)

@@ -28,6 +28,8 @@ import inspect
 import collections
 import json
 
+from click import echo
+
 from ares.Lib import AresHtmlContainer
 from ares.Lib import AresHtmlEvent
 from ares.Lib import AresHtmlText
@@ -128,8 +130,8 @@ class Report(object):
     """ Add a user notfication to the report """
     notif = notifType.upper()
     if not notif in self.definedNotif:
-      print("Notification %s not recognized !" % notif)
-      print("Allowed notification %s" % self.definedNotif.keys())
+      echo("Notification %s not recognized !" % notif)
+      echo("Allowed notification %s" % self.definedNotif.keys())
       raise Exception("Notification Type should belong to one of the above category")
 
     alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
@@ -167,7 +169,7 @@ class Report(object):
           try:
             del self.content[self.content.index(val.htmlId)]
           except:
-            print("PROBLEME")
+            echo("PROBLEME")
             pass
 
     return recordSet
@@ -185,14 +187,14 @@ class Report(object):
               try:
                 del self.content[self.content.index(val.htmlId)]
               except:
-                print("PROBLEME")
+                echo("PROBLEME")
                 pass
         else:
           if hasattr(htmlObj, 'htmlId'):
             try:
               del self.content[self.content.index(htmlObj.htmlId)]
             except:
-              print("PROBLEME")
+              echo("PROBLEME")
               pass
     else:
       if hasattr(htmlObjs, 'htmlId'):
@@ -356,12 +358,12 @@ class Report(object):
         subFolderDirectory = os.path.join(self.http['DIRECTORY'], *subfolders)
         subFolderDirectory = os.path.join(subFolderDirectory, file)
         if os.path.exists(subFolderDirectory):
-          print("%s file already created on the server" % file)
+          echo("%s file already created on the server" % file)
           return None
 
       else:
         if os.path.exists(os.path.join(self.http['DIRECTORY'], file)):
-          print("%s file already created on the server" % file)
+          echo("%s file already created on the server" % file)
           return None
 
     if subfolders is None:

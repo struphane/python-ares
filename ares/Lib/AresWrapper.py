@@ -16,6 +16,9 @@ Ares documentation is available here:
 from __future__ import print_function
 import os
 import sys
+
+from click import echo
+
 from ares.Lib import Ares
 
 
@@ -45,7 +48,7 @@ JS = ['jquery-3.2.1.min.js',
 
 def getReport(reportModule, results, scriptPath):
   """ Recursively runs all the reports """
-  print("  > Running report %s" % reportModule.__name__)
+  echo("  > Running report %s" % reportModule.__name__)
   aresObj = Ares.Report()
   aresObj.http['USER_PATH'] = scriptPath
   results[reportModule.__name__] = reportModule.report(aresObj)

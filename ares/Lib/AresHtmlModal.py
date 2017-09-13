@@ -2,6 +2,8 @@
 
 """
 
+from click import echo
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 
@@ -61,4 +63,4 @@ class Modal(AresHtml.Html):
 
 if __name__ == '__main__':
   obj = Modal(0, 'Hey', [['Olivier', 'Aurelie'], [1, 2]])
-  print(obj)
+  echo(obj)

@@ -5,9 +5,13 @@ Most of the graph can be details on the below links:
 
 """
 
+
+from click import echo
+
 from ares.Lib import AresHtmlContainer
 from ares.Lib import AresItem
 from ares.Lib import AresJs
+
 
 class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   """
@@ -106,8 +110,8 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
     try:
       dataSource.jsLinkTo([self]) #all datasource should have a jsLinkTo function (see AresHtmlTable)
     except Exception as e:
-      print(e)
-      print('Please use a data source that has a jsLinkTo attribute')
+      echo(e)
+      echo('Please use a data source that has a jsLinkTo attribute')
 
 
 class Pie(JsNvD3Graph):
@@ -535,6 +539,6 @@ class WordCloud(JsNvD3Graph):
 if __name__ == '__main__':
   obj = Pie(0, [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}])
 
-  print(obj.jsEvents())
-  print('\n'.join(obj.onLoad()))
-  print(obj)
+  echo(obj.jsEvents())
+  echo('\n'.join(obj.onLoad()))
+  echo(obj)

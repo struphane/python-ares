@@ -2,9 +2,13 @@
 
 """
 
+
+from click import echo
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
+
 
 class Div(AresHtml.Html):
   """ Python Wrapper for a simple DIV tag """
@@ -404,6 +408,6 @@ class Vignet(AresHtml.Html):
 
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])
-  print(obj)
+  echo(obj)
 
 
