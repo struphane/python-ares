@@ -64,7 +64,8 @@
 .page {
     background-color: white ;
     border: 1px solid black ;
-    min-height: 900px;
+    padding: 5px;
+    /* min-height: 900px; */
     width: 700px;
     overflow: auto;
 }

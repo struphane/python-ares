@@ -9,12 +9,11 @@ def report(aresObj):
   """
 
   """
+  path = r"E:\GitHub\Ares\ares"
   scriptName = aresObj.http['script'].replace(".py", "")
-  report = open(r"D:\GitHub\python-ares\ares\%s.py" % scriptName)
-  wikiObj = aresObj.wiki(aresObj, scriptName, report)
-  #report.close()
+  wikiObj = aresObj.wiki(aresObj, scriptName, open(r"%s\%s.py" % (path, scriptName)).__doc__.split("\n"))
 
-  aresObj.script('youpi', **{'report_name': 'JsWikiScripts', 'script_name': 'JsWikiScriptsTest',
+  aresObj.anchor('youpi', **{'report_name': 'JsWikiScripts', 'script_name': 'JsWikiScriptsTest',
                              'var': 'youpi', 'cssCls': 'Yes'
                              })
   return aresObj
