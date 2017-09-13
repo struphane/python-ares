@@ -1,12 +1,17 @@
 from flask import Blueprint, render_template
+from click import echo
+
 from ares.Lib import Ares
 
+
 monitoringBP = Blueprint("monitoring", __name__, url_prefix='/monitoring')
+
 
 @monitoringBP.route("/")
 def index():
     onload, content, js = index_report()
     return render_template("ares_template.html", onload=onload, content=content, js=js)
+
 
 def index_report():
     aresObj = Ares.Report()
@@ -34,4 +39,4 @@ def index_report():
 
 if __name__ == '__main__':
     onload, content, js = index_report()
-    print(js)
+    echo(js)

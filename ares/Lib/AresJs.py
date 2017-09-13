@@ -10,6 +10,8 @@ reference website: http://api.jquery.com/jquery.ajax/
 import json
 import six
 
+from click import echo
+
 from ares.Lib import AresItem
 
 
@@ -33,8 +35,8 @@ class JQueryEvents(object):
     if not eventType in self.mapEvent:
       # This is a check to control the number of events per class
       # Also because some of them might require specific display
-      print('Do not use any Ajax call or bespoke methods here')
-      print('In the function is not implemented yet please have a look at the call in AreHtml.py')
+      echo('Do not use any Ajax call or bespoke methods here')
+      echo('In the function is not implemented yet please have a look at the call in AreHtml.py')
       raise Exception('%s not defined for this %s!' % (eventType, self.__class__))
 
     if isinstance(jsFnc, six.text_type) or isinstance(jsFnc, str): # to be compatible with unicode in python 2

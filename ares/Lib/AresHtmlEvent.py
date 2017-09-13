@@ -2,11 +2,16 @@
 
 """
 
+
+import json
+
+from click import echo
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
 from datetime import datetime
-import json
+
 
 class Button(AresHtml.Html):
   """
@@ -651,11 +656,11 @@ class GeneratePdf(ButtonRemove):
 
 if __name__ == '__main__':
   obj = DropZone(0, 'Drop files here')
-  print('\n'.join(obj.jsEvents()))
-  print('\n'.join(obj.onLoad()))
-  print(obj)
+  echo('\n'.join(obj.jsEvents()))
+  echo('\n'.join(obj.onLoad()))
+  echo(obj)
 
   obj = DatePicker(0, 'Drop files here')
-  print('\n'.join(obj.jsEvents()))
-  print('\n'.join(obj.onLoad()))
-  print(obj)
+  echo('\n'.join(obj.jsEvents()))
+  echo('\n'.join(obj.onLoad()))
+  echo(obj)

@@ -5,6 +5,8 @@
 import os
 import locale
 
+from click import echo
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 
@@ -345,10 +347,10 @@ class Wiki(AresHtml.Html):
 
 if __name__ == '__main__':
   obj = Title(0, 'Reports Environment (Beta)')
-  #print(obj.jsEvents())
-  print('\n'.join(obj.onLoad()))
-  #print(obj)
+  #echo(obj.jsEvents())
+  echo('\n'.join(obj.onLoad()))
+  #echo(obj)
 
   Numeric(1, 34455656)
   objText = Paragraph(0, "Youpi {0}", htmlComp=[Numeric(1, 34455656)])
-  print(objText)
+  echo(objText)

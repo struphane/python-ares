@@ -12,6 +12,7 @@ import traceback
 import time
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response
+from click import echo
 
 import config
 
@@ -21,6 +22,7 @@ import config
 from ares.Lib import Ares
 
 from ares import report_index, report_index_page, report_index_set, report_doc_local, report_doc_graph
+
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -555,10 +557,10 @@ def designerComponent(component, compId):
   """
 
   """
-  print(compId)
-  print(component)
-  print(Ares.moduleFromAlias(component))
-  print(Ares.moduleFromAlias(component).aresDesigner(compId))
+  echo(compId)
+  echo(component)
+  echo(Ares.moduleFromAlias(component))
+  echo(Ares.moduleFromAlias(component).aresDesigner(compId))
   return json.dumps('')
 
 # ---------------------------------------------------------------------------------------------------------
