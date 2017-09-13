@@ -1,7 +1,5 @@
 **/__pycache__/**
 .idea/**
-<<<<<<< HEAD
-=======
 **/*.pyc
 
 ### Python template
@@ -106,8 +104,3 @@ ENV/
 
 ### Python template
 # Byte-compiled / optimized / DLL files
->>>>>>> c8dbdc656abdd5111077d524feee85c73d049f65
-__pycache__/
-*$py.class
-*.pyc
-*.git*
