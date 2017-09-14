@@ -211,9 +211,10 @@ class Report(object):
 
     """
     strFct, newRecordSet = [], []
-    for headerRow in header:
-      if headerRow.get("type") == 'object':
-        strFct.append(headerRow.get('key', headerRow['colName']) )
+    for headerLine in header:
+      for headerRow in headerLine:
+        if headerRow.get("type") == 'object':
+          strFct.append(headerRow.get('key', headerRow['colName']) )
     if id(recordSet) not in self.jsRegistered:
       if strFct:
         newRecordSet = []
