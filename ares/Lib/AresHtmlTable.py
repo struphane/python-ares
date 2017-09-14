@@ -36,10 +36,8 @@ class Table(AresHtml.Html):
       self.header = [header]
     else: # we have a header on several lines, nothing to do
       self.header = header
-    for headerLine in self.header:
-      for col in headerLine:
-        self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
-    self.rowTmpl = "\n".join(["<td>%%(%s)s</td>" % col for col in self.header])
+    for col in self.header[-1]:
+      self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
 
   def recKey(self, col):
     """ Return the record Key taken into accounr th possible user options """
@@ -67,7 +65,18 @@ class Table(AresHtml.Html):
       item.add(1, '<div class="panel-body">')
     if self.filt is not None:
       item.join(self.filt)
-    item.add(0, '<table %s></table>' % self.strAttr())
+    item.add(0, '<table %s>' % self.strAttr())
+
+    if len(self.header) > 1:
+      item.add(1, "<thead>")
+      for headerLine in self.header:
+        item.add(2, "<tr>")
+        for col in headerLine:
+          item.add(3, "<th rowspan='%s' colspan='%s'>%s</th>" % (col.get("rowspan", 1), col.get("colspan", 1), col.get("colName")))
+        item.add(2, "</tr>")
+      item.add(1, "</thead>")
+    item.add(0, '</table>')
+
     if self.headerBox is not None:
       item.add(0, '</div>')
       item.add(0, '</div>')
@@ -142,8 +151,17 @@ class Table(AresHtml.Html):
                       {
                         data: recordSet_%s ,
                         columns: [
-                                    %s
+                                    %s,
                               ],
+
+                        dom: 'Bfrtip',
+                                        buttons: [
+                                              {
+                                                  extend: 'colvis',
+                                                  collectionLayout: 'fixed two-column'
+                                              }
+                                        ],
+
                         fixedHeader: true,
                         fnDrawCallback: function( oSettings ) {
                                             // Add the linked functions here
@@ -154,15 +172,30 @@ class Table(AresHtml.Html):
                   ''' % (self.jqId, self.recordSetId, ",".join(self.recordSetHeader), "\n".join(self.linkedObjs)))
     else:
       item.add(1, '''
+                  // createdRow
                   %s = %s.DataTable(
                                      {
+                                        responsive: true,
                                         data: recordSet_%s ,
                                         columns: [
                                                     %s
                                               ],
-                                        fixedHeader: true
+                                        dom: 'Bfrtip',
+                                        buttons: [
+                                              {
+                                                  extend: 'colvis',
+                                                  collectionLayout: 'fixed two-column'
+                                              }
+                                        ],
+
+                                        //headerCallback( thead, data, start, end, display ) {
+                                        //      alert(display.toSource());
+                                        //},
+
                                      }
-                  ) ;''' % (self.htmlId, self.jqId, self.recordSetId, ",".join(self.recordSetHeader)))
+                  ) ;
+
+                  ''' % (self.htmlId, self.jqId, self.recordSetId, ",".join(self.recordSetHeader)))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)

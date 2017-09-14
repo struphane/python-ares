@@ -19,14 +19,16 @@ def report(aresObj):
                       'VAL2': random.uniform(0, 100),
                       'VAL3': random.uniform(0, 320),
                       'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
-  table = aresObj.table(recordSet, [{'key': 'PTF', 'colName': 'Portfolio'},
-                                                {'key': 'PTF2', 'colName': 'Portfolio 2'},
-                                                {'key': 'CCY', 'colName': 'Currency'},
-                                                {'key': 'VAL', 'colName': 'Value'},
-                                                {'key': 'VAL2', 'colName': 'Value 2'},
-                                                {'key': 'VAL3', 'colName': 'Value 3'}],
+  table = aresObj.table(recordSet, [[{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                     {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
+                                     {'key': 'VAL', 'colName': 'Value', 'colspan': 1}],
+                                    [
+                                      {'key': 'CCY', 'colName': 'Currency'},
+                                      {'key': 'VAL2', 'colName': 'Value 2'},
+                                      {'key': 'VAL3', 'colName': 'Value 3'}],
+                                    ],
                         'Test Table')
-  table.filters(['Currency', 'Portfolio', 'Portfolio 2'])
+  table.filters(['Currency', 'Value 2'])
 
 
   #pie = aresObj.pieChart('Folders', recordSet, {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
