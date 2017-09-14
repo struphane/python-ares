@@ -408,13 +408,13 @@ class IndentedTree(JsNvD3Graph):
   showCount = 1
   alias = 'tree'
 
-  def __init__(self, htmlId, cols, data, useMockData=False):
+  def __init__(self, aresObj, cols, data, useMockData=False):
     """
 
     cols should be a list of col and the col object should be defined like a dictionary with the below properties
       col = { key: 'type', label: 'Type', width: '25%', type: 'text' }
     """
-    super(IndentedTree, self).__init__(htmlId, data)
+    super(IndentedTree, self).__init__(aresObj, data)
     self.cols = cols
 
   def pyDataToJs(self, localPath=None):

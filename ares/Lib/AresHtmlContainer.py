@@ -94,9 +94,9 @@ class Container(Div):
   cssCls, alias = 'container-fluid', 'container'
   reference = 'https://getbootstrap.com/docs/3.3/css/'
 
-  def __init__(self, htmlId, header, vals, cssCls=None):
+  def __init__(self, aresObj, header, vals, cssCls=None):
     """  """
-    super(Container, self).__init__(htmlId, vals, cssCls)
+    super(Container, self).__init__(aresObj, vals, cssCls)
     self.headerBox = header
 
   def __str__(self):
@@ -129,9 +129,9 @@ class GraphSvG(AresHtml.Html):
   icon = 'fa fa-pie-chart'
   categories, values = None, None
 
-  def __init__(self, htmlId, header, vals, recordSetDef, cssCls=None):
+  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None):
     """ selectors is a tuple with the category first and the value list second """
-    super(GraphSvG, self).__init__(htmlId, vals, cssCls)
+    super(GraphSvG, self).__init__(aresObj, vals, cssCls)
     self.headerBox = header
     self.recordSetId = id(vals)
     self.header = recordSetDef
@@ -294,7 +294,7 @@ class Row(AresHtml.Html):
   gridCss = 'panel panel-success'
   reference = 'https://getbootstrap.com/docs/3.3/css/'
 
-  def __init__(self, htmlId, hltmObjs, cssCls=None):
+  def __init__(self, aresObj, hltmObjs, cssCls=None):
     if len(hltmObjs) > 3:
       raise Exception('Row object can only display maximum 3 components')
 
@@ -302,13 +302,13 @@ class Row(AresHtml.Html):
       vals = [('col-6 col-md-4', htmlObj) for htmlObj in hltmObjs]
     elif len(hltmObjs) == 2:
       vals = [('col-xs-6', htmlObj) for htmlObj in hltmObjs]
-    super(Row, self).__init__(htmlId, vals, cssCls)
+    super(Row, self).__init__(aresObj, vals, cssCls)
 
   def extend(self, component):
     """ Extend one of the objects on to columns """
     tempVals = []
     for size, htmlOjb in self.vals:
-      if component.htmlId == htmlOjb.htmlId:
+      if id(component) == id(htmlOjb):
         tempVals.append(('col-xs-12 col-md-8', htmlOjb))
       else:
         tempVals.append(('col-xs-6 col-md-4', htmlOjb))
@@ -391,9 +391,9 @@ class Vignet(AresHtml.Html):
 
   cssCls, alias = "panel panel-success", 'vignet'
 
-  def __init__(self, htmlId, title, content, recordSet, fnc, col, cssCls=None):
+  def __init__(self, aresObj, title, content, recordSet, fnc, col, cssCls=None):
     vals = fnc(recordSet, col)
-    super(Vignet, self).__init__(htmlId, vals, cssCls)
+    super(Vignet, self).__init__(aresObj, vals, cssCls)
     self.title = title
     self.text = content
 

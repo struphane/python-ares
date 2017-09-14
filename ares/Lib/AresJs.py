@@ -29,7 +29,7 @@ class JQueryEvents(object):
               'change': ['%(src)s.on("%(eventType)s", function (event){', '}', ');'],
         }
 
-  def __init__(self, htmlId, jsSrcRef, eventType, jsFnc, data=None, url=None):
+  def __init__(self, aresObj, jsSrcRef, eventType, jsFnc, data=None, url=None):
     """
     """
     if not eventType in self.mapEvent:
@@ -47,8 +47,13 @@ class JQueryEvents(object):
       jsItemFnc = items
     else:
       jsItemFnc = jsFnc
-    self.jsAttr = {'src': jsSrcRef, 'eventType': eventType, 'fnc': jsItemFnc, 'htmlId': htmlId,
+    self.jsAttr = {'src': jsSrcRef, 'eventType': eventType, 'fnc': jsItemFnc, 'htmlId': self.htmlId,
                    'data': data, 'url': url}
+
+  @property
+  def htmlId(self):
+    """ Property to get the HTML ID of a python HTML object """
+    return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
   def extendJsFnc(self, jsFnc):
     """ Add the extr actions to the even function """

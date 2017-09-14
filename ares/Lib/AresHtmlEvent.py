@@ -139,7 +139,7 @@ class ButtonOk(ButtonRemove):
     return aresObj.ok("OK Button")
 
 
-class __A(AresHtml.Html):
+class A(AresHtml.Html):
   """
   Wrapper for a Anchor HTML tag
 
@@ -147,8 +147,8 @@ class __A(AresHtml.Html):
   link, alias = '', 'anchor'
   reference = 'https://www.w3schools.com/tags/att_a_href.asp'
 
-  def __init__(self, htmlId, vals, reportName, childPages, directory, cssCls=None):
-    super(A, self).__init__(htmlId, vals, cssCls)
+  def __init__(self, aresObj, vals, reportName, childPages, directory, cssCls=None):
+    super(A, self).__init__(aresObj, vals, cssCls)
     self.childPages = childPages
     self.reportName = reportName
     self.directory = directory
@@ -375,9 +375,9 @@ class Select(AresHtml.Html):
   # TODO: Extend the python object to handle multi select and all the cool features
   alias, cssCls = 'select', 'selectpicker'
 
-  def __init__(self, htmlId, vals, selected, cssCls=None):
+  def __init__(self, aresObj, vals, selected, cssCls=None):
     """ Instanciate the object and store the selected item """
-    super(Select, self).__init__(htmlId, vals, cssCls)
+    super(Select, self).__init__(aresObj, vals, cssCls)
     self.selected = selected
 
   def __str__(self):
@@ -498,8 +498,8 @@ class DropZone(AresHtml.Html):
   """
   alias = 'dropzone'
 
-  def __init__(self, htmlId, vals, cssCls=None):
-    super(DropZone, self).__init__(htmlId, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None):
+    super(DropZone, self).__init__(aresObj, vals, cssCls)
     self.js('dragover',
             '''
               event.originalEvent.stopPropagation();
@@ -547,8 +547,8 @@ class DropFile(AresHtml.Html):
   alias = 'dropfile'
   reportName = ''
 
-  def __init__(self, htmlId, vals, cssCls=None):
-    super(DropFile, self).__init__( htmlId, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None):
+    super(DropFile, self).__init__(aresObj, vals, cssCls)
     self.js('dragover', '''
                           event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
@@ -676,15 +676,15 @@ class GeneratePdf(ButtonRemove):
   source = r"http://pdfmake.org/#/gettingstarted"
 
   def __init__(self, aresObj, fileName=None, cssCls=None): # Hack: I need the whole aresObj as param since I need to retrieve everything that has been created so far
-    super(GeneratePdf, self).__init__(aresObj.getNext(), "", cssCls)
+    super(GeneratePdf, self).__init__(aresObj, "", cssCls)
 
     if fileName is None:
       fileName = "%s_%s" % (aresObj.reportName.strip().replace(" ", "_") if hasattr(aresObj, "reportName") else "ares_export", datetime.now())
 
     content = []
     styles = {"Title": {"fontSize": 22, "bold": "true", "italic": "true", "alignment": "left"}}
-    for htmlId in aresObj.content:
-      htmlObj = aresObj.htmlItems[htmlId]
+    for objId in aresObj.content:
+      htmlObj = aresObj.htmlItems[objId]
       content.append({"text": htmlObj.vals, "style": htmlObj.__class__.__name__})
     varName = "%s_Content" % self.htmlId
     varTxt = "var %s = %s;" % (varName, json.dumps({"content": content, "style": styles}))

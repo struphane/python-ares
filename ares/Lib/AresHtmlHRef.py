@@ -21,8 +21,8 @@ class A(AresHtml.Html):
   alias, cssCls = 'anchor', 'btn btn-success'
   flask = 'ares.launch'
 
-  def __init__(self, htmlId, vals, **kwargs):
-    super(A, self).__init__(htmlId, vals, kwargs.get('cssCls'))
+  def __init__(self, aresObj, vals, **kwargs):
+    super(A, self).__init__(aresObj, vals, kwargs.get('cssCls'))
     self.kwargs = kwargs
 
   def __str__(self):

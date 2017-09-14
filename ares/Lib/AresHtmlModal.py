@@ -21,9 +21,9 @@ class Modal(AresHtml.Html):
   reference = 'https://v4-alpha.getbootstrap.com/components/modal/'
   default = {'color': '#398438', 'font-family': 'anchorjs-icons', 'font-style': 'normal', 'font-varian': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
 
-  def __init__(self, htmlId, name, cssCls=None):
+  def __init__(self, aresObj, name, cssCls=None):
     """ Create an python HTML object """
-    super(Modal, self).__init__(htmlId, None, cssCls)
+    super(Modal, self).__init__(aresObj, None, cssCls)
     self.name = name
     self.vals = []
 

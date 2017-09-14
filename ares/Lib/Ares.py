@@ -135,42 +135,35 @@ class Report(object):
       raise Exception("Notification Type should belong to one of the above category")
 
     alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
-    alertObject = alertCls(self.countItems, title, value, self.countNotif, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
-    self.htmlItems[alertObject.htmlId] = alertObject
-    self.content.append(alertObject.htmlId)
+    alertObj = alertCls(self.countItems, title, value, self.countNotif, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
+    self.htmlItems[id(alertObj)] = alertObj
+    self.content.append(id(alertObj))
     if notif == 'DANGER':
-      self.interruptReport = (True, alertObject.htmlId)  # we keep track of the object since this is the only thing we will display
+      self.interruptReport = (True, id(alertObj))  # we keep track of the object since this is the only thing we will display
     self.countItems += 1
     self.countNotif += 1
-    return alertObject
+    return alertObj
 
   def item(self, itemId):
     """ Return the HTML object """
     return self.htmlItems[itemId]
-
-  def getNext(self):
-    """ Return the next ID available for a HTML component """
-    self.countItems += 1
-    return self.countItems
 
   def add(self, htmlObj, fncName):
     """ Register the HTML component to the Ares object """
     if fncName != htmlObj.alias:
       raise Exception("%s not register for the Ares function %s" % (htmlObj.alias, fncName))
 
-    self.htmlItems[htmlObj.htmlId] = htmlObj
-    self.content.append(htmlObj.htmlId)
+    self.htmlItems[id(htmlObj)] = htmlObj
+    self.content.append(id(htmlObj))
     return htmlObj
 
   def suppRec(self, recordSet):
     for rec in recordSet:
       for val in rec.values():
-        if hasattr(val, 'htmlId'):
-          try:
-            del self.content[self.content.index(val.htmlId)]
-          except:
-            echo("PROBLEME")
-            pass
+        try:
+          del self.content[self.content.index(id(val))]
+        except:
+          echo("PROBLEME")
 
     return recordSet
 
@@ -179,26 +172,26 @@ class Report(object):
     if htmlObjs is None:
       return htmlObjs
 
+    print(htmlObjs)
+
     if isinstance(htmlObjs, list):
       for htmlObj in htmlObjs:
         if isinstance(htmlObj, list):
           for val in htmlObj:
-            if hasattr(val, 'htmlId'):
-              try:
-                del self.content[self.content.index(val.htmlId)]
-              except:
-                echo("PROBLEME")
-                pass
-        else:
-          if hasattr(htmlObj, 'htmlId'):
             try:
-              del self.content[self.content.index(htmlObj.htmlId)]
+              del self.content[self.content.index(id(val))]
             except:
               echo("PROBLEME")
-              pass
+        else:
+          try:
+            del self.content[self.content.index(id(htmlObj))]
+          except:
+            echo("PROBLEME")
     else:
-      if hasattr(htmlObjs, 'htmlId'):
-        del self.content[self.content.index(htmlObjs.htmlId)]
+      try:
+        del self.content[self.content.index(id(htmlObjs))]
+      except:
+        echo("PROBLEME")
     return htmlObjs
 
   def addTo(self, container, htmlObj):
@@ -241,85 +234,88 @@ class Report(object):
   # This part is done in python 3 in order to ensure users will put the right type of objects
   # del self.content[self.content.index(val.htmlId)]
   # ---------------------------------------------------------------------------------------------------------
-  def vignet(self, header, text, recordSet, fnc, col,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self.getNext(), header, text, recordSet, fnc, col, cssCls), sys._getframe().f_code.co_name)
-  def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
-  def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
-  def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Paragraph(self.getNext(), self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
-  def dropzone(self, value, cssCls=None): return self.add(AresHtmlEvent.DropZone(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def newline(self, cssCls=None): return self.add(AresHtmlText.Newline(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
-  def line(self, cssCls=None): return self.add(AresHtmlText.Line(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
-  def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def number(self, value, cssCls=None): return self.add(AresHtmlText.Numeric(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def wiki(self, aresObj, dataSourceName, value, cssCls=None): return self.add(AresHtmlText.Wiki(self.getNext(), dataSourceName, value, aresObj, cssCls), sys._getframe().f_code.co_name)
+  def vignet(self, header, text, recordSet, fnc, col,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self, header, text, recordSet, fnc, col, cssCls), sys._getframe().f_code.co_name)
+  def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Paragraph(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def dropzone(self, value, cssCls=None): return self.add(AresHtmlEvent.DropZone(self, value, cssCls), sys._getframe().f_code.co_name)
+  def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self, value, cssCls), sys._getframe().f_code.co_name)
+  def newline(self, cssCls=None): return self.add(AresHtmlText.Newline(self, '', cssCls), sys._getframe().f_code.co_name)
+  def line(self, cssCls=None): return self.add(AresHtmlText.Line(self, '', cssCls), sys._getframe().f_code.co_name)
+  def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self, value, cssCls), sys._getframe().f_code.co_name)
+  def number(self, value, cssCls=None): return self.add(AresHtmlText.Numeric(self, value, cssCls), sys._getframe().f_code.co_name)
+  def wiki(self, dataSourceName, value, cssCls=None): return self.add(AresHtmlText.Wiki(self, dataSourceName, value, cssCls), sys._getframe().f_code.co_name)
 
   # Title section
-  def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
-  def title2(self, value, cssCls=None): return self.add(AresHtmlText.Title2(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
-  def title3(self, value, cssCls=None): return self.add(AresHtmlText.Title3(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
-  def title4(self, value, cssCls=None): return self.add(AresHtmlText.Title4(self.getNext(), value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title2(self, value, cssCls=None): return self.add(AresHtmlText.Title2(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title3(self, value, cssCls=None): return self.add(AresHtmlText.Title3(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title4(self, value, cssCls=None): return self.add(AresHtmlText.Title4(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
 
   # Action section
-  def slider(self, value, cssCls=None): return self.add(AresHtmlEvent.Slider(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def date(self, label='Date', cssCls=None): return self.add(AresHtmlEvent.DatePicker(self.getNext(), label, cssCls), sys._getframe().f_code.co_name)
-  def textArea(self, value, cssCls=None): return self.add(AresHtmlEvent.TextArea(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def button(self, value, cssCls=None): return self.add(AresHtmlEvent.Button(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
-  def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self.getNext(), '', cssCls), sys._getframe().f_code.co_name)
-  def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name) # hack: I need the full aresObj to generate the pdf, hence I pass self and not self.getNext() as param
+  def slider(self, value, cssCls=None): return self.add(AresHtmlEvent.Slider(self, value, cssCls), sys._getframe().f_code.co_name)
+  def date(self, label='Date', cssCls=None): return self.add(AresHtmlEvent.DatePicker(self, label, cssCls), sys._getframe().f_code.co_name)
+  def textArea(self, value, cssCls=None): return self.add(AresHtmlEvent.TextArea(self, value, cssCls), sys._getframe().f_code.co_name)
+  def button(self, value, cssCls=None): return self.add(AresHtmlEvent.Button(self, value, cssCls), sys._getframe().f_code.co_name)
+  def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self, '', cssCls), sys._getframe().f_code.co_name)
+  def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self, '', cssCls), sys._getframe().f_code.co_name)
+  def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)
+  def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
+  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name) # hack: I need the full aresObj to generate the pdf, hence I pass self and not self as param
+
 
   # Containers section
-  def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
-  def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def table(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlTable.Table(self.getNext(), headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def select(self, values, selected=None, cssCls=None): return self.add(AresHtmlEvent.Select(self.getNext(), self.supp(values), selected, cssCls), sys._getframe().f_code.co_name)
-  def select_group(self, values, cssCls=None): return self.add(AresHtmlEvent.SelectWithGroup(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self.getNext(), header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def col(self, values, cssCls=None): return self.add(AresHtmlContainer.Col(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self, value, cssCls), sys._getframe().f_code.co_name)
+  def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def table(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlTable.Table(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def select(self, values, selected=None, cssCls=None): return self.add(AresHtmlEvent.Select(self, self.supp(values), selected, cssCls), sys._getframe().f_code.co_name)
+  def select_group(self, values, cssCls=None): return self.add(AresHtmlEvent.SelectWithGroup(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self, header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def col(self, values, cssCls=None): return self.add(AresHtmlContainer.Col(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+
 
   # Modal Section
-  def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self.getNext(), self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+
 
   # Chart section
-  def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def pie(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Pie(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def donut(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Donut(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def lineChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Line(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def stackedAreaChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def multiBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def lineChartFocus(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self.getNext(), headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def pie(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Pie(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def donut(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Donut(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def lineChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Line(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def stackedAreaChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def multiBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def lineChartFocus(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
 
+  def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self, header, values, cssCls), sys._getframe().f_code.co_name)
+  def tree(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
 
-  def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self.getNext(), header, values, cssCls), sys._getframe().f_code.co_name)
-  def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self.getNext(), header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
 
   # File HTML Section
-  def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self.getNext(), values, cssCls), sys._getframe().f_code.co_name)
+  def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self, values, cssCls), sys._getframe().f_code.co_name)
 
   # Anchor section
-  #def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self.getNext(), self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
-  def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def anchor_add_scripts(self, value, **kwargs): return self.add(AresHtmlHRef.AddScript(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self.getNext(), self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self.getNext(), value, cssCls), sys._getframe().f_code.co_name)
+  #def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self, self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
+  def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_add_scripts(self, value, **kwargs): return self.add(AresHtmlHRef.AddScript(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self, value, cssCls), sys._getframe().f_code.co_name)
 
 
   # Designer objects
-  def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self.getNext(), 'Put your text here', cssCls), sys._getframe().f_code.co_name)
-  def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self.getNext(), 'Drop here', cssCls), sys._getframe().f_code.co_name)
-  def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self.getNext(), vals, cssCls), sys._getframe().f_code.co_name)
+  def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self, 'Put your text here', cssCls), sys._getframe().f_code.co_name)
+  def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self, 'Drop here', cssCls), sys._getframe().f_code.co_name)
+  def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self, vals, cssCls), sys._getframe().f_code.co_name)
 
   def components(self):
     """ Get the list of component available in the framework """
@@ -432,8 +428,8 @@ class Report(object):
 
     """
     onloadParts, htmlParts, jsSection, jsGraphs = set(), [], [], []
-    for htmlId in self.content:
-      jsOnload, html, js = self.htmlItems[htmlId].html()
+    for objId in self.content:
+      jsOnload, html, js = self.htmlItems[objId].html()
       for ref, data in self.jsRegistered.items():
         onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data)))
       for onloadFnc in jsOnload:

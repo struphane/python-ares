@@ -54,9 +54,9 @@ class Html(object):
   cssCls, reference = None, None
   incIndent = 0
 
-  def __init__(self, htmlId, vals, cssCls=None):
+  def __init__(self, aresObj, vals, cssCls=None):
     """ Create an python HTML object """
-    self.__htmlId = htmlId # The html object ID
+    self.aresObj = aresObj # The html object ID
     self.attr = {} if self.cssCls is None else {'class': self.cssCls} # default HTML attributes
     self.jsOnLoad, self.jsEvent, self.jsEventFnc = set(), {}, collections.defaultdict(set)
     self.vals = vals
@@ -66,7 +66,7 @@ class Html(object):
   @property
   def htmlId(self):
     """ Property to get the HTML ID of a python HTML object """
-    return "%s_%s" % (self.__class__.__name__.lower(), self.__htmlId)
+    return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
   @property
   def jqId(self):

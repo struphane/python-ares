@@ -24,11 +24,11 @@ class Table(AresHtml.Html):
   filt, filtId = None, None
   linkedObjs = None
 
-  def __init__(self, htmlId, headerBox, vals, header=None, cssCls=None):
+  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
 
     """
-    super(Table, self).__init__(htmlId, vals, cssCls)
+    super(Table, self).__init__(aresObj, vals, cssCls)
     self.headerBox = headerBox
     self.recordSetId = id(vals)
     self.recordSetHeader = []
