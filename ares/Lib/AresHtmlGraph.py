@@ -3,8 +3,9 @@
 Most of the graph can be details on the below links:
   - http://nvd3.org/examples/
 
-"""
 
+"""
+# TODO: Add the type of the tickFormat for X and Y axis in the headers definition
 
 from click import echo
 
@@ -375,7 +376,8 @@ class ScatterChart(JsNvD3Graph):
   alias = 'scatterChart'
   style = {'chartStyle': {},
            'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }"},
+                                   #'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }"
+                                   },
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
 

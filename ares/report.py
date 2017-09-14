@@ -18,6 +18,7 @@ from click import echo
 import config
 
 # TODO add a check on the variable DIRECTORY to ensure that it cannot be changed
+# TODO add the Flask url_for for an even using a text file like the attempt in JsTable
 
 # Ares Framework
 from ares.Lib import Ares
