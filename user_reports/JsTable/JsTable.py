@@ -32,6 +32,15 @@ def report(aresObj):
   pie = aresObj.scatterChart(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}]
                     )
+
+  button = aresObj.button("Youpi")
+  button.js('click',
+            '''
+              $.getJSON("../user_reports/JsTable/test.json", function(json) {
+                  alert(json.a);
+              });
+            ''' #% aresObj.http["DIRECTORY"].replace("\\", "/")
+            )
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
  # pie.linkTo(table)
