@@ -19,19 +19,19 @@ def report(aresObj):
                       'VAL2': random.uniform(0, 100),
                       'VAL3': random.uniform(0, 320),
                       'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
-  table = aresObj.table(recordSet, [[{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+  table = aresObj.table(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                      {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
-                                     {'key': 'VAL', 'colName': 'Value', 'colspan': 1}],
-                                    [
+                                     {'key': 'VAL', 'colName': 'Value', 'colspan': 1},
                                       {'key': 'CCY', 'colName': 'Currency'},
                                       {'key': 'VAL2', 'colName': 'Value 2'},
                                       {'key': 'VAL3', 'colName': 'Value 3'}],
-                                    ],
                         'Test Table')
   table.filters(['Currency', 'Value 2'])
 
 
-  #pie = aresObj.pieChart('Folders', recordSet, {'PTF': 'Portfolio', 'PTF2': 'Portfolio 2', 'CCY': 'Currency', 'VAL': 'Value', 'VAL2': 'Value 2', 'VAL3': 'Value 3'}, selectors)
+  pie = aresObj.scatterChart(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}]
+                    )
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
  # pie.linkTo(table)
