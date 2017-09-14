@@ -172,8 +172,6 @@ class Report(object):
     if htmlObjs is None:
       return htmlObjs
 
-    print(htmlObjs)
-
     if isinstance(htmlObjs, list):
       for htmlObj in htmlObjs:
         if isinstance(htmlObj, list):
@@ -204,8 +202,8 @@ class Report(object):
 
     """
     strFct, newRecordSet = [], []
-    for headerLine in header:
-      for headerRow in headerLine:
+    for headerRow in header:
+      #for headerRow in headerLine:
         if headerRow.get("type") == 'object':
           strFct.append(headerRow.get('key', headerRow['colName']) )
     if id(recordSet) not in self.jsRegistered:
