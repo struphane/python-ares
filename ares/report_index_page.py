@@ -100,8 +100,7 @@ def report(aresObj, localPath=None):
   aresLogFile = os.path.join(aresObj.http['DIRECTORY'], 'log_ares.dat')
   folderEvents = collections.defaultdict(int)
   if os.path.exists(aresLogFile):
-    log = open(aresLogFile)
-    log.next()
+    log = open(aresLogFile, "r")
     for line in log:
       row = line.strip().split("#")
       folderEvents[row[1]] += 1

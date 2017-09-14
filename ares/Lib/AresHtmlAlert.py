@@ -1,13 +1,10 @@
 #
 # class Notification(object):
 #   """ """
-#   def __init__(self, htmlId):
+#   def __init__(self, aresObj):
 #     """ """
-#     self.__htmlId = htmlId
+#     self.aresObj = aresObj
 #
-#   @property
-#   def htmlId(self):
-#     return self.__htmlId
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -24,11 +21,11 @@ class DangerAlert(AresHtml.Html):
   cssCls = 'alert-danger'
   jsEvent = None
 
-  def __init__(self, htmlId, title, value, countNotif, closeButton=False, backgroundColor=None, cssCls=None):
+  def __init__(self, aresObj, title, value, countNotif, closeButton=False, backgroundColor=None, cssCls=None):
     """ """
     if cssCls:
       self.cssCls = cssCls
-    super(DangerAlert, self).__init__(htmlId, self.cssCls)
+    super(DangerAlert, self).__init__(aresObj, self.cssCls)
     self.title = title
     self.val = value
     self.closeButton = closeButton

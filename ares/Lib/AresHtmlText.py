@@ -17,8 +17,8 @@ class Text(AresHtml.Html):
   alias = 'text'
   htmlComp = None
 
-  def __init__(self, htmlId, vals, cssCls=None, htmlComp=None):
-    super(Text, self).__init__(htmlId, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None, htmlComp=None):
+    super(Text, self).__init__(aresObj, vals, cssCls)
     self.htmlComp = htmlComp
 
   def __str__(self):
@@ -39,8 +39,8 @@ class Code(AresHtml.Html):
   alias = 'code'
   htmlComp = None
 
-  def __init__(self, htmlId, vals, cssCls=None, htmlComp=None):
-    super(Code, self).__init__(htmlId, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None, htmlComp=None):
+    super(Code, self).__init__(aresObj, vals, cssCls)
     self.htmlComp = htmlComp
 
   def __str__(self):
@@ -61,8 +61,8 @@ class Paragraph(AresHtml.Html):
   alias = 'paragraph'
   htmlComp = None
 
-  def __init__(self, htmlId, vals, cssCls=None, htmlComp=None):
-    super(Paragraph, self).__init__(htmlId, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None, htmlComp=None):
+    super(Paragraph, self).__init__(aresObj, vals, cssCls)
     self.htmlComp = htmlComp
 
   def __str__(self):
@@ -282,9 +282,9 @@ class Wiki(AresHtml.Html):
   """
   alias = 'wiki'
 
-  def __init__(self, htmlId, dataSourceName, vals, aresObj, cssCls=None):
+  def __init__(self, aresObj, dataSourceName, vals, cssCls=None):
     """ Init override in order to store the Ares Object (only the parameters"""
-    super(Wiki, self).__init__(htmlId, vals, cssCls)
+    super(Wiki, self).__init__(aresObj, vals, cssCls)
     self.http = aresObj.http
     self.dataSourceName = dataSourceName
 

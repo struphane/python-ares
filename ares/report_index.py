@@ -12,7 +12,10 @@ def report(aresObj):
   """
 
   aresObj.title('Reports Environment (Beta)')
+  print(aresObj.content)
   aresInput = aresObj.input("Report Name", '')
+  print(id(aresInput))
+  print(aresObj.content)
   reportsPath = aresObj.http.get('USER_PATH')
   # Get the list of all the reports
   foldersReports, folderEvents = [], {}
@@ -34,6 +37,7 @@ def report(aresObj):
         log.close()
   # Add this list to the auto completion of the input item
   aresInput.autocomplete(foldersReports)
+  print(id(aresInput))
   aresButton = aresObj.main('Open Report Section', **{'report_name': aresInput, 'cssCls': 'btn btn-success'})
   modal = aresObj.modal('click on the link to create a new report section')
   modal.modal_header = "Set New Environment"
