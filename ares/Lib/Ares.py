@@ -261,7 +261,7 @@ class Report(object):
   def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self, '', cssCls), sys._getframe().f_code.co_name)
   def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
-  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name) # hack: I need the full aresObj to generate the pdf, hence I pass self and not self as param
+  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name)
 
 
   # Containers section
