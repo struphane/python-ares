@@ -226,20 +226,6 @@ def report_dsc_graph_details(chartName):
 def report_html_description(objectName):
   """ Function to return teh html defition of an object """
 
-@report.route("/json/<report_name>/<file_name>", methods=['GET', 'POST'])
-def data_refresh(report_name, file_name):
-  """
-  REST Service to refresh the data in a report.
-  The target would be to use this to reload the content of a json file where the recordSet are stored.
-  Then the event will update the attached component on the page
-  """
-  fileLocation = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'data', file_name)
-  if os.path.exists(fileLocation):
-    inFile = open(fileLocation)
-    return json.dumps(inFile.read())
-
-  return json.dumps('')
-
 @report.route("/page/<report_name>")
 def page_report(report_name):
   """ Return the html content of the main report """
@@ -518,18 +504,16 @@ def ajaxCall(report_name, script):
   """ Generic Ajax call """
   onload, js, error = '', '', False
   requestParams = getHttpParams(request)
-  if 'LOCATION' in requestParams:
-    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, requestParams['LOCATION'])
-    sys.path.append(userDirectory)
-  else:
-    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
   reportObj = Ares.Report()
+  reportObj.http = getHttpParams(request)
   reportObj.http['FILE'] = None
   reportObj.http['REPORT_NAME'] = report_name
   reportObj.http['DIRECTORY'] = userDirectory
-  reportObj.http.update(requestParams)
   reportObj.reportName = report_name
   try:
+    ajaxDirectory = os.path.join(userDirectory, 'ajax')
+    sys.path.append(ajaxDirectory)
     mod = __import__(script.replace(".py", ""))
     result = mod.call(reportObj)
   except Exception as e:
@@ -538,6 +522,7 @@ def ajaxCall(report_name, script):
   finally:
     if script in sys.modules:
       del sys.modules[script]
+
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js)
 

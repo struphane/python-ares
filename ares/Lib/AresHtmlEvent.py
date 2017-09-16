@@ -149,12 +149,13 @@ class ButtonRefresh(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'refresh'
 
-  def __init__(self, aresObj, vals, recordSet, cssCls=None):
+  def __init__(self, aresObj, vals, recordSet, ajaxScript, cssCls=None):
     """
     Instantiate the object and attached the recordSet to the event
     This object will also store the data to a text file.
     """
     super(ButtonRefresh, self).__init__(aresObj, vals, cssCls)
+    self.ajaxScript = ajaxScript
     self.dataFileName = "%s.json" % id(recordSet)
     dataPath = os.path.join(aresObj.http['DIRECTORY'], 'data')
     if not os.path.exists(dataPath):
@@ -167,10 +168,13 @@ class ButtonRefresh(ButtonRemove):
     """ Add the corresponding event when the button is clicked """
     self.js('click',
             render_template_string('''
-                $.getJSON("{{ url_for('ares.data_refresh', report_name='%s', file_name='%s') }}", function(data) {
+                // The first part will update the file
+                $.post("{{ url_for('ares.ajaxCall', report_name='%s', script='%s', file_name='%s') }}", function(data) {
+                    data = JSON.parse(data) ;
+                    // Then it will update the reports
                     %s
                 });
-              ''' % (self.aresObj.http['REPORT_NAME'], self.dataFileName, jsFnc)
+              ''' % (self.aresObj.http['REPORT_NAME'], self.ajaxScript, self.dataFileName, jsFnc)
             ))
 
   def __str__(self):

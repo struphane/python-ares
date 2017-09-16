@@ -37,11 +37,11 @@ def report(aresObj):
   table.filters(['Currency', 'Value 2'])
 
 
-  pie = aresObj.scatterChart(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+  pie = aresObj.bar(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Graph')
 
-  button = aresObj.refresh("Youpi", recordSet)
+  button = aresObj.refresh("", recordSet, 'ajaxUpdate')
   button.click('''
                   %s ;
                   %s ;

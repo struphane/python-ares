@@ -23,9 +23,11 @@ The script can return something according to what is defined in your ajax call.
 By default it will return true or falsk to give a status on the result of the script
 """
 
+import json
+
 def call(aresObj):
   """
   [ PLEASE DETAIL YOU SCRIPT HERE ]
   """
 
-  return True
+  return json.dumps('')
