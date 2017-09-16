@@ -66,7 +66,7 @@ class Html(object):
   @property
   def htmlId(self):
     """ Property to get the HTML ID of a python HTML object """
-    return "%s-%s" % (self.__class__.__name__.lower(), id(self))
+    return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
   @property
   def jqId(self):

@@ -30,7 +30,7 @@ https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/
         <a href="#" data-toggle="dropdown">MRX<b class="caret"></b></a>
         <ul class="dropdown-menu">
           <li><a href="#">Screens</a></li>
-          <li><a href="{{ url_for('ares.launch', report_name='JsWikiScripts') }}">Script Wiki</a></li>
+          <li><a href="{{ url_for('ares.run_report', report_name='JsWikiScripts') }}">Script Wiki</a></li>
           <li><a href="#">Import View Package</a></li>
           <li><a href="{{ url_for('ares.report_dsc_index') }}">About MRXImportView</a></li>
         </ul>

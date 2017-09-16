@@ -5,7 +5,6 @@
 import os
 import json
 
-from click import echo
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from flask import render_template_string

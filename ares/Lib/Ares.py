@@ -39,6 +39,7 @@ from ares.Lib import AresHtmlAlert
 from ares.Lib import AresHtmlModal
 from ares.Lib import AresItem
 from ares.Lib import AresHtmlHRef
+from ares.Lib import AresHtmlButton
 from ares.Lib import AresLog
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
@@ -246,23 +247,28 @@ class Report(object):
   def number(self, value, cssCls=None): return self.add(AresHtmlText.Numeric(self, value, cssCls), sys._getframe().f_code.co_name)
   def wiki(self, dataSourceName, value, cssCls=None): return self.add(AresHtmlText.Wiki(self, dataSourceName, value, cssCls), sys._getframe().f_code.co_name)
 
+
   # Title section
   def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
   def title2(self, value, cssCls=None): return self.add(AresHtmlText.Title2(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
   def title3(self, value, cssCls=None): return self.add(AresHtmlText.Title3(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
   def title4(self, value, cssCls=None): return self.add(AresHtmlText.Title4(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
 
-  # Action section
+
+  # Button Section
+  def refresh(self, value, recordSet, ajaxScript, cssCls=None): return self.add(AresHtmlButton.ButtonRefresh(self, value, recordSet, ajaxScript, cssCls), sys._getframe().f_code.co_name)
+  def remove(self, cssCls=None): return self.add(AresHtmlButton.ButtonRemove(self, '', cssCls), sys._getframe().f_code.co_name)
+  def download(self, cssCls=None): return self.add(AresHtmlButton.ButtonDownload(self, '', cssCls), sys._getframe().f_code.co_name)
+  def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlButton.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)
+  def button(self, value, cssCls=None): return self.add(AresHtmlButton.Button(self, value, cssCls), sys._getframe().f_code.co_name)
+  def ok(self, value, cssCls=None): return self.add(AresHtmlButton.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
+
+
+  # Generic Action section
   def slider(self, value, cssCls=None): return self.add(AresHtmlEvent.Slider(self, value, cssCls), sys._getframe().f_code.co_name)
   def date(self, label='Date', cssCls=None): return self.add(AresHtmlEvent.DatePicker(self, label, cssCls), sys._getframe().f_code.co_name)
   def textArea(self, value, cssCls=None): return self.add(AresHtmlEvent.TextArea(self, value, cssCls), sys._getframe().f_code.co_name)
-  def button(self, value, cssCls=None): return self.add(AresHtmlEvent.Button(self, value, cssCls), sys._getframe().f_code.co_name)
-  def refresh(self, value, recordSet, ajaxScript, cssCls=None): return self.add(AresHtmlEvent.ButtonRefresh(self, value, recordSet, ajaxScript, cssCls), sys._getframe().f_code.co_name)
-  def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self, '', cssCls), sys._getframe().f_code.co_name)
-  def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self, '', cssCls), sys._getframe().f_code.co_name)
-  def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)
-  def ok(self, value, cssCls=None): return self.add(AresHtmlEvent.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
-  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlEvent.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name)
+  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlButton.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name)
 
 
   # Containers section
@@ -295,7 +301,6 @@ class Report(object):
   def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-
   def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self, header, values, cssCls), sys._getframe().f_code.co_name)
   def tree(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
 
@@ -303,8 +308,8 @@ class Report(object):
   # File HTML Section
   def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self, values, cssCls), sys._getframe().f_code.co_name)
 
+
   # Anchor section
-  #def anchor(self, value='', cssCls=None): return self.add(AresHtmlEvent.A(self, self.supp(value), self.reportName, self.childPages, self.directory, cssCls), sys._getframe().f_code.co_name)
   def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)

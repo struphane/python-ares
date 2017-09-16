@@ -9,6 +9,13 @@ import Lib.FlexFnc
 
 import ajax.ajaxUpdate
 
+NAME = 'Javascript Test'
+SHORTCUTS = [('Other Links',
+                [('Youpi', 'TestScript')
+                 ]
+
+              )
+            ]
 
 def report(aresObj):
   # Write your report here

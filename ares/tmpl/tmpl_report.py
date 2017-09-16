@@ -18,6 +18,13 @@ In the javascript layer
 
 """
 
+
+NAME = 'Report' # The Report Name in the left menu
+# The Shortcuts should be defined as below
+# [(Cateogry Name, [List of the script in the root directory])]
+# It is only possible to create new links for scripts in the root
+SHORTCUTS = [] # All the possible link to other pages
+
 def report(aresObj):
   # Write your report here
 

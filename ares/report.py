@@ -12,7 +12,7 @@ import traceback
 import time
 import shutil
 
-from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response
+from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
 
 import config
@@ -314,48 +314,9 @@ def run_test_graph():
   onload, content, js = report_doc_graph.report(aresObj).html()
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
-@report.route("/run/<report_name>", methods = ['GET'])
-def run_report(report_name):
-  """ Run the report """
-  onload, js, error, side_bar = '', '', False, []
-  try:
-    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-    sys.path.append(userDirectory)
-    reportObj = Ares.Report()
-    reportObj.http = getHttpParams(request)
-    reportObj.reportName = report_name
-    mod = __import__(report_name)
-    reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
-    reportObj.http['FILE'] = report_name
-    reportObj.http['REPORT_NAME'] = report_name
-    reportObj.http['DIRECTORY'] = userDirectory
-    aresObj = mod.report(reportObj)
-    downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
-    downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
-    downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
-    downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
-    if hasattr(mod, 'DISPLAY'):
-      side_bar = ['<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % mod.DISPLAY]
-      for name, path in getattr(mod, 'SHORTCUTS', []):
-        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
-
-    onload, content, js = aresObj.html()
-  except Exception as e:
-    error = True
-    content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
-    content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
-  finally:
-    # Try to unload the module
-    if report_name in sys.modules:
-      del sys.modules[report_name]
-
-  if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
-
-@report.route("/launch/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
-@report.route("/launch/<report_name>/<script_name>", methods = ['GET', 'POST'])
-def launch(report_name, script_name):
+@report.route("/run/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
+@report.route("/run/<report_name>/<script_name>", methods = ['GET', 'POST'])
+def run_report(report_name, script_name):
   """ Run the report """
   onload, js, error, side_bar = '', '', False, []
   try:
@@ -374,17 +335,19 @@ def launch(report_name, script_name):
     reportObj.http['FILE'] = script_name
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
-    aresObj = mod.report(reportObj)
-    downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
+    mod.report(reportObj)
+    downAll = reportObj.download(cssCls='btn btn-success bdiBar-download')
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
-    downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
+    downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
-    if hasattr(mod, 'DISPLAY'):
-      side_bar = ['<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % mod.DISPLAY]
-      for name, path in getattr(mod, 'SHORTCUTS', []):
-        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
 
-    onload, content, js = aresObj.html()
+    report = __import__(report_name) # run the report
+    side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, report_name.replace(".py", ""), report.NAME))]
+    for categories, links in getattr(report, 'SHORTCUTS', []):
+      side_bar.append('<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % categories)
+      for name, scriptName in links:
+        side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
+    onload, content, js = reportObj.html()
   except Exception as e:
     error = True
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
@@ -393,51 +356,11 @@ def launch(report_name, script_name):
     # Try to unload the module
     if report_name in sys.modules:
       del sys.modules[report_name]
-
+    if script_name in sys.modules:
+      del sys.modules[script_name]
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
-
-@report.route("/sidebar/<report_name>/<script>", methods = ['GET'])
-@report.route("/child:<report_name>/<script>", methods = ['GET'])
-def child(report_name, script):
-  """ Return the content of the attached pages """
-  reportObj = Ares.Report()
-  reportObj.http = getHttpParams(request)
-  onload, js, error, side_bar = '', '', False, []
-  try:
-    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-    sys.path.append(userDirectory)
-    mod = __import__(script)
-    reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
-    reportObj.http['FILE'] = script
-    reportObj.http['REPORT_NAME'] = report_name
-    reportObj.http['DIRECTORY'] = userDirectory
-    reportObj.reportName = report_name
-    aresObj = mod.report(reportObj)
-    downAll = aresObj.download(cssCls='btn btn-success bdiBar-download')
-    downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % script})
-    downScript = aresObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
-    downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
-    onload, content, js = aresObj.html()
-
-    mod = __import__(report_name)
-    if hasattr(mod, 'DISPLAY'):
-      side_bar = ['<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % mod.DISPLAY]
-      for name, path in getattr(mod, 'SHORTCUTS', []):
-        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
-
-  except Exception as e:
-    content = traceback.format_exc()
-    error = True
-  finally:
-    for py in [report_name, script]:
-      if py in sys.modules:
-        del sys.modules[py]
-  if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
-
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
 @report.route("/create/env", methods = ['POST', 'GET'])
 def ajaxCreate():
