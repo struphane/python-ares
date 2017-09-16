@@ -14,7 +14,7 @@ def report(aresObj):
   # Write your report here
   CCYS = ['EUR', 'GBP', 'USD']
   recordSet = []
-  for i in range(60):
+  for i in range(10):
     recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010), 'PTF2': random.randint(900, 1005),
                       'VAL2': random.uniform(0, 100),
                       'VAL3': random.uniform(0, 320),
@@ -43,8 +43,9 @@ def report(aresObj):
 
   button = aresObj.refresh("Youpi", recordSet)
   button.click('''
-                  alert('youpi') ;
-               ''')
+                  %s ;
+               ''' % table.jsUpdate()
+               )
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
  # pie.linkTo(table)

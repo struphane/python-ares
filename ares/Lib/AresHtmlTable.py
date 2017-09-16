@@ -131,6 +131,18 @@ class Table(AresHtml.Html):
     item.add(0, "}) ;")
     return str(item)
 
+  def jsUpdate(self, jsDataVar='data'):
+    """
+    Function to update the table from a javascript function.
+    By default the usual javascript function will use the variable data in the signature.
+    """
+    item = AresItem.Item("%s.clear();" % self.htmlId)
+    item.add(0, "var recordSet = JSON.parse(%s); " % jsDataVar)
+    item.add(0, "recordSet.forEach(function(element){")
+    item.add(1, "%s.row.add(element).draw(false) ;" % (self.htmlId))
+    item.add(0, "}) ;")
+    return str(item)
+
   def getData(self):
     """
     Returns a javascript recordSet
