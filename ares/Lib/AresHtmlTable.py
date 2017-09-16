@@ -91,6 +91,35 @@ class Table(AresHtml.Html):
       item.add(0, '</div>')
     return str(item)
 
+  def update(self, newRecordSet):
+    """ Refresh the table object with the new recordSet Data """
+    item = AresItem.Item("%s.clear();" % self.htmlId)
+    if isinstance(newRecordSet, str):
+      # In this case we assume that data are received from a String
+      # Rows should be # delimited
+      # Columns should be , delimited
+      item.add(0, "%s.split('#').forEach(function(element){" % newRecordSet)
+      item.add(1, "%s.row.add(element.split(',')).draw(false) ;" % (self.htmlId))
+    else:
+      # here we assume that we receive a list of list to add to the table
+      item.add(0, "%s.forEach(function(element){" % newRecordSet)
+      item.add(1, "%s.row.add(element).draw(false) ;" % (self.htmlId))
+    item.add(0, "}) ;")
+    return str(item)
+
+  def getData(self):
+    """
+    Returns a javascript recordSet
+    This line should not have ; at the end as it is only a fragment that will be added to the
+    middle of another javascript line
+    """
+    return "getRecordSetFromTable('%s')" % self.htmlId
+
+  @classmethod
+  def aresExample(cls, aresObj):
+    return aresObj.table('Table Example', [["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
+
+
   def jsEvents(self, jsEventFnc=None):
     """ Function to get the Javascript methods for this object and all the underlying objects """
     if jsEventFnc is None:
@@ -115,22 +144,6 @@ class Table(AresHtml.Html):
             getattr(row[rawCol], 'jsEvents')(jsEventFnc)
     return jsEventFnc
 
-  def update(self, newRecordSet):
-    """ Refresh the table object with the new recordSet Data """
-    item = AresItem.Item("%s.clear();" % self.htmlId)
-    if isinstance(newRecordSet, str):
-      # In this case we assume that data are received from a String
-      # Rows should be # delimited
-      # Columns should be , delimited
-      item.add(0, "%s.split('#').forEach(function(element){" % newRecordSet)
-      item.add(1, "%s.row.add(element.split(',')).draw(false) ;" % (self.htmlId))
-    else:
-      # here we assume that we receive a list of list to add to the table
-      item.add(0, "%s.forEach(function(element){" % newRecordSet)
-      item.add(1, "%s.row.add(element).draw(false) ;" % (self.htmlId))
-    item.add(0, "}) ;")
-    return str(item)
-
   def jsUpdate(self, jsDataVar='data'):
     """
     Function to update the table from a javascript function.
@@ -142,18 +155,6 @@ class Table(AresHtml.Html):
     item.add(1, "%s.row.add(element).draw(false) ;" % (self.htmlId))
     item.add(0, "}) ;")
     return str(item)
-
-  def getData(self):
-    """
-    Returns a javascript recordSet
-    This line should not have ; at the end as it is only a fragment that will be added to the
-    middle of another javascript line
-    """
-    return "getRecordSetFromTable('%s')" % self.htmlId
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.table('Table Example', [["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
 
   def jsLinkTo(self, htmlObjs):
     """ Send the data to the different HTML objects in order to update them """
@@ -243,3 +244,4 @@ class Table(AresHtml.Html):
       item.add(1, "}")
       item.add(0, ") ;")
     return str(item)
+
