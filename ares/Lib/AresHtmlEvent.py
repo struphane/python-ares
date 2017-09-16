@@ -155,19 +155,22 @@ class ButtonRefresh(ButtonRemove):
     This object will also store the data to a text file.
     """
     super(ButtonRefresh, self).__init__(aresObj, vals, cssCls)
+    self.dataFileName = "%s.json" % id(recordSet)
     dataPath = os.path.join(aresObj.http['DIRECTORY'], 'data')
     if not os.path.exists(dataPath):
       os.makedirs(dataPath)
-    recordSetJson = open(os.path.join(dataPath, "%s.json" % id(recordSet)), "w")
+    recordSetJson = open(os.path.join(dataPath, self.dataFileName), "w")
     json.dump(recordSet, recordSetJson)
     recordSetJson.close()
+
+  def click(self, jsFnc):
+    """ Add the corresponding event when the button is clicked """
     self.js('click',
             render_template_string('''
-                $.getJSON("{{ url_for('ares.data_refresh', report_name='%s', file_name='%s.json') }}", function(jsonData) {
-                    var data = JSON.parse(jsonData) ;
-                    alert(data[0]["VAL"]) ;
+                $.getJSON("{{ url_for('ares.data_refresh', report_name='%s', file_name='%s') }}", function(data) {
+                    %s
                 });
-              ''' % (aresObj.http['REPORT_NAME'], id(recordSet))
+              ''' % (self.aresObj.http['REPORT_NAME'], self.dataFileName, jsFnc)
             ))
 
   def __str__(self):

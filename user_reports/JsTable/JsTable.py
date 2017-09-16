@@ -42,7 +42,9 @@ def report(aresObj):
                     'Graph')
 
   button = aresObj.refresh("Youpi", recordSet)
-
+  button.click('''
+                  alert('youpi') ;
+               ''')
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
  # pie.linkTo(table)
