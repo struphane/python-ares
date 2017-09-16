@@ -120,6 +120,9 @@ class Table(AresHtml.Html):
     return aresObj.table('Table Example', [["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
 
 
+  # ------------------------------------------------------------------------------------------------------------
+  #                                           Javascript Events section
+  # ------------------------------------------------------------------------------------------------------------
   def jsEvents(self, jsEventFnc=None):
     """ Function to get the Javascript methods for this object and all the underlying objects """
     if jsEventFnc is None:
