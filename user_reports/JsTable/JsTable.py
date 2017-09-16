@@ -7,18 +7,12 @@ import random
 import json
 import Lib.FlexFnc
 
-def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
-  return ''.join(random.choice(chars) for _ in range(size))
+import ajax.ajaxUpdate
+
 
 def report(aresObj):
   # Write your report here
-  CCYS = ['EUR', 'GBP', 'USD']
-  recordSet = []
-  for i in range(10):
-    recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010), 'PTF2': random.randint(900, 1005),
-                      'VAL2': random.uniform(0, 100),
-                      'VAL3': random.uniform(0, 320),
-                      'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
+  recordSet = ajax.ajaxUpdate.getRecordSet()
   table = aresObj.table(recordSet, [
                                     #[{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                     # {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},

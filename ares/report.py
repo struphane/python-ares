@@ -489,6 +489,9 @@ def addScripts():
     ajaxPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'ajax')
     if not os.path.exists(ajaxPath):
       os.makedirs(ajaxPath)
+      # Create also the init in order to be able to call the extra services directly
+      initFile = open(os.path.join(ajaxPath, "__init__.py"), "w")
+      initFile.close()
     scriptName = reportObj.http['script'] if reportObj.http['script'].endswith(".py") else "%s.py" % reportObj.http['script']
     shutil.copyfile(os.path.join(tmplPath, 'tmpl_service.py'), os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'], 'ajax', scriptName))
     log.addScript(reportObj.http['script_type'], scriptName)
@@ -512,6 +515,7 @@ def ajaxCall(report_name, script):
   reportObj.http['DIRECTORY'] = userDirectory
   reportObj.reportName = report_name
   try:
+    # TODO Improve the __import__ to not have to append the ajax path to the sys.path
     ajaxDirectory = os.path.join(userDirectory, 'ajax')
     sys.path.append(ajaxDirectory)
     mod = __import__(script.replace(".py", ""))
