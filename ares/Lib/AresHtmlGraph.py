@@ -42,12 +42,6 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
 
-  def jsChart(self):
-    style, attr = self.formatChart()
-    if style:
-      style = '\n.%s' % style
-    return '''nv.models.%s()%s%s; %s ''' % (self.chartObject, self.jsFrag, style, attr)
-
   def addStyle(self, style):
     """ add style to graphs (will be added to the nv.models js function"""
     self.style.setdefault('chartStyle', {}).update(style)
@@ -80,27 +74,6 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
         chartAttr.append('chart_%s.%s.%s(%s)' % (self.htmlId, subObj, subAttr, val))
     return ('\n.'.join(chartStyle), ';'.join(chartAttr))
 
-  def jsEvents(self, jsEventFnc=None):
-    """ It is not possible to have sub HTML items in a graph object """
-    if jsEventFnc is None:
-      jsEventFnc = self.jsEventFnc
-    jGraphAttr = {'src': self.jqId, 'htmlId': self.htmlId, 'duration': self.duration}
-    self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart().strip(), self.dataFnc())
-    if self.clickFnc is not None:
-      self.jsEvent['addGraph'].click(self.clickFnc)
-    for jEventType, jsEvent in self.jsEvent.items():
-      jsEventFnc[jEventType].add(str(jsEvent))
-    return jsEventFnc
-
-  @property
-  def jqId(self):
-    """ Function to return the Jquery reference to the Html object """
-    return 'select("#%s svg")' % self.htmlId
-
-  def js(self, evenType, jsDef):
-    """ Add a Javascript Event to an HTML object """
-    raise Exception("Cannot work for a graph ")
-
   def addClick(self, fnc):
     """ Add Click function on a graph """
     self.clickFnc = 'chart_%s.%s.dispatch.on("elementClick", function(e) {%s});' % (self.htmlId, self.clickObject, fnc)
@@ -113,6 +86,45 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
     except Exception as e:
       echo(e)
       echo('Please use a data source that has a jsLinkTo attribute')
+
+
+  # ------------------------------------------------------------------------------------------------------------
+  #                                           Javascript Events section
+  # ------------------------------------------------------------------------------------------------------------
+  def jsEvents(self, jsEventFnc=None):
+    """ It is not possible to have sub HTML items in a graph object """
+    if jsEventFnc is None:
+      jsEventFnc = self.jsEventFnc
+    jGraphAttr = {'src': self.jqId, 'htmlId': self.htmlId, 'duration': self.duration}
+    self.jsEvent['addGraph'] = AresJs.JD3Graph(jGraphAttr, self.jsChart().strip(), self.dataFnc())
+    if self.clickFnc is not None:
+      self.jsEvent['addGraph'].click(self.clickFnc)
+    for jEventType, jsEvent in self.jsEvent.items():
+      jsEventFnc[jEventType].add(str(jsEvent))
+    return jsEventFnc
+
+  def jsUpdate(self, jsDataVar='data'):
+    """ Update the content of an HTML component """
+    item = AresItem.Item("var recordSet = JSON.parse(%s); " % jsDataVar)
+    item.add(0, "var filterRecordSet = buildJsRecordSet(recordSet, %s, %s) ;" % (self.jqCategory, self.jqValue))
+    item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
+    item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
+    return str(item)
+
+  def jsChart(self):
+    style, attr = self.formatChart()
+    if style:
+      style = '\n.%s' % style
+    return '''nv.models.%s()%s%s; %s ''' % (self.chartObject, self.jsFrag, style, attr)
+
+  @property
+  def jqId(self):
+    """ Function to return the Jquery reference to the Html object """
+    return 'select("#%s svg")' % self.htmlId
+
+  def js(self, evenType, jsDef):
+    """ Add a Javascript Event to an HTML object """
+    raise Exception("Cannot work for a graph ")
 
 
 class Pie(JsNvD3Graph):

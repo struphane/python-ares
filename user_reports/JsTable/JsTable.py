@@ -44,7 +44,8 @@ def report(aresObj):
   button = aresObj.refresh("Youpi", recordSet)
   button.click('''
                   %s ;
-               ''' % table.jsUpdate()
+                  %s ;
+               ''' % (table.jsUpdate(), pie.jsUpdate())
                )
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
