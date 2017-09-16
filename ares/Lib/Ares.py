@@ -257,6 +257,7 @@ class Report(object):
   def date(self, label='Date', cssCls=None): return self.add(AresHtmlEvent.DatePicker(self, label, cssCls), sys._getframe().f_code.co_name)
   def textArea(self, value, cssCls=None): return self.add(AresHtmlEvent.TextArea(self, value, cssCls), sys._getframe().f_code.co_name)
   def button(self, value, cssCls=None): return self.add(AresHtmlEvent.Button(self, value, cssCls), sys._getframe().f_code.co_name)
+  def refresh(self, value, recordSet, cssCls=None): return self.add(AresHtmlEvent.ButtonRefresh(self, value, recordSet, cssCls), sys._getframe().f_code.co_name)
   def remove(self, cssCls=None): return self.add(AresHtmlEvent.ButtonRemove(self, '', cssCls), sys._getframe().f_code.co_name)
   def download(self, cssCls=None): return self.add(AresHtmlEvent.ButtonDownload(self, '', cssCls), sys._getframe().f_code.co_name)
   def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlEvent.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)

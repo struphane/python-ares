@@ -19,6 +19,7 @@ import config
 
 # TODO add a check on the variable DIRECTORY to ensure that it cannot be changed
 # TODO add the Flask url_for for an even using a text file like the attempt in JsTable
+# TODO remove the use of chidren pages. Everything should use run
 
 # Ares Framework
 from ares.Lib import Ares
@@ -225,6 +226,20 @@ def report_dsc_graph_details(chartName):
 def report_html_description(objectName):
   """ Function to return teh html defition of an object """
 
+@report.route("/json/<report_name>/<file_name>", methods=['GET', 'POST'])
+def data_refresh(report_name, file_name):
+  """
+  REST Service to refresh the data in a report.
+  The target would be to use this to reload the content of a json file where the recordSet are stored.
+  Then the event will update the attached component on the page
+  """
+  fileLocation = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'data', file_name)
+  if os.path.exists(fileLocation):
+    inFile = open(fileLocation)
+    return json.dumps(inFile.read())
+
+  return json.dumps('')
+
 @report.route("/page/<report_name>")
 def page_report(report_name):
   """ Return the html content of the main report """
@@ -279,7 +294,6 @@ def page_generic():
   """ Generic link to the main page """
   requestParams = getHttpParams(request)
   return page_report(requestParams['report_name'])
-
 
 @report.route("/")
 @report.route("/index")

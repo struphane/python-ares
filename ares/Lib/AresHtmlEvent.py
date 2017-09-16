@@ -4,6 +4,7 @@
 
 
 import json
+import os
 
 from click import echo
 
@@ -137,6 +138,41 @@ class ButtonOk(ButtonRemove):
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.ok("OK Button")
+
+
+class ButtonRefresh(ButtonRemove):
+  """
+  Python wrapper to the HTML Button Refresh component
+
+  """
+  glyphicon, cssCls = 'refresh', 'btn btn-success'
+  reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
+  alias = 'refresh'
+
+  def __init__(self, aresObj, vals, recordSet, cssCls=None):
+    """
+    Instantiate the object and attached the recordSet to the event
+    This object will also store the data to a text file.
+    """
+    super(ButtonRefresh, self).__init__(aresObj, vals, cssCls)
+    dataPath = os.path.join(aresObj.http['DIRECTORY'], 'data')
+    if not os.path.exists(dataPath):
+      os.makedirs(dataPath)
+    recordSetJson = open(os.path.join(dataPath, "%s.json" % id(recordSet)), "w")
+    json.dump(recordSet, recordSetJson)
+    recordSetJson.close()
+    self.js('click',
+            render_template_string('''
+                $.getJSON("{{ url_for('ares.data_refresh', report_name='%s', file_name='%s.json') }}", function(jsonData) {
+                    var data = JSON.parse(jsonData) ;
+                    alert(data[0]["VAL"]) ;
+                });
+              ''' % (aresObj.http['REPORT_NAME'], id(recordSet))
+            ))
+
+  def __str__(self):
+    """ Return the String representation of a HTML Style Twitter button """
+    return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
 
 
 class A(AresHtml.Html):

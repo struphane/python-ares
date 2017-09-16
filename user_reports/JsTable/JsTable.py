@@ -19,18 +19,19 @@ def report(aresObj):
                       'VAL2': random.uniform(0, 100),
                       'VAL3': random.uniform(0, 320),
                       'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
-  table = aresObj.table(recordSet, [[{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
-                                     {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
-                                     {'key': 'VAL', 'colName': 'Value', 'colspan': 2}],
+  table = aresObj.table(recordSet, [
+                                    #[{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                    # {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
+                                    # {'key': 'VAL', 'colName': 'Value', 'colspan': 2}],
 
-                                    [{'key': 'PTF3', 'colName': 'Portfolio 3'},
-                                     {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
-                                     {'key': 'VAL1', 'colName': 'Value 1', 'colspan': 1}],
+                                    # [{'key': 'PTF3', 'colName': 'Portfolio 3'},
+                                    #  {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
+                                    #  {'key': 'VAL1', 'colName': 'Value 1', 'colspan': 1}],
 
-                                      [ {'key': 'PTF', 'colName': 'Portfolio'},
+                                    {'key': 'PTF', 'colName': 'Portfolio'},
                                         {'key': 'CCY', 'colName': 'Currency'},
                                         {'key': 'VAL2', 'colName': 'Value 2'},
-                                        {'key': 'VAL3', 'colName': 'Value 3'}]
+                                        {'key': 'VAL3', 'colName': 'Value 3'}
                         ],
                         'Test Table')
   table.filters(['Currency', 'Value 2'])
@@ -40,14 +41,8 @@ def report(aresObj):
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Graph')
 
-  button = aresObj.button("Youpi")
-  button.js('click',
-            '''
-              $.getJSON("../user_reports/JsTable/test.json", function(json) {
-                  alert(json.a);
-              });
-            ''' #% aresObj.http["DIRECTORY"].replace("\\", "/")
-            )
+  button = aresObj.refresh("Youpi", recordSet)
+
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
  # pie.linkTo(table)
