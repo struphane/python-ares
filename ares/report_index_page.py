@@ -8,19 +8,13 @@ import time
 import collections
 import six
 
-CHILD_PAGES = {}
-
-def convert_bytes(num):
-  """
-  this function will convert bytes to MB.... GB... etc
-  """
-  for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-      if num < 1024.0:
-          return "%3.1f %s" % (num, x)
-      num /= 1024.0
+from ares.Lib import Ares
 
 def report(aresObj, localPath=None):
-  """ Run the report """
+  """
+  Run the report
+
+  """
   aresObj.title('%s - ReportEnvironment' % aresObj.http['SCRIPTS_NAME'])
   aresObj.newline()
   aresObj.title3('Report Description')
@@ -30,8 +24,6 @@ def report(aresObj, localPath=None):
                     what if environment.
                     ''')
   aresObj.code(aresObj.http['SCRIPTS_DSC'])
-  CHILD_PAGES['report'] = "../../run/%s" % aresObj.http['SCRIPTS_NAME']
-
   scriptComp = aresObj.anchor('%s.py' % aresObj.http['SCRIPTS_NAME'], **{'report_name': aresObj.http['SCRIPTS_NAME'], 'cssCls': ''})
   aresObj.title3('Python Scripts')
   aresObj.paragraph('''
@@ -41,14 +33,12 @@ def report(aresObj, localPath=None):
                       Please go here to get more details about the process
                     ''')
   downComp = aresObj.anchor_download('', **{'report_name': aresObj.http['SCRIPTS_NAME'], 'script': '%s.py' % aresObj.http['SCRIPTS_NAME']})
-  fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME'])))
-  fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.reportName, '%s.py' % aresObj.http['SCRIPTS_NAME']))))
-
+  fileSize = Ares.convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['REPORT_NAME'], '%s.py' % aresObj.http['SCRIPTS_NAME'])))
+  fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], aresObj.http['REPORT_NAME'], '%s.py' % aresObj.http['SCRIPTS_NAME']))))
   displayedScript = {}
   ajxCall =  aresObj.http['SCRIPTS_AJAX'].get('%s.py' % aresObj.http['SCRIPTS_NAME'], [])
   for call in ajxCall:
     displayedScript[call] = True
-
   header = [{'key': 'script_name', 'colName': 'Script Name', 'type': 'object'},
             {'key': 'size', 'colName': 'Size'},
             {'key': 'lst_mod_dt', 'colName': 'Modification Date'},
@@ -69,7 +59,7 @@ def report(aresObj, localPath=None):
         scriptLink = scriptPath.replace(aresObj.http['SCRIPTS_NAME'], "")
         remov.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, 'display(data);')
         downComp = aresObj.anchor_download('', **{'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
-        fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
+        fileSize = Ares.convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
         fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
         ajxCall =  aresObj.http['SCRIPTS_AJAX'].get(script, [])
         divComp = aresObj.div(script)
@@ -90,7 +80,7 @@ def report(aresObj, localPath=None):
       scriptLink = scriptPath.replace(aresObj.http['SCRIPTS_NAME'], "")
       removComp.post('click', "../delete/%s" % aresObj.http['SCRIPTS_NAME'], {'SCRIPT': script}, "display(data); window.location.href='../page/%s' ;" % aresObj.http['SCRIPTS_NAME'])
       downComp = aresObj.anchor_download('', **{'report_name': aresObj.http['SCRIPTS_NAME'], 'script': "%s&%s" % (scriptLink, script)})
-      fileSize = convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
+      fileSize = Ares.convert_bytes(os.path.getsize(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script)))
       fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(aresObj.http['SCRIPTS_PATH'], scriptPath, script))))
       divComp = aresObj.div(script)
       divComp.toolTip(os.path.join(scriptPath, script))
@@ -111,11 +101,9 @@ def report(aresObj, localPath=None):
   inputModal = aresObj.input("Script Name", '')
   selectReport = aresObj.select(["Report", "Service"], selected="Report")
   createReport = aresObj.anchor_add_scripts('Add', **{'script': inputModal, 'report_name': aresObj.http['SCRIPTS_NAME'], 'script_type': selectReport})
-
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, selectReport)
   aresObj.addTo(modal, createReport)
-
   aresObj.newline()
   aresObj.newline()
 
@@ -142,7 +130,6 @@ def report(aresObj, localPath=None):
               , 'Activity History'
               )
 
-
   graphObj = aresObj.bar(recordSet,
                           [{'key': 'script', 'colName': 'Script Name', 'type': 'object'},
                            {'key': 'size', 'colName': 'Size', 'selected': True, 'type': 'number'},
@@ -153,9 +140,6 @@ def report(aresObj, localPath=None):
                         {'key': 'size', 'colName': 'Size', 'selected': True, 'type': 'number'},
                         {'key': 'lst_mod_dt', 'colName': 'Modification Date'}], 'Files Size')
 
-  # graphObj.linkTo(tableComp)
-  # pieObj.linkTo(tableComp)
   aresObj.row([graphObj, pieObj])
   zipComp = aresObj.downloadAll('Download Zip archive of this environment')
   zipComp.js('click', "window.location.href='../download/%s/package'" % aresObj.http['SCRIPTS_NAME'])
-  return aresObj

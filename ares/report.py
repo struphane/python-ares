@@ -231,9 +231,8 @@ def page_report(report_name):
   """ Return the html content of the main report """
   reportObj = Ares.Report()
   reportObj.http['FILE'] = report_name
-  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-  reportObj.http['DIRECTORY'] = userDirectory
-  reportObj.reportName = report_name
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  reportObj.http['REPORT_NAME'] = report_name
   reportEnv = report_name.replace(".py", "")
   scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
 
@@ -243,7 +242,7 @@ def page_report(report_name):
       continue
 
     for pyFile in  files:
-      if Ares.isExcluded(userDirectory, file=pyFile):
+      if Ares.isExcluded(reportObj.http['DIRECTORY'], file=pyFile):
         continue
 
       scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
@@ -269,10 +268,11 @@ def page_report(report_name):
   reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
   reportObj.http['AJAX_CALLBACK'] = {}
   reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  reportObj.childPages = report_index_page.CHILD_PAGES
-  onload, content, js = report_index_page.report(reportObj).html()
+  report_index_page.report(reportObj)
+  onload, content, js = reportObj.html()
   if scriptEnv in sys.modules:
     del sys.modules[scriptEnv]
+
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
 
 @report.route("/page_dyn")
@@ -290,7 +290,8 @@ def index():
   aresObj.http['DIRECTORY'] = userDirectory
   aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
   aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  onload, content, js = report_index.report(aresObj).html()
+  report_index.report(aresObj)
+  onload, content, js = aresObj.html()
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
 @report.route("/test/graphs")
