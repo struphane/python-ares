@@ -23,6 +23,7 @@ class Table(AresHtml.Html):
   refernce = 'https://www.w3schools.com/css/css_table.asp'
   filt, filtId = None, None
   linkedObjs = None
+  pageLength = 50
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
@@ -69,11 +70,19 @@ class Table(AresHtml.Html):
 
     if len(self.header) > 1:
       item.add(1, "<thead>")
-      for headerLine in self.header:
+      for headerLine in self.header[:-1]:
         item.add(2, "<tr>")
         for col in headerLine:
-          item.add(3, "<th rowspan='%s' colspan='%s'>%s</th>" % (col.get("rowspan", 1), col.get("colspan", 1), col.get("colName")))
+          rowspan = " rowspan='%s'" % col['rowspan'] if col.get("rowspan", 1) > 1 else ''
+          colspan = " colspan='%s'" % col['colspan'] if col.get("colspan", 1) > 1 else ''
+          item.add(3, "<td%s%s>%s</td>" % (rowspan, colspan, col.get("colName")))
         item.add(2, "</tr>")
+      item.add(2, "<tr>")
+      # This row will be changed by the DataTable creation
+      # It should correspond to the column that we will then use to populate the table
+      for col in self.header[-1]:
+        item.add(3, "<td>%s</td>" % col.get("colName"))
+      item.add(2, "</tr>")
       item.add(1, "</thead>")
     item.add(0, '</table>')
 
@@ -150,6 +159,7 @@ class Table(AresHtml.Html):
                     %s.DataTable(
                       {
                         data: recordSet_%s ,
+                        pageLength: %s,
                         columns: [
                                     %s,
                               ],
@@ -169,13 +179,14 @@ class Table(AresHtml.Html):
                                         }
                       }
                     ) ;
-                  ''' % (self.jqId, self.recordSetId, ",".join(self.recordSetHeader), "\n".join(self.linkedObjs)))
+                  ''' % (self.jqId, self.recordSetId, self.pageLength, ",".join(self.recordSetHeader), "\n".join(self.linkedObjs)))
     else:
       item.add(1, '''
                   // createdRow
                   %s = %s.DataTable(
                                      {
                                         responsive: true,
+                                        pageLength: %s,
                                         data: recordSet_%s ,
                                         columns: [
                                                     %s
@@ -195,7 +206,7 @@ class Table(AresHtml.Html):
                                      }
                   ) ;
 
-                  ''' % (self.htmlId, self.jqId, self.recordSetId, ",".join(self.recordSetHeader)))
+                  ''' % (self.htmlId, self.jqId, self.pageLength, self.recordSetId, ",".join(self.recordSetHeader)))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)
