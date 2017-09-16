@@ -19,7 +19,7 @@ class A(AresHtml.Html):
   In this class no Javascript is used in the click event
   """
   alias, cssCls = 'anchor', 'btn btn-success'
-  flask = 'ares.launch'
+  flask = 'ares.run_report'
 
   def __init__(self, aresObj, vals, **kwargs):
     super(A, self).__init__(aresObj, vals, kwargs.get('cssCls'))

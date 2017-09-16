@@ -330,7 +330,6 @@ def run_report(report_name, script_name):
     reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
     mod = __import__(script_name) # run the report
-    reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
     # Set some environments variables which can be used in the report
     reportObj.http['FILE'] = script_name
     reportObj.http['REPORT_NAME'] = report_name

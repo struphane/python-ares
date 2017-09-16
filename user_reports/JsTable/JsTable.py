@@ -1,6 +1,4 @@
 
-AJAX_CALL = {} # Ajax call definition
-CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 import string
 import random

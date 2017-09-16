@@ -5,6 +5,7 @@
 In the python layer
     aresObj.http['FILE'] is the current file
     aresObj.http['REPORT_NAME'] is the current report environment name
+    aresObj.http['DIRECTORY'] is the report location
 
      def readFile(self, file, subfolders=None):
      def createFile(self, file, subfolders=None, checkFileExist=True):
