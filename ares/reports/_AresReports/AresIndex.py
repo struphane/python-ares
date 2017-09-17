@@ -6,6 +6,7 @@
 import collections
 import os
 
+NAME = 'Reports Definition'
 
 def report(aresObj):
   """
@@ -13,7 +14,7 @@ def report(aresObj):
   """
   aresObj.title('Reports Environment')
   aresInput = aresObj.input("Report Name", '')
-  reportsPath = aresObj.http.get('USER_PATH')
+  reportsPath = aresObj.http.get('DIRECTORY')
   # Get the list of all the reports
   foldersReports, folderEvents = [], {}
   for folder in os.listdir(reportsPath):
@@ -45,7 +46,7 @@ def report(aresObj):
     iconComp = aresObj.icon('trash')
     iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
     content.append({'folderName': folder, 'Date': folderInfo['LAST_MOD_DT'], 'Size': folderInfo['SIZE'],
-                    'folderLink': aresObj.main(folder, **{'report_name': folder}),
+                    'folderLink': aresObj.main(folder, **{'report_name': '_AresReports', 'script_name': 'AresIndexPage', 'user_script': folder}),
                     'FolderFiles': len(aresObj.getFiles([folder])), 'delete': iconComp,
                     'activity': folderEvents[folder]['count'],
                     'creationDate': folderEvents[folder]['data'].get('FOLDER CREATION', '')

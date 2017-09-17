@@ -25,7 +25,7 @@ import config
 from ares.Lib import Ares
 from ares.Lib import AresLog
 
-from ares import report_index, report_index_page, report_doc_local, report_doc_graph
+from ares import report_doc_local, report_doc_graph
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -39,30 +39,6 @@ LIB_PACKAGE = {
   'JSON': ['horizBars.json', 'linePlusBarData.json', 'lineWithFocus.json', 'multiBar.json', 'stackedAreaData.json']
 }
 
-def getScriptChildren(env, scriptName, scriptTree, ajaxCalls):
-  """ Return the list of script attached to a script """
-  if os.path.isfile(os.path.join(env, scriptName)):
-    mod = __import__(scriptName.replace(".py", ""))
-    children = getattr(mod, 'CHILD_PAGES', {}).values()
-    ajax = getattr(mod, 'AJAX_CALLS', [])
-    for js in ajax:
-      ajaxCalls[scriptName].append(js)
-    if not children:
-      scriptTree[scriptName] = {}
-    else:
-      scriptTree[scriptName] = {}
-      for child in children:
-        scriptTree[scriptName][child] = {}
-        if child not in scriptTree:
-          getScriptChildren(env, child, scriptTree[scriptName], ajaxCalls)
-
-def getChildrenFlatStruct(scriptTree, listChildren):
-  """ Returns a flat list of children for a given report """
-  for mainScript, children in scriptTree.items():
-    for child in children.keys():
-      listChildren.append((mainScript, child))
-      if children[child]:
-        getChildrenFlatStruct(children, listChildren)
 
 def appendToLog(reportName, event, comment):
   """ Append an event to the dedicated log file """
@@ -72,12 +48,17 @@ def appendToLog(reportName, event, comment):
   logFile.close()
 
 def getHttpParams(request):
-  """ Get the HTTP parameters of a request """
+  """
+  Get the HTTP parameters of a request
+
+  All the results will be done in upper case, just to make sure that users will be used to define
+  those variable in uppercases
+  """
   httpParams = {}
   for postValues in request.args.items():
-    httpParams[postValues[0]] = postValues[1]
+    httpParams[postValues[0].upper()] = postValues[1]
   for postValues in request.form.items():
-    httpParams[postValues[0]] = postValues[1]
+    httpParams[postValues[0].upper()] = postValues[1]
   httpParams['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   return httpParams
 
@@ -243,74 +224,6 @@ def report_dsc_graph_details(chartName):
 def report_html_description(objectName):
   """ Function to return teh html defition of an object """
 
-@report.route("/page/<report_name>")
-def page_report(report_name):
-  """ Return the html content of the main report """
-  reportObj = Ares.Report()
-  reportObj.http['FILE'] = report_name
-  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-  reportObj.http['REPORT_NAME'] = report_name
-  reportEnv = report_name.replace(".py", "")
-  scriptEnv = os.path.join(config.ARES_USERS_LOCATION, reportEnv)
-
-  scripts, side_bar = {}, []
-  for (path, dirs, files) in os.walk(scriptEnv):
-    if path != scriptEnv and not '__init__.py' in files:
-      continue
-
-    for pyFile in  files:
-      if Ares.isExcluded(reportObj.http['DIRECTORY'], file=pyFile):
-        continue
-
-      scripts[pyFile] = path.replace(config.ARES_USERS_LOCATION, '')[1:]
-  reportObj.http['SCRIPTS'] = scripts
-  reportObj.http['SCRIPTS_NAME'] = report_name
-  scriptTree, children, ajaxCalls = {}, [], collections.defaultdict(list)
-  try:
-    sys.path.append(scriptEnv)
-    getScriptChildren(scriptEnv, "%s.py" % report_name, scriptTree, ajaxCalls)
-    getChildrenFlatStruct(scriptTree, children)
-    mod = __import__(reportObj.http['SCRIPTS_NAME'])
-    reportObj.http['SCRIPTS_DSC'] = mod.__doc__.strip()
-    if hasattr(mod, 'DISPLAY'):
-      side_bar = ['<h4 style="color:white"><strong>%s</strong></h4>' % mod.DISPLAY]
-      for name, path in getattr(mod, 'SHORTCUTS', []):
-        side_bar.append('<li><a href="/reports/sidebar/%s/%s">%s</a></li>' % (report_name, path.replace(".py", ""), name))
-
-  except Exception as e:
-    reportObj.http['SCRIPTS_DSC'] = e
-
-  # Internal callback functions, Users are not expected to use them
-  reportObj.http['SCRIPTS_CHILD'] = children
-  reportObj.http['SCRIPTS_AJAX'] = ajaxCalls
-  reportObj.http['AJAX_CALLBACK'] = {}
-  reportObj.http['SCRIPTS_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  report_index_page.report(reportObj)
-  onload, content, js = reportObj.html()
-  if scriptEnv in sys.modules:
-    del sys.modules[scriptEnv]
-
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar))
-
-@report.route("/page_dyn")
-def page_generic():
-  """ Generic link to the main page """
-  requestParams = getHttpParams(request)
-  return page_report(requestParams['report_name'])
-
-@report.route("/")
-@report.route("/index")
-def index():
-  """ Return the main page with the reports selection """
-  aresObj = Ares.Report()
-  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  aresObj.http['DIRECTORY'] = userDirectory
-  aresObj.http['ROOT_PATH'] = current_app.config['ROOT_PATH']
-  aresObj.http['USER_PATH'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
-  report_index.report(aresObj)
-  onload, content, js = aresObj.html()
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
-
 @report.route("/test/graphs")
 def run_test_graph():
   import inspect
@@ -332,18 +245,31 @@ def run_test_graph():
   onload, content, js = report_doc_graph.report(aresObj).html()
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
+@report.route("/", defaults={'report_name': '_AresIndex', 'script_name': 'AresIndex'})
+@report.route("/index", defaults={'report_name': '_AresIndex', 'script_name': 'AresIndex'})
 @report.route("/run/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
 @report.route("/run/<report_name>/<script_name>", methods = ['GET', 'POST'])
 def run_report(report_name, script_name):
-  """ Run the report """
+  """
+  Run the report
+
+  """
   onload, js, error, side_bar = '', '', False, []
   try:
     if script_name is None:
       script_name = report_name
     # add the folder directory to the python path in order to run the script
-    userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-    sys.path.append(userDirectory)
-
+    # The underscore folders are internal onces and we do not need to include them to the classpath
+    if not report_name.startswith("_"):
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+      sys.path.append(userDirectory)
+    else:
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', '_AresReports')
+      sys.path.append(userDirectory)
+      # In this context we need the generic user directory as we are in a system report
+      # Users should not be allowed to create env starting with _
+      #TODO put in place a control
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
     reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
@@ -357,8 +283,7 @@ def run_report(report_name, script_name):
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
     downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
-
-    report = __import__(report_name) # run the report
+    report = __import__(script_name) # run the report
     side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, report_name.replace(".py", ""), report.NAME))]
     for categories, links in getattr(report, 'SHORTCUTS', []):
       side_bar.append('<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % categories)
@@ -371,10 +296,11 @@ def run_report(report_name, script_name):
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
     # Try to unload the module
-    if report_name in sys.modules:
-      del sys.modules[report_name]
-    if script_name in sys.modules:
-      del sys.modules[script_name]
+    if not report_name.startswith("_"):
+      if report_name in sys.modules:
+        del sys.modules[report_name]
+      if script_name in sys.modules:
+        del sys.modules[script_name]
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
@@ -405,6 +331,7 @@ def ajaxCreate():
 
   return json.dumps("Existing Environment")
 
+# TODO Replace by AresAddScript Service
 @report.route("/add/file", methods = ['POST', 'GET'])
 def addScripts():
   """

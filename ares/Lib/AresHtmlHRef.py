@@ -61,7 +61,7 @@ class ScriptPage(A):
   In this class no Javascript is used in the click event
   """
   alias, cssCls = 'main', ''
-  flask = 'ares.page_generic'
+  flask = 'ares.run_report'
 
 
 class Download(A):
