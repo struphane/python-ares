@@ -87,7 +87,7 @@ class Input(AresHtml.Html):
     """ Return the String representation of a HTML Input object """
     item = AresItem.Item('<div class="form-group">', self.incIndent)
     item.add(1, '<label for="%s">%s:</label>' % (self.vals.replace(" ", "").lower(), self.vals))
-    item.add(2, '<input type="text" style="width:100%%" %s>' %  self.strAttr())
+    item.add(2, '<input type="text" style="width:100%%; height:32px" %s>' %  self.strAttr())
     item.add(0, '</div>')
     return str(item)
 
@@ -243,7 +243,7 @@ class Select(AresHtml.Html):
   cssCls = selectpicker
   """
   # TODO: Extend the python object to handle multi select and all the cool features
-  alias, cssCls = 'select', 'selectpicker'
+  alias, cssCls = 'select', 'form-control'
 
   def __init__(self, aresObj, vals, selected, cssCls=None):
     """ Instanciate the object and store the selected item """
@@ -252,13 +252,16 @@ class Select(AresHtml.Html):
 
   def __str__(self):
     """ Return the HTML string for a select """
-    item = AresItem.Item('<select %s>' % self.strAttr(), self.incIndent)
+    item = AresItem.Item('<div class="form-group">', self.incIndent)
+    item.add(1, '<label for="sel1">Select list:</label>')
+    item.add(1, '<select %s style="height:32px">' % self.strAttr())
     for v in self.vals:
       if v == self.selected:
         item.add(2, '<option selected>%s</option>' % v)
       else:
-        item.add(2, '<option>%s</option>' % v)
-    item.add(0, '</select>')
+        item.add(3, '<option >%s</option>' % v)
+    item.add(1, '</select>')
+    item.add(0, '</div>')
     return str(item)
 
   @classmethod

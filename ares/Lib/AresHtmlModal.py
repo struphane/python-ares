@@ -37,9 +37,8 @@ class Modal(AresHtml.Html):
     item.add(0, '<div %s tabindex="-1" role="dialog" aria-labelledby="%sTitle" aria-hidden="true">' % (self.strAttr(), self.htmlId))
     item.add(1, '<div class="modal-dialog">')
     item.add(2, '<div class="modal-content">')
-    item.add(3, '<div class="modal-header">')
+    item.add(3, '<div class="modal-header" style="padding-top: 32px">')
     item.add(4, '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
-
     self.style = dict(self.default)
     styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
     item.add(4, '<h4 class="modal-title" id="%sTitle" style="%s">%s</h4>' % (self.htmlId, styleStr, self.modal_header))
