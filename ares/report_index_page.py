@@ -10,6 +10,7 @@ import six
 
 from ares.Lib import Ares
 
+
 def report(aresObj, localPath=None):
   """
   Run the report
@@ -100,7 +101,7 @@ def report(aresObj, localPath=None):
   modal = aresObj.modal('Add a script')
   modal.modal_header = 'Create new script'
   inputModal = aresObj.input("Script Name", '')
-  selectReport = aresObj.select(["Report", "Python Service", "Javascript"], selected="Report")
+  selectReport = aresObj.select(["Report", "Python Service", "Javascript", "Configuration"], selected="Report")
   createReport = aresObj.anchor_add_scripts('Add', **{'script': inputModal, 'report_name': aresObj.http['SCRIPTS_NAME'], 'script_type': selectReport})
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, selectReport)
