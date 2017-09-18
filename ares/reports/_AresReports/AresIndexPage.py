@@ -14,6 +14,8 @@ import time
 import collections
 import six
 
+import ajax.AresRefreshScripts
+
 from ares.Lib import Ares
 
 NAME = 'Report Environment'
@@ -46,35 +48,10 @@ def report(aresObj):
             {'key': 'download', 'colName': 'Download', 'type': 'object'},
             {'key': 'delete', 'colName': 'Delete', 'type': 'object'}]
 
-  recordSet, scriptUpdate = [], None
-  for script in os.listdir(directory):
-    if not script.endswith(".py"):
-      continue
+  scriptUpdate = None
 
-    downComp = aresObj.anchor_download('', **{'report_name': aresObj.http['USER_SCRIPT'], 'script': script})
-    fileSize = Ares.convert_bytes(os.path.getsize(os.path.join(directory, script)))
-    fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(directory, script))))
-    if script == "%s.py" % aresObj.http['USER_SCRIPT']:
-      hyperLink = aresObj.anchor('%s.py' % aresObj.http['USER_SCRIPT'], **{'report_name': aresObj.http['USER_SCRIPT'], 'cssCls': ''})
-      row = {'script': script, 'script_name': hyperLink, 'size': fileSize, 'lst_mod_dt': fileDate, 'download': downComp, 'delete': ''}
-    else:
-      remov = aresObj.icon('trash')
-      remov.post('click', "../delete/%s" % aresObj.http['USER_SCRIPT'], {'SCRIPT': script}, 'display(data);')
-      divComp = aresObj.div(script)
-      divComp.toolTip(script)
-      row = {'script': script, 'script_name': divComp, 'size': fileSize, 'lst_mod_dt': fileDate, 'download': downComp, 'delete': remov}
-    recordSet.append(row)
-    scriptUpdate = fileDate if scriptUpdate is None or fileDate > scriptUpdate else scriptUpdate
-
-  ajaxRecordSet = []
-  for script in os.listdir(os.path.join(directory, 'ajax')):
-    if not script.endswith(".py") or script == '__init__.py':
-      continue
-
-    downComp = aresObj.anchor_download('', **{'report_name': aresObj.http['USER_SCRIPT'], 'script': "ajax&%s" % script})
-    fileSize = Ares.convert_bytes(os.path.getsize(os.path.join(directory, 'ajax', script)))
-    fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(os.path.join(directory, 'ajax', script))))
-    ajaxRecordSet.append({'script': script, 'script_name': script, 'size': fileSize, 'lst_mod_dt': fileDate, 'download': downComp, 'delete': remov})
+  recordSet = ajax.AresRefreshScripts.getRecordSet(aresObj, directory)
+  ajaxRecordSet = ajax.AresRefreshScripts.getRecordSet(aresObj, os.path.join(directory, 'ajax'))
 
   aresLogFile = os.path.join(directory, 'log_ares.dat')
   folderEvents = collections.defaultdict(int)
@@ -111,8 +88,19 @@ def report(aresObj):
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])
 
-  aresObj.table(recordSet, header, 'Report Summary', cssCls="table table-hover table-bordered")
+  reports = aresObj.table(recordSet, header, 'Report Summary', cssCls="table table-hover table-bordered")
+  button = aresObj.refresh(" Refresh Reports", recordSet, 'AresRefreshScripts')
+  button.click('''
+                  %s ;
+               ''' % (reports.jsUpdate())
+               )
+
   aresObj.table(ajaxRecordSet, header, 'Python Service Summary', cssCls="table table-hover table-bordered")
+  button = aresObj.refresh(" Refresh Python Services", ajaxRecordSet, 'AresRefreshScripts')
+  button.click('''
+                  %s ;
+               ''' % (reports.jsUpdate())
+               )
 
   eventRecordSet = []
   for dt, eventCount in folderEvents.items():

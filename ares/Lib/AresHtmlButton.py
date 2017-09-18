@@ -25,7 +25,7 @@ class Button(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of HTML button """
-    return '<button %s type="button" style="margin-bottom:10px;">%s</button>' % (self.strAttr(), self.vals)
+    return '<button %s type="button" style="margin-bottom: 20px;margin-top: -10px;">%s</button>' % (self.strAttr(), self.vals)
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -162,17 +162,18 @@ class ButtonRefresh(ButtonRemove):
     self.js('click',
             render_template_string('''
                 // The first part will update the file
-                $.post("{{ url_for('ares.ajaxCall', report_name='%s', script='%s', file_name='%s') }}", function(data) {
+                $.post("{{ url_for('ares.ajaxCall', report_name='%s', script='%s', file_name='%s', user_script='%s') }}", function(data) {
                     data = JSON.parse(data) ;
                     // Then it will update the reports
                     %s
                 });
-              ''' % (self.aresObj.http['REPORT_NAME'], self.ajaxScript, self.dataFileName, jsFnc)
+              ''' % (self.aresObj.http['REPORT_NAME'], self.ajaxScript, self.dataFileName,
+                     self.aresObj.http.get('USER_SCRIPT', self.aresObj.http['REPORT_NAME']), jsFnc)
             ))
 
   def __str__(self):
     """ Return the String representation of a HTML Style Twitter button """
-    return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
+    return '<button type="button" %s style="margin-bottom: 20px;margin-top: -10px;"><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
 
 
 class GeneratePdf(ButtonRemove):

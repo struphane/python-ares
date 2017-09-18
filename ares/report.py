@@ -56,7 +56,8 @@ def getHttpParams(request):
   """
   httpParams = {}
   for postValues in request.args.items():
-    httpParams[postValues[0].upper()] = postValues[1]
+    #TODO Find a way to not have this stupid hack
+    httpParams[postValues[0].replace("amp;", "").upper()] = postValues[1]
   for postValues in request.form.items():
     httpParams[postValues[0].upper()] = postValues[1]
   httpParams['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
@@ -264,7 +265,7 @@ def run_report(report_name, script_name):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       sys.path.append(userDirectory)
     else:
-      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', '_AresReports')
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
       # In this context we need the generic user directory as we are in a system report
       # Users should not be allowed to create env starting with _
@@ -406,18 +407,25 @@ def addScripts():
 def ajaxCall(report_name, script):
   """ Generic Ajax call """
   onload, js, error = '', '', False
-  requestParams = getHttpParams(request)
-  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-  reportObj = Ares.Report()
-  reportObj.http = getHttpParams(request)
-  reportObj.http['FILE'] = None
-  reportObj.http['REPORT_NAME'] = report_name
-  reportObj.http['DIRECTORY'] = userDirectory
-  reportObj.reportName = report_name
   try:
-    # TODO Improve the __import__ to not have to append the ajax path to the sys.path
-    ajaxDirectory = os.path.join(userDirectory, 'ajax')
-    sys.path.append(ajaxDirectory)
+    reportObj = Ares.Report()
+    reportObj.http = getHttpParams(request)
+    if report_name.startswith("_"):
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
+      sys.path.append(userDirectory)
+      # TODO Improve the __import__ to not have to append the ajax path to the sys.path
+      ajaxDirectory = os.path.join(userDirectory, 'ajax')
+      sys.path.append(ajaxDirectory)
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['USER_SCRIPT'])
+    else:
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+      sys.path.append(userDirectory)
+      ajaxDirectory = os.path.join(userDirectory, 'ajax')
+      sys.path.append(ajaxDirectory)
+    reportObj.http['FILE'] = None
+    reportObj.http['REPORT_NAME'] = report_name
+    reportObj.http['DIRECTORY'] = userDirectory
+    reportObj.reportName = report_name
     mod = __import__(script.replace(".py", ""))
     result = mod.call(reportObj)
   except Exception as e:
@@ -428,7 +436,7 @@ def ajaxCall(report_name, script):
       del sys.modules[script]
 
   if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js)
+    return json.dumps(content)
 
   return json.dumps(result)
 
