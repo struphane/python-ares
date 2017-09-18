@@ -271,6 +271,7 @@ def run_report(report_name, script_name):
       sys.path.append(userDirectory)
       if os.path.exists(os.path.join(userDirectory, 'ajax')):
         sys.path.append(os.path.join(userDirectory, 'ajax'))
+
       # In this context we need the generic user directory as we are in a system report
       # Users should not be allowed to create env starting with _
       #TODO put in place a control
