@@ -91,15 +91,16 @@ def report(aresObj):
   reports = aresObj.table(recordSet, header, 'Report Summary', cssCls="table table-hover table-bordered")
   button = aresObj.refresh(" Refresh Reports", recordSet, 'AresRefreshScripts')
   button.click('''
+                  display(status) ;
                   %s ;
                ''' % (reports.jsUpdate())
                )
 
-  aresObj.table(ajaxRecordSet, header, 'Python Service Summary', cssCls="table table-hover table-bordered")
+  reportAjax = aresObj.table(ajaxRecordSet, header, 'Python Service Summary', cssCls="table table-hover table-bordered")
   button = aresObj.refresh(" Refresh Python Services", ajaxRecordSet, 'AresRefreshScripts')
   button.click('''
                   %s ;
-               ''' % (reports.jsUpdate())
+               ''' % (reportAjax.jsUpdate())
                )
 
   eventRecordSet = []

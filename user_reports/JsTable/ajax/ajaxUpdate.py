@@ -31,4 +31,4 @@ def call(aresObj):
   recordSetJson.close()
 
   # And return the recordSet
-  return json.dumps(recordSet)
+  return recordSet

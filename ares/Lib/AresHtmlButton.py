@@ -162,8 +162,10 @@ class ButtonRefresh(ButtonRemove):
     self.js('click',
             render_template_string('''
                 // The first part will update the file
-                $.post("{{ url_for('ares.ajaxCall', report_name='%s', script='%s', file_name='%s', user_script='%s') }}", function(data) {
-                    data = JSON.parse(data) ;
+                $.post("{{ url_for('ares.ajaxCall', report_name='%s', script='%s', file_name='%s', user_script='%s') }}", function(result) {
+                    var res = JSON.parse(result) ;
+                    var data = res.data ;
+                    var status = res.status ;
                     // Then it will update the reports
                     %s
                 });

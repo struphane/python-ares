@@ -246,8 +246,8 @@ def run_test_graph():
   onload, content, js = report_doc_graph.report(aresObj).html()
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
-@report.route("/", defaults={'report_name': '_AresIndex', 'script_name': 'AresIndex'})
-@report.route("/index", defaults={'report_name': '_AresIndex', 'script_name': 'AresIndex'})
+@report.route("/", defaults={'report_name': '_AresReports', 'script_name': 'AresIndex'})
+@report.route("/index", defaults={'report_name': '_AresReports', 'script_name': 'AresIndex'})
 @report.route("/run/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
 @report.route("/run/<report_name>/<script_name>", methods = ['GET', 'POST'])
 def run_report(report_name, script_name):
@@ -264,9 +264,13 @@ def run_report(report_name, script_name):
     if not report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       sys.path.append(userDirectory)
+      if os.path.exists(os.path.join(userDirectory, 'ajax')):
+        sys.path.append(os.path.join(userDirectory, 'ajax'))
     else:
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
+      if os.path.exists(os.path.join(userDirectory, 'ajax')):
+        sys.path.append(os.path.join(userDirectory, 'ajax'))
       # In this context we need the generic user directory as we are in a system report
       # Users should not be allowed to create env starting with _
       #TODO put in place a control
@@ -414,14 +418,12 @@ def ajaxCall(report_name, script):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
       # TODO Improve the __import__ to not have to append the ajax path to the sys.path
-      ajaxDirectory = os.path.join(userDirectory, 'ajax')
-      sys.path.append(ajaxDirectory)
+      sys.path.append(os.path.join(userDirectory, 'ajax'))
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['USER_SCRIPT'])
     else:
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       sys.path.append(userDirectory)
-      ajaxDirectory = os.path.join(userDirectory, 'ajax')
-      sys.path.append(ajaxDirectory)
+      sys.path.append(os.path.join(userDirectory, 'ajax'))
     reportObj.http['FILE'] = None
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory

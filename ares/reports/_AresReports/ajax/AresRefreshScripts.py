@@ -36,5 +36,4 @@ def getRecordSet(aresObj, directory, restrictedExt=".py"):
 
 def call(aresObj):
   """ Ajax Call to refresh the tables """
-  print "Test"
-  return json.dumps("Youpi")
+  return {"status": "Updated", "data": [], "content": ""}
