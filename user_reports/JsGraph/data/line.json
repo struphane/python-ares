@@ -1,0 +1,5 @@
+[
+	{"color": "#ff7f0e", "key": "Sine Wave", "values": [{"x": 1, "y": 10.0}, {"x": 2, "y": 30.0}]},
+	{"color": "#ff1f0e", "key": "Test Wave", "values": [{"x": 1, "y": 5.0}, {"x": 2, "y": 10.0}]}
+
+]

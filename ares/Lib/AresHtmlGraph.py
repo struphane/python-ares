@@ -33,11 +33,11 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return "buildJsRecordSet(%s, %s, %s)" % (self.jqRecordSet, self.jqCategory, self.jqValue)
+    return "buildMultiSeriesRecordSet(%s, '%s', %s, %s)" % (self.jqRecordSet, self.jqSeries, self.jqCategory, self.jqValue)
 
   def update(self, data):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = buildJsRecordSet(%s, %s, %s) ;" % (self.jqRecordSet, self.jqCategory, self.jqValue))
+    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, '%s', %s, %s) ;" % (self.jqRecordSet, self.jqSeries,  self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
@@ -105,7 +105,7 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def jsUpdate(self, jsDataVar='data'):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = buildJsRecordSet(%s, %s, %s) ;" % (jsDataVar, self.jqCategory, self.jqValue))
+    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, '%s', %s, %s) ;" % (jsDataVar, self.jqSeries, self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
@@ -132,7 +132,7 @@ class Pie(JsNvD3Graph):
 
   This will expect as input data a list of tuple (label, value)
 
-  Data format expected in the Graph:
+  data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   alias = 'pie'
@@ -157,7 +157,7 @@ class Pie(JsNvD3Graph):
 class Donut(Pie):
   """
 
-  Data format expected in the Graph:
+  data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   mockData = r'json\pie.json'
@@ -169,7 +169,7 @@ class Donut(Pie):
 class Bar(JsNvD3Graph):
   """
 
-  Data format expected in the graph:
+  data format expected in the graph:
     [{key: "Cumulative Return", values: [{ "label": "One","value" : 29.765957771107},  {"label": "Four", "value" : 196.45946739256}]}]
   """
   duration = 200
@@ -190,7 +190,7 @@ class Bar(JsNvD3Graph):
 class Line(JsNvD3Graph):
   """
 
-  Data format expected in the graph
+  data format expected in the graph
     [{color: "#ff7f0e", key: "Sine Wave", values: [{x: 1, y:10.0}, {x: 2, y:30.0}]}]
 
   """
@@ -409,7 +409,7 @@ class Network(JsNvD3Graph):
 
 class IndentedTree(JsNvD3Graph):
   """
-  Data expected:
+  data expected:
     [ (label, url, values), (label, url, dataKeys)]
     Example
     [ ('NVD3', 'http://novus.github.com/nvd3',

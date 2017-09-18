@@ -59,8 +59,8 @@ def getReport(reportModule, results, scriptPath):
 if __name__ == '__main__':
   # Run the script locally
   statisPath = r'..\..\..\static' # the path with the CSS and JS folders (if current path please keep this empty
-  directory = os.getcwd() # The path of this script by default
-  report = "HelloWorld" # The name of the main script with the report
+  directory = r'C:\Users\Tinels972\PycharmProjects\python-ares\user_reports' # The path of this script by default
+  report = "jsGraph" # The name of the main script with the report
   result_folder = 'html'
 
   # This will move all the results in a html folder
@@ -80,6 +80,7 @@ if __name__ == '__main__':
 
   res = {}
   sys.path.append(os.path.join(directory, report))
+  print(os.path.join(directory, report))
   getReport(__import__(report), res, directory)
 
   for report, htmlReport in res.items():

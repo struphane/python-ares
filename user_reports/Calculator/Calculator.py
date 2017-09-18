@@ -5,7 +5,7 @@ SHORTCUTS = [('Configuration', 'Calculator.py'),
              ('Environments', 'CalculatorSetEnv.py'),
              ('Calculator', 'CalculatorResults.py')]
 
-AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
+AJAX_CALL = {} # ajax call definition e.g ['MyRepotTestAjax.py']
 CHILD_PAGES = {'results': 'CalculatorSetEnv.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 import collections

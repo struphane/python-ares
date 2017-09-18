@@ -18,7 +18,7 @@ In the javascript layer
 
 """
 
-AJAX_CALL = {} # Ajax call definition
+AJAX_CALL = {} # ajax call definition
 CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 def report(aresObj):

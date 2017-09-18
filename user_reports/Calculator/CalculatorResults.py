@@ -1,6 +1,6 @@
 ''' [SCRIPT COMMENT] '''
 
-AJAX_CALL = {} # Ajax call definition e.g ['MyRepotTestAjax.py']
+AJAX_CALL = {} # ajax call definition e.g ['MyRepotTestAjax.py']
 CHILD_PAGES = {'results': 'CalculatorResults.py'} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
 
 import collections

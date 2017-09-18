@@ -127,7 +127,8 @@ class GraphSvG(AresHtml.Html):
   width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
-  categories, values = None, None
+  categories, values, series = None, None, None
+  recordSetKey = None
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None):
     """ selectors is a tuple with the category first and the value list second """
@@ -140,6 +141,7 @@ class GraphSvG(AresHtml.Html):
     """ Return the String representation of a DIV containing a SVG tag """
     self.selectCategory()
     self.selectValues()
+    self.selectKey()
 
     item = AresItem.Item('')
     if self.headerBox is not None:
@@ -151,11 +153,31 @@ class GraphSvG(AresHtml.Html):
       item.join(self.categories)
     if self.values is not None:
       item.join(self.values)
+    if self.series is not None:
+      item.join(self.series)
     item.add(1, '<svg style="width:100%;height:100%;"></svg>')
     if self.headerBox is not None:
       item.add(0, '</div>')
     item.add(0, '</div>')
     return str(item)
+
+  def selectKey(self):
+    """ for multicharts, define the key to be used in js recordSet"""
+    item = AresItem.Item('Serie')
+    tmpSerie = ''
+    item.add(2, '<select hidden id="%s_series_selector" class="selectpicker">' % self.htmlId)
+    for headerLine in self.header:
+      if  headerLine.get('type') == 'series':
+        item.add(3, '<option hidden value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
+        break
+
+      elif headerLine.get('type') != 'number':
+        tmpSerie = '<option hidden value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName'])
+    else:
+      item.add(3, tmpSerie)
+    item.add(2, '</select>')
+    self.series = item
+
 
   def selectCategory(self):
     """ Return the category to be selected in the graph display """
@@ -168,7 +190,7 @@ class GraphSvG(AresHtml.Html):
     for headerLine in self.header:
       if headerLine.get('selected') and headerLine.get('type') != 'number':
         item.add(3, '<option value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
-      else:
+      elif headerLine.get('type') != 'series':
         item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
     item.add(2, '</select>')
     self.categories = item
@@ -208,6 +230,11 @@ class GraphSvG(AresHtml.Html):
   def jqCategory(self):
     """ Returns the selected category for the graph """
     return '$("#%s_col_selector option:selected")'% self.htmlId
+
+  @property
+  def jqSeries(self):
+    """ Returns the selected category for the graph """
+    return '$("#%s_series_selector option:selected")' % self.htmlId
 
   @property
   def jqValue(self):

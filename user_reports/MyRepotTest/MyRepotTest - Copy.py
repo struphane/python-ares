@@ -22,7 +22,7 @@ AJAX_CALLS = [
   ]
 
 # Currently this is only supported by the anchor balises
-# If there is button and actions we will assume that this will be sent via Ajax calls
+# If there is button and actions we will assume that this will be sent via ajax calls
 CHILD_PAGES = {
 	'test': 'MyRepotTestChild.py',
   'test3': 'MyRepotTestChild3.py',

@@ -38,6 +38,35 @@ function wrapperSimpleCharts(data, categories, selectedVals) {
     return getDataFromRecordSet(data, [key, val]);
 }
 
+
+function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals)
+{
+    var tmpDict = {};
+    var recSet = [];
+    //build tmpDict to aggregate the series together
+    for (var i = 0, len = data.length; i < len; i++)
+    {
+        serie = data[i][seriesKey];
+        category = data[i][category];
+        values = data[i][selectedVals];
+        if (serie in tmpDict)
+        {
+            tmpDict[serie].push([category, values]);
+        }
+        else
+        {
+            tmpDict[serie] = [[category, values]];
+        }
+    }
+
+    for (var key in tmpDict)
+    {
+        recSet.push({"key": key, "values": tmpDict[key]});
+    }
+
+
+}
+
 function buildJsRecordSet(data, categories, selectedVals) {
     // new function to allow for multiple series to be passed to the graph
     series = [];

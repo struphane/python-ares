@@ -97,7 +97,7 @@ def report(aresObj):
  #  horizBarChart.linkTo(table)
  #
  #  table.jsLinkTo([pie, bar])
- #  button = aresObj.button('Change Graph (Ajax)')
+ #  button = aresObj.button('Change Graph (ajax)')
  #  button.post('click', '../ajax/JsTable/testAjax.py', {},
  #              '''
  #                var filterRecordSet = getDataFromRecordSet(JSON.parse(data), [%s, %s]) ;
