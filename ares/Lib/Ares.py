@@ -27,6 +27,11 @@ import time
 import inspect
 import collections
 import json
+import numpy
+def jsonDefault(obj):
+  """ numpy.int64 is not JSON serializable, but users may use it in their report. """
+  if isinstance(obj, numpy.integer): return int(obj)
+  raise TypeError("%s (%s) is not JSON serializable" % (repr(obj), type(obj)))
 
 from click import echo
 
@@ -431,7 +436,7 @@ class Report(object):
     for objId in self.content:
       jsOnload, html, js = self.htmlItems[objId].html()
       for ref, data in self.jsRegistered.items():
-        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data)))
+        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data, jsonDefault)))
       for onloadFnc in jsOnload:
         onloadParts.add(onloadFnc)
       htmlParts.append(html)
