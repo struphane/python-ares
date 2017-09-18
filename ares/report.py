@@ -323,6 +323,8 @@ def run_report(report_name):
     reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
+    if report_name is sys.modules:
+      del sys.modules[report_name]
     mod = __import__(report_name)
     reportObj.childPages = getattr(mod, 'CHILD_PAGES', {})
     reportObj.http['FILE'] = report_name
