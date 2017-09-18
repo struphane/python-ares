@@ -88,30 +88,6 @@ def noCache(f):
     return resp
   return respFunc
 
-@report.route("/doc")
-@report.route("/dsc")
-@report.route("/dsc/index")
-def report_dsc_index():
-  """ Main page for the Ares Documentation """
-  aresObj = Ares.Report()
-  aresObj.reportName = 'dsc'
-  aresObj.childPages = {'html': 'html', 'graph': 'graph', 'local': 'local'}
-  aresObj.title("Report Documentation")
-  aresObj.title2("How to create a report")
-  aresObj.img('local_runs.JPG')
-  aresObj.title2("Report Components")
-  aresComp = aresObj.anchor('Local Environment')
-  aresComp.addLink('local', dots='.')
-  aresObj.newline()
-  aresComp = aresObj.anchor('HTML Component documentation')
-  aresComp.addLink('html', dots='.')
-  aresObj.newline()
-  aresComp = aresObj.anchor('Graph Component documentation')
-  aresObj.img('graph.JPG')
-  aresComp.addLink('graph', dots='.')
-  onload, content, js = aresObj.html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
-
 @report.route("/doc/html")
 @report.route("/child:dsc/html")
 def report_dsc_html():
