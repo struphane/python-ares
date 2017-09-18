@@ -214,7 +214,7 @@ class Report(object):
             strFct.append(headerRow.get('key', headerRow['colName']) )
       else:
         if headerLine.get("type") == 'object':
-          strFct.append(headerRow.get('key', headerRow['colName']) )
+          strFct.append(headerLine.get('key', headerLine['colName']) )
     if id(recordSet) not in self.jsRegistered:
       if strFct:
         newRecordSet = []
@@ -436,7 +436,7 @@ class Report(object):
     for objId in self.content:
       jsOnload, html, js = self.htmlItems[objId].html()
       for ref, data in self.jsRegistered.items():
-        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data, jsonDefault)))
+        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data)))
       for onloadFnc in jsOnload:
         onloadParts.add(onloadFnc)
       htmlParts.append(html)
