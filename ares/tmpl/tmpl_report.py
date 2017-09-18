@@ -5,6 +5,7 @@
 In the python layer
     aresObj.http['FILE'] is the current file
     aresObj.http['REPORT_NAME'] is the current report environment name
+    aresObj.http['DIRECTORY'] is the report location
 
      def readFile(self, file, subfolders=None):
      def createFile(self, file, subfolders=None, checkFileExist=True):
@@ -17,6 +18,13 @@ In the javascript layer
     preloader() to show a loading page
 
 """
+
+
+NAME = 'Report' # The Report Name in the left menu
+# The Shortcuts should be defined as below
+# [(Cateogry Name, [List of the script in the root directory])]
+# It is only possible to create new links for scripts in the root
+SHORTCUTS = [] # All the possible link to other pages
 
 def report(aresObj):
   # Write your report here

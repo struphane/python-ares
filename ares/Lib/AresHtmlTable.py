@@ -23,6 +23,7 @@ class Table(AresHtml.Html):
   refernce = 'https://www.w3schools.com/css/css_table.asp'
   filt, filtId = None, None
   linkedObjs = None
+  pageLength = 50
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
@@ -69,11 +70,19 @@ class Table(AresHtml.Html):
 
     if len(self.header) > 1:
       item.add(1, "<thead>")
-      for headerLine in self.header:
+      for headerLine in self.header[:-1]:
         item.add(2, "<tr>")
         for col in headerLine:
-          item.add(3, "<th rowspan='%s' colspan='%s'>%s</th>" % (col.get("rowspan", 1), col.get("colspan", 1), col.get("colName")))
+          rowspan = " rowspan='%s'" % col['rowspan'] if col.get("rowspan", 1) > 1 else ''
+          colspan = " colspan='%s'" % col['colspan'] if col.get("colspan", 1) > 1 else ''
+          item.add(3, "<td%s%s>%s</td>" % (rowspan, colspan, col.get("colName")))
         item.add(2, "</tr>")
+      item.add(2, "<tr>")
+      # This row will be changed by the DataTable creation
+      # It should correspond to the column that we will then use to populate the table
+      for col in self.header[-1]:
+        item.add(3, "<td>%s</td>" % col.get("colName"))
+      item.add(2, "</tr>")
       item.add(1, "</thead>")
     item.add(0, '</table>')
 
@@ -81,30 +90,6 @@ class Table(AresHtml.Html):
       item.add(0, '</div>')
       item.add(0, '</div>')
     return str(item)
-
-  def jsEvents(self, jsEventFnc=None):
-    """ Function to get the Javascript methods for this object and all the underlying objects """
-    if jsEventFnc is None:
-      jsEventFnc = self.jsEventFnc
-    for jEventType, jsEvent in self.jsEvent.items():
-      jsEventFnc[jEventType].add(str(jsEvent))
-
-    # Retrieve the list of all the columns objects
-    # Those objects should be taken into account for any special javascript function
-    colObj = []
-    for headerLine in self.header:
-      for col in headerLine:
-        if col.get('type') == 'object':
-          colObj.append(self.recKey(col))
-    # Second Loop to extract the Javascript fragements
-    # This will be added to the HTML page
-    if colObj:
-      for row in self.vals:
-        for col in colObj:
-          rawCol = "__%s" % col
-          if hasattr(row[rawCol], 'jsEvent'):
-            getattr(row[rawCol], 'jsEvents')(jsEventFnc)
-    return jsEventFnc
 
   def update(self, newRecordSet):
     """ Refresh the table object with the new recordSet Data """
@@ -134,6 +119,45 @@ class Table(AresHtml.Html):
   def aresExample(cls, aresObj):
     return aresObj.table('Table Example', [["Node Code", "Ptf Code", 'IR Delta'], ["GBCSA", 31415, 24683]])
 
+
+  # ------------------------------------------------------------------------------------------------------------
+  #                                           Javascript Events section
+  # ------------------------------------------------------------------------------------------------------------
+  def jsEvents(self, jsEventFnc=None):
+    """ Function to get the Javascript methods for this object and all the underlying objects """
+    if jsEventFnc is None:
+      jsEventFnc = self.jsEventFnc
+    for jEventType, jsEvent in self.jsEvent.items():
+      jsEventFnc[jEventType].add(str(jsEvent))
+
+    # Retrieve the list of all the columns objects
+    # Those objects should be taken into account for any special javascript function
+    colObj = []
+    for headerLine in self.header:
+      for col in headerLine:
+        if col.get('type') == 'object':
+          colObj.append(self.recKey(col))
+    # Second Loop to extract the Javascript fragements
+    # This will be added to the HTML page
+    if colObj:
+      for row in self.vals:
+        for col in colObj:
+          rawCol = "__%s" % col
+          if hasattr(row[rawCol], 'jsEvent'):
+            getattr(row[rawCol], 'jsEvents')(jsEventFnc)
+    return jsEventFnc
+
+  def jsUpdate(self, jsDataVar='data'):
+    """
+    Function to update the table from a javascript function.
+    By default the usual javascript function will use the variable data in the signature.
+    """
+    item = AresItem.Item("%s.clear();" % self.htmlId)
+    item.add(0, "%s.forEach(function(element){" % jsDataVar)
+    item.add(1, "%s.row.add(element).draw(false) ;" % (self.htmlId))
+    item.add(0, "}) ;")
+    return str(item)
+
   def jsLinkTo(self, htmlObjs):
     """ Send the data to the different HTML objects in order to update them """
     if not self.linkedObjs:
@@ -150,6 +174,7 @@ class Table(AresHtml.Html):
                     %s.DataTable(
                       {
                         data: recordSet_%s ,
+                        pageLength: %s,
                         columns: [
                                     %s,
                               ],
@@ -169,13 +194,14 @@ class Table(AresHtml.Html):
                                         }
                       }
                     ) ;
-                  ''' % (self.jqId, self.recordSetId, ",".join(self.recordSetHeader), "\n".join(self.linkedObjs)))
+                  ''' % (self.jqId, self.recordSetId, self.pageLength, ",".join(self.recordSetHeader), "\n".join(self.linkedObjs)))
     else:
       item.add(1, '''
                   // createdRow
                   %s = %s.DataTable(
                                      {
                                         responsive: true,
+                                        pageLength: %s,
                                         data: recordSet_%s ,
                                         columns: [
                                                     %s
@@ -195,7 +221,7 @@ class Table(AresHtml.Html):
                                      }
                   ) ;
 
-                  ''' % (self.htmlId, self.jqId, self.recordSetId, ",".join(self.recordSetHeader)))
+                  ''' % (self.htmlId, self.jqId, self.pageLength, self.recordSetId, ",".join(self.recordSetHeader)))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)
@@ -220,3 +246,4 @@ class Table(AresHtml.Html):
       item.add(1, "}")
       item.add(0, ") ;")
     return str(item)
+
