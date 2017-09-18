@@ -27,6 +27,7 @@ import time
 import inspect
 import collections
 import json
+
 import numpy
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
