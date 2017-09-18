@@ -255,6 +255,8 @@ def run_report(report_name, script_name):
     reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
+    if script_name in sys.modules:
+      del sys.modules[script_name]
     mod = __import__(script_name) # run the report
     # Set some environments variables which can be used in the report
     reportObj.http['FILE'] = script_name
