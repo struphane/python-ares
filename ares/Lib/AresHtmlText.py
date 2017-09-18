@@ -45,7 +45,7 @@ class Code(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of a Code HTML tag """
-    html = '<pre><code %s>%s</code></pre>' % (self.strAttr(), self.vals)
+    html = '<code %s>%s</code>' % (self.strAttr(), self.vals)
     if self.htmlComp is not None:
       html = html.format(*self.htmlComp)
     return html
@@ -53,6 +53,16 @@ class Code(AresHtml.Html):
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.code("def myFct(): pass")
+
+class Preformat(AresHtml.Html):
+  """ Python Wrapper for the HTML preformatted tag """
+
+  reference = "https://www.w3schools.com/html/html_styles.asp"
+  alias = 'preformat'
+
+  def __str__(self):
+    """  String representation of the HTML object """
+    return '<pre %s>%s</pre>' % (self.strAttr(), self.vals)
 
 
 class Paragraph(AresHtml.Html):
@@ -67,16 +77,27 @@ class Paragraph(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of a Code HTML tag """
-    val = " ".join([str(val) for val in self.vals]) if isinstance(self.vals, list) else self.vals
-    html = '<p %s>%s</p>' % (self.strAttr(), val)
+    item = AresItem.Item('<div class="container">')
     if self.htmlComp is not None:
-      html = html.format(*self.htmlComp)
-    return html
+      self.vals = self.vals.format(*self.htmlComp)
+    for val in self.vals.split("\n"):
+      item.add(1, "<p class='text-justify'>%s</p>" % val.strip())
+    return str(item)
 
   @classmethod
   def aresExample(cls, aresObj):
     aresObj.text("My text")
     return aresObj.paragraph("My Paragraph")
+
+
+class BlockQuote(AresHtml.Html):
+  """ Python Wrapper to the HTML Block qutoe Bootstrap object """
+  alias, cssCls = 'blockquote', 'blockquote'
+  reference = 'https://v4-alpha.getbootstrap.com/content/typography/'
+
+  def __str__(self):
+    """  String representation of the HTML object """
+    return '<blockquote class="blockquote">'
 
 
 class Title(AresHtml.Html):
