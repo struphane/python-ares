@@ -89,6 +89,13 @@ class List(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
+  def jsUpdate(self, jsDataVar='data'):
+    """ Return the Javascript update function from a data object """
+    return  '''
+              // Data is supposed to be a list
+              var listResult = data.join('</li><li class="list-group-item">')
+              %s.html('<li class="list-group-item">' + listResult + '</li>') ;
+            ''' % self.jqId
 
 class ListBadge(AresHtml.Html):
   """

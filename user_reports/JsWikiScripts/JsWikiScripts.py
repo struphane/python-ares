@@ -75,8 +75,9 @@ def report(aresObj):
                                             'script_name': inputModal, 'comment': reason,
                                             'js': '''
                                                       display(status) ;
+                                                      %s ;
                                                       %s.modal("toggle") ;
-                                                  ''' % modal.jqId})
+                                                  ''' % (htmlList.jsUpdate(), modal.jqId)})
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, reason)
   aresObj.addTo(modal, request)
