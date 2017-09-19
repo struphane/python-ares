@@ -43,8 +43,8 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, hasS
 {
     var tmpDict = {};
     var recSet = [];
-    var selCat = category.text();
-    var selVal = selectedVals.text();
+    var selCat = category.val();
+    var selVal = selectedVals.val();
     //build tmpDict to aggregate the series together
 
     for (var i = 0, len = data.length; i < len; i++)
