@@ -20,6 +20,7 @@ In the javascript layer
 
 AJAX_CALL = {} # ajax call definition
 CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
+NAME = 'First Report'
 
 def report(aresObj):
   # Write your report here
