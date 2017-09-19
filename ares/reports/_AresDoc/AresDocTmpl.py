@@ -11,7 +11,6 @@ def report(aresObj):
   """
 
   """
-
   aresObj.title("Report Template")
   aresObj.title2("Template for a report")
   tmpplPath = os.path.join(aresObj.http['DIRECTORY'], "..", "ares", "tmpl")

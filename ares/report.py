@@ -222,8 +222,8 @@ def run_test_graph():
   onload, content, js = report_doc_graph.report(aresObj).html()
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
-@report.route("/", defaults={'report_name': '_AresReports', 'script_name': 'AresIndex'})
-@report.route("/index", defaults={'report_name': '_AresReports', 'script_name': 'AresIndex'})
+@report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
+@report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
 @report.route("/run/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
 @report.route("/run/<report_name>/<script_name>", methods = ['GET', 'POST'])
 def run_report(report_name, script_name):
@@ -267,7 +267,7 @@ def run_report(report_name, script_name):
     downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
     downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
-    report = __import__(script_name) # run the report
+    report = __import__(report_name) # run the report
     side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, report_name.replace(".py", ""), report.NAME))]
     for categories, links in getattr(report, 'SHORTCUTS', []):
       side_bar.append('<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % categories)
