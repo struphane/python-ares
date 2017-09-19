@@ -54,6 +54,7 @@ class Code(AresHtml.Html):
   def aresExample(cls, aresObj):
     return aresObj.code("def myFct(): pass")
 
+
 class Preformat(AresHtml.Html):
   """ Python Wrapper for the HTML preformatted tag """
 
@@ -97,7 +98,11 @@ class BlockQuote(AresHtml.Html):
 
   def __str__(self):
     """  String representation of the HTML object """
-    return '<blockquote class="blockquote">'
+    item = AresItem.Item('<blockquote %s">' % self.strAttr())
+    item.add(1, "<p>%s</p>" % self.vals[0])
+    item.add(1, "<small>by <cite>%s</cite></small>" % self.vals[1])
+    item.add(0 , "</blockquote>")
+    return str(item)
 
 
 class Title(AresHtml.Html):

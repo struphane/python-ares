@@ -63,3 +63,5 @@ def report(aresObj):
                    aresObj.code('/js/'),
                    aresObj.anchor('Golden rules  Good practises', cssCls=''),
                    ])
+
+  aresObj.blockquote(["Youpi", 'Olivier'])

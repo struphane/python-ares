@@ -243,7 +243,7 @@ class Report(object):
   def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def preformat(self, value, cssCls=None): return self.add(AresHtmlText.Preformat(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
-  def blockquote(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.BlockQuote(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def blockquote(self, value, cssCls=None): return self.add(AresHtmlText.BlockQuote(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Paragraph(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def dropzone(self, value, cssCls=None): return self.add(AresHtmlEvent.DropZone(self, value, cssCls), sys._getframe().f_code.co_name)
   def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self, value, cssCls), sys._getframe().f_code.co_name)
