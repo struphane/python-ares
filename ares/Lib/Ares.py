@@ -306,12 +306,6 @@ class Report(object):
   def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self, header, values, cssCls), sys._getframe().f_code.co_name)
   def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def comboLineBar(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def scatterChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def stackedAreaChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def multiBarChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def lineChartFocus(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
-  def horizBarChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
 
   # File HTML Section
   def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self, values, cssCls), sys._getframe().f_code.co_name)

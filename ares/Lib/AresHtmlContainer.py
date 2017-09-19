@@ -136,6 +136,7 @@ class GraphSvG(AresHtml.Html):
     self.headerBox = header
     self.recordSetId = id(vals)
     self.header = recordSetDef
+    self.serieExist = False
 
   def __str__(self):
     """ Return the String representation of a DIV containing a SVG tag """
@@ -164,17 +165,15 @@ class GraphSvG(AresHtml.Html):
   def selectKey(self):
     """ for multicharts, define the key to be used in js recordSet"""
     item = AresItem.Item('')
-    tmpSerie = ''
     item.add(2, '<script>')
     for headerLine in self.header:
       if  headerLine.get('type') == 'series':
-        item.add(3, "var serie_%s = '%s';" % (self.recordSetId, headerLine.get('key', headerLine['colName'])))
+        item.add(3, "var serie_%s = '%s';" % (self.htmlId, headerLine.get('key', headerLine['colName'])))
+        self.serieExist = True
         break
 
-      elif headerLine.get('type') != 'number':
-        tmpSerie = "var serie_%s = '%s'" % (self.recordSetId, headerLine.get('key', headerLine['colName']))
     else:
-      item.add(3, tmpSerie)
+      item.add(3, "var serie_%s = '';" % self.htmlId)
     item.add(2, '</script>')
     self.series = item
 
@@ -234,7 +233,7 @@ class GraphSvG(AresHtml.Html):
   @property
   def jqSeries(self):
     """ Returns the selected category for the graph """
-    return 'serie_%s' % self.recordSetId
+    return 'serie_%s' % self.htmlId
 
   @property
   def jqValue(self):
