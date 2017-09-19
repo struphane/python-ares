@@ -38,18 +38,28 @@ class Button(AresHtml.Html):
     """
     # Part dedicated to run before the Ajax call
 
-    jsData = []
+    jsData, pyData = [], []
     for key, data in kwargs.items():
-      if key not in ('cssCls', ):
+      if key not in ('cssCls', 'js'):
         if issubclass(data.__class__, AresHtml.Html):
           jsData.append("%s: %s" % (key, data.val))
-
-    url = render_template_string('''{{ url_for(\'%s\') }}''' % url)
+        else:
+          pyData.append("%s='%s'" % (key, data))
+    #
+    print "{%s}" % ",".join(jsData)
+    url = render_template_string('''{{ url_for(\'%s\', %s) }}''' % (url, ",".join(pyData)))
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     preAjax.add(0, kwargs.get('preAjaxJs', ''))
-
-    super(Button, self).post(evenType, url, "{%s}" % ",".join(jsData), "%s ; %s.html('%s') ;" % (kwargs.get('js', ''), self.jqId, self.vals),
+    #
+    super(Button, self).post(evenType, url, "{%s}" % ",".join(jsData),
+                             '''
+                              var res = JSON.parse(data) ;
+                              var data = res.data ;
+                              var status = res.status ;
+                              %s.html(%s);
+                              %s ;
+                             ''' % (self.jqId, self.htmlId, kwargs.get('js', '')),
     str(preAjax), kwargs.get('redirectUrl', ''))
 
 

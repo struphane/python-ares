@@ -6,6 +6,7 @@ http://127.0.0.1:5000/reports/run/JsWikiScripts
 
 import os
 import sys
+import ajax.ajaxWikiRequest
 
 NAME = "BDI Wiki Scripts"
 
@@ -53,10 +54,7 @@ def report(aresObj):
 
   pieChart = aresObj.pie(recordSet, [{'colName': 'Category', 'key': 'category'},
                                     {'colName': 'Count', 'key': 'total', 'type': 'number'}
-                                    ])
-  pieChart2 = aresObj.pie(recordSet, [{'colName': 'Category', 'key': 'category'},
-                                    {'colName': 'Count', 'key': 'total', 'type': 'number'}
-                                    ])
+                                    ], headerBox='Framework Migration')
   aresObj.paragraph('''
       Not all the scripts have been migrated to this new set up, but this is an on going process in BDI.
       So please have a look at the current documentation and do not hesitate to propose improvements.
@@ -64,13 +62,21 @@ def report(aresObj):
       Also you can request for a script to be reviewed and migrated to the new framework.
       You request will be then taken into account and we will process it as part of our weekly comment review.
   ''')
-  aresObj.row([pieChart, pieChart2])
+
+  htmlList = aresObj.list(ajax.ajaxWikiRequest.getRequests(os.path.join(aresObj.http['DIRECTORY'], 'requests')), headerBox='Pending requests')
+  aresObj.row([pieChart, htmlList])
 
   modal = aresObj.modal('Ask for a documentation review')
   modal.modal_header = "Request a Script Review"
   inputModal = aresObj.input("Script Name", '')
   reason = aresObj.textArea('')
   request = aresObj.button('Request')
+  request.post('click', 'ares.ajaxCall', **{'report_name': 'JsWikiScripts', 'script': 'ajaxWikiRequest',
+                                            'script_name': inputModal, 'comment': reason,
+                                            'js': '''
+                                                      display(status) ;
+                                                      %s.modal("toggle") ;
+                                                  ''' % modal.jqId})
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, reason)
   aresObj.addTo(modal, request)

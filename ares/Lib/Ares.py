@@ -278,6 +278,7 @@ class Report(object):
 
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self, value, cssCls), sys._getframe().f_code.co_name)
+  def list(self, values, headerBox=None, cssCls=None): return self.add(AresHtmlContainer.List(self, headerBox, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def table(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlTable.Table(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)

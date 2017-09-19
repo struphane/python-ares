@@ -56,6 +56,40 @@ class IFrame(AresHtml.Html):
     </iframe>''' % (self.vals, styleStr)
 
 
+
+class List(AresHtml.Html):
+  """
+  HTML List
+
+  This object will return a HTML list and the constructor of this class is
+  expecting in the values a list of tuples. The first one should be the
+  name and the second the count to be displayed in the badge
+
+  Default class parameters
+    - CSS Default Class = list-group
+  """
+  cssCls = 'list-group'
+  reference = 'https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp'
+  alias = 'list'
+
+  def __init__(self, aresObj, headerBox, vals, cssCls=None):
+    super(List, self).__init__(aresObj, vals, cssCls)
+    self.headerBox = headerBox
+
+  def __str__(self):
+    """ Return the String representation of a HTML List """
+    item = AresItem.Item('<div class="panel panel-success">')
+    item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+    item.add(1, '<div class="panel-body">')
+    item.add(2, '<ul %s>' % self.strAttr())
+    for label in self.vals:
+      item.add(3, '<li class="list-group-item">%s</li>' % label)
+    item.add(2, '</ul>')
+    item.add(1, '</div>')
+    item.add(0, '</div>')
+    return str(item)
+
+
 class ListBadge(AresHtml.Html):
   """
   HTML List
