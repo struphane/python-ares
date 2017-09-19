@@ -43,12 +43,15 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals)
 {
     var tmpDict = {};
     var recSet = [];
+    var selCat = category.text();
+    var selVal = selectedVals.text();
     //build tmpDict to aggregate the series together
+
     for (var i = 0, len = data.length; i < len; i++)
     {
         serie = data[i][seriesKey];
-        category = data[i][category];
-        values = data[i][selectedVals];
+        category = data[i][selCat];
+        values = data[i][selVal];
         if (serie in tmpDict)
         {
             tmpDict[serie].push([category, values]);
@@ -63,6 +66,8 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals)
     {
         recSet.push({"key": key, "values": tmpDict[key]});
     }
+
+    return recSet;
 
 
 }

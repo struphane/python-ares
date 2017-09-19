@@ -33,11 +33,11 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return "buildMultiSeriesRecordSet(%s, '%s', %s, %s)" % (self.jqRecordSet, self.jqSeries, self.jqCategory, self.jqValue)
+    return "buildMultiSeriesRecordSet(%s, %s, %s, %s)" % (self.jqRecordSet, self.jqSeries, self.jqCategory, self.jqValue)
 
   def update(self, data):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, '%s', %s, %s) ;" % (self.jqRecordSet, self.jqSeries,  self.jqCategory, self.jqValue))
+    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, %s, %s, %s) ;" % (self.jqRecordSet, self.jqSeries,  self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
@@ -105,7 +105,7 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def jsUpdate(self, jsDataVar='data'):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, '%s', %s, %s) ;" % (jsDataVar, self.jqSeries, self.jqCategory, self.jqValue))
+    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, %s, %s, %s) ;" % (jsDataVar, self.jqSeries, self.jqCategory, self.jqValue))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
@@ -256,7 +256,7 @@ class MultiBars(JsNvD3Graph):
   alias = 'multiBarChart'
   clickObject = 'multibar'
   style = {'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",
+                                   'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }",
                                    },
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
@@ -291,10 +291,10 @@ class LineWithFocus(JsNvD3Graph):
   alias = 'lineChartFocus'
 
   style = {'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",},
+                                   'tickFormat': "function(d) { return d3.time.format('x')(new Date(d)) }",},
                          'yAxis': {'tickFormat': "d3.format(',.2f')",},
                          'x2Axis': {'showMaxMin': 'false',
-                                    'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",},
+                                    'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }",},
                          'y2Axis': {'tickFormat': "d3.format(',.2f')"}
                          }}
 
@@ -331,7 +331,7 @@ class HorizontalBars(JsNvD3Graph):
                           'tooltips': 'false',
                           'showControls': 'false'},
            'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat':"function(d) { return d3.time.format('%%x')(new Date(d)) }",},
+                                   'tickFormat':"function(d) { return d3.time.format('%x')(new Date(d)) }",},
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
 
@@ -351,7 +351,7 @@ class ComboLineBar(JsNvD3Graph):
 
   style = {'chartStyle': {'color': 'd3.scale.category10().range()'},
            'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }",
+                                   'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }",
                                    },
                          'bars': {'forceY': '[0]'},
                          'y1Axis': {'tickFormat': "d3.format(',.2f')"},
