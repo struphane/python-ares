@@ -83,6 +83,7 @@ class Paragraph(AresHtml.Html):
       self.vals = self.vals.format(*self.htmlComp)
     for val in self.vals.split("\n"):
       item.add(1, "<p class='text-justify'>%s</p>" % val.strip())
+    item.add(0, '</div>')
     return str(item)
 
   @classmethod
@@ -108,7 +109,7 @@ class BlockQuote(AresHtml.Html):
 class Title(AresHtml.Html):
   """ Python Wrapper to the HTML H1 Tag """
   dim, alias = 1, 'title'
-  default = {'color': '#398438', 'font-family': 'anchorjs-icons', 'font-style': 'normal', 'font-varian': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
+  default = {'color': '#398438', 'cursor': 'pointer', 'font-family': 'anchorjs-icons', 'font-style': 'normal', 'font-variant': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   def addStyle(self, name, value):

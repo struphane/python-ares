@@ -61,6 +61,9 @@ def getHttpParams(request):
   for postValues in request.form.items():
     httpParams[postValues[0].upper()] = postValues[1]
   httpParams['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+  # Special environment configuration
+  httpParams['CONFIG'] = {}
+  httpParams['CONFIG']['WRK'] = config.WORK_PATH
   return httpParams
 
 def getFileName(script, ext):

@@ -147,7 +147,7 @@ class TextArea(AresHtml.Html):
     - rows = 3 (the size of the Textarea)
     - dflt - '' (The default value of the Textarea)
   """
-  cssCls, rows, dflt = 'form-control custom-control', 3, ''
+  cssCls, rows, dflt = 'form-control custom-control', 5, ''
   reference = 'https://www.w3schools.com/tags/tag_textarea.asp'
   alias = 'textArea'
 
@@ -157,15 +157,7 @@ class TextArea(AresHtml.Html):
 
   def __str__(self):
     """ Return the item with a text area and a button """
-    item = AresItem.Item('<div class="input-group">')
-    item.add(1, '<textarea %s rows="%s" style="resize:none">%s</textarea>' % (self.strAttr(), self.rows, self.dflt))
-    item.add(1, '<span class="input-group-btn">')
-    item.add(2, '<button class="btn btn-primary" id="%s_button">')
-    item.add(3, '<span>Send</span>')
-    item.add(2, '</button>')
-    item.add(1, '</span>')
-    item.add(0, '</div>')
-    return str(item)
+    return str('<textarea %s rows="%s" style="resize:none;cursor:pointer;margin-bottom:30px">%s</textarea>' % (self.strAttr(), self.rows, self.dflt))
 
   @property
   def val(self):
@@ -175,11 +167,6 @@ class TextArea(AresHtml.Html):
   def jsText(self, val):
     """ Update the textarea value - set the value of the textarea object """
     return '$("#%s").html(%s)' % (self.htmlId, val)
-
-  @property
-  def jqId(self):
-    """ Function to return the Jquery reference to the Html object """
-    return '$("#%s_button")' % self.htmlId
 
   @classmethod
   def aresExample(cls, aresObj):
