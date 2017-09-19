@@ -194,6 +194,7 @@ class Html(object):
   def aresExample(cls, aresObj):
     return aresObj
 
+
 class NavBar(object):
   """ """
 

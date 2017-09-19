@@ -28,6 +28,12 @@ import inspect
 import collections
 import json
 
+import numpy
+def jsonDefault(obj):
+  """ numpy.int64 is not JSON serializable, but users may use it in their report. """
+  if isinstance(obj, numpy.integer): return int(obj)
+  raise TypeError("%s (%s) is not JSON serializable" % (repr(obj), type(obj)))
+
 from click import echo
 
 from ares.Lib import AresHtmlContainer
@@ -173,8 +179,6 @@ class Report(object):
     if htmlObjs is None:
       return htmlObjs
 
-    print(htmlObjs)
-
     if isinstance(htmlObjs, list):
       for htmlObj in htmlObjs:
         if isinstance(htmlObj, list):
@@ -238,6 +242,8 @@ class Report(object):
   def vignet(self, header, text, recordSet, fnc, col,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self, header, text, recordSet, fnc, col, cssCls), sys._getframe().f_code.co_name)
   def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def preformat(self, value, cssCls=None): return self.add(AresHtmlText.Preformat(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def blockquote(self, value, cssCls=None): return self.add(AresHtmlText.BlockQuote(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Paragraph(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def dropzone(self, value, cssCls=None): return self.add(AresHtmlEvent.DropZone(self, value, cssCls), sys._getframe().f_code.co_name)
   def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self, value, cssCls), sys._getframe().f_code.co_name)
@@ -270,7 +276,6 @@ class Report(object):
   def textArea(self, value, cssCls=None): return self.add(AresHtmlEvent.TextArea(self, value, cssCls), sys._getframe().f_code.co_name)
   def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlButton.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name)
 
-
   # Containers section
   def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self, value, cssCls), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
@@ -285,10 +290,8 @@ class Report(object):
   def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
-
   # Modal Section
   def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-
 
   # Chart section
   def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
@@ -302,8 +305,13 @@ class Report(object):
   def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
   def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self, header, values, cssCls), sys._getframe().f_code.co_name)
-  def tree(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-
+  def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def comboLineBar(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def scatterChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def stackedAreaChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def multiBarChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def lineChartFocus(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def horizBarChart(self, header, values, mapCols, selectors, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
 
   # File HTML Section
   def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self, values, cssCls), sys._getframe().f_code.co_name)

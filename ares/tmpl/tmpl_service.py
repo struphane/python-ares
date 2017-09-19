@@ -30,4 +30,4 @@ def call(aresObj):
   [ PLEASE DETAIL YOU SCRIPT HERE ]
   """
 
-  return json.dumps('')
+  return {'status': '', 'data': []}
