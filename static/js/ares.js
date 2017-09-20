@@ -39,26 +39,40 @@ function wrapperSimpleCharts(data, categories, selectedVals) {
 }
 
 
-function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, hasSerie=false)
+function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, selectedSeries)
 {
     var tmpDict = {};
     var recSet = [];
+    var series = [];
     var selCat = category.val();
     var selVal = selectedVals.val();
+
+    selectedSeries.each(function() {
+        series.push($(this).val());
+        })
+
     //build tmpDict to aggregate the series together
 
     for (var i = 0, len = data.length; i < len; i++)
     {
-        if (hasSerie)
+        category = data[i][selCat];
+        values = data[i][selVal];
+
+        if (series.includes('default') )
         {
-            serie = data[i][seriesKey];
+            serie = 'Default';
         }
         else
         {
-            serie = 'Serie 1'
+            if (!(series.includes(data[i][seriesKey]) || series.includes('All')))
+            {
+                continue;
+            }
+            else
+            {
+                serie = data[i][seriesKey];
+            }
         }
-        category = data[i][selCat];
-        values = data[i][selVal];
         if (serie in tmpDict)
         {
             tmpDict[serie].push([category, values]);

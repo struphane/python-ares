@@ -13,12 +13,6 @@ from ares.Lib import AresItem
 from ares.Lib import AresJs
 
 
-def convertPyBoolToJs(val):
-  if val:
-    return 'true'
-  else:
-    return 'false'
-
 
 class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   """
@@ -39,11 +33,11 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return "buildMultiSeriesRecordSet(%s, %s, %s, %s, %s)" % (self.jqRecordSet, self.jqSeries, self.jqCategory, self.jqValue, convertPyBoolToJs(self.serieExist))
+    return "buildMultiSeriesRecordSet(%s, %s, %s, %s, %s)" % (self.jqRecordSet, self.jqSeriesKey, self.jqCategory, self.jqValue, self.jqSeries)
 
   def update(self, data):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, %s, %s, %s, %s) ;" % (self.jqRecordSet, self.jqSeries,  self.jqCategory, self.jqValue, convertPyBoolToJs(self.serieExist)))
+    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, %s, %s, %s, %s) ;" % (self.jqRecordSet, self.jqSeriesKey,  self.jqCategory, self.jqValue, self.jqSeries))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)
@@ -111,7 +105,7 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
 
   def jsUpdate(self, jsDataVar='data'):
     """ Update the content of an HTML component """
-    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, %s, %s, %s, %s) ;" % (jsDataVar, self.jqSeries, self.jqCategory, self.jqValue, convertPyBoolToJs(self.serieExist)))
+    item = AresItem.Item("var filterRecordSet = buildMultiSeriesRecordSet(%s, %s, %s, %s, %s) ;" % (jsDataVar, self.jqSeriesKey, self.jqCategory, self.jqValue, self.jqSeries))
     item.add(0, "var %s = nv.models.%s().x(function(d) { return d[0]; }).y(function(d) { return d[1]; });" % (self.chartObject, self.chartObject))
     item.add(0, "d3.%s.datum(filterRecordSet).transition().duration(500).call(%s) ;" % (self.jqId, self.chartObject))
     return str(item)

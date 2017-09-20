@@ -168,7 +168,8 @@ class GraphSvG(AresHtml.Html):
   width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
-  categories, values, series = None, None, None
+  categories, values, seriesKey, series = None, None, None, None
+  hasSeries = False
   recordSetKey = None
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None):
@@ -184,6 +185,7 @@ class GraphSvG(AresHtml.Html):
     self.selectCategory()
     self.selectValues()
     self.selectKey()
+    self.selectSeries()
 
     item = AresItem.Item('')
     if self.headerBox is not None:
@@ -195,6 +197,8 @@ class GraphSvG(AresHtml.Html):
       item.join(self.categories)
     if self.values is not None:
       item.join(self.values)
+    if self.seriesKey is not None:
+      item.join(self.seriesKey)
     if self.series is not None:
       item.join(self.series)
     item.add(1, '<svg style="width:100%;height:100%;"></svg>')
@@ -210,14 +214,42 @@ class GraphSvG(AresHtml.Html):
     for headerLine in self.header:
       if  headerLine.get('type') == 'series':
         item.add(3, "var serie_%s = '%s';" % (self.htmlId, headerLine.get('key', headerLine['colName'])))
-        self.serieExist = True
+        self.hasSeries = True
         break
 
     else:
       item.add(3, "var serie_%s = '';" % self.htmlId)
     item.add(2, '</script>')
-    self.series = item
+    self.seriesKey = item
 
+  def selectSeries(self):
+    """ """
+    style = '' if len(self.header) > 2 else 'style="display:none"'
+    if self.hasSeries:
+      item = AresItem.Item('Series')
+      item.add(2, '<select id="%s_series_selector" class ="selectpicker" multiple="true" %s>' % (self.htmlId, style))
+    else:
+      item = AresItem.Item('')
+      item.add(2, '<select hidden id="%s_series_selector" class ="selectpicker" multiple="true" %s>' % (
+      self.htmlId, style))
+      item.add(3, '<option value="default" selected>default</option>')
+
+    for headerLine in self.header:
+      if headerLine.get('type') == 'series':
+        if headerLine.get('selectedIdx'):
+          item.add(3, '<option value="All">All</option>')
+        else:
+          item.add(3, '<option value="All" selected>All</option>')
+        for i, val in enumerate(headerLine.get('values', []), 1):
+          if i in headerLine.get('selectedIdx', []):
+            item.add(3, '<option value="%s" selected>%s</option>' % (val, val))
+          else:
+            item.add(3, '<option value="%s">%s</option>' % (val, val))
+    item.add(2, '</select>')
+    self.series = item
+    self.jsEvent['serie-change'] = AresJs.JQueryEvents("%s_series_selector" % self.htmlId,
+                                                       "$('#%s_series_selector')" % self.htmlId,
+                                                       'change', self.update(self.vals), '')
 
   def selectCategory(self):
     """ Return the category to be selected in the graph display """
@@ -272,9 +304,14 @@ class GraphSvG(AresHtml.Html):
     return '$("#%s_col_selector option:selected")'% self.htmlId
 
   @property
-  def jqSeries(self):
+  def jqSeriesKey(self):
     """ Returns the selected category for the graph """
     return 'serie_%s' % self.htmlId
+
+  @property
+  def jqSeries(self):
+    """ """
+    return '$("#%s_series_selector option:selected")'% self.htmlId
 
   @property
   def jqValue(self):
