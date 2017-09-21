@@ -255,6 +255,8 @@ def run_report(report_name, script_name):
       # Users should not be allowed to create env starting with _
       #TODO put in place a control
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+
+    print sys.path
     reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name

@@ -10,10 +10,12 @@ import random
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for _ in range(size))
 
-def getRecordSet():
-  """ """
+def getRecordSet(directory):
+  """
+  """
   recordSet = []
-  multibarRecSet = open(r'C:\Users\Tinels972\PycharmProjects\python-ares\user_reports\JsGraph\data\multiBar.json', 'r')
+  pathMultiBar = os.path.join(directory, 'data', 'multiBar.json')
+  multibarRecSet = open(pathMultiBar)
   data = json.load(multibarRecSet)
   multibarRecSet.close()
   for series in data:
@@ -26,7 +28,7 @@ def call(aresObj):
   """
   [ PLEASE DETAIL YOU SCRIPT HERE ]
   """
-  recordSet = getRecordSet()
+  recordSet = getRecordSet(aresObj.http['DIRECTORY'])
   recordSetJson = open(os.path.join(aresObj.http['DIRECTORY'], 'data', aresObj.http['file_name']), "w")
   json.dump(recordSet, recordSetJson)
   recordSetJson.close()
