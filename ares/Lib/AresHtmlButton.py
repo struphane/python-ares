@@ -37,7 +37,6 @@ class Button(AresHtml.Html):
       https://api.jquery.com/jquery.post/
     """
     # Part dedicated to run before the Ajax call
-
     jsData, pyData = [], []
     for key, data in kwargs.items():
       if key not in ('cssCls', 'js'):
@@ -45,13 +44,14 @@ class Button(AresHtml.Html):
           jsData.append("%s: %s" % (key, data.val))
         else:
           pyData.append("%s='%s'" % (key, data))
-    #
-    print "{%s}" % ",".join(jsData)
+    # Distinguish jsData (to be converted in the javascript layer) from python data
+    # Python data will be converted on the server side and they will never change
+    # on the client
     url = render_template_string('''{{ url_for(\'%s\', %s) }}''' % (url, ",".join(pyData)))
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     preAjax.add(0, kwargs.get('preAjaxJs', ''))
-    #
+    # Return the common post call method to a AresJs object
     super(Button, self).post(evenType, url, "{%s}" % ",".join(jsData),
                              '''
                               var res = JSON.parse(data) ;

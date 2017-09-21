@@ -28,9 +28,9 @@ import inspect
 import collections
 import json
 
-import numpy
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
+  import numpy
   if isinstance(obj, numpy.integer): return int(obj)
   raise TypeError("%s (%s) is not JSON serializable" % (repr(obj), type(obj)))
 
