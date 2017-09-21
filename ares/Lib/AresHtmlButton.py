@@ -152,7 +152,7 @@ class ButtonRefresh(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'refresh'
 
-  def __init__(self, aresObj, vals, recordSet, ajaxScript, cssCls=None):
+  def __init__(self, aresObj, vals, recordSet, ajaxScript, withDataFiles, cssCls=None):
     """
     Instantiate the object and attached the recordSet to the event
     This object will also store the data to a text file.
@@ -160,12 +160,13 @@ class ButtonRefresh(ButtonRemove):
     super(ButtonRefresh, self).__init__(aresObj, vals, cssCls)
     self.ajaxScript = ajaxScript
     self.dataFileName = "%s.json" % id(recordSet)
-    dataPath = os.path.join(aresObj.http['DIRECTORY'], 'data')
-    if not os.path.exists(dataPath):
-      os.makedirs(dataPath)
-    recordSetJson = open(os.path.join(dataPath, self.dataFileName), "w")
-    json.dump(recordSet, recordSetJson)
-    recordSetJson.close()
+    if withDataFiles:
+      dataPath = os.path.join(aresObj.http['DIRECTORY'], 'data')
+      if not os.path.exists(dataPath):
+        os.makedirs(dataPath)
+      recordSetJson = open(os.path.join(dataPath, self.dataFileName), "w")
+      json.dump(recordSet, recordSetJson)
+      recordSetJson.close()
 
   def click(self, jsFnc):
     """ Add the corresponding event when the button is clicked """

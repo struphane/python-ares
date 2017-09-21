@@ -4,7 +4,7 @@ import string
 import random
 import json
 
-import ajax.ajaxUpdate
+import ajaxUpdate
 
 NAME = 'Javascript Test'
 SHORTCUTS = [('Other Links',
@@ -16,7 +16,7 @@ SHORTCUTS = [('Other Links',
 
 def report(aresObj):
   # Write your report here
-  recordSet = ajax.ajaxUpdate.getRecordSet(aresObj.http['DIRECTORY'])
+  recordSet = ajaxUpdate.getRecordSet(aresObj.http['DIRECTORY'])
   multibar = aresObj.multiBarChart(recordSet, [{'key': 'Date', 'colName': 'Date', 'type': 'string'},
                                                {'key': 'Value', 'colName': 'Value', 'type': 'number'},
                                                {'key': 'category', 'colName': 'Series', 'type': 'series'}], 'Graph')

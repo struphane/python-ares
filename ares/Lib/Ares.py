@@ -262,7 +262,7 @@ class Report(object):
 
 
   # Button Section
-  def refresh(self, value, recordSet, ajaxScript, cssCls=None): return self.add(AresHtmlButton.ButtonRefresh(self, value, recordSet, ajaxScript, cssCls), sys._getframe().f_code.co_name)
+  def refresh(self, value, recordSet, ajaxScript, withDataFiles=False, cssCls=None): return self.add(AresHtmlButton.ButtonRefresh(self, value, recordSet, ajaxScript, withDataFiles, cssCls), sys._getframe().f_code.co_name)
   def remove(self, cssCls=None): return self.add(AresHtmlButton.ButtonRemove(self, '', cssCls), sys._getframe().f_code.co_name)
   def download(self, cssCls=None): return self.add(AresHtmlButton.ButtonDownload(self, '', cssCls), sys._getframe().f_code.co_name)
   def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlButton.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)
