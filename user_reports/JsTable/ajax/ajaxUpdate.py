@@ -26,9 +26,9 @@ def call(aresObj):
   [ PLEASE DETAIL YOU SCRIPT HERE ]
   """
   recordSet = getRecordSet()
-  recordSetJson = open(os.path.join(aresObj.http['DIRECTORY'], 'data', aresObj.http['FILE_NAME']), "w")
-  json.dump(recordSet, recordSetJson)
-  recordSetJson.close()
+  #recordSetJson = open(os.path.join(aresObj.http['DIRECTORY'], 'data', aresObj.http['FILE_NAME']), "w")
+  #json.dump(recordSet, recordSetJson)
+  #recordSetJson.close()
 
   # And return the recordSet
   return {"status": "Updated", "data": recordSet, "content": ""}
