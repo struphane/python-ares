@@ -46,6 +46,8 @@ def report(aresObj):
                   %s ;
                ''' % (table.jsUpdate(), pie.jsUpdate())
                )
+  #button.jsFromFile('click', 'loadJs.js', {'table': table.jsUpdate(), 'pie': pie.jsUpdate()})
+
   # pie.selectCategory('Portfolio', ['Portfolio', 'Currency'], table)
   # pie.selectValues('Value 2', ['Value', 'Value 2'], table)
  # pie.linkTo(table)

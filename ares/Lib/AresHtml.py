@@ -8,6 +8,7 @@ Please make sure that all the CSS information are defined in a CSS class
 Aliases must be unique
 """
 
+import os
 import json
 import collections
 import warnings
@@ -100,6 +101,14 @@ class Html(object):
 
   def js(self, evenType, jsDef):
     """ Add a Javascript Event to an HTML object """
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
+
+  def jsFromFile(self, evenType, fileName, variables=None):
+    """ Add a Javascript even by loading a file """
+    jsFile = open(os.path.join(self.aresObj.http["DIRECTORY"], 'js', fileName))
+    jsDef = jsFile.read()
+    if variables is not None:
+      jsDef = jsDef % variables
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
 
   def update(self, data):
