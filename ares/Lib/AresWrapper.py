@@ -23,26 +23,36 @@ from ares.Lib import Ares
 
 
 # CSS imports
-CSS = ['jquery-ui.css',
-       'bootstrap.min.css',
+CSS = ['bootstrap.min.css',
+       'jquery-ui.css',
        'bootstrap-theme.min.css',
        'nv.d3.css',
-       'bootstrap-select.min.css',
+       'svg.css'
        'jquery.dataTables.min.css',
-       #'svg.css'
-       ]
+       'bootstrap-simple-sidebar.css',
+       'font-awesome.min.cs',
+       'metro-bootstrap.min.css',
+       'buttons.dataTables.min.css',
+       'responsive.dataTables.min.css',
+       'bdi.css']
 
 # Javascript imports
 JS = ['jquery-3.2.1.min.js',
       'jquery-ui.min.js',
       'bootstrap.min.js',
-      'bootstrap-select.min.js',
+      'transition.min.js',
+      'collapse.js',
       'd3.v3.js',
-      'ares.js',
-      'jquery.dataTables.min.js',
-      'npm.js',
-      'nv.d3.js', # The mimifyed version does not contain indentedTree objects. https://stackoverflow.com/questions/35452946/not-running-minimal-example-of-indentedtree
-      'd3.layout.cloud.js', # world cloud chart
+      'nv.d3.js',
+      'd3.layout.cloud.js',
+      'colorbrewer.js', # The mimifyed version does not contain indentedTree objects. https://stackoverflow.com/questions/35452946/not-running-minimal-example-of-indentedtree
+      'jquery.dataTables.min.js', # world cloud chart
+      'dataTables.buttons.min.js', # world cloud chart
+      'dataTables.responsive.min.js', # world cloud chart
+      'buttons.colVis.min.js', # world cloud chart
+      'pdfmake.min.js', # world cloud chart
+      'vfs_fonts.js', # world cloud chart
+      'ares.js', # world cloud chart
       ]
 
 
@@ -50,17 +60,16 @@ def getReport(reportModule, results, scriptPath):
   """ Recursively runs all the reports """
   echo("  > Running report %s" % reportModule.__name__)
   aresObj = Ares.Report()
-  aresObj.http['USER_PATH'] = scriptPath
+  aresObj.http['DIRECTORY'] = scriptPath
   results[reportModule.__name__] = reportModule.report(aresObj)
-  for child in getattr(reportModule, 'CHILD_PAGES', {}).values():
-    getReport(child.replace(".py", ""), results, scriptPath)
+
 
 
 if __name__ == '__main__':
   # Run the script locally
-  statisPath = r'..\..\..\static' # the path with the CSS and JS folders (if current path please keep this empty
-  directory = r'C:\Users\Tinels972\PycharmProjects\python-ares\user_reports' # The path of this script by default
-  report = "jsGraph" # The name of the main script with the report
+  statisPath = r'http://127.0.0.1:5000/static' # the path with the CSS and JS folders (if current path please keep this empty
+  directory = r'E:\GitHub\Ares\localtests' # The path of this script by default
+  report = "JsGraph" # The name of the main script with the report
   result_folder = 'html'
 
   # This will move all the results in a html folder
@@ -80,8 +89,11 @@ if __name__ == '__main__':
 
   res = {}
   sys.path.append(os.path.join(directory, report))
-  print(os.path.join(directory, report))
-  getReport(__import__(report), res, directory)
+  directoryPath = os.path.join(directory, report)
+  ajaxPath = os.path.join(directory, report, 'ajax')
+  if os.path.exists(ajaxPath):
+    sys.path.append(ajaxPath)
+  getReport(__import__(report), res, directoryPath)
 
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")
@@ -89,11 +101,11 @@ if __name__ == '__main__':
     htmlFile.write(header)
     htmlFile.write("\n  <script>\n")
     htmlFile.write(jsOnload)
-    htmlFile.write("\n  </script>\n</head>\n<body>\n<div class='container' id='html_content'>\n")
+    htmlFile.write("\n  </script>\n</head>\n<body oncontextmenu='return false;' style='background-color: #EAEAEA'>\n<div id='wrapper'>\n<div class='container' id='html_content'>\n")
     htmlFile.write(html)
     htmlFile.write("\n<script>\n")
     htmlFile.write(js)
-    htmlFile.write("\n</script>\n</div>")
+    htmlFile.write("\n</script>\n</div></div>")
     htmlFile.write(footer)
     htmlFile.close()
 
