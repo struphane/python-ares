@@ -14,7 +14,7 @@ import time
 import collections
 import six
 
-import ajax.AresRefreshScripts
+import AresRefreshScripts
 
 from ares.Lib import Ares
 
@@ -50,8 +50,8 @@ def report(aresObj):
 
   scriptUpdate = None
 
-  recordSet = ajax.AresRefreshScripts.getRecordSet(aresObj, directory)
-  ajaxRecordSet = ajax.AresRefreshScripts.getRecordSet(aresObj, os.path.join(directory, 'ajax'))
+  recordSet = AresRefreshScripts.getRecordSet(aresObj, directory)
+  ajaxRecordSet = AresRefreshScripts.getRecordSet(aresObj, os.path.join(directory, 'ajax'))
 
   aresLogFile = os.path.join(directory, 'log_ares.dat')
   folderEvents = collections.defaultdict(int)

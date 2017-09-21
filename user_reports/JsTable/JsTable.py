@@ -5,7 +5,7 @@ import random
 import json
 import Lib.FlexFnc
 
-import ajax.ajaxUpdate
+import ajaxUpdate
 
 NAME = 'Javascript Test'
 SHORTCUTS = [('Other Links',
@@ -17,7 +17,7 @@ SHORTCUTS = [('Other Links',
 
 def report(aresObj):
   # Write your report here
-  recordSet = ajax.ajaxUpdate.getRecordSet()
+  recordSet = ajaxUpdate.getRecordSet()
   table = aresObj.table(recordSet, [
                                     #[{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                     # {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},

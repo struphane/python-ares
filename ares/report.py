@@ -242,21 +242,24 @@ def run_report(report_name, script_name):
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-      sys.path.append(userDirectory)
-      if os.path.exists(os.path.join(userDirectory, 'ajax')):
-        sys.path.append(os.path.join(userDirectory, 'ajax'))
+      if not userDirectory in sys.path:
+        sys.path.append(userDirectory)
+      ajaxPath = os.path.join(userDirectory, 'ajax')
+      if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
+        sys.path.append(ajaxPath)
     else:
-      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
-      sys.path.append(userDirectory)
-      if os.path.exists(os.path.join(userDirectory, 'ajax')):
-        sys.path.append(os.path.join(userDirectory, 'ajax'))
+      systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
+      if not systemDirectory in sys.path:
+        sys.path.append(systemDirectory)
+      ajaxPath = os.path.join(systemDirectory, 'ajax')
+      if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
+        sys.path.append(ajaxPath)
 
       # In this context we need the generic user directory as we are in a system report
       # Users should not be allowed to create env starting with _
       #TODO put in place a control
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
 
-    print sys.path
     reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
@@ -286,10 +289,14 @@ def run_report(report_name, script_name):
   finally:
     # Try to unload the module
     if not report_name.startswith("_"):
-      if report_name in sys.modules:
-        del sys.modules[report_name]
-      if script_name in sys.modules:
-        del sys.modules[script_name]
+      sys.path.remove(userDirectory)
+      if os.path.exists(os.path.join(userDirectory, 'ajax')):
+        sys.path.remove(os.path.join(userDirectory, 'ajax'))
+
+      for module, ss in sys.modules.items():
+        if userDirectory in str(ss):
+          del sys.modules[module]
+
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
