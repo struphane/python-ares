@@ -10,41 +10,50 @@ from __future__ import print_function
 
 import requests
 import json
-import os
 
-from click import echo
 
-reportName = 'HelloWorld'
-projectLocalPath = os.path.join(os.getcwd(), reportName)
-filename = 'HelloWorld.py'
+reportName = 'Youpi'
+projectLocalPath = r'E:\GitHub\Ares\localtests\%s' % reportName
+
+# Possible category of reports
+# report - For a bespoke python report which will have a defined display
+# ajax - For a python service. This will not display anything but return dictionaries
+# configuration - For static configuration files. Extension .json
+# js - For javascript templates (like text files)
+filenames = [('Test.py', 'report'),
+             ]
 
 # The Url to be used in order to create the environments in Ares
 # This will allow the use of scripts instead of the web interface
 serverPath = 'http://127.0.0.1:5000'
-postUrlDeploy = r'%s/reports/upload/%s' % (serverPath, reportName)
+postUrlDeploy = r'%s/reports/upload/%s/%s'
 postUrlCreate = r'%s/reports/create/env' % serverPath
 postUrlFolderCreate = r'%s/reports/folder/create' % serverPath
 postUrlScriptVersion = r"%s/reports/ares/version" % serverPath
-withEnvCreation = True
+withEnvCreation = False
 
-def uploadFile(filename):
+def uploadFile(filename, fileType):
   """ Upload a file on the server """
+  if withEnvCreation:
+    response = requests.post(postUrlCreate, {'REPORT_NAME': reportName})
+    if response.status_code == 500:
+      print("########################################")
+      print("Problem in the environment creation")
+      print("########################################")
+      print(response.text)
+
   files = {'file': open(r"%s\%s" % (projectLocalPath, filename))}
-  response = requests.post(postUrlDeploy, files=files)
+  response = requests.post(postUrlDeploy % (serverPath, fileType, reportName), files=files)
   if response.status_code == 500:
-    echo("########################################")
-    echo("The environment is potentially missing")
-    echo("########################################")
-    if withEnvCreation:
-      response = requests.post(postUrlCreate, {'REPORT': reportName})
-      files = {'file': open(r"%s\%s" % (projectLocalPath, filename))}
-      response = requests.post(postUrlDeploy, files=files)
-      echo(response)
+    print("########################################")
+    print("The environment is potentially missing")
+    print("########################################")
+    print(response.text)
 
 def createFolders(folders):
   """ Create a folder on the server """
   response = requests.post(postUrlFolderCreate, {'REPORT_NAME': reportName, 'FOLDERS': "/".join(folders)})
-  echo(response)
+  print(response)
 
 def getPackageVersion():
   """  Check the version of the files on the server to ensure that the framework runs with the last version
@@ -54,7 +63,8 @@ def getPackageVersion():
   """
   # TODO add the comparison in the RIskLab shared folder
   response = requests.post(postUrlScriptVersion)
-  echo(json.loads(response.text))
+  print(json.loads(response.text))
 
 #createFolders(['aa', 'bb'])
-uploadFile(filename)
+for filename, fileType in filenames:
+  uploadFile(filename, fileType)

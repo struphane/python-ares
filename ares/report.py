@@ -308,13 +308,17 @@ def ajaxCreate():
   This service will create the environment and also add an emtpy report.
   The log file will be produce and the zip archive with the history will be defined
   """
+
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
   reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   reportObj.http['ARES_TMPL'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl')
-  scriptName = "%s.py" % reportObj.http['report_name']
-  scriptPath = os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'])
-  log = AresLog.AresLog(current_app.config['ROOT_PATH'], reportObj.http['report_name'], config)
+  scriptName = "%s.py" % reportObj.http['REPORT_NAME']
+  scriptPath = os.path.join(reportObj.http['DIRECTORY'], reportObj.http['REPORT_NAME'])
+  if scriptName.startswith("_"):
+    return json.dumps("Environment Name cannot start with _"), 500
+
+  log = AresLog.AresLog(current_app.config['ROOT_PATH'], reportObj.http['REPORT_NAME'], config)
   if not os.path.exists(scriptPath):
     os.makedirs(scriptPath)
     log.createFolder()
@@ -323,9 +327,9 @@ def ajaxCreate():
     fileFullPath = os.path.join(scriptPath, scriptName)
     with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
       zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
-    return json.dumps("New environment created: %s" % scriptName)
+    return json.dumps("New environment created: %s" % scriptName), 200
 
-  return json.dumps("Existing Environment")
+  return json.dumps("Existing Environment"), 200
 
 # TODO Replace by AresAddScript Service
 @report.route("/add/file", methods = ['POST', 'GET'])
@@ -433,21 +437,36 @@ def ajaxCall(report_name, script):
 
   return json.dumps(result)
 
-@report.route("/upload/<report_name>", methods = ['POST'])
-def uploadFiles(report_name):
+@report.route("/upload/<report_type>/<report_name>", methods = ['POST'])
+def uploadFiles(report_type, report_name):
   """ Add all the files that a users will drag and drop in the section """
   result = []
-  if request.method == 'POST':
-    postParams = {}
-    for postValues in request.form.items():
-      postParams[postValues[0]] = postValues[1]
+  reportTypes = {'report': ('.py', None), 'configuration': ('.json', 'config'),
+                 'ajax': ('.py', 'ajax'), 'javascript': ('.js', 'js')}
+  if not report_type in reportTypes:
+    return json.dumps('Error %s category not recognized !' % report_type), 500
 
+  if report_name.startswith("_"):
+    return json.dumps("Environment Name cannot start with _"), 500
+
+  if request.method == 'POST':
+    ext, path = reportTypes[report_type]
+    postParams = getHttpParams(request)
     for filename, fileType in request.files.items():
       file = request.files[filename]
+      if not file.filename.endswith(ext):
+        return json.dumps('File extension %s not recognized for this category %s  !' % (ext, report_type)), 500
+
       if 'DESTINATION' in postParams:
         fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['DESTINATION'], file.filename)
       else:
-        fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
+        if path is None:
+          fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
+        else:
+          filePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, path)
+          if not os.path.exists(filePath):
+            os.makedirs(filePath)
+          fileFullPath = os.path.join(filePath, file.filename)
       file.save(fileFullPath)
       appendToLog(report_name, 'UPLOAD', file.filename)
 
