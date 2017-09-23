@@ -167,10 +167,8 @@ class Report(object):
   def suppRec(self, recordSet):
     for rec in recordSet:
       for val in rec.values():
-        try:
+        if id(val) in self.content:
           del self.content[self.content.index(id(val))]
-        except:
-          echo("PROBLEME")
 
     return recordSet
 
@@ -183,20 +181,17 @@ class Report(object):
       for htmlObj in htmlObjs:
         if isinstance(htmlObj, list):
           for val in htmlObj:
-            try:
-              del self.content[self.content.index(id(val))]
-            except:
-              echo("PROBLEME")
+            idObj = id(val)
+            if idObj in self.content:
+              del self.content[self.content.index(idObj)]
         else:
-          try:
-            del self.content[self.content.index(id(htmlObj))]
-          except:
-            echo("PROBLEME")
+          idObj = id(htmlObj)
+          if idObj in self.content:
+              del self.content[self.content.index(idObj)]
     else:
-      try:
-        del self.content[self.content.index(id(htmlObjs))]
-      except:
-        echo("PROBLEME")
+      idObj = id(htmlObjs)
+      if idObj in self.content:
+        del self.content[self.content.index(idObj)]
     return htmlObjs
 
   def addTo(self, container, htmlObj):
