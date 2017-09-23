@@ -435,7 +435,7 @@ class Report(object):
     for objId in self.content:
       jsOnload, html, js = self.htmlItems[objId].html()
       for ref, data in self.jsRegistered.items():
-        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data)))
+        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
       for onloadFnc in jsOnload:
         onloadParts.add(onloadFnc)
       htmlParts.append(html)
