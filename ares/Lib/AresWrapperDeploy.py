@@ -10,29 +10,19 @@ from __future__ import print_function
 
 import requests
 import json
-
-
-reportName = 'Youpi'
-projectLocalPath = r'E:\GitHub\Ares\localtests\%s' % reportName
-
-# Possible category of reports
-# report - For a bespoke python report which will have a defined display
-# ajax - For a python service. This will not display anything but return dictionaries
-# configuration - For static configuration files. Extension .json
-# js - For javascript templates (like text files)
-filenames = [('Test.py', 'report'),
-             ]
+import os
+import AresWrapper
 
 # The Url to be used in order to create the environments in Ares
 # This will allow the use of scripts instead of the web interface
-serverPath = 'http://127.0.0.1:5000'
-postUrlDeploy = r'%s/reports/upload/%s/%s'
-postUrlCreate = r'%s/reports/create/env' % serverPath
-postUrlFolderCreate = r'%s/reports/folder/create' % serverPath
-postUrlScriptVersion = r"%s/reports/ares/version" % serverPath
+SERVER_PATH = 'http://127.0.0.1:5000'
+postUrlDeploy = AresWrapper.SERVER_PATH + r'/reports/upload/%s/%s'
+postUrlCreate = r'%s/reports/create/env' % AresWrapper.SERVER_PATH
+postUrlFolderCreate = r'%s/reports/folder/create' % AresWrapper.SERVER_PATH
+postUrlScriptVersion = r"%s/reports/ares/version" % AresWrapper.SERVER_PATH
 withEnvCreation = False
 
-def uploadFile(filename, fileType):
+def uploadFiles(files, reportName, withEnvCreation=False):
   """ Upload a file on the server """
   if withEnvCreation:
     response = requests.post(postUrlCreate, {'REPORT_NAME': reportName})
@@ -42,18 +32,14 @@ def uploadFile(filename, fileType):
       print("########################################")
       print(response.text)
 
-  files = {'file': open(r"%s\%s" % (projectLocalPath, filename))}
-  response = requests.post(postUrlDeploy % (serverPath, fileType, reportName), files=files)
-  if response.status_code == 500:
-    print("########################################")
-    print("The environment is potentially missing")
-    print("########################################")
-    print(response.text)
-
-def createFolders(folders):
-  """ Create a folder on the server """
-  response = requests.post(postUrlFolderCreate, {'REPORT_NAME': reportName, 'FOLDERS': "/".join(folders)})
-  print(response)
+  for filename, fileType in files:
+    files = {'file': open(os.path.join(os.getcwd(), reportName, filename))}
+    response = requests.post(postUrlDeploy % (fileType, reportName), files=files)
+    if response.status_code == 500:
+      print("########################################")
+      print("The environment is potentially missing")
+      print("########################################")
+      print(response.text)
 
 def getPackageVersion():
   """  Check the version of the files on the server to ensure that the framework runs with the last version
@@ -65,6 +51,23 @@ def getPackageVersion():
   response = requests.post(postUrlScriptVersion)
   print(json.loads(response.text))
 
-#createFolders(['aa', 'bb'])
-for filename, fileType in filenames:
-  uploadFile(filename, fileType)
+if __name__ == '__main__':
+  #createFolders(['aa', 'bb'])
+  # Possible category of reports
+  # report - For a bespoke python report which will have a defined display
+  # ajax - For a python service. This will not display anything but return dictionaries
+  # configuration - For static configuration files. Extension .json
+  # js - For javascript templates (like text files with a js extension)
+  # views - For view configuration (like text files extension .txt)
+  files = [('Test.py', 'report'),
+
+          ]
+
+  # Function used to send files to the server
+  uploadFiles(files, AresWrapper.REPORT, withEnvCreation=False)
+
+
+  # Function used to check your version of your local package
+  # This will warn you if you have some important module not in line with the ones on the server
+  # If your modules are not in line this might not work when you will deploy
+  # getPackageVersion)_

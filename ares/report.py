@@ -66,7 +66,7 @@ def getHttpParams(request):
   httpParams['CONFIG']['WRK'] = config.WORK_PATH
   return httpParams
 
-def getFileName(script, ext):
+def getFileName(script, exts):
   """ Return the filename with the expected extension
 
   This is just to ensure that users will not make eny mistake in the filenames
@@ -75,11 +75,11 @@ def getFileName(script, ext):
   If the extension is not expected, it will return None
   """
   scriptName, file_extension = os.path.splitext(script)
-  if file_extension == ext:
+  if file_extension in exts:
     return script
 
   if file_extension == '':
-    return "%s%s" % (scriptName, ext)
+    return "%s%s" % (scriptName, exts[0])
 
   return None
 
@@ -327,6 +327,8 @@ def ajaxCreate():
     fileFullPath = os.path.join(scriptPath, scriptName)
     with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
       zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
+
+    os.makedirs(os.path.join(scriptPath, 'output'))
     return json.dumps("New environment created: %s" % scriptName), 200
 
   return json.dumps("Existing Environment"), 200
@@ -346,7 +348,7 @@ def addScripts():
 
   scriptName, file_extension = os.path.splitext(reportObj.http['script'])
   if reportObj.http['script_type'] == 'Report':
-    scriptName = getFileName(reportObj.http['script'], '.py')
+    scriptName = getFileName(reportObj.http['script'], ['.py'])
     if scriptName is None:
       return json.dumps('Not script created, extension %s not recognised' % file_extension)
 
@@ -365,7 +367,7 @@ def addScripts():
       initFile = open(os.path.join(ajaxPath, "__init__.py"), "w")
       initFile.close()
 
-    scriptName = getFileName(reportObj.http['script'], '.py')
+    scriptName = getFileName(reportObj.http['script'], ['.py'])
     if scriptName is None:
       return json.dumps('Not script created, extension %s not recognised' % file_extension)
 
@@ -377,7 +379,7 @@ def addScripts():
     return json.dumps('New Script added: %s' % scriptName)
 
   elif reportObj.http['script_type'] == 'Javascript':
-    scriptName = getFileName(reportObj.http['script'], '.js')
+    scriptName = getFileName(reportObj.http['script'], ['.js'])
     if scriptName is None:
       return json.dumps('Not script created, extension %s not recognised' % file_extension)
 
@@ -389,7 +391,19 @@ def addScripts():
     return json.dumps('New Script added: %s' % scriptName)
 
   elif reportObj.http['script_type'] == 'Configuration':
-    scriptName = getFileName(reportObj.http['script'], '.json')
+    scriptName = getFileName(reportObj.http['script'], ['.json'])
+    if scriptName is None:
+      return json.dumps('Not script created, extension %s not recognised' % file_extension)
+
+    configPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'config')
+    if not os.path.exists(configPath):
+      os.makedirs(configPath)
+    newFile = open(os.path.join(configPath, scriptName), "w")
+    newFile.close()
+    return json.dumps('New configuration file available: %s' % scriptName)
+
+  elif reportObj.http['script_type'] == 'views':
+    scriptName = getFileName(reportObj.http['script'], ['.txt'])
     if scriptName is None:
       return json.dumps('Not script created, extension %s not recognised' % file_extension)
 

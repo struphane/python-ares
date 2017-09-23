@@ -16,11 +16,12 @@ Ares documentation is available here:
 from __future__ import print_function
 import os
 import sys
-
-from click import echo
-
 from ares.Lib import Ares
 
+# Path for the server on which you are testing the report
+# The name of the report you are working on (The folder name)
+SERVER_PATH = 'http://127.0.0.1:5000'
+REPORT = "JsGraph" # The name of the main script with the report
 
 # CSS imports
 CSS = ['bootstrap.min.css',
@@ -67,33 +68,31 @@ def getReport(reportModule, results, scriptPath):
 
 if __name__ == '__main__':
   # Run the script locally
-  statisPath = r'http://127.0.0.1:5000/static' # the path with the CSS and JS folders (if current path please keep this empty
-  directory = r'E:\GitHub\Ares\localtests' # The path of this script by default
-  report = "JsGraph" # The name of the main script with the report
-  result_folder = 'html'
 
+  result_folder = 'html'
+  directory = os.getcwd() # The path of this script by default
   # This will move all the results in a html folder
   # It only work locally
-  path = os.path.join(directory, result_folder, report)
+  path = os.path.join(directory, result_folder, REPORT)
   if not os.path.exists(path):
     os.makedirs(path)
-  if not statisPath:
+  if not SERVER_PATH:
     localPathSize = len(os.path.split(path))
     if os.path.split(path)[0] == '':
       localPathSize -= 1
-    statisPath = os.path.join(*[".." for i in range(localPathSize)])
+    SERVER_PATH = os.path.join(*[".." for i in range(localPathSize)])
 
   # Create the generic headers and footers
-  header = Ares.htmlLocalHeader(statisPath, CSS, JS)
+  header = Ares.htmlLocalHeader(r"%s/static" % SERVER_PATH, CSS, JS)
   footer = Ares.htmlLocalFooter()
 
   res = {}
-  sys.path.append(os.path.join(directory, report))
-  directoryPath = os.path.join(directory, report)
-  ajaxPath = os.path.join(directory, report, 'ajax')
+  sys.path.append(os.path.join(directory, REPORT))
+  directoryPath = os.path.join(directory, REPORT)
+  ajaxPath = os.path.join(directory, REPORT, 'ajax')
   if os.path.exists(ajaxPath):
     sys.path.append(ajaxPath)
-  getReport(__import__(report), res, directoryPath)
+  getReport(__import__(REPORT), res, directoryPath)
 
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")
