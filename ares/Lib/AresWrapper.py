@@ -21,7 +21,7 @@ from ares.Lib import Ares
 # Path for the server on which you are testing the report
 # The name of the report you are working on (The folder name)
 SERVER_PATH = 'http://127.0.0.1:5000'
-REPORT = "JsGraph" # The name of the main script with the report
+REPORT = "Youpi" # The name of the main script with the report
 
 # CSS imports
 CSS = ['bootstrap.min.css',
@@ -57,12 +57,23 @@ JS = ['jquery-3.2.1.min.js',
       ]
 
 
-def getReport(reportModule, results, scriptPath):
+def getReport(results, scriptPath):
   """ Recursively runs all the reports """
-  echo("  > Running report %s" % reportModule.__name__)
-  aresObj = Ares.Report()
-  aresObj.http['DIRECTORY'] = scriptPath
-  results[reportModule.__name__] = reportModule.report(aresObj)
+  for report in os.listdir(scriptPath):
+    if report.endswith(".py"):
+      reportModule = __import__(report.replace(".py", ""))
+      if hasattr(reportModule, 'report'):
+        print("  > Loading report %s" % report)
+        aresObj = Ares.Report()
+        aresObj.http['DIRECTORY'] = scriptPath
+        aresObj.http['REPORT_NAME'] = report.replace(".py", "")
+        try:
+          results[reportModule.__name__] = reportModule.report(aresObj)
+        except Exception as e:
+          print("Error with report %s" % report)
+          print(e)
+      else:
+        print("Module ignore %s" % report)
 
 
 
@@ -87,12 +98,12 @@ if __name__ == '__main__':
   footer = Ares.htmlLocalFooter()
 
   res = {}
-  sys.path.append(os.path.join(directory, REPORT))
   directoryPath = os.path.join(directory, REPORT)
+  sys.path.append(directoryPath)
   ajaxPath = os.path.join(directory, REPORT, 'ajax')
   if os.path.exists(ajaxPath):
     sys.path.append(ajaxPath)
-  getReport(__import__(REPORT), res, directoryPath)
+  getReport(res, directoryPath)
 
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")
