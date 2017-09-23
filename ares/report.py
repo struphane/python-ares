@@ -89,6 +89,7 @@ def noCache(f):
     return resp
   return respFunc
 
+#TO BE REMOVED
 @report.route("/doc/html")
 @report.route("/child:dsc/html")
 def report_dsc_html():
@@ -119,17 +120,7 @@ def report_dsc_html():
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
-@report.route("/child:dsc/html/<chartName>")
-def report_dsc_html_details(chartName):
-  """ """
-  aresObj = Ares.Report()
-  aresObj.reportName = 'dsc/html'
-  aresObj.childPages = {}
-  aresObj.title(chartName)
-  getattr(aresObj, chartName)('Youpi')
-  onload, content, js = aresObj.html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
-
+#TO BE REMOVED
 @report.route("/doc/graph")
 @report.route("/child:dsc/graph")
 def report_dsc_graph():
@@ -190,10 +181,17 @@ def report_dsc_graph_details(chartName):
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
-@report.route("/html/<objectName>")
-def report_html_description(objectName):
-  """ Function to return teh html defition of an object """
-
+# ------------------------------------------------------------------------------------------------------------
+# Section dedicated to run the reports on the servers
+#
+# All the reports will use one of the two common entry points as below
+#     - run_report, for the main reports. The ones which can be run directly
+#     - ajaxCall, for the services used by reports to refresh data
+#
+# No other entries is posslble and the structure of the local environment should be as defined in the wiki
+# Please make sure that this script is never shared and also that no user env start with a _
+# _ is dedicated to internal environments (for BDI only)
+# ------------------------------------------------------------------------------------------------------------
 @report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
 @report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
 @report.route("/run/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
@@ -270,6 +268,46 @@ def run_report(report_name, script_name):
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
+@report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
+def ajaxCall(report_name, script):
+  """ Generic Ajax call """
+  onload, js, error = '', '', False
+  try:
+    reportObj = Ares.Report()
+    reportObj.http = getHttpParams(request)
+    if report_name.startswith("_"):
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
+      sys.path.append(userDirectory)
+      # TODO Improve the __import__ to not have to append the ajax path to the sys.path
+      sys.path.append(os.path.join(userDirectory, 'ajax'))
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['USER_SCRIPT'])
+    else:
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+      sys.path.append(userDirectory)
+      sys.path.append(os.path.join(userDirectory, 'ajax'))
+    reportObj.http['FILE'] = None
+    reportObj.http['REPORT_NAME'] = report_name
+    reportObj.http['DIRECTORY'] = userDirectory
+    reportObj.reportName = report_name
+    mod = __import__(script.replace(".py", ""))
+    result = mod.call(reportObj)
+  except Exception as e:
+    content = traceback.format_exc()
+    error = True
+  finally:
+    if script in sys.modules:
+      del sys.modules[script]
+
+  if error:
+    return json.dumps(content)
+
+  return json.dumps(result)
+
+
+
+# ------------------------------------------------------------------------------------------------------------
+# Section dedicated to
+# ------------------------------------------------------------------------------------------------------------
 @report.route("/create/env", methods = ['POST', 'GET'])
 def ajaxCreate():
   """ Special Ajax call to set up the environment
@@ -385,40 +423,8 @@ def addScripts():
 
   return json.dumps("No Event %s defined..." % reportObj.http['script_type'])
 
-@report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
-def ajaxCall(report_name, script):
-  """ Generic Ajax call """
-  onload, js, error = '', '', False
-  try:
-    reportObj = Ares.Report()
-    reportObj.http = getHttpParams(request)
-    if report_name.startswith("_"):
-      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
-      sys.path.append(userDirectory)
-      # TODO Improve the __import__ to not have to append the ajax path to the sys.path
-      sys.path.append(os.path.join(userDirectory, 'ajax'))
-      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['USER_SCRIPT'])
-    else:
-      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-      sys.path.append(userDirectory)
-      sys.path.append(os.path.join(userDirectory, 'ajax'))
-    reportObj.http['FILE'] = None
-    reportObj.http['REPORT_NAME'] = report_name
-    reportObj.http['DIRECTORY'] = userDirectory
-    reportObj.reportName = report_name
-    mod = __import__(script.replace(".py", ""))
-    result = mod.call(reportObj)
-  except Exception as e:
-    content = traceback.format_exc()
-    error = True
-  finally:
-    if script in sys.modules:
-      del sys.modules[script]
 
-  if error:
-    return json.dumps(content)
 
-  return json.dumps(result)
 
 @report.route("/upload/<report_type>/<report_name>", methods = ['POST'])
 def uploadFiles(report_type, report_name):
