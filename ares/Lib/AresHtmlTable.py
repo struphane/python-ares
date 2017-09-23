@@ -3,6 +3,8 @@
 
 """
 
+import os
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 
@@ -18,12 +20,20 @@ class Table(AresHtml.Html):
   Default class parameters
     - CSS Default Class = table
 
+  The only parameter defined during the Datatable definition are
+      - data: data will be attached directly to the recordSet
+      - pageLength: This will be set by default to 50 but it can be changed in the object by changing pageLength
+      - columns: This will be deduced automatically from the header definition
+
+  For more details regarding the datatable configuration please refer directly to the
+  web page. All the documentation will be available
   """
   cssCls, alias = 'table', 'table'
-  refernce = 'https://www.w3schools.com/css/css_table.asp'
+  reference = 'https://datatables.net/'
   filt, filtId = None, None
   linkedObjs = None
   pageLength = 50
+  jsTableConf = ''
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
@@ -165,6 +175,13 @@ class Table(AresHtml.Html):
     for htmlObj in htmlObjs:
       self.linkedObjs.append(htmlObj.update(self.getData()))
 
+  def jsConfFromFile(self, fileName, attr=None):
+    """ Load some extra parameters from a javascript file """
+    configFile = open(os.path.join(self.aresObj.http["DIRECTORY"], 'js', fileName))
+    content = configFile.read()
+    configFile.close()
+    self.jsTableConf = content % attr if attr is not None else content
+
   def onLoadFnc(self):
     """ Return a String with the Javascript method to put in the HTML report """
     #item = AresItem.Item("var %s;" % self.htmlId)
@@ -173,46 +190,36 @@ class Table(AresHtml.Html):
       item.add(1, '''
                     %s.DataTable(
                       {
+                        bJQueryUI: true,
                         data: recordSet_%s ,
                         pageLength: %s,
                         columns: [
                                     %s,
                               ],
-
-                        dom: 'Bfrtip',
-                                        buttons: [
-                                              {
-                                                  extend: 'colvis',
-                                                  collectionLayout: 'fixed two-column'
-                                              }
-                                        ],
-
-                        fixedHeader: true,
-                        fnDrawCallback: function( oSettings ) {
-                                            // Add the linked functions here
-                                            %s
-                                        }
+                        %s
+                       // fnDrawCallback: function( oSettings ) {
+                       //                     // Add the linked functions here
+                       //                     %s
+                       //                 }
+                       // "\n".join(self.linkedObjs)
                       }
                     ) ;
-                  ''' % (self.jqId, self.recordSetId, self.pageLength, ",".join(self.recordSetHeader), "\n".join(self.linkedObjs)))
+                  ''' % (self.jqId, self.recordSetId, self.pageLength, ",".join(self.recordSetHeader), self.jsTableConf))
     else:
       item.add(1, '''
                   // createdRow
-                  %s = %s.DataTable(
+                  // responsive: true,
+                  var %s = %s.DataTable(
                                      {
-                                        responsive: true,
+                                        bJQueryUI: true,
+                                        sDom: 'l<"H"Rf>t<"F"ip>',
                                         pageLength: %s,
                                         data: recordSet_%s ,
                                         columns: [
                                                     %s
                                               ],
-                                        dom: 'Bfrtip',
-                                        buttons: [
-                                              {
-                                                  extend: 'colvis',
-                                                  collectionLayout: 'fixed two-column'
-                                              }
-                                        ],
+
+                                        %s
 
                                         //headerCallback( thead, data, start, end, display ) {
                                         //      alert(display.toSource());
@@ -221,7 +228,8 @@ class Table(AresHtml.Html):
                                      }
                   ) ;
 
-                  ''' % (self.htmlId, self.jqId, self.pageLength, self.recordSetId, ",".join(self.recordSetHeader)))
+                  ''' % (self.htmlId, self.jqId, self.pageLength, self.recordSetId, ",".join(self.recordSetHeader),
+                         self.jsTableConf))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)
@@ -247,3 +255,42 @@ class Table(AresHtml.Html):
       item.add(0, ") ;")
     return str(item)
 
+  def click(self, jsFnc):
+    """
+    Add a Click event feature
+
+    The below example will display the column script from the row
+    rowData[0] is a javascript dictionary with key and values
+
+    $('#%s').on('click', 'tr', function () {
+        var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
+        alert( 'You clicked on ' + rowData[0].script + ' row' );
+        }
+    );
+    """
+    self.jsEvent['click'] = '''
+      $('#%s').on('click', 'tr', function () {
+          %s
+          }
+      );
+      ''' % (self.htmlId, jsFnc)
+
+  def contextMenu(self, jsFnc):
+    """
+    Add a Click event feature
+
+    The below example will display the column script from the row
+    rowData[0] is a javascript dictionary with key and values
+
+    $('#%s').on('click', 'tr', function () {
+        var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
+        alert( 'You clicked on ' + rowData[0].script + ' row' );
+        }
+    );
+    """
+    self.jsEvent['contextmenu'] = '''
+      $('#%s').on('contextmenu', 'tr', function () {
+          %s
+          }
+      );
+      ''' % (self.htmlId, jsFnc)
