@@ -25,7 +25,7 @@ import config
 from ares.Lib import Ares
 from ares.Lib import AresLog
 
-from ares import report_doc_local, report_doc_graph
+from ares import report_doc_graph
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -131,14 +131,6 @@ def report_dsc_html_details(chartName):
   getattr(aresObj, chartName)('Youpi')
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
-
-@report.route("/doc/local")
-def report_dsc_local_details():
-  aresObj = Ares.Report()
-  aresObj.childPages = getattr(report_doc_local, 'CHILD_PAGES', {})
-  aresObj.reportName = None
-  onload, content, js = report_doc_local.report(aresObj).html()
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
 @report.route("/doc/graph")
 @report.route("/child:dsc/graph")
