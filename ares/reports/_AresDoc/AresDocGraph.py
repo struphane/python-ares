@@ -1,1 +1,9 @@
-__author__ = 'HOME'
+"""
+
+"""
+
+NAME = 'Graphs'
+
+def report(aresObj):
+  """
+  """

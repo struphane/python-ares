@@ -25,8 +25,6 @@ import config
 from ares.Lib import Ares
 from ares.Lib import AresLog
 
-from ares import report_doc_graph
-
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
 # Return the list of all the scripts needed to run this package
@@ -195,27 +193,6 @@ def report_dsc_graph_details(chartName):
 @report.route("/html/<objectName>")
 def report_html_description(objectName):
   """ Function to return teh html defition of an object """
-
-@report.route("/test/graphs")
-def run_test_graph():
-  import inspect
-  from ares.Lib import AresHtmlGraph
-  from ares.Lib import AresTest
-
-  aresObj = Ares.Report()
-  aresObj.reportName = 'Test Graphs'
-  excludeTestsLst = ['JsGraph', 'IndentedTree', 'NVD3Chart'] + AresTest.GRAPH['exclude']
-  for name, obj in inspect.getmembers(AresHtmlGraph):
-    if inspect.isclass(obj) and name not in excludeTestsLst:
-      try:
-        mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, obj.mockData)
-        with open(mokfilePath) as data_file:
-          data = data_file.read()
-        getattr(aresObj, obj.alias)('', data)
-      except Exception as e:
-        aresObj.addNotification('WARNING', 'No chart %s' % name, str(e))
-  onload, content, js = report_doc_graph.report(aresObj).html()
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js)
 
 @report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
 @report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})

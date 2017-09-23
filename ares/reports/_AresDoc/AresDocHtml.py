@@ -20,7 +20,8 @@ def report(aresObj):
       for item in module_info.values():
         classNames.append({'Class': aresObj.main(item.name, cssCls='', **{'report_name': '_AresDoc',
                                                                           'script_name': 'AresDocHtmlItem',
-                                                                          'html_class': item.name
+                                                                          'html_class': item.name,
+                                                                          'html_alias': 'anchor'
                                                                           }),
                            'Ares Module': aresMod})
   aresObj.table(classNames, [{'colName': 'Class', 'type': 'object'},
