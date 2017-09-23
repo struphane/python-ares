@@ -7,6 +7,7 @@ import os
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
+from flask import render_template_string
 
 
 class Table(AresHtml.Html):
@@ -33,7 +34,7 @@ class Table(AresHtml.Html):
   filt, filtId = None, None
   linkedObjs = None
   pageLength = 50
-  jsTableConf = ''
+  jsTableConf, jsMenu, jsClick = '', '', ''
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
@@ -190,7 +191,6 @@ class Table(AresHtml.Html):
       item.add(1, '''
                     %s.DataTable(
                       {
-                        bJQueryUI: true,
                         data: recordSet_%s ,
                         pageLength: %s,
                         columns: [
@@ -204,14 +204,18 @@ class Table(AresHtml.Html):
                        // "\n".join(self.linkedObjs)
                       }
                     ) ;
-                  ''' % (self.jqId, self.recordSetId, self.pageLength, ",".join(self.recordSetHeader), self.jsTableConf))
+
+                  %s
+
+                  %s
+                  ''' % (self.jqId, self.recordSetId, self.pageLength, ",".join(self.recordSetHeader),
+                         self.jsTableConf, self.jsMenu, self.jsClick))
     else:
       item.add(1, '''
                   // createdRow
                   // responsive: true,
                   var %s = %s.DataTable(
                                      {
-                                        bJQueryUI: true,
                                         sDom: 'l<"H"Rf>t<"F"ip>',
                                         pageLength: %s,
                                         data: recordSet_%s ,
@@ -228,8 +232,11 @@ class Table(AresHtml.Html):
                                      }
                   ) ;
 
+                  %s
+
+                  %s
                   ''' % (self.htmlId, self.jqId, self.pageLength, self.recordSetId, ",".join(self.recordSetHeader),
-                         self.jsTableConf))
+                         self.jsTableConf, self.jsMenu, self.jsClick))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)
@@ -268,14 +275,14 @@ class Table(AresHtml.Html):
         }
     );
     """
-    self.jsEvent['click'] = '''
+    self.jsClick = '''
       $('#%s').on('click', 'tr', function () {
           %s
           }
       );
       ''' % (self.htmlId, jsFnc)
 
-  def contextMenu(self, jsFnc):
+  def contextMenu(self, contextMenu):
     """
     Add a Click event feature
 
@@ -288,9 +295,16 @@ class Table(AresHtml.Html):
         }
     );
     """
-    self.jsEvent['contextmenu'] = '''
-      $('#%s').on('contextmenu', 'tr', function () {
-          %s
+    strItems = render_template_string("".join(['''<a href="{{ url_for('ares.run_report', report_name='%s', script_name='%s' )}}?var=' + rowData[0].%s +'" class="btn btn-secondary" style="width:100%%; height:30px">%s</a>''' % (self.aresObj.http['REPORT_NAME'], script, key, menu) for menu, script, key in contextMenu]))
+    self.jsMenu = '''
+      $('#%s').on('contextmenu', 'tr', function (e) {
+          var posX = $(this).offset().left,
+              posY = $(this).offset().top;
+          var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
+          $('#context-menu').css({top: posY - $(document).scrollTop(), left: posX - $(document).scrollLeft()});
+          $('#context-menu').empty() ;
+          $('#context-menu').html('%s') ;
+          $('#context-menu').show() ;
           }
       );
-      ''' % (self.htmlId, jsFnc)
+      ''' % (self.htmlId, self.htmlId, strItems)

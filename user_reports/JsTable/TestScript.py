@@ -9,4 +9,4 @@
 def report(aresObj):
   """
   """
-  aresObj.title("Goo")
+  aresObj.title("Goo %s" % aresObj.http['VAR'])

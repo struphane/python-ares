@@ -20,6 +20,15 @@
             $('#temp-message').fadeOut( 4000 );
         }
 
+        $(window).scroll(function() {
+            $('#context-menu').hide() ;
+        }) ;
+
+        $(window).click(function() {
+            // Function to close the context menu
+            $("#context-menu").hide();
+        });
+
     {{ onload|safe }}
     </script>
 </head>
@@ -55,6 +64,7 @@
 
 <div id="loading"><img src="/static/images/loading.gif" alt="Be patient.."/></div>
 <div class="alert alert-success" id="temp-message">Test</div>
+<div class="" id="context-menu">Test</div>
 
 </body>
 </html>
