@@ -266,6 +266,7 @@ def run_report(report_name, script_name):
 
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
+
   return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])

@@ -2,6 +2,8 @@
 
 """
 
+import importlib
+
 NAME = 'HTML Item'
 
 def report(aresObj):
@@ -9,4 +11,6 @@ def report(aresObj):
 
   """
   aresObj.title("HTML Definition for the %s component" % aresObj.http['HTML_CLASS'])
-  getattr(aresObj, aresObj.http['HTML_ALIAS'])('Youpi')
+  mod = importlib.import_module("ares.Lib.%s" % aresObj.http['HTML_MODULE'].replace(".py", ""))
+  htmlObj = getattr(mod, aresObj.http['HTML_CLASS']).aresExample(aresObj)
+

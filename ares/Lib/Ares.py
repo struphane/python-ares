@@ -309,6 +309,8 @@ class Report(object):
 
   # Anchor section
   def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def external_link(self, value, url, **kwargs): return self.add(AresHtmlHRef.ABespoke(self, self.supp(value), url, **kwargs), sys._getframe().f_code.co_name)
+
   def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_add_scripts(self, value, **kwargs): return self.add(AresHtmlHRef.AddScript(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)

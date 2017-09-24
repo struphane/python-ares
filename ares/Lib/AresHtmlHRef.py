@@ -88,3 +88,17 @@ class AddScript(A):
     flask = 'ares.addScripts'
 
 
+class ABespoke(AresHtml.Html):
+  """
+  Class to link a script to another sub script in a report
+  In this class no Javascript is used in the click event
+  """
+  alias, cssCls = 'external_link', ''
+
+  def __init__(self, aresObj, vals, url, **kwargs):
+    super(ABespoke, self).__init__(aresObj, vals, kwargs.get('cssCls'))
+    self.url = url
+
+  def __str__(self):
+    """ Standard string representation for a href """
+    return '<a %s href="%s" target="_blank">%s</a>' % (self.strAttr(), self.url, self.vals)
