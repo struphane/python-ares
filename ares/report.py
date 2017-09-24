@@ -454,6 +454,7 @@ def deleteFiles(report_name):
     appendToLog(report_name, 'DELETE', request.form.get('SCRIPT'))
   return json.dumps({'SCRIPT': request.form.get('SCRIPT'), 'ENV': report_name})
 
+#TO BE REMOVED
 @report.route("/json/<report_name>", methods=['POST'])
 def configFile(report_name):
   """
@@ -505,6 +506,7 @@ def downloadFiles(report_name, script):
     userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name)
   return send_from_directory(userDirectory, splitScriptPath[-1], as_attachment=True)
 
+#TO BE REMOVED
 @noCache
 @report.route("/download/dsc/json/<jsonFile>", methods = ['GET', 'POST'])
 def downloadJsonFiles(jsonFile):
@@ -630,25 +632,3 @@ def getAresFilesVersions():
       stat = os.stat(os.path.join(libPath, pyFile))
       files[pyFile] = [stat.st_mtime, stat.st_size]
   return json.dumps(files)
-
-# ---------------------------------------------------------------------------------------------------------
-#                             CREATE FILES AND FOLDERS IN AN ARES ENV
-#
-# The below section will allow
-#   - To get the full Ares updated package
-#   - To get the full report updated package
-#   - To get the last version of a specific script
-# ---------------------------------------------------------------------------------------------------------
-
-@report.route("/folder/create", methods = ['POST'])
-def create_folder():
-  """ This REST service will create a file in a given env """
-  reportObj = Ares.Report()
-  reportObj.http.update(getHttpParams(request))
-  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['REPORT_NAME'])
-  subfolders = reportObj.http['FOLDERS'].split("/")
-  subDirectories = os.path.join(reportObj.http['DIRECTORY'], *subfolders)
-  if not os.path.exists(subDirectories):
-    os.makedirs(subDirectories)
-    appendToLog(reportObj.http['REPORT_NAME'], 'FOLDER_CREATION', reportObj.http['FOLDERS'])
-  return json.dumps('Folders created in the env %s' % reportObj.http['REPORT_NAME'])

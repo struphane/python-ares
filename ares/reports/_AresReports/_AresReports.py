@@ -43,6 +43,9 @@ def report(aresObj):
   aresObj.container('Create Environment', [aresInput, grid])
   content = []
   for folder, folderInfo in aresObj.getFoldersInfo().items():
+    if not os.path.exists(os.path.join(aresObj.http['DIRECTORY'], folder, "%s.py" % folder)):
+      continue
+      
     iconComp = aresObj.icon('trash')
     iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
     content.append({'folderName': folder, 'Date': folderInfo['LAST_MOD_DT'], 'Size': folderInfo['SIZE'],
