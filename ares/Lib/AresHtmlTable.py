@@ -277,10 +277,11 @@ class Table(AresHtml.Html):
     """
     self.jsClick = '''
       $('#%s').on('click', 'tr', function () {
+          var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
           %s
           }
       );
-      ''' % (self.htmlId, jsFnc)
+      ''' % (self.htmlId, self.htmlId, jsFnc)
 
   def contextMenu(self, contextMenu):
     """

@@ -4,7 +4,7 @@
 
 import ExAjaxRec
 
-NAME = 'Tables'
+NAME = 'Complex Tables'
 
 def report(aresObj):
   """
@@ -15,27 +15,18 @@ def report(aresObj):
   # Produce the recordSet
   recordSet = ExAjaxRec.getRecordSet()
   table = aresObj.table(recordSet, [
-                                    [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
-                                     {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
-                                     {'key': 'VAL', 'colName': 'Value', 'colspan': 2}],
-
-                                     [{'key': 'PTF3', 'colName': 'Portfolio 3'},
-                                      {'key': 'PTF2', 'colName': 'Portfolio 2', 'colspan': 1},
-                                      {'key': 'VAL1', 'colName': 'Value 1', 'colspan': 1}],
-
                                     {'key': 'PTF', 'colName': 'Portfolio'},
-                                        {'key': 'CCY', 'colName': 'Currency'},
-                                        {'key': 'VAL2', 'colName': 'Value 2'},
-                                        {'key': 'VAL3', 'colName': 'Value 3'}
+                                    {'key': 'CCY', 'colName': 'Currency'},
+                                    {'key': 'VAL2', 'colName': 'Value 2'},
+                                    {'key': 'VAL3', 'colName': 'Value 3'}
                         ],
                         'Test Table')
+
   # Special properties of the HTML object
   table.filters(['Currency', 'Value 2'])
-  table.contextMenu([('Ok', 'TestScript', ['CCY']), ('Test', 'TestScript', ['VAL2'])])
+  table.contextMenu([('Link to Currency', 'AresExTableLinkCcy', ['CCY']), ('Link to Ptf and Currency', 'AresExTableLinkCcyPtf', ['PTF', 'CCY'])])
   table.click(
     '''
-    var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
-        alert( 'You clicked on ' + rowData[0].script + ' row' );
-        }
+    alert( 'You clicked on ' + rowData[0].PTF + ' row' );
     '''
   )
