@@ -300,7 +300,6 @@ class Table(AresHtml.Html):
       vars = ["VAR%s=' + rowData[0].%s +'" % (i, key) for i, key in enumerate(keys)]
       items.append('''<a href="{{ url_for('ares.run_report', report_name='%s', script_name='%s' )}}?%s" class="btn btn-secondary" style="width:100%%; height:30px">%s</a>''' % (self.aresObj.http['REPORT_NAME'], script, "&".join(vars), menu))
     strItems = render_template_string("".join(items))
-    print strItems
     self.jsMenu = '''
       $('#%s').on('contextmenu', 'tr', function (e) {
           var posX = $(this).offset().left,
