@@ -424,7 +424,9 @@ class Report(object):
     folders = []
     for (path, dirs, files) in os.walk(os.path.join(self.http['DIRECTORY'], 'outputs', folder)):
       for file in files:
-        folders.append({'folderPath': path, 'file': file})
+        fileData =  self.getFileInfo(file, ['outputs', folder])
+        fileData.update({'folderPath': folder, 'file': file})
+        folders.append(fileData)
     return folders
 
   def setOutput(self, folder, fileName):
@@ -434,6 +436,7 @@ class Report(object):
     if not os.path.exists(outPath):
       os.makedirs(outPath)
     return open(os.path.join(outPath, fileName), "w")
+
 
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """

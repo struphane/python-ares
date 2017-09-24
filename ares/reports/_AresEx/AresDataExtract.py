@@ -14,17 +14,18 @@ def report(aresObj):
   nodeObj = aresObj.input('Node')
   nameObj = aresObj.input('Name')
   button = aresObj.refresh(" Extract Data", [], 'ExAjaxDataExtract')
-  aresObj.setOutput('BasicExtract', "youpi2.txt")
   repo = aresObj.table(aresObj.getOutputFrom("BasicExtract"),
                         [{'key': 'folderPath', 'colName': 'Folder'},
                          {'key': 'file', 'colName': 'File Name'},
+                         {'key': 'LAST_MOD_DT', 'colName': 'Last Modification'},
+                         {'key': 'SIZE', 'colName': 'File Size'},
                          ],
                         headerBox="Environments")
 
   button.click('''
                   display(status) ;
                   %s ;
-               ''' % repo.jsUpdate())
+               ''' % repo.jsUpdate(), {'youpi': 'RRR', 'node': nodeObj, 'name': nameObj, 'cob': dateObj})
 
 
 

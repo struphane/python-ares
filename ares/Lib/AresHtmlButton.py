@@ -168,20 +168,45 @@ class ButtonRefresh(ButtonRemove):
       json.dump(recordSet, recordSetJson)
       recordSetJson.close()
 
-  def click(self, jsFnc):
-    """ Add the corresponding event when the button is clicked """
+  def click(self, jsFnc, vars=None):
+    """
+    Add the corresponding event when the button is clicked
+
+    """
+    jsVars, pyVars = set(), set()
+    if vars is not None:
+      for key, val in vars.items():
+        if issubclass(val.__class__, AresHtml.Html):
+          # In this case we cannot have the parameters hard coded
+          # So we need to use Javascript and the Ajax Get and Post features to deduce it on the fly
+          jsVars.add("%s=' + %s" % (key, val.val))
+        else:
+          pyVars.add("%s='%s'" % (key, val))
+    if 'report_name' not in pyVars:
+      pyVars.add("report_name='%s'" % self.aresObj.http['REPORT_NAME'])
+    if 'script' not in pyVars:
+      pyVars.add("script='%s'" % self.ajaxScript)
+    if 'file_name' not in pyVars:
+      pyVars.add("file_name='%s'" % self.dataFileName)
+    if 'user_script' not in pyVars:
+      pyVars.add("user_script='%s'" % self.aresObj.http.get('USER_SCRIPT', self.aresObj.http['REPORT_NAME']))
+
+    strUrl = render_template_string('''{{ url_for('ares.ajaxCall', %s) }}''' % ",".join(pyVars))
+    if "?" in strUrl and jsVars:
+      strUrl = "'%s&amp;%s" % (strUrl, " + '&amp;".join(jsVars))
+    print strUrl
+
     self.js('click',
             render_template_string('''
                 // The first part will update the file
-                $.post("{{ url_for('ares.ajaxCall', report_name='%s', script='%s', file_name='%s', user_script='%s') }}", function(result) {
+                $.post(%s, function(result) {
                     var res = JSON.parse(result) ;
                     var data = res.data ;
                     var status = res.status ;
                     // Then it will update the reports
                     %s
                 });
-              ''' % (self.aresObj.http['REPORT_NAME'], self.ajaxScript, self.dataFileName,
-                     self.aresObj.http.get('USER_SCRIPT', self.aresObj.http['REPORT_NAME']), jsFnc)
+              ''' % (strUrl, jsFnc)
             ))
 
   def __str__(self):
