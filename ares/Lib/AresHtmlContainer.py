@@ -277,9 +277,7 @@ class GraphSvG(AresHtml.Html):
     values = []
     for headerLine in self.header:
       if headerLine.get('type') == 'number':
-        isSelected = ''
-        if headerLine.get('selected'):
-          isSelected = 'selected'
+        isSelected = '' if headerLine.get('selected') else 'selected'
         values.append((isSelected, headerLine.get('key', headerLine['colName']), headerLine['colName']))
     style = 'style="margin-bottom:5px"' if len(values) > 2 else 'style="display:none"'
     item = AresItem.Item('<select id="%s_val_selector" class ="form-control input-sm" %s>' % (self.htmlId, style))
