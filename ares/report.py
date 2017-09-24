@@ -145,6 +145,7 @@ def report_dsc_graph():
   onload, content, js = aresObj.html()
   return render_template('ares_template.html', onload=onload, content=content, js=js)
 
+#TO BE REMOVED
 @report.route("/child:dsc/graph/<chartName>")
 def report_dsc_graph_details(chartName):
   """ """
