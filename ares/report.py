@@ -264,6 +264,9 @@ def run_report(report_name, script_name):
       for module, ss in sys.modules.items():
         if userDirectory in str(ss):
           del sys.modules[module]
+    for f in reportObj.fileManager.values():
+      if not f.closed:
+        f.close()
 
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
@@ -300,6 +303,10 @@ def ajaxCall(report_name, script):
   finally:
     if script in sys.modules:
       del sys.modules[script]
+    for f in reportObj.fileManager.values():
+      if not f.closed:
+        f.close()
+
 
   if error:
     return json.dumps(content)

@@ -124,7 +124,7 @@ class Report(object):
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
-    self.jsRegistered, self.jsGlobal = {}, {}
+    self.jsRegistered, self.jsGlobal, self.fileManager = {}, {}, {}
 
   def structure(self):
     return self.content
@@ -430,12 +430,14 @@ class Report(object):
     return folders
 
   def setOutput(self, folder, fileName):
-    """
-    """
+    """ Open the output file """
     outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
     if not os.path.exists(outPath):
       os.makedirs(outPath)
-    return open(os.path.join(outPath, fileName), "w")
+
+    fileFullPath = os.path.join(outPath, fileName)
+    self.fileManager[fileFullPath] = open(fileFullPath, "w")
+    return self.fileManager[fileFullPath]
 
 
   def getFileInfo(self, fileName, subfolders=None):
