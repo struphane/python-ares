@@ -12,14 +12,13 @@ from __future__ import print_function
 import requests
 import json
 import os
-import AresWrapper
+import AresWrapper # This import will work locally (because the structure is a bit different)
 
 # The Url to be used in order to create the environments in Ares
 # This will allow the use of scripts instead of the web interface
 SERVER_PATH = 'http://127.0.0.1:5000'
 postUrlDeploy = AresWrapper.SERVER_PATH + r'/reports/upload/%s/%s'
 postUrlCreate = r'%s/reports/create/env' % AresWrapper.SERVER_PATH
-postUrlFolderCreate = r'%s/reports/folder/create' % AresWrapper.SERVER_PATH
 postUrlScriptVersion = r"%s/reports/ares/version" % AresWrapper.SERVER_PATH
 withEnvCreation = False
 
@@ -34,7 +33,11 @@ def uploadFiles(files, reportName, withEnvCreation=False):
       print(response.text)
 
   for filename, fileType in files:
-    files = {'file': open(os.path.join(os.getcwd(), reportName, filename))}
+    folder = {'report': None, 'configuration': 'config', 'ajax': 'ajax', 'javascript': 'js', 'views': 'statics'}[fileType]
+    if folder is not None:
+      files = {'file': open(os.path.join(os.getcwd(), reportName, folder, filename))}
+    else:
+      files = {'file': open(os.path.join(os.getcwd(), reportName, filename))}
     response = requests.post(postUrlDeploy % (fileType, reportName), files=files)
     if response.status_code == 500:
       print("########################################")

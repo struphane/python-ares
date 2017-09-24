@@ -73,7 +73,7 @@ def getFileName(script, exts):
   If the extension is not expected, it will return None
   """
   scriptName, file_extension = os.path.splitext(script)
-  if file_extension in exts:
+  if file_extension.upper() in exts:
     return script
 
   if file_extension == '':
@@ -307,7 +307,21 @@ def ajaxCall(report_name, script):
 
 
 # ------------------------------------------------------------------------------------------------------------
-# Section dedicated to
+# Section dedicated to upload files to a shared environment on the server
+#
+# Users will not have a write access on the server so it will have to use the scripts dedicated to deploy
+# their environment to the correct location. Users will have to get the same structure of folders locally
+# This constraint will ensure that there will be no surprise when they will try to push the scripts to production
+# Basically the structure of a report should be as below
+# /ReportName/
+#    ReportName.py
+#    /ajax/
+#       xxx.py
+#    /output/
+#    /json/
+#    /js/
+#    /statics/
+# For more information please look at the documentation of the local runs
 # ------------------------------------------------------------------------------------------------------------
 @report.route("/create/env", methods = ['POST', 'GET'])
 def ajaxCreate():
@@ -341,98 +355,14 @@ def ajaxCreate():
 
   return json.dumps("Existing Environment"), 200
 
-# TODO Replace by AresAddScript Service
-@report.route("/add/file", methods = ['POST', 'GET'])
-def addScripts():
-  """
-  Special Ajax call to set up the environment
-
-  """
-  reportObj = Ares.Report()
-  reportObj.http = getHttpParams(request)
-  echo(reportObj.http)
-  log = AresLog.AresLog(current_app.config['ROOT_PATH'], reportObj.http['report_name'], config)
-  tmplPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl')
-
-  scriptName, file_extension = os.path.splitext(reportObj.http['script'])
-  if reportObj.http['script_type'] == 'Report':
-    scriptName = getFileName(reportObj.http['script'], ['.py'])
-    if scriptName is None:
-      return json.dumps('Not script created, extension %s not recognised' % file_extension)
-
-    shutil.copyfile(os.path.join(tmplPath, 'tmpl_report.py'), os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'], scriptName))
-    log.addScript(reportObj.http['script_type'], scriptName)
-    fileFullPath = os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'], scriptName)
-    with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
-      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
-    return json.dumps('New Script added: %s' % scriptName)
-
-  elif reportObj.http['script_type'] == 'Python Service':
-    ajaxPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'ajax')
-    if not os.path.exists(ajaxPath):
-      os.makedirs(ajaxPath)
-      # Create also the init in order to be able to call the extra services directly
-      initFile = open(os.path.join(ajaxPath, "__init__.py"), "w")
-      initFile.close()
-
-    scriptName = getFileName(reportObj.http['script'], ['.py'])
-    if scriptName is None:
-      return json.dumps('Not script created, extension %s not recognised' % file_extension)
-
-    shutil.copyfile(os.path.join(tmplPath, 'tmpl_service.py'), os.path.join(reportObj.http['DIRECTORY'], reportObj.http['report_name'], 'ajax', scriptName))
-    log.addScript(reportObj.http['script_type'], scriptName)
-    fileFullPath = os.path.join(ajaxPath, scriptName)
-    with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
-      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
-    return json.dumps('New Script added: %s' % scriptName)
-
-  elif reportObj.http['script_type'] == 'Javascript':
-    scriptName = getFileName(reportObj.http['script'], ['.js'])
-    if scriptName is None:
-      return json.dumps('Not script created, extension %s not recognised' % file_extension)
-
-    jsPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'js')
-    if not os.path.exists(jsPath):
-      os.makedirs(jsPath)
-    newFile = open(os.path.join(jsPath, scriptName), "w")
-    newFile.close()
-    return json.dumps('New Script added: %s' % scriptName)
-
-  elif reportObj.http['script_type'] == 'Configuration':
-    scriptName = getFileName(reportObj.http['script'], ['.json'])
-    if scriptName is None:
-      return json.dumps('Not script created, extension %s not recognised' % file_extension)
-
-    configPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'config')
-    if not os.path.exists(configPath):
-      os.makedirs(configPath)
-    newFile = open(os.path.join(configPath, scriptName), "w")
-    newFile.close()
-    return json.dumps('New configuration file available: %s' % scriptName)
-
-  elif reportObj.http['script_type'] == 'views':
-    scriptName = getFileName(reportObj.http['script'], ['.txt'])
-    if scriptName is None:
-      return json.dumps('Not script created, extension %s not recognised' % file_extension)
-
-    configPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['report_name'], 'config')
-    if not os.path.exists(configPath):
-      os.makedirs(configPath)
-    newFile = open(os.path.join(configPath, scriptName), "w")
-    newFile.close()
-    return json.dumps('New configuration file available: %s' % scriptName)
-
-  return json.dumps("No Event %s defined..." % reportObj.http['script_type'])
-
-
-
-
 @report.route("/upload/<report_type>/<report_name>", methods = ['POST'])
 def uploadFiles(report_type, report_name):
   """ Add all the files that a users will drag and drop in the section """
   result = []
-  reportTypes = {'report': ('.py', None), 'configuration': ('.json', 'config'),
-                 'ajax': ('.py', 'ajax'), 'javascript': ('.js', 'js')}
+  reportTypes = {'report': (['.PY'], None), 'configuration': (['.JSON'], 'config'),
+                 'ajax': (['.PY'], 'ajax'), 'javascript': (['.JS'], 'js'),
+                 'views': (['.TXT', '.CSV'], 'statics')
+                 }
   if not report_type in reportTypes:
     return json.dumps('Error %s category not recognized !' % report_type), 500
 
@@ -444,7 +374,8 @@ def uploadFiles(report_type, report_name):
     postParams = getHttpParams(request)
     for filename, fileType in request.files.items():
       file = request.files[filename]
-      if not file.filename.endswith(ext):
+      fileWithoutExt = getFileName(file.filename, ext)
+      if fileWithoutExt is None:
         return json.dumps('File extension %s not recognized for this category %s  !' % (ext, report_type)), 500
 
       if 'DESTINATION' in postParams:
@@ -469,6 +400,10 @@ def uploadFiles(report_type, report_name):
         zf.close()
       result.append(filename)
   return json.dumps(result)
+
+
+
+
 
 @report.route("/delete_file/<report_name>", methods = ['POST'])
 def deleteData(report_name):
