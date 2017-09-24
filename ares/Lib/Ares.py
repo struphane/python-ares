@@ -376,7 +376,7 @@ class Report(object):
   def getViews(self, fileName):
     """ Return the object in the Statics area with the views parameters """
     confFilg = open(os.path.join(self.http['DIRECTORY'], 'statics', fileName))
-    data = [line.strip().split("\t") for line in confFilg]
+    data = confFilg.read()
     confFilg.close()
     return data
 
