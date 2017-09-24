@@ -37,6 +37,7 @@ def report(aresObj):
   table.contextMenu([('Ok', 'TestScript', ['CCY', 'VAL2']), ('Test', 'TestScript', ['VAL2'])])
 
   pie = aresObj.bar(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                {'key': 'CCY', 'colName': 'Currency', 'colspan': 1, 'rowspan': 2},
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Graph')
 
