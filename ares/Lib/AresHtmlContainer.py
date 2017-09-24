@@ -274,17 +274,18 @@ class GraphSvG(AresHtml.Html):
   def selectValues(self):
     """ Return the value to be selected in the graph display """
     # To early to think about the multi select
-    #if len(selectedValue) > 1:
-    #  item.add(2, '<select id="%s_val_selector" class ="selectpicker" multiple="true">' % self.htmlId)
-    style = '' if len(self.header) > 2 else 'style="display:none"'
-    item = AresItem.Item('<select id="%s_val_selector" class ="form-control input-sm" %s>' % (self.htmlId, style))
-    item.add(1, '<optgroup label="Y-Axis">')
+    values = []
     for headerLine in self.header:
       if headerLine.get('type') == 'number':
+        isSelected = ''
         if headerLine.get('selected'):
-          item.add(3, '<option value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
-        else:
-          item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
+          isSelected = 'selected'
+        values.append((isSelected, headerLine.get('key', headerLine['colName']), headerLine['colName']))
+    style = 'style="margin-bottom:5px"' if len(values) > 2 else 'style="display:none"'
+    item = AresItem.Item('<select id="%s_val_selector" class ="form-control input-sm" %s>' % (self.htmlId, style))
+    item.add(1, '<optgroup label="Y-Axis">')
+    for isSelect, key, val in values:
+      item.add(3, '<option value="%s" %s>%s</option>' % (key, isSelect, val))
     item.add(2, '</select></label>')
     self.values = item
     self.jsEvent['val-change'] = AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,
