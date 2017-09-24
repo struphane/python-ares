@@ -191,7 +191,9 @@ class GraphSvG(AresHtml.Html):
     if self.headerBox is not None:
       item.add(0, '<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
       item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
-    item.add(1, '<div style="width:95%%;height:95%%;" %s>' % self.strAttr())
+    item.add(1, '<div style="width:95%%;height:90%%;" %s>' % self.strAttr())
+    #TODO put a better display for this section
+    item.add(1, '<div class="container">')
     # Add the pointers for the display
     if self.categories is not None:
       item.join(self.categories)
@@ -201,6 +203,8 @@ class GraphSvG(AresHtml.Html):
       item.join(self.seriesKey)
     if self.series is not None:
       item.join(self.series)
+    item.add(1, '</div>')
+
     item.add(1, '<svg style="width:100%;height:100%;"></svg>')
     if self.headerBox is not None:
       item.add(0, '</div>')
