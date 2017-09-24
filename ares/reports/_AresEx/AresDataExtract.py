@@ -21,6 +21,7 @@ def report(aresObj):
                          ],
                         headerBox="Environments")
 
+  repo.filters(['File Name', 'Last Modification'])
   button.click('''
                   display(status) ;
                   %s ;

@@ -194,8 +194,6 @@ class ButtonRefresh(ButtonRemove):
     strUrl = render_template_string('''{{ url_for('ares.ajaxCall', %s) }}''' % ",".join(pyVars))
     if "?" in strUrl and jsVars:
       strUrl = "'%s&amp;%s" % (strUrl, " + '&amp;".join(jsVars))
-    print strUrl
-
     self.js('click',
             render_template_string('''
                 // The first part will update the file
