@@ -13,7 +13,7 @@ def report(aresObj):
   dateObj = aresObj.date('COB Date')
   nodeObj = aresObj.input('Node')
   button = aresObj.refresh(" Extract Data", [], 'ExAjaxDataExtract')
-  repo = aresObj.table(aresObj.getOutputFrom("BasicExtract"),
+  repo = aresObj.table(aresObj.listDataFrom("BasicExtract"),
                         [{'key': 'folderPath', 'colName': 'Folder'},
                          {'key': 'file', 'colName': 'File Name'},
                          {'key': 'LAST_MOD_DT', 'colName': 'Last Modification'},

@@ -390,7 +390,7 @@ class Report(object):
         folders.append(fileData)
     return folders
 
-  def writeDataToFile(self, folder, fileName):
+  def wData(self, folder, fileName):
     """ Create and write the output file """
     outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
     if not os.path.exists(outPath):
@@ -401,7 +401,7 @@ class Report(object):
     self.fileManager[fileFullPath] = open(fileFullPath, "w")
     return self.fileManager[fileFullPath]
 
-  def getDataFromFile(self, folder, fileName):
+  def rDara(self, folder, fileName):
     """ Open a file in readonly """
     fileFullPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder, fileName)
     if not os.path.exists(fileFullPath):
