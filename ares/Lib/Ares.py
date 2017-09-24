@@ -332,95 +332,34 @@ class Report(object):
           comp.append(cls.alias)
     return comp
 
-  # ---------------------------------------------------
-  #    Action on files and folders reaad and write
+
+  # --------------------------------------------------
+  # Section dedicated to the file management
   #
-  # ---------------------------------------------------
+  # From the Ares object the users will be able to only
+  #   1. Read configuration files. This will return a python object (as configuration are supposed to be json object)
+  #   2. Add and write a output file in the output section
+  #   3. Read a file in the output file section
+  #
+  # The js folder is not accessible directly as this is open and read by the HTML object directly
+  #
+  # --------------------------------------------------
+  def configFile(self, fileName):
+    """ Return the object in the configuration file from the json file """
+    confFilg = open(os.path.join(self.http['DIRECTORY'], 'config', fileName))
+    data = json.load(confFilg)
+    confFilg.close()
+    return data
 
-  # TODO add the closure in ares when the report is running
-  # It should not be the user responsible to close the files
+  def getViews(self, fileName):
+    """ Return the object in the Statics area with the views parameters """
+    confFilg = open(os.path.join(self.http['DIRECTORY'], 'statics', fileName))
+    data = [line.strip().split("\t") for line in confFilg]
+    confFilg.close()
+    return data
 
-  def readFile(self, file, subfolders=None):
-    """
-    This function will read a file in the list of sub folder
-    that the user will select in the report directory
-    """
-    if subfolders is not None:
-      filePath = os.path.join(self.http['DIRECTORY'], *subfolders)
-      filePath = os.path.join(filePath, file)
-    else:
-      filePath = os.path.join(self.http['DIRECTORY'], file)
-
-    if os.path.exists(filePath):
-      return open(filePath)
-
-    return None
-
-  def createFile(self, file, subfolders=None, checkFileExist=True):
-    """
-    This function will create a file in the folder that the user will select
-    This function will return an error is the file already exist and we try to override it
-    You can change the flag to False if you do not want to fail
-    """
-    if checkFileExist:
-      if subfolders is not None:
-        subFolderDirectory = os.path.join(self.http['DIRECTORY'], *subfolders)
-        subFolderDirectory = os.path.join(subFolderDirectory, file)
-        if os.path.exists(subFolderDirectory):
-          echo("%s file already created on the server" % file)
-          return None
-
-      else:
-        if os.path.exists(os.path.join(self.http['DIRECTORY'], file)):
-          echo("%s file already created on the server" % file)
-          return None
-
-    if subfolders is None:
-      return open(os.path.join(self.http['DIRECTORY'], file), 'w')
-
-    subFolderDirectory = os.path.join(self.http['DIRECTORY'], *subfolders)
-    if not os.path.exists(subFolderDirectory):
-      os.makedirs(subFolderDirectory)
-    return open('%s\%s' % (subFolderDirectory, file), 'w')
-
-  def getFolders(self):
-    """ Return the list of sub folders in tne environment """
-    folders = set()
-    for folder in os.walk(os.path.join(self.http['DIRECTORY'])):
-      if isExcluded(self.http['DIRECTORY'], folders=[folder[0]]):
-        continue
-
-      fPath = list(os.path.split(folder[0].lstrip("\\").replace(self.http['DIRECTORY'], '').lstrip("\\")))
-      folders.add(tuple(fPath[1:])) if fPath[0] == '' else folders.add(tuple(fPath))
-    return folders
-
-  def getFoldersInfo(self, subfolders=None):
-    """  """
-    folders = {}
-    if subfolders is not None:
-      folderPath = os.path.join(self.http['DIRECTORY'], *subfolders)
-    else:
-      folderPath = self.http['DIRECTORY']
-    for folder in os.listdir(folderPath):
-      filePath = os.path.join(folderPath, folder)
-      fileSize = convert_bytes(os.path.getsize(filePath))
-      fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
-      folders[folder] = {'SIZE': fileSize, 'LAST_MOD_DT': fileDate}
-    return folders
-
-  def getFiles(self, subfolders):
-    """ return the list of files in a given directory structure """
-    files = set()
-    for pyFile in os.listdir(os.path.join(self.http['DIRECTORY'], *subfolders)):
-      if isExcluded(self.http['DIRECTORY'], file=pyFile):
-        continue
-
-      files.add(pyFile)
-    return files
-
-  def getOutputFrom(self, folder):
-    """
-    """
+  def listDataFrom(self, folder):
+    """ List the file available in the folder in the output area """
     folders = []
     for (path, dirs, files) in os.walk(os.path.join(self.http['DIRECTORY'], 'outputs', folder)):
       for file in files:
@@ -429,16 +368,26 @@ class Report(object):
         folders.append(fileData)
     return folders
 
-  def setOutput(self, folder, fileName):
-    """ Open the output file """
+  def writeDataToFile(self, folder, fileName):
+    """ Create and write the output file """
     outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
     if not os.path.exists(outPath):
       os.makedirs(outPath)
-
+    # Open the file and register it in the Ares File Manager
+    # This will be monitored by the framework to close the files
     fileFullPath = os.path.join(outPath, fileName)
     self.fileManager[fileFullPath] = open(fileFullPath, "w")
     return self.fileManager[fileFullPath]
 
+  def getDataFromFile(self, folder, fileName):
+    """ Open a file in readonly """
+    fileFullPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder, fileName)
+    if not os.path.exists(fileFullPath):
+      return []
+    # Open the file and register it in the Ares File Manager
+    # This will be monitored by the framework to close the files
+    self.fileManager[fileFullPath] = open(fileFullPath, "r")
+    return self.fileManager[fileFullPath]
 
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """
@@ -450,6 +399,9 @@ class Report(object):
     fileSize = convert_bytes(os.path.getsize(filePath))
     fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
     return {'SIZE': fileSize, 'LAST_MOD_DT': fileDate}
+
+
+
 
   def html(self):
     """
