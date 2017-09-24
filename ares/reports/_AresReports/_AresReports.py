@@ -46,7 +46,9 @@ def report(aresObj):
     iconComp = aresObj.icon('trash')
     iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
     content.append({'folderName': folder, 'Date': folderInfo['LAST_MOD_DT'], 'Size': folderInfo['SIZE'],
-                    'folderLink': aresObj.main(folder, **{'report_name': '_AresReports', 'script_name': 'AresIndexPage', 'user_script': folder}),
+                    'folderLink': aresObj.anchor('%s.py' % folder, **{'report_name': folder, 'cssCls': ''}),
+                    # TODO add this page in the bottom right section
+                    #'folderLink': aresObj.main(folder, **{'report_name': '_AresReports', 'script_name': 'AresIndexPage', 'user_script': folder}),
                     'FolderFiles': len(aresObj.getFiles([folder])), 'delete': iconComp,
                     'activity': folderEvents[folder]['count'],
                     'creationDate': folderEvents[folder]['data'].get('FOLDER CREATION', '')
