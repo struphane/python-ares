@@ -124,7 +124,7 @@ class Report(object):
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
-    self.jsRegistered = {}
+    self.jsRegistered, self.jsGlobal = {}, {}
 
   def structure(self):
     return self.content
@@ -438,6 +438,9 @@ class Report(object):
       jsOnload, html, js = self.htmlItems[objId].html()
       for ref, data in self.jsRegistered.items():
         onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
+      for ref in self.jsGlobal.keys():
+        onloadParts.add("        var %s ;" % ref)
+
       for onloadFnc in jsOnload:
         onloadParts.add(onloadFnc)
       htmlParts.append(html)

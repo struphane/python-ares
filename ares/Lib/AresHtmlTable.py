@@ -41,6 +41,7 @@ class Table(AresHtml.Html):
 
     """
     super(Table, self).__init__(aresObj, vals, cssCls)
+    self.aresObj.jsGlobal[self.htmlId] = True # table has to be registered as a global variable in js
     self.headerBox = headerBox
     self.recordSetId = id(vals)
     self.recordSetHeader = []
@@ -214,7 +215,7 @@ class Table(AresHtml.Html):
       item.add(1, '''
                   // createdRow
                   // responsive: true,
-                  var %s = %s.DataTable(
+                  %s = %s.DataTable(
                                      {
                                         sDom: 'l<"H"Rf>t<"F"ip>',
                                         pageLength: %s,

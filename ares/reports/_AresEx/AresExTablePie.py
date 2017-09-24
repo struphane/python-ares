@@ -23,7 +23,7 @@ def report(aresObj):
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Graph')
 
-  button = aresObj.refresh("", recordSet, 'ajaxUpdate')
+  button = aresObj.refresh("", recordSet, 'ExAjaxRec')
   button.click('''
                   %s ;
                   %s ;
