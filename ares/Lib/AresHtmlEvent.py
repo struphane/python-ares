@@ -341,7 +341,7 @@ class DatePicker(AresHtml.Html):
     """ Return the String representation of a Date picker object """
     if '-' in self.dflt:
       return '<p><strong>%s: </strong><input type="text" %s value="%s"></p>' % (self.vals, self.strAttr(), self.dflt)
-    return '<p><strong>%s: </strong><input type="text" style="width:100%%" %s></p>' % (self.vals, self.strAttr())
+    return '<p><strong>%s: </strong><input type="text" style="width:100%%;height:32px" %s></p>' % (self.vals, self.strAttr())
 
   def onLoadFnc(self):
     """ Start the Date picker transformation when the document is loaded """
