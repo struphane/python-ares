@@ -244,7 +244,7 @@ def run_report(report_name, script_name):
     downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
     downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     report = __import__(report_name) # run the report
-    side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, report_name.replace(".py", ""), report.NAME))]
+    side_bar = [render_template_string('<h4 style="color:white"><strong><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></strong></h4>' % (report_name, report_name.replace(".py", ""), report.NAME))]
     for categories, links in getattr(report, 'SHORTCUTS', []):
       side_bar.append('<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % categories)
       for name, scriptName in links:

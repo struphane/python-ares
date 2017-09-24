@@ -4,6 +4,22 @@
 
 
 NAME = 'Ares Example'
+# Just to set up the menu on the left hand side
+SHORTCUTS = [('Tables', [('Basic Table', 'AresExTables'),
+                         ('Complex Table', 'AresExTablesComplex'),
+                         ('Table with Chart', 'AresExTablePie')
+                         ]),
+             ('Graphs', [('Basic Graphs', 'AresExTables'),
+                         ('Complex Graphs', 'AresExTables'),
+                         ('Table with Chart', 'AresExTablePie')
+                         ]),
+             ('Links', [('Basic Hyperlink', 'AresExTables'),
+                        ('Complex Graphs', 'AresExTables'),
+                        ('Table with Chart', 'AresExTablePie')
+                      ]),
+             ('Ajax', [('Basic Ajax Call', 'AresExTables'),
+                      ]),
+              ]
 
 def report(aresObj):
   """
