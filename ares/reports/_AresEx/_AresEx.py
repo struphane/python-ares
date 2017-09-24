@@ -20,6 +20,8 @@ SHORTCUTS = [('Tables', [('Basic Table', 'AresExTables'),
                       ]),
              ('Ajax', [('Basic Ajax Call', 'AresExTables'),
                       ]),
+             ('Templates', [('Data Extraction', 'AresDataExtract'),
+                      ]),
               ]
 
 def report(aresObj):
