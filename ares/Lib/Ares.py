@@ -418,6 +418,23 @@ class Report(object):
       files.add(pyFile)
     return files
 
+  def getOutputFrom(self, folder):
+    """
+    """
+    folders = []
+    for (path, dirs, files) in os.walk(os.path.join(self.http['DIRECTORY'], 'outputs', folder)):
+      for file in files:
+        folders.append({'folderPath': path, 'file': file})
+    return folders
+
+  def setOutput(self, folder, fileName):
+    """
+    """
+    outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
+    if not os.path.exists(outPath):
+      os.makedirs(outPath)
+    return open(os.path.join(outPath, fileName), "w")
+
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """
     if subfolders is None:

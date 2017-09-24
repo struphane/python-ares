@@ -7,12 +7,14 @@ It will also help them adding more interesting features by understanding well ho
 python components are working together
 """
 
+import os
 import string
 import random
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   """ Randing String generator """
   return ''.join(random.choice(chars) for _ in range(size))
+
 
 def getRecordSet():
   """

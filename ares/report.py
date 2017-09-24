@@ -282,7 +282,8 @@ def ajaxCall(report_name, script):
       sys.path.append(userDirectory)
       # TODO Improve the __import__ to not have to append the ajax path to the sys.path
       sys.path.append(os.path.join(userDirectory, 'ajax'))
-      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, reportObj.http['USER_SCRIPT'])
+      # , reportObj.http['USER_SCRIPT']
+      userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
     else:
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       sys.path.append(userDirectory)
