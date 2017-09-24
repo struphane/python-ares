@@ -6,7 +6,7 @@ http://127.0.0.1:5000/reports/run/JsWikiScripts
 
 import os
 import sys
-import ajax.ajaxWikiRequest
+import ajaxWikiRequest
 
 NAME = "BDI Wiki Scripts"
 
@@ -63,7 +63,7 @@ def report(aresObj):
       You request will be then taken into account and we will process it as part of our weekly comment review.
   ''')
 
-  htmlList = aresObj.list(ajax.ajaxWikiRequest.getRequests(os.path.join(aresObj.http['DIRECTORY'], 'requests')), headerBox='Pending requests')
+  htmlList = aresObj.list(ajaxWikiRequest.getRequests(os.path.join(aresObj.http['DIRECTORY'], 'requests')), headerBox='Pending requests')
   aresObj.row([pieChart, htmlList])
 
   modal = aresObj.modal('Ask for a documentation review')
