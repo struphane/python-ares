@@ -20,7 +20,6 @@ SERVER_PATH = 'http://127.0.0.1:5000'
 postUrlDeploy = AresWrapper.SERVER_PATH + r'/reports/upload/%s/%s'
 postUrlCreate = r'%s/reports/create/env' % AresWrapper.SERVER_PATH
 postUrlScriptVersion = r"%s/reports/ares/version" % AresWrapper.SERVER_PATH
-withEnvCreation = False
 
 def uploadFiles(files, reportName, withEnvCreation=False):
   """ Upload a file on the server """
@@ -61,14 +60,15 @@ if __name__ == '__main__':
   # report - For a bespoke python report which will have a defined display
   # ajax - For a python service. This will not display anything but return dictionaries
   # configuration - For static configuration files. Extension .json
-  # js - For javascript templates (like text files with a js extension)
-  # views - For view configuration (like text files extension .txt)
-  files = [('Test.py', 'report'),
-
+  # javascript - In the folder js For javascript templates (like text files with a js extension)
+  # views - in the folder statics For view configuration (like text files extension .txt)
+  files = [('Youpi.py', 'report'),
+           ('test.json', 'configuration'),
+           ('params.txt', 'views'),
           ]
-
+  
   # Function used to send files to the server
-  uploadFiles(files, AresWrapper.REPORT, withEnvCreation=False)
+  uploadFiles(files, AresWrapper.REPORT, withEnvCreation=True)
 
 
   # Function used to check your version of your local package

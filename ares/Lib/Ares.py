@@ -333,6 +333,31 @@ class Report(object):
     return comp
 
 
+  def getFoldersInfo(self, subfolders=None):
+    """  """
+    folders = {}
+    if subfolders is not None:
+      folderPath = os.path.join(self.http['DIRECTORY'], *subfolders)
+    else:
+      folderPath = self.http['DIRECTORY']
+    for folder in os.listdir(folderPath):
+      filePath = os.path.join(folderPath, folder)
+      fileSize = convert_bytes(os.path.getsize(filePath))
+      fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
+      folders[folder] = {'SIZE': fileSize, 'LAST_MOD_DT': fileDate}
+    return folders
+
+  def getFiles(self, subfolders):
+    """ return the list of files in a given directory structure """
+    files = set()
+    for pyFile in os.listdir(os.path.join(self.http['DIRECTORY'], *subfolders)):
+      if isExcluded(self.http['DIRECTORY'], file=pyFile):
+        continue
+
+      files.add(pyFile)
+    return files
+
+
   # --------------------------------------------------
   # Section dedicated to the file management
   #
@@ -340,9 +365,6 @@ class Report(object):
   #   1. Read configuration files. This will return a python object (as configuration are supposed to be json object)
   #   2. Add and write a output file in the output section
   #   3. Read a file in the output file section
-  #
-  # The js folder is not accessible directly as this is open and read by the HTML object directly
-  #
   # --------------------------------------------------
   def configFile(self, fileName):
     """ Return the object in the configuration file from the json file """
