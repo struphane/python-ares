@@ -201,8 +201,13 @@ class ButtonRefresh(ButtonRemove):
                     var res = JSON.parse(result) ;
                     var data = res.data ;
                     var status = res.status ;
-                    // Then it will update the reports
-                    %s
+                    if (status == 'Error') {
+                      alert(res.message) ;
+                    }
+                    else {
+                      // Then it will update the reports
+                      %s
+                    }
                 });
               ''' % (strUrl, jsFnc)
             ))
