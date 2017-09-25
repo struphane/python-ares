@@ -600,6 +600,10 @@ def downloadAres():
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
+        if pyFile == 'flask_dummy.py':
+          zf.write(os.path.join(libPath, path, pyFile), os.path.join('flask.py'))
+          continue
+
         if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
