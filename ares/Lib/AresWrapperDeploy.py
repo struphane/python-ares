@@ -12,14 +12,13 @@ from __future__ import print_function
 import requests
 import json
 import os
-import AresWrapper # This import will work locally (because the structure is a bit different)
+import AresInstall # This import will work locally (because the structure is a bit different)
 
 # The Url to be used in order to create the environments in Ares
 # This will allow the use of scripts instead of the web interface
-SERVER_PATH = 'http://127.0.0.1:5000'
-postUrlDeploy = AresWrapper.SERVER_PATH + r'/reports/upload/%s/%s'
-postUrlCreate = r'%s/reports/create/env' % AresWrapper.SERVER_PATH
-postUrlScriptVersion = r"%s/reports/ares/version" % AresWrapper.SERVER_PATH
+postUrlDeploy = AresInstall.SERVER_PATH + r'/reports/upload/%s/%s'
+postUrlCreate = r'%s/reports/create/env' % AresInstall.SERVER_PATH
+postUrlScriptVersion = r"%s/reports/ares/version" % AresInstall.SERVER_PATH
 
 def uploadFiles(files, reportName, withEnvCreation=False):
   """ Upload a file on the server """
@@ -66,9 +65,10 @@ if __name__ == '__main__':
            ('test.json', 'configuration'),
            ('params.txt', 'views'),
           ]
-  
+  REPORT = 'Youpi'
+
   # Function used to send files to the server
-  uploadFiles(files, AresWrapper.REPORT, withEnvCreation=True)
+  uploadFiles(files, REPORT, withEnvCreation=True)
 
 
   # Function used to check your version of your local package

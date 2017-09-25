@@ -16,6 +16,7 @@ Ares documentation is available here:
 from __future__ import print_function
 import os
 import sys
+import AresInstall
 from ares.Lib import Ares
 
 # Path for the server on which you are testing the report
@@ -83,20 +84,21 @@ if __name__ == '__main__':
   # Run the script locally
 
   result_folder = 'html'
+  serverStatics = True # To supply you statics folder with your versions of the CSS and Js files
   directory = os.getcwd() # The path of this script by default
   # This will move all the results in a html folder
   # It only work locally
   path = os.path.join(directory, result_folder, REPORT)
   if not os.path.exists(path):
     os.makedirs(path)
-  if not SERVER_PATH:
+  if not serverStatics:
     localPathSize = len(os.path.split(path))
     if os.path.split(path)[0] == '':
       localPathSize -= 1
-    SERVER_PATH = os.path.join(*[".." for i in range(localPathSize)])
+    AresInstall.SERVER_PATH = os.path.join(*[".." for i in range(localPathSize)])
 
   # Create the generic headers and footers
-  header = Ares.htmlLocalHeader(r"%s/static" % SERVER_PATH, CSS, JS)
+  header = Ares.htmlLocalHeader(r"%s/static" % AresInstall.SERVER_PATH, CSS, JS)
   footer = Ares.htmlLocalFooter()
 
   res = {}
