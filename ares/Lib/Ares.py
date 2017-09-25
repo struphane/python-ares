@@ -201,7 +201,7 @@ class Report(object):
 
   def register(self, recordSet, header):
     """
-
+    This function will register the recordSet when it is shared with other components
     """
     strFct, newRecordSet = [], []
     for headerLine in header:
@@ -290,16 +290,16 @@ class Report(object):
   def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Chart section
-  def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def pie(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Pie(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def donut(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Donut(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def lineChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Line(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def stackedAreaChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def multiBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def lineChartFocus(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
-  def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(values, header), header, cssCls), sys._getframe().f_code.co_name)
+  def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def pie(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Pie(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def donut(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Donut(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def lineChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Line(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def stackedAreaChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def multiBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def lineChartFocus(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self, header, values, cssCls), sys._getframe().f_code.co_name)
   def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
 

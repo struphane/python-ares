@@ -14,11 +14,12 @@ def report(aresObj):
   the data
   """
   # Produce the recordSet
-  recordSet = ExAjaxRec.getRecordSet()
+  recordSet = ExAjaxRec.getRecordSet(aresObj)
   table = aresObj.table(recordSet, [
                                     {'key': 'PTF', 'colName': 'Portfolio'},
                                     {'key': 'CCY', 'colName': 'Currency'},
                                     {'key': 'VAL2', 'colName': 'Value 2'},
+                                    {'key': 'VAL6', 'colName': 'Value 6', 'type': 'object', 'visible': False},
                                     {'key': 'VAL3', 'colName': 'Value 3'}
                         ],
                         'Test Table')

@@ -10,6 +10,9 @@ SHORTCUTS = [('Tables', [('Basic Table', 'AresExTables'),
                          ('Ajax Table', 'AresExTableAjax'),
                          ('Table with Chart', 'AresExTablePie')
                          ]),
+             ('Graphs', [('Basic Graphs', 'AresExCharts'),
+
+                         ]),
 
              ('Templates', [('Data Extraction', 'AresDataExtract'),
                       ]),

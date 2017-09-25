@@ -50,7 +50,8 @@ class Table(AresHtml.Html):
     else: # we have a header on several lines, nothing to do
       self.header = header
     for col in self.header[-1]:
-      self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
+      if col.get("visible", True):
+        self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
 
   def recKey(self, col):
     """ Return the record Key taken into accounr th possible user options """
@@ -93,7 +94,8 @@ class Table(AresHtml.Html):
       # This row will be changed by the DataTable creation
       # It should correspond to the column that we will then use to populate the table
       for col in self.header[-1]:
-        item.add(3, "<td>%s</td>" % col.get("colName"))
+        if col.get("visible", True):
+          item.add(3, "<td>%s</td>" % col.get("colName"))
       item.add(2, "</tr>")
       item.add(1, "</thead>")
     item.add(0, '</table>')
