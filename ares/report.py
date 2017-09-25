@@ -249,7 +249,7 @@ def run_report(report_name, script_name):
       downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
       downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     report = __import__(report_name) # run the report
-    side_bar = [render_template_string('<h4 style="color:white"><strong><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></strong></h4>' % (report_name, report_name.replace(".py", ""), report.NAME))]
+    side_bar = [render_template_string('<h4 style="color:white"><strong><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></strong></h4>' % (report_name, report_name.replace(".py", ""), getattr(report, 'NAME', 'Missing NAME')))]
     for categories, links in getattr(report, 'SHORTCUTS', []):
       side_bar.append('<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % categories)
       for name, scriptName in links:
@@ -501,6 +501,7 @@ def designerComponent(component, compId):
 @report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
   """ Download a specific file in a report project """
+  #TODO add a check on the class variable DOWNLOAD to check if the module is downloadable (by default it is the case)
   requestParams = getHttpParams(request)
   if '.' not in script:
     # We assume it is a python script
