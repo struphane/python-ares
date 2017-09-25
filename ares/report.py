@@ -358,7 +358,7 @@ def ajaxCreate():
     with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
       zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
 
-    os.makedirs(os.path.join(scriptPath, 'output'))
+    os.makedirs(os.path.join(scriptPath, 'outputs'))
     return json.dumps("New environment created: %s" % scriptName), 200
 
   return json.dumps("Existing Environment"), 200
@@ -369,7 +369,7 @@ def uploadFiles(report_type, report_name):
   result = []
   reportTypes = {'report': (['.PY'], None), 'configuration': (['.JSON'], 'config'),
                  'ajax': (['.PY'], 'ajax'), 'javascript': (['.JS'], 'js'),
-                 'views': (['.TXT', '.CSV'], 'statics')
+                 'views': (['.TXT', '.CSV'], 'statics'), 'outputs': (None, 'outputs'),
                  }
   if not report_type in reportTypes:
     return json.dumps('Error %s category not recognized !' % report_type), 500
@@ -382,9 +382,12 @@ def uploadFiles(report_type, report_name):
     postParams = getHttpParams(request)
     for filename, fileType in request.files.items():
       file = request.files[filename]
-      fileWithoutExt = getFileName(file.filename, ext)
-      if fileWithoutExt is None:
-        return json.dumps('File extension %s not recognized for this category %s  !' % (ext, report_type)), 500
+      if report_type != 'outputs':
+        # No checks for the outputs folder
+        # User can deploy whatever they want in this folder
+        fileWithoutExt = getFileName(file.filename, ext)
+        if fileWithoutExt is None:
+          return json.dumps('File extension %s not recognized for this category %s  !' % (ext, report_type)), 500
 
       if 'DESTINATION' in postParams:
         fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, postParams['DESTINATION'], file.filename)
