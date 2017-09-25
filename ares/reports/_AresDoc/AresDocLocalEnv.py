@@ -2,6 +2,7 @@
 """
 
 NAME = 'Local Run'
+DOWNLOAD = None
 
 def report(aresObj):
   """

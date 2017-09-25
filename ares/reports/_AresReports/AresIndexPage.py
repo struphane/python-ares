@@ -19,6 +19,7 @@ import AresRefreshScripts
 from ares.Lib import Ares
 
 NAME = 'Report Environment'
+DOWNLOAD = None
 
 def report(aresObj):
   """

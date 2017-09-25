@@ -4,6 +4,7 @@
 """
 
 NAME = 'Table Link CCY and PTF'
+DOWNLOAD = 'SCRIPT'
 
 def report(aresObj):
   """

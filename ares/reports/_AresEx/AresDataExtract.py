@@ -4,6 +4,7 @@
 import ExAjaxDataExtract
 
 NAME = 'Reports Data Extract'
+DOWNLOAD = 'SCRIPT'
 
 def report(aresObj):
   """

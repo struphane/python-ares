@@ -7,6 +7,7 @@ import collections
 import os
 
 NAME = 'Reports Documentation'
+DOWNLOAD = None
 SHORTCUTS = [('Documentation', [
       ('Local Runs', 'AresDocLocalEnv'),
       ('HTML Components', 'AresDocHtml'),

@@ -5,6 +5,7 @@
 import ExAjaxRec
 
 NAME = 'Tables'
+DOWNLOAD = 'SCRIPT'
 
 def report(aresObj):
   """

@@ -5,6 +5,7 @@
 import ExAjaxRec
 
 NAME = 'Complex Tables'
+DOWNLOAD = 'SCRIPT'
 
 def report(aresObj):
   """

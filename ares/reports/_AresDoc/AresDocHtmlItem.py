@@ -5,6 +5,7 @@
 import importlib
 
 NAME = 'HTML Item'
+DOWNLOAD = None
 
 def report(aresObj):
   """

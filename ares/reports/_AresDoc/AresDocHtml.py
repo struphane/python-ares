@@ -8,6 +8,7 @@ import pyclbr
 import inspect
 
 NAME = 'HTML Components'
+DOWNLOAD = None
 
 def report(aresObj):
   """ Display all the HTML components """

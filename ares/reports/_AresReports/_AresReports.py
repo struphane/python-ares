@@ -7,6 +7,7 @@ import collections
 import os
 
 NAME = 'Reports Definition'
+DOWNLOAD = None
 
 def report(aresObj):
   """

@@ -239,10 +239,15 @@ def run_report(report_name, script_name):
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
     mod.report(reportObj)
-    downAll = reportObj.download(cssCls='btn btn-success bdiBar-download')
-    downAll.js('click', "window.location.href='../download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
-    downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
-    downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
+    typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
+    if typeDownload in ['BOTH', 'SCRIPT']:
+      downAll = reportObj.download(cssCls='btn btn-success bdiBar-download')
+      #TODO Replace this dirty hack to a correct way using URL_FOR
+      dots = '../../' if report_name.startswith("_") else '../'
+      downAll.js('click', "window.location.href='" + dots + "download/%(report_name)s/%(script)s'" % {'report_name': report_name, 'script': "%s.py" % report_name})
+    if typeDownload == 'BOTH':
+      downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
+      downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     report = __import__(report_name) # run the report
     side_bar = [render_template_string('<h4 style="color:white"><strong><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></strong></h4>' % (report_name, report_name.replace(".py", ""), report.NAME))]
     for categories, links in getattr(report, 'SHORTCUTS', []):
@@ -500,12 +505,16 @@ def downloadFiles(report_name, script):
   if '.' not in script:
     # We assume it is a python script
     script = "%s.py" % script
+  if report_name.startswith("_"):
+    pathDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports')
+  else:
+    pathDirectory = config.ARES_USERS_LOCATION
   if '&' in script:
     splitScriptPath = script.strip("\\").split("&")
-    userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name, *splitScriptPath[:-1])
+    userDirectory = os.path.join(pathDirectory, report_name, *splitScriptPath[:-1])
   else:
     splitScriptPath = [script]
-    userDirectory = os.path.join(config.ARES_USERS_LOCATION, report_name)
+    userDirectory = os.path.join(pathDirectory, report_name)
   return send_from_directory(userDirectory, splitScriptPath[-1], as_attachment=True)
 
 #TO BE REMOVED

@@ -6,6 +6,7 @@ import collections
 import os
 
 NAME = 'Templates'
+DOWNLOAD = None
 
 def report(aresObj):
   """

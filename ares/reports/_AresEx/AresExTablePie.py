@@ -4,6 +4,7 @@ __author__ = 'HOME'
 import ExAjaxRec
 
 NAME = 'Reports Definition'
+DOWNLOAD = 'SCRIPT'
 
 def report(aresObj):
 
