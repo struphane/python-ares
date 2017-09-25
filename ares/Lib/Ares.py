@@ -401,7 +401,7 @@ class Report(object):
     self.fileManager[fileFullPath] = open(fileFullPath, "w")
     return self.fileManager[fileFullPath]
 
-  def rDara(self, folder, fileName):
+  def rData(self, folder, fileName):
     """ Open a file in readonly """
     fileFullPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder, fileName)
     if not os.path.exists(fileFullPath):

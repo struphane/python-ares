@@ -193,11 +193,11 @@ class ButtonRefresh(ButtonRemove):
 
     strUrl = render_template_string('''{{ url_for('ares.ajaxCall', %s) }}''' % ",".join(pyVars))
     if "?" in strUrl and jsVars:
-      strUrl = "'%s&amp;%s" % (strUrl, " + '&amp;".join(jsVars))
+      strUrl = "%s&amp;%s +'" % (strUrl, " + '&amp;".join(jsVars))
     self.js('click',
             render_template_string('''
                 // The first part will update the file
-                $.post(%s, function(result) {
+                $.post('%s', function(result) {
                     var res = JSON.parse(result) ;
                     var data = res.data ;
                     var status = res.status ;
