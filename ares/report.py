@@ -308,7 +308,7 @@ def ajaxCall(report_name, script):
         f.close()
 
   if error:
-    return json.dumps({'status': 'Error', "data": [""], 'message': str(content)})
+    return json.dumps({'status': 'Error', "data": [], 'message': str(content)})
 
   return json.dumps(result)
 
