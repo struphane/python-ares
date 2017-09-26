@@ -231,7 +231,7 @@ class GraphSvG(AresHtml.Html):
     style = '' if len(self.header) > 2 else 'style="display:none"'
     if self.hasSeries:
       item = AresItem.Item('Series')
-      item.add(2, '<select id="%s_series_selector" class ="selectpicker" multiple="true" %s>' % (self.htmlId, style))
+      item.add(2, '<select id="%s_series_selector" size="1" class ="selectpicker" multiple="true" %s>' % (self.htmlId, style))
     else:
       item = AresItem.Item('')
       item.add(2, '<select hidden id="%s_series_selector" class ="selectpicker" multiple="true" %s>' % (
@@ -261,10 +261,11 @@ class GraphSvG(AresHtml.Html):
     item = AresItem.Item('<select id="%s_col_selector" class ="form-control input-sm" %s>' % (self.htmlId, style))
     item.add(1, '<optgroup label="X-Axis">')
     for headerLine in self.header:
-      if headerLine.get('selected') and headerLine.get('type') != 'number':
-        item.add(3, '<option value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
-      elif headerLine.get('type') != 'series':
-        item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
+      if headerLine.get('type') != 'object':
+        if headerLine.get('selected') and headerLine.get('type') != 'number':
+          item.add(3, '<option value="%s" selected>%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
+        elif headerLine.get('type') != 'series':
+          item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
     item.add(2, '</select>')
     self.categories = item
     self.jsEvent['cat-change'] = AresJs.JQueryEvents("%s_col_selector" % self.htmlId,

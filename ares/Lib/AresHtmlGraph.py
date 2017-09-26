@@ -387,7 +387,7 @@ class ScatterChart(JsNvD3Graph):
   alias = 'scatterChart'
   style = {'chartStyle': {},
            'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('%%x')(new Date(d)) }"},
+                                   'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }"},
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
 
