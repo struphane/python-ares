@@ -13,7 +13,6 @@ def report(aresObj):
   """
 
   """
-  aresObj.title('Reports Environment')
   aresInput = aresObj.input("Report Name", '')
   reportsPath = aresObj.http.get('DIRECTORY')
   # Get the list of all the reports

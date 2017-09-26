@@ -33,13 +33,13 @@
     </script>
 </head>
 <body oncontextmenu="return false;" style="background-color: #EAEAEA">
-    {% include 'ares_part_navbar.html' %}
+    {% include 'ares_part_navbar_reports.html' %}
 
 <div id="wrapper">
 	{% include 'ares_part_side_bar.html' %}
-	
+	<!--
 	<a href="#menu-toggle" id="menu-toggle"><i id='menu-icon' class="fa fa-chevron-circle-left fa-2x" aria-hidden="true"></i></a>
-	<!-- Page Content -->
+	 Page Content -->
     <div class="container">
         <div id="page-content-wrapper">
             {{ content|safe }}
@@ -49,14 +49,14 @@
 
 <script>
     {{ js|safe }}
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        if($("#menu-icon").hasClass('fa-chevron-circle-left')) {$("#menu-icon").removeClass('fa-chevron-circle-left').addClass("fa fa-chevron-circle-right fa-2x");}
-        else {$("#menu-icon").removeClass('fa-chevron-circle-right').addClass("fa fa-chevron-circle-left fa-2x");}
-        $("#wrapper").toggleClass("toggled");
-    });
-
-    $("#menu-icon").removeClass('fa-chevron-circle-left').addClass("fa fa-chevron-circle-right fa-2x");
+    //$("#menu-toggle").click(function(e) {
+    //    e.preventDefault();
+    //    if($("#menu-icon").hasClass('fa-chevron-circle-left')) {$("#menu-icon").removeClass('fa-chevron-circle-left').addClass("fa fa-chevron-circle-right fa-2x");}
+    //    else {$("#menu-icon").removeClass('fa-chevron-circle-right').addClass("fa fa-chevron-circle-left fa-2x");}
+    //    $("#wrapper").toggleClass("toggled");
+    //});
+    $("#wrapper").toggleClass("toggled");
+    //$("#menu-icon").removeClass('fa-chevron-circle-left').addClass("fa fa-chevron-circle-right fa-2x");
 </script>
 
 <script language="javascript" type="text/javascript" src="{{ url_for('static',filename='js/map-graph.js') }}"></script>

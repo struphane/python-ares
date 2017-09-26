@@ -202,7 +202,7 @@ def run_report(report_name, script_name):
   Run the report
 
   """
-  onload, js, error, side_bar = '', '', False, []
+  onload, js, error, side_bar, envName = '', '', False, [], ''
   try:
     if script_name is None:
       script_name = report_name
@@ -249,9 +249,11 @@ def run_report(report_name, script_name):
       downScript = reportObj.downloadAll(cssCls='btn btn-success bdiBar-download-all')
       downScript.js('click', "window.location.href='../download/%s/package'" % report_name)
     report = __import__(report_name) # run the report
-    side_bar = [render_template_string('<h4 style="color:white"><strong><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></strong></h4>' % (report_name, report_name.replace(".py", ""), getattr(report, 'NAME', 'Missing NAME')))]
+    envName = getattr(report, 'NAME', '')
+    #side_bar = [render_template_string('<h4 style="color:white"><strong><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></strong></h4>' % (report_name, report_name.replace(".py", ""), getattr(report, 'NAME', 'Missing NAME')))]
+    side_bar = ['<h5 style="color:white"><b>&nbsp;<i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Dashboard</b></h5>']
     for categories, links in getattr(report, 'SHORTCUTS', []):
-      side_bar.append('<h4 style="color:white"><strong>&nbsp;%s</strong></h4>' % categories)
+      side_bar.append('<h6 style="color:white"><b>&nbsp;&nbsp;&nbsp;<i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;%s</b></h6>' % categories)
       for name, scriptName in links:
         side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
     onload, content, js = reportObj.html()
@@ -276,7 +278,7 @@ def run_report(report_name, script_name):
   if error:
     return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
 
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar=side_bar)
+  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar), name=envName)
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
