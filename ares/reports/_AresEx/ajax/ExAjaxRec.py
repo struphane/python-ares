@@ -26,7 +26,6 @@ def getRecordSet(aresObj):
     recordSet.append({'ID': id_generator(), 'PTF': random.randint(1000, 1010), 'PTF2': random.randint(900, 1005),
                       'VAL2': random.uniform(0, 100),
                       'VAL3': random.uniform(0, 320),
-                      'VAL6': aresObj.paragraph(""),
                       'VAL': random.uniform(0, 100), 'CCY': CCYS[random.randint(0, 2)]})
   return recordSet
 
