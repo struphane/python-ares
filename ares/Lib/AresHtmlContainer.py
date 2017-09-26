@@ -79,7 +79,7 @@ class List(AresHtml.Html):
   def __str__(self):
     """ Return the String representation of a HTML List """
     item = AresItem.Item('<div class="panel panel-success">')
-    item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+    item.add(1, '<div class="ares-panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
     item.add(1, '<div class="panel-body">')
     item.add(2, '<ul %s>' % self.strAttr())
     for label in self.vals:
@@ -142,8 +142,8 @@ class Container(Div):
 
   def __str__(self):
     """ Return the String representation of a HTML List """
-    item = AresItem.Item('<div class="panel panel-success">') #% self.strAttr())
-    item.add(2, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+    item = AresItem.Item('<div class="panel ares-panel-success">') #% self.strAttr())
+    item.add(2, '<div class="ares-panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
     item.add(2, '<div class="panel-body">')
     for val in self.vals:
       item.add(3, val)
@@ -189,8 +189,8 @@ class GraphSvG(AresHtml.Html):
 
     item = AresItem.Item('')
     if self.headerBox is not None:
-      item.add(0, '<div class="panel panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
-      item.add(1, '<div class="panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
+      item.add(0, '<div class="panel ares-panel-success" style="width:%s%%;height:%spx;">' % (self.width, self.height))
+      item.add(1, '<div class="ares-panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
     item.add(1, '<div style="width:95%%;height:90%%;" %s>' % self.strAttr())
     #TODO put a better display for this section
     item.add(1, '<div class="container">')

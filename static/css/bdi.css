@@ -1,5 +1,13 @@
 
+.ares-panel-success {
+    border: 1px solid #c3c3c3;
+}
 
+.ares-panel-heading{
+    font-weight: bold;
+    font-size: 12px;
+    padding: 5px;
+}
 
 .bdiBar-download {
     position: fixed;

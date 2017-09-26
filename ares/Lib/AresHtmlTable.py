@@ -74,8 +74,8 @@ class Table(AresHtml.Html):
     """ Return the string representation of a HTML table """
     item = AresItem.Item(None, self.incIndent)
     if self.headerBox is not None:
-      item.add(0, '<div class="panel panel-success">')
-      item.add(1, '<div class="panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
+      item.add(0, '<div class="panel ares-panel-success">')
+      item.add(1, '<div class="ares-panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
       item.add(1, '<div class="panel-body">')
     if self.filt is not None:
       item.join(self.filt)
@@ -157,7 +157,7 @@ class Table(AresHtml.Html):
       for row in self.vals:
         for col in colObj:
           rawCol = "__%s" % col
-          if hasattr(row[rawCol], 'jsEvent'):
+          if rawCol in row and hasattr(row[rawCol], 'jsEvent'):
             getattr(row[rawCol], 'jsEvents')(jsEventFnc)
     return jsEventFnc
 
