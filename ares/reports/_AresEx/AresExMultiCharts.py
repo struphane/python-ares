@@ -102,6 +102,9 @@ def report(aresObj):
                                  }],
                     'Graph')
 
+
+
+
   stackedArea.style['chartAttr']['xAxis']['tickFormat'] = "function(d) { return d3.time.format('%x')(new Date(d)) }"
   line.style['chartAttr']['xAxis']['tickFormat'] = "function(d) { return d3.time.format('%x')(new Date(d)) }"
 

@@ -23,6 +23,7 @@ def report(aresObj):
 
   hbar.delAttr('xAxis', 'tickFormat')
   hbar.addStyle({'showControls': 'true'})
+
   # This will create a Bar chart on the page display
   # It will use the key of the recordSet and the colName will represent the values
   bar = aresObj.bar(recordSet, [
