@@ -1,7 +1,7 @@
 
 .ares-panel-success {
-    border: 1px solid #ffffff;
-    border-radius: 5px;
+    border: 1px solid #7bb062;
+    border-radius: 7px;
 }
 
 .ares-panel-heading{
@@ -16,6 +16,34 @@
     bottom: 6px;
     padding: 3px;
     border: 1px solid black
+}
+
+.btn-primary {
+    border-radius: 7px;
+    background-color: #7bb062;
+    border: 1px solid #bb062;
+
+    }
+
+.btn-primary:hover
+{
+    color: #fff;
+    background-color: rgba(37, 140, 51, 0.72);
+    border: 1px solid rgba(37, 140, 51, 0.72);
+}
+
+.btn-success {
+    border-radius: 7px;
+    border: 1px solid #7bb062;
+    background-color: #fff;
+    color: #7bb062;
+    }
+
+.btn-success:hover
+{
+    color: #fff;
+    background-color: #7bb062;
+    border: 1px solid #fff;
 }
 
 .bdiBar-download-all {
