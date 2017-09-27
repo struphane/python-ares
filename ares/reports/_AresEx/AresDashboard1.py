@@ -18,8 +18,11 @@ def report(aresObj):
   # It will use the key of the recordSet and the colName will represent the values
   hbar = aresObj.horizBarChart(recordSet, [{'key': 'CCY', 'colName': 'Currency'},
                                            {'key': 'VAL', 'colName': 'Value', 'type': 'number'},
+                                           {'key': 'PTF', 'colName': 'Portfolio', 'type': 'series'}
                                           ], headerBox='Per Currency')
 
+  hbar.delAttr('xAxis', 'tickFormat')
+  hbar.addStyle({'showControls': 'true'})
   # This will create a Bar chart on the page display
   # It will use the key of the recordSet and the colName will represent the values
   bar = aresObj.bar(recordSet, [
@@ -30,12 +33,12 @@ def report(aresObj):
   # This will create a Pie chart on the page display
   # It will use the key of the recordSet and the colName will represent the values
   pie = aresObj.pie(recordSet, [
-                                    {'key': 'CATEGORY', 'colName': 'Product'},
+                                    {'key': 'PTF', 'colName': 'Portfolio'},
                                     {'key': 'VAL', 'colName': 'Value', 'type': 'number'},
                                  ], headerBox='Concentration per Portfolio')
 
   # Special container to display all the chart on the same page
-  aresObj.row([hbar, pie, bar])
+  aresObj.row([pie, bar])
 
   # Display the recordSet as a tab;e
   # Same concept the columns to be displayed are selected by using the key
