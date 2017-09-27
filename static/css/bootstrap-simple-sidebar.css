@@ -6,7 +6,7 @@
 
 body {
     overflow-x: hidden;
-    background-color: #EAEAEA ;
+    background-color: #f4f4f4 ;
 }
 
 #menu-toggle {
@@ -27,7 +27,6 @@ body {
 
 #wrapper {
     margin-top: 60px ;
-    background-color: #EAEAEA ;
     font-family: Arial, sans-serif ;
     Font-Size: 10px ;
     padding-left: 0;
@@ -125,7 +124,6 @@ body {
     #wrapper {
         padding-left: 0;
         margin-top: 60px ;
-        background-color: #EAEAEA;
         font-family: Arial, sans-serif ;
         Font-Size: 10px ;
     }
