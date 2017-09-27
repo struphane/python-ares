@@ -14,7 +14,9 @@ SHORTCUTS = [('Tables', [('Basic Table', 'AresExTables'),
 
                          ]),
 
-             ('Templates', [('Data Extraction', 'AresDataExtract'),
+             ('Templates', [
+               ('Data Extraction', 'AresDataExtract'),
+               ('Dashboard 1', 'AresDashboard1.py'),
                       ]),
               ]
 
