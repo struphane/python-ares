@@ -235,6 +235,23 @@ class Numeric(AresHtml.Html):
     html = "<font %s>{:,d}/font>" % self.strAttr()
     return html.format(int(float(self.vals)))
 
+
+class Tick(AresHtml.Html):
+  """
+
+  """
+  alias = 'tick'
+
+  def __str__(self):
+    """ Return the String representation of a line tag """
+    locale.setlocale(locale.LC_ALL, '')
+    if self.vals:
+      html = "<i class='fa fa-check' aria-hidden='true' %s style='color:green'></i>" % self.strAttr()
+    else:
+      html = "<i class='fa fa-times' aria-hidden='true' %s style='color:red'></i>" % self.strAttr()
+    return html.format(int(float(self.vals)))
+
+
 # --------------------------------------------------------------------
 # Object dedicated to be used
 #      - To show an example of an HTML object

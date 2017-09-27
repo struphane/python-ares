@@ -37,8 +37,16 @@ def report(aresObj):
 
   # Display the recordSet as a tab;e
   # Same concept the columns to be displayed are selected by using the key
-  aresObj.table(recordSet, [{'key': 'PTF', 'colName': 'Portfolio'},
-                            {'key': 'CCY', 'colName': 'Currency'},
-                            {'key': 'CATEGORY', 'colName': 'Product'},
-                            {'key': 'VAL', 'colName': 'Value'},
-                            ], headerBox='Population')
+  newRecordSet = []
+  for rec in recordSet:
+    if rec['VAL'] < 20:
+      rec['TICK'] = aresObj.tick(False)
+    else:
+      rec['TICK'] = aresObj.tick(True)
+    newRecordSet.append(rec)
+  aresObj.table(newRecordSet, [{'key': 'PTF', 'colName': 'Portfolio'},
+                                {'key': 'CCY', 'colName': 'Currency'},
+                                {'key': 'CATEGORY', 'colName': 'Product'},
+                                {'key': 'VAL', 'colName': 'Value'},
+                                {'key': 'TICK', 'colName': 'Type', 'type': 'object'},
+                                ], headerBox='Population')
