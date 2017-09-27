@@ -6,6 +6,8 @@
 
 import ExAjaxRec
 
+DOWNLOAD = 'SCRIPT'
+
 def report(aresObj):
   """ Dummy report """
 
