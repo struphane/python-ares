@@ -23,9 +23,9 @@ def getRecordSet(aresObj):
   CCYS = ['EUR', 'GBP', 'USD']
   PRODUCTS = ['Bond', 'CDS', 'TRS', 'Option', 'Index']
   recordSet = []
-  for i in range(100):
+  for i in range(20):
     recordSet.append({'ID': id_generator(),
-                      'PTF': random.randint(1000, 1010),
+                      'PTF': random.randint(1, 1010),
                       'PTF2': random.randint(900, 1005),
                       'CATEGORY': PRODUCTS[random.randint(0, 4)],
                       'VAL2': random.uniform(0, 100),
