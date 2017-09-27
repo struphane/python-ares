@@ -228,13 +228,12 @@ class GraphSvG(AresHtml.Html):
 
   def selectSeries(self):
     """ """
-    style = '' if len(self.header) > 2 else 'style="display:none"'
+    style = 'style="margin-bottom:5px"' if len(self.header) > 2 else 'style="display:none"'
     if self.hasSeries:
-      item = AresItem.Item('Series')
-      item.add(2, '<select id="%s_series_selector" size="1" class ="selectpicker" multiple="true" %s>' % (self.htmlId, style))
+      item = AresItem.Item('<select id="%s_series_selector" class ="form-control input-sm" multiple="true" %s>' % (self.htmlId, style))
+      item.add(1, '<optgroup label="Series">')
     else:
-      item = AresItem.Item('')
-      item.add(2, '<select hidden id="%s_series_selector" class ="selectpicker" multiple="true" %s>' % (
+      item = AresItem.Item('<select hidden id="%s_series_selector" class ="form-control input-sm" multiple="true" %s>' % (
       self.htmlId, style))
       item.add(3, '<option value="default" selected>default</option>')
 
