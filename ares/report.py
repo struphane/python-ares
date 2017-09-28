@@ -209,6 +209,7 @@ def run_report(report_name, script_name):
     # add the folder directory to the python path in order to run the script
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
+      side_bar = ['<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresEx\', script_name=\'_AresEx\') }}" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>']
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       if not userDirectory in sys.path:
         sys.path.append(userDirectory)
@@ -216,6 +217,7 @@ def run_report(report_name, script_name):
       if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
         sys.path.append(ajaxPath)
     else:
+      side_bar = []
       systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       if not systemDirectory in sys.path:
         sys.path.append(systemDirectory)
@@ -240,7 +242,6 @@ def run_report(report_name, script_name):
     reportObj.http['DIRECTORY'] = userDirectory
     mod.report(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
-    side_bar = []
     if typeDownload in ['BOTH', 'SCRIPT']:
       side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadFiles\', report_name=\'%s\', script=\'%s.py\') }}" >Python script</a></li>' % (report_name, script_name)))
     if typeDownload == 'BOTH':

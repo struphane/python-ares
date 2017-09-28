@@ -46,10 +46,16 @@ def report(aresObj):
     if not os.path.exists(os.path.join(aresObj.http['DIRECTORY'], folder, "%s.py" % folder)):
       continue
 
+    name = folder
+    with open(os.path.join(aresObj.http['DIRECTORY'], folder, "%s.py" % folder)) as script:
+      for line in script:
+        if line.startswith("NAME"):
+          name = line.split("=")[1].strip().split("#")[0].replace("'", "").replace('"', "")
+
     iconComp = aresObj.icon('trash')
     iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
-    content.append({'folderName': folder, 'Date': folderInfo['LAST_MOD_DT'], 'Size': folderInfo['SIZE'],
-                    'folderLink': aresObj.anchor('%s.py' % folder, **{'report_name': folder, 'cssCls': ''}),
+    content.append({'folderName': name, 'Date': folderInfo['LAST_MOD_DT'], 'Size': folderInfo['SIZE'],
+                    'folderLink': aresObj.anchor(name, **{'report_name': folder, 'cssCls': ''}),
                     # TODO add this page in the bottom right section
                     #'folderLink': aresObj.main(folder, **{'report_name': '_AresReports', 'script_name': 'AresIndexPage', 'user_script': folder}),
                     'FolderFiles': len(aresObj.getFiles([folder])), 'delete': iconComp,
