@@ -54,14 +54,13 @@ def report(aresObj):
   recordSet = AresRefreshScripts.getRecordSet(aresObj, directory)
   ajaxRecordSet = AresRefreshScripts.getRecordSet(aresObj, os.path.join(directory, 'ajax'))
 
-  aresLogFile = os.path.join(directory, 'log_ares.dat')
-  folderEvents = collections.defaultdict(int)
-  if os.path.exists(aresLogFile):
-    log = open(aresLogFile, "r")
+  folderEvents, activity = collections.defaultdict(int), collections.defaultdict(int)
+  log = aresObj.logs(aresObj.http['USER_SCRIPT'])
+  if log is not None:
     for line in log:
       row = line.strip().split("#")
       folderEvents[row[1]] += 1
-    log.close()
+      activity[row[1]] += 1
 
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
 
@@ -77,14 +76,6 @@ def report(aresObj):
   aresObj.newline()
   aresObj.newline()
 
-  activity = collections.defaultdict(int)
-  inFile = aresObj.readFile('log_ares.dat')
-  if inFile is not None:
-    six.next(inFile)
-    for line in inFile:
-      splitLine = line.strip().split("#")
-      activity[splitLine[1]] += 1
-    inFile.close()
   content = []
   for k in sorted(activity.keys()):
     content.append([k, activity[k]])

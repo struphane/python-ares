@@ -408,6 +408,15 @@ class Report(object):
     self.fileManager[fileFullPath] = open(fileFullPath, typeFile)
     return self.fileManager[fileFullPath]
 
+  def logs(self, reportName):
+    """ Return the log file """
+    fileFullPath = os.path.join(self.http['DIRECTORY'], reportName, 'log_ares.dat')
+    if os.path.exists(fileFullPath):
+      self.fileManager[fileFullPath] = open(fileFullPath, 'r')
+      return self.fileManager[fileFullPath]
+
+    return None
+
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """
     if subfolders is None:
