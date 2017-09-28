@@ -190,12 +190,13 @@ class Table(AresHtml.Html):
     """ Return a String with the Javascript method to put in the HTML report """
     #item = AresItem.Item("var %s;" % self.htmlId)
     item = AresItem.Item("$(document).ready(function() {")
+    itemsPerPage = "pageLength: %s," % self.pageLength if self.pageLength is not None else ''
     if self.linkedObjs is not None:
       item.add(1, '''
                     %s.DataTable(
                       {
                         data: recordSet_%s ,
-                        pageLength: %s,
+                        %s
                         columns: [
                                     %s,
                               ],
@@ -211,7 +212,7 @@ class Table(AresHtml.Html):
                   %s
 
                   %s
-                  ''' % (self.jqId, self.recordSetId, self.pageLength, ",".join(self.recordSetHeader),
+                  ''' % (self.jqId, self.recordSetId, itemsPerPage, ",".join(self.recordSetHeader),
                          self.jsTableConf, self.jsMenu, self.jsClick))
     else:
       item.add(1, '''
@@ -219,8 +220,8 @@ class Table(AresHtml.Html):
                   // responsive: true,
                   %s = %s.DataTable(
                                      {
-                                        sDom: 'l<"H"Rf>t<"F"ip>',
-                                        pageLength: %s,
+                                        //sDom: 'l<"H"Rf>t<"F"ip>',
+                                        %s
                                         data: recordSet_%s ,
                                         columns: [
                                                     %s
@@ -242,7 +243,7 @@ class Table(AresHtml.Html):
                   %s
 
                   %s
-                  ''' % (self.htmlId, self.jqId, self.pageLength, self.recordSetId, ",".join(self.recordSetHeader),
+                  ''' % (self.htmlId, self.jqId, itemsPerPage, self.recordSetId, ",".join(self.recordSetHeader),
                          self.jsTableConf, self.jsInitCallBack, self.jsMenu, self.jsClick))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
