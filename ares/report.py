@@ -209,7 +209,7 @@ def run_report(report_name, script_name):
     # add the folder directory to the python path in order to run the script
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
-      side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
+      side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       if not userDirectory in sys.path:
         sys.path.append(userDirectory)
