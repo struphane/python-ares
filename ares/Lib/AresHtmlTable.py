@@ -34,7 +34,7 @@ class Table(AresHtml.Html):
   filt, filtId = None, None
   linkedObjs = None
   pageLength = 50
-  jsTableConf, jsMenu, jsClick = '', '', ''
+  jsTableConf, jsMenu, jsClick, jsInitCallBack = '', '', '', ''
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
@@ -232,14 +232,18 @@ class Table(AresHtml.Html):
                                         //      alert(display.toSource());
                                         //},
 
+                                        %s
+
                                      }
                   ) ;
+
+
 
                   %s
 
                   %s
                   ''' % (self.htmlId, self.jqId, self.pageLength, self.recordSetId, ",".join(self.recordSetHeader),
-                         self.jsTableConf, self.jsMenu, self.jsClick))
+                         self.jsTableConf, self.jsInitCallBack, self.jsMenu, self.jsClick))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)
@@ -285,6 +289,19 @@ class Table(AresHtml.Html):
           }
       );
       ''' % (self.htmlId, self.htmlId, jsFnc)
+
+  def initCallBack(self, js="$('#%s thead').find('tr:last').hide();"):
+    """
+
+    Call Back once the table is loaded
+      $('#%s thead').find('tr:last').hide();
+
+    """
+    self.jsInitCallBack = '''
+      fnInitComplete: function(oSettings) {
+        %s
+      },
+      ''' % js % self.htmlId
 
   def contextMenu(self, contextMenu):
     """
