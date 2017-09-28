@@ -91,6 +91,9 @@ def isExcluded(rootPath, file=None, folders=None):
     folder = os.path.join(*folders)
     if '__pycache__' in folder or folder == rootPath or '.svn' in folder:
       return True
+  else:
+    if '__pycache__' in rootPath or '.svn' in rootPath or 'text-base' in rootPath:
+      return True
 
   return False
 
@@ -391,25 +394,18 @@ class Report(object):
         folders.append(fileData)
     return folders
 
-  def wData(self, folder, fileName):
-    """ Create and write the output file """
-    outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
-    if not os.path.exists(outPath):
-      os.makedirs(outPath)
+  def open(self, fileName, typeFile='r', folder=None):
+    """ Return a python file object is the selected type """
+    if folder is None:
+      outPath = os.path.join(self.http['DIRECTORY'], 'outputs')
+    else:
+      outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
+      if not os.path.exists(outPath):
+        os.makedirs(outPath)
     # Open the file and register it in the Ares File Manager
     # This will be monitored by the framework to close the files
     fileFullPath = os.path.join(outPath, fileName)
-    self.fileManager[fileFullPath] = open(fileFullPath, "w")
-    return self.fileManager[fileFullPath]
-
-  def rData(self, folder, fileName):
-    """ Open a file in readonly """
-    fileFullPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder, fileName)
-    if not os.path.exists(fileFullPath):
-      return []
-    # Open the file and register it in the Ares File Manager
-    # This will be monitored by the framework to close the files
-    self.fileManager[fileFullPath] = open(fileFullPath, "r")
+    self.fileManager[fileFullPath] = open(fileFullPath, typeFile)
     return self.fileManager[fileFullPath]
 
   def getFileInfo(self, fileName, subfolders=None):

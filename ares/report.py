@@ -615,7 +615,7 @@ def downloadAres():
           zf.write(os.path.join(libPath, path, pyFile), os.path.join('flask.py'))
           continue
 
-        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
+        if Ares.isExcluded(path, file=pyFile):
           continue
 
         zipArchPath = path.replace(libPath, "").lstrip("\\")
