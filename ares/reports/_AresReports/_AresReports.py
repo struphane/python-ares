@@ -92,3 +92,4 @@ def report(aresObj):
   aresObj.row([barComp, pieComp])
 
   aresObj.updown(100000, 4)
+  aresObj.progressbar(40)

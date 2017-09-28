@@ -239,6 +239,7 @@ class Report(object):
   # ---------------------------------------------------------------------------------------------------------
   def vignet(self, header, text, recordSet, fnc, col,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self, header, text, recordSet, fnc, col, cssCls), sys._getframe().f_code.co_name)
   def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def progressbar(self, value, cssCls=None): return self.add(AresHtmlEvent.Progress(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def tick(self, value, cssCls=None): return self.add(AresHtmlText.Tick(self, value, cssCls), sys._getframe().f_code.co_name)
   def updown(self, value, delta, cssCls=None): return self.add(AresHtmlText.UpDown(self, value, delta, cssCls), sys._getframe().f_code.co_name)
   def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)

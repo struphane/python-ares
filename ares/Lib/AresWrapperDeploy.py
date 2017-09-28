@@ -62,12 +62,12 @@ if __name__ == '__main__':
   # javascript - In the folder js For javascript templates (like text files with a js extension)
   # views - in the folder statics For view configuration (like text files extension .txt)
   # outputs - in the folder outputs For any bespoke data - No extension checks)
-  files = [('Youpi.py', 'report'),
+  files = [('NewReport.py', 'report'),
            ('test.json', 'configuration'),
            ('params.txt', 'views'),
            ('params.zz', 'outputs'),
           ]
-  REPORT = 'Youpi'
+  REPORT = 'NewReport'
 
   # Function used to send files to the server
   uploadFiles(files, REPORT, withEnvCreation=True)

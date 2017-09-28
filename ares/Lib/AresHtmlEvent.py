@@ -530,6 +530,17 @@ class UploadFile(AresHtml.Html):
     return aresObj.upload("MyFile")
 
 
+class Progress(AresHtml.Html):
+  """ HTML Wrapper for the progress Bar """
+  cssCls = 'progress-bar bg-success'
+  alias = 'progressbar'
+
+  def __str__(self):
+    """ Return the String representation of the HTML progress bar """
+    items = AresItem.Item('<div class="progress" style="border:1px solid green">')
+    items.add(1, '<div %s role="progressbar" aria-valuenow="%s" aria-valuemin="0" aria-valuemax="100" style="width:%s%%">%s%%</div>' % (self.strAttr(), self.vals, self.vals, self.vals))
+    items.add(0, '</div>')
+    return str(items)
 
 if __name__ == '__main__':
   obj = DropZone(0, 'Drop files here')
