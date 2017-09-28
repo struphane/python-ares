@@ -5,7 +5,7 @@
 function getDict(dict, key, dflt){
     // Return a default value in a dictionary
     if (key in dict) return dict[key];
-    else return dflt
+    else return dflt ;
 }
 
 function getDataFromRecordSet(data, cols) {
@@ -28,6 +28,7 @@ function getDataFromRecordSet(data, cols) {
 function wrapperSimpleCharts(data, categories, selectedVals) {
     var key ;
     var val ;
+
     categories.each(function() {
         key = $(this).val();
     });
@@ -41,6 +42,7 @@ function wrapperSimpleCharts(data, categories, selectedVals) {
 
 function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, selectedSeries)
 {
+
     var tmpDict = {};
     var recSet = [];
     var series = [];
@@ -49,7 +51,7 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, sele
 
     selectedSeries.each(function() {
         series.push($(this).val());
-        })
+    }) ;
 
     //build tmpDict to aggregate the series together
 
@@ -57,14 +59,10 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, sele
     {
         category = data[i][selCat];
         values = data[i][selVal];
-
-        if (series.includes('default') )
-        {
-            serie = 'Default';
-        }
+        if (series.indexOf('default') != -1 ) { serie = 'Default'; }
         else
         {
-            if (!(series.includes(data[i][seriesKey]) || series.includes('All')))
+            if ( (series.indexOf(data[i][seriesKey]) != -1) && (series.indexOf('All') != -1) )
             {
                 continue;
             }
@@ -73,6 +71,7 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, sele
                 serie = data[i][seriesKey];
             }
         }
+
         if (serie in tmpDict)
         {
             tmpDict[serie].push([category, values]);
@@ -81,13 +80,13 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, sele
         {
             tmpDict[serie] = [[category, values]];
         }
-    }
+    } ;
 
     for (var key in tmpDict)
     {
 
         recSet.push({"key": key, "values": tmpDict[key]});
-    }
+    } ;
 
     return recSet;
 

@@ -89,5 +89,4 @@ def report(aresObj):
                                   {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Folder')
-  # pieComp.linkTo(tableComp)
   aresObj.row([barComp, pieComp])

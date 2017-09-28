@@ -178,8 +178,10 @@ class Bar(JsNvD3Graph):
   clickObject = 'discretebar'
   icon = 'fa fa-bar-chart'
   chartObject = 'discreteBarChart'
-  style = {'chartStyle': {'staggerLabels': 'true', 'showValues': 'true',
-                          'transitionDuration': '350'} }
+  style = {'chartStyle': {'staggerLabels': 'true',
+                          'showValues': 'true',
+                          'transitionDuration': '350'
+                          } }
 
   @classmethod
   def aresExample(cls, aresObj):
