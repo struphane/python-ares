@@ -47,6 +47,8 @@ from ares.Lib import AresItem
 from ares.Lib import AresHtmlHRef
 from ares.Lib import AresHtmlButton
 from ares.Lib import AresLog
+from ares.Lib import AresJsModules
+
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
@@ -116,8 +118,7 @@ class Report(object):
   showNavMenu = False
 
   def __init__(self, prefix=''):
-    """
-    """
+    """ Instanciate the Ares object """
     # Internal variable that should not be used directly
     # Those variable will drive the report generation
     self.countItems, self.countNotif = 0, 0
@@ -128,6 +129,7 @@ class Report(object):
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
     self.jsRegistered, self.jsGlobal, self.fileManager = {}, {}, {}
+    self.jsImports, self.cssImport = set(), set()
 
   def structure(self):
     return self.content

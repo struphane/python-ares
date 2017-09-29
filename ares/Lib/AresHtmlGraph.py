@@ -30,6 +30,8 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   pyDataSource = None
   chartObject = 'to be overriden'
   jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
+  jsFiles = ['jquery']
+  cssFiles = ['jquery-ui']
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """

@@ -54,6 +54,7 @@ class Html(object):
   alias, jsEvent, requirements = None, None, ['jquery-ui.js']
   cssCls, reference = None, None
   incIndent = 0
+  reqJs, reqCss = None, None
 
   def __init__(self, aresObj, vals, cssCls=None):
     """ Create an python HTML object """
@@ -63,6 +64,17 @@ class Html(object):
     self.vals = vals
     if cssCls is not None:
       self.attr['class'] = cssCls
+    if self.reqJs is not None:
+      self.aresObj.jsImports = [self.reqJs]
+    else:
+      self.aresObj.cssImport.append(self.reqJs)
+
+    if self.reqCss is not None:
+      if self.aresObj.cssImport is None:
+        self.aresObj.cssImport = [self.reqCss]
+      else:
+        self.aresObj.cssImport.append(self.reqCss)
+
 
   @property
   def htmlId(self):
