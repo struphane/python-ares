@@ -456,9 +456,6 @@ class Report(object):
         else:
           jsSection.append("\n".join(jsFncs))
 
-    print self.jsImports, self.cssImport
     importMng = AresJsModules.ImportManager()
-    importMng.cssResolve(self.cssImport)
-    importMng.jsResolve(self.jsImports)
     jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n".join(jsGraphs))
-    return "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)
+    return importMng.cssResolve(self.cssImport), importMng.jsResolve(self.jsImports), "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

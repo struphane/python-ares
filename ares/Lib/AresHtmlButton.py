@@ -31,7 +31,7 @@ class Button(AresHtml.Html):
   alias, cssCls = 'button', 'btn btn-success'
   reference = 'https://www.w3schools.com/tags/tag_button.asp'
   reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['jquery']
+  reqJs = ['bootstrap', 'jquery']
 
   def __str__(self):
     """ Return the String representation of HTML button """
@@ -87,7 +87,7 @@ class ButtonRemove(AresHtml.Html):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'remove'
   reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['jquery']
+  reqJs = ['bootstrap', 'jquery']
 
   def __str__(self):
     """ Return the String representation of a HTML Style Twitter button """
@@ -112,7 +112,7 @@ class ButtonDownload(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'download'
   reqCss = ['bootstrap']
-  reqJs = ['jquery']
+  reqJs = ['bootstrap', 'jquery']
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -133,7 +133,7 @@ class ButtonDownloadAll(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'downloadAll'
   reqCss = ['bootstrap']
-  reqJs = ['jquery']
+  reqJs = ['bootstrap', 'jquery']
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -154,7 +154,7 @@ class ButtonOk(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'ok'
   reqCss = ['bootstrap']
-  reqJs = ['jquery']
+  reqJs = ['bootstrap', 'jquery']
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -170,7 +170,7 @@ class ButtonRefresh(ButtonRemove):
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'refresh'
   reqCss = ['bootstrap']
-  reqJs = ['jquery']
+  reqJs = ['bootstrap', 'jquery']
 
   def __init__(self, aresObj, vals, recordSet, ajaxScript, withDataFiles, cssCls=None):
     """

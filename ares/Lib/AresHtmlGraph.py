@@ -142,7 +142,7 @@ class Pie(JsNvD3Graph):
   style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
   reqCss = ['bootstrap', 'font-awesome', 'd3']
-  reqJs = ['jquery', 'd3']
+  reqJs = ['d3']
 
   def update(self, data):
     """ Update the content of an HTML component """

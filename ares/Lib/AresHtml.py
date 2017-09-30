@@ -51,7 +51,7 @@ class Html(object):
     - jquery-ui.js, for the nice display of the Tooltips, the Date picker and the Slider objects
 
   """
-  alias, jsEvent, requirements = None, None, ['jquery-ui.js']
+  alias, jsEvent = None, None
   cssCls, reference = None, None
   incIndent = 0
   reqJs, reqCss = None, None

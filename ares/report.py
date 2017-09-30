@@ -203,6 +203,7 @@ def run_report(report_name, script_name):
 
   """
   onload, js, error, side_bar, envName = '', '', False, [], ''
+  cssImport, jsImport = '', ''
   try:
     if script_name is None:
       script_name = report_name
@@ -254,7 +255,7 @@ def run_report(report_name, script_name):
       side_bar.append('<h6 style="color:white"><b>&nbsp;&nbsp;&nbsp;<i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;%s</b></h6>' % categories)
       for name, scriptName in links:
         side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
-    onload, content, js = reportObj.html()
+    cssImport, jsImport, onload, content, js = reportObj.html()
   except Exception as e:
     error = True
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
@@ -274,9 +275,9 @@ def run_report(report_name, script_name):
         f.close()
 
   if error:
-    return render_template('ares_error.html', onload=onload, content=content, js=js, side_bar=side_bar)
+    return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, onload=onload, content=content, js=js, side_bar=side_bar)
 
-  return render_template('ares_template_basic.html', onload=onload, content=content, js=js, side_bar="\n".join(side_bar), name=envName)
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport, onload=onload, content=content, js=js, side_bar="\n".join(side_bar), name=envName)
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
