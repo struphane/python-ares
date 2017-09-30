@@ -101,7 +101,7 @@ class Table(AresHtml.Html):
     item.add(0, '</table>')
 
     if self.headerBox is not None:
-      item = AresHtmlContainer.AresBox(None, item, self.headerBox)
+      item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox)
     return str(item)
 
   def update(self, newRecordSet):
