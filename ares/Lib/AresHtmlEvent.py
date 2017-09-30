@@ -91,6 +91,7 @@ class Input(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
+
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.input("Input text...")

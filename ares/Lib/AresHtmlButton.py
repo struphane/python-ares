@@ -12,10 +12,12 @@ Some based functions are available in order to change more or less everything in
 
 import os
 import json
+from datetime import datetime
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from datetime import datetime
+from ares.Lib import AresJs
+
 from flask import render_template_string
 
 
@@ -35,43 +37,36 @@ class Button(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of HTML button """
-    return '<button %s type="button" style="margin-bottom: 20px;margin-top: -10px;">%s</button>' % (self.strAttr(), self.vals)
+    return '<button %s type="button" style="margin-bottom:20px;margin-top:-10px;">%s</button>' % (self.strAttr(), self.vals)
 
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.button("MyButton")
 
-  def post(self, evenType, url, **kwargs):
+  def post(self, evenType, scriptName, jsDef, attr):
     """
-      Post method to get data directly by interacting with the page
-      https://api.jquery.com/jquery.post/
+
     """
-    # Part dedicated to run before the Ajax call
-    jsData, pyData = [], []
-    for key, data in kwargs.items():
-      if key not in ('cssCls', 'js'):
-        if issubclass(data.__class__, AresHtml.Html):
-          jsData.append("%s: %s" % (key, data.val))
-        else:
-          pyData.append("%s='%s'" % (key, data))
-    # Distinguish jsData (to be converted in the javascript layer) from python data
-    # Python data will be converted on the server side and they will never change
-    # on the client
-    url = render_template_string('''{{ url_for(\'%s\', %s) }}''' % (url, ",".join(pyData)))
+    url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'%s\', script=\'%s\') }}''' % (self.aresObj.http['REPORT_NAME'], scriptName))
+    data = json.dumps(attr, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()')
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
-    preAjax.add(0, kwargs.get('preAjaxJs', ''))
-    # Return the common post call method to a AresJs object
-    super(Button, self).post(evenType, url, "{%s}" % ",".join(jsData),
-                             '''
-                              var res = JSON.parse(data) ;
-                              var data = res.data ;
-                              var status = res.status ;
-                              %s.html(%s);
-                              %s ;
-                             ''' % (self.jqId, self.htmlId, kwargs.get('js', '')),
-    str(preAjax), kwargs.get('redirectUrl', ''))
+    preAjax.add(0, attr.get('preAjaxJs', ''))
+    jsDef = '''
+              %s ;
+              $.post("%s", %s, function(data) {
+                  var res = JSON.parse(data) ;
+                  var data = res.data ;
+                  var status = res.status ;
+                  %s.html(%s);
+                  %s
+              } );
+            ''' % (preAjax, url, data, self.jqId, self.htmlId, jsDef)
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef, url=url)
 
+  def click(self, scriptName, jsDef, attr):
+    """ Implement the click event on the button object """
+    self.post('click', scriptName, jsDef, attr)
 
 class ButtonRemove(AresHtml.Html):
   """
@@ -111,7 +106,7 @@ class ButtonDownload(ButtonRemove):
   glyphicon, cssCls = 'download', 'btn btn-success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'download'
-  reqCss = ['bootstrap']
+  reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
   @classmethod
@@ -132,7 +127,7 @@ class ButtonDownloadAll(ButtonRemove):
   glyphicon, cssCls = 'cloud-download', 'btn btn-success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'downloadAll'
-  reqCss = ['bootstrap']
+  reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
   @classmethod
@@ -153,7 +148,7 @@ class ButtonOk(ButtonRemove):
   glyphicon, cssCls = 'check-square-o', 'success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'ok'
-  reqCss = ['bootstrap']
+  reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
   @classmethod

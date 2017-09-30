@@ -34,6 +34,15 @@ def deprecated(func):
         return func(*args, **kwargs)
     return new_func
 
+class SetEncoder(json.JSONEncoder):
+
+   def default(self, obj):
+     if issubclass(obj.__class__, Html):
+       return obj.val
+     if isinstance(obj, set):
+       return list(obj)
+
+     return json.JSONEncoder.default(self, obj)
 
 class Html(object):
   """
@@ -82,8 +91,12 @@ class Html(object):
 
   @property
   def jqId(self):
-    """ Property to get the Jquery ID of a python HTML object """
-    return '$("#%s")' % self.htmlId
+    """
+    Property to get the Jquery ID of a python HTML object
+    The use of ' instead of " is because the dumps will add some \ and it will not be correctly taken into account
+    by the javascript layer
+    """
+    return "$('#%s')" % self.htmlId
 
   @property
   def val(self):

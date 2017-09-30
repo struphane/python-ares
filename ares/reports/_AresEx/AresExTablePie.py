@@ -1,7 +1,7 @@
 __author__ = 'HOME'
 
 
-import ExAjaxRec
+import ExAjaxQuery
 
 NAME = 'Reports Definition'
 DOWNLOAD = 'SCRIPT'
@@ -9,7 +9,7 @@ DOWNLOAD = 'SCRIPT'
 def report(aresObj):
 
   # Write your report here
-  recordSet = ExAjaxRec.getRecordSet(aresObj)
+  recordSet = ExAjaxQuery.getRecordSet(aresObj)
   table = aresObj.table(recordSet, [
                                     {'key': 'PTF', 'colName': 'Portfolio'},
                                         {'key': 'CCY', 'colName': 'Currency'},
@@ -23,10 +23,6 @@ def report(aresObj):
   pie = aresObj.bar(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Graph')
-
-  button = aresObj.refresh("", recordSet, 'ExAjaxRec')
-  button.click('''
-                  %s ;
-                  %s ;
-               ''' % (table.jsUpdate(), pie.jsUpdate())
-               )
+  aresInput = aresObj.input("Report Name", '')
+  button = aresObj.button("Refresh Data")
+  button.click('ExAjaxQuery', '%s ; %s ;' % (table.jsUpdate(), pie.jsUpdate()), {'Ok': 1, 'deux': {'ddd': 'dsfdsf', 'input': aresInput}})
