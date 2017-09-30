@@ -68,16 +68,12 @@ class Html(object):
     if self.aresObj is not None:
       # Some components are not using aresObj because they are directly used for the display
       if self.reqJs is not None:
-        self.aresObj.jsImports.add(self.reqJs)
-      else:
-        self.aresObj.cssImport.add(self.reqJs)
+        for js in self.reqJs:
+          self.aresObj.jsImports.add(js)
 
       if self.reqCss is not None:
-        if self.aresObj.cssImport is None:
-          self.aresObj.cssImport = [self.reqCss]
-        else:
+        for css in self.reqCss:
           self.aresObj.cssImport.add(self.reqCss)
-
 
   @property
   def htmlId(self):
