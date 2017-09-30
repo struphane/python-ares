@@ -169,7 +169,7 @@ class ButtonRefresh(ButtonRemove):
   glyphicon, cssCls = 'refresh', 'btn btn-success'
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'refresh'
-  reqCss = ['bootstrap']
+  reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
   def __init__(self, aresObj, vals, recordSet, ajaxScript, withDataFiles, cssCls=None):
