@@ -73,7 +73,7 @@ class Html(object):
 
       if self.reqCss is not None:
         for css in self.reqCss:
-          self.aresObj.cssImport.add(self.reqCss)
+          self.aresObj.cssImport.add(css)
 
   @property
   def htmlId(self):

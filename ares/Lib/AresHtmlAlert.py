@@ -20,6 +20,7 @@ class DangerAlert(AresHtml.Html):
   closeButton = False
   cssCls = 'alert-danger'
   jsEvent = None
+  reqCss = ['bootstrap']
 
   def __init__(self, aresObj, title, value, countNotif, closeButton=False, backgroundColor=None, cssCls=None):
     """ """
@@ -50,7 +51,7 @@ class SuccessAlert(DangerAlert):
   backgroundColor = '#4CAF50'
   closeButton = True
   cssCls = 'alert-success'
-
+  reqCss = ['bootstrap']
 
 class WarningAlert(DangerAlert):
   """ """
@@ -58,7 +59,7 @@ class WarningAlert(DangerAlert):
   backgroundColor = '#2196F3'
   closeButton = True
   cssCls = 'alert-warning'
-
+  reqCss = ['bootstrap']
 
 class InfoAlert(DangerAlert):
   """ """
@@ -66,4 +67,4 @@ class InfoAlert(DangerAlert):
   backgroundColor = '#ff9800'
   closeButton = True
   cssCls = 'alert-info'
-
+  reqCss = ['bootstrap']

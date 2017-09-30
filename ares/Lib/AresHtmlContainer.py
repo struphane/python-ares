@@ -14,6 +14,8 @@ class Div(AresHtml.Html):
   """ Python Wrapper for a simple DIV tag """
   reference = 'https://www.w3schools.com/tags/tag_div.asp'
   alias = 'div'
+  reqCss = ['bootstrap']
+  reqJs = ['jquery']
 
   def __str__(self):
     """ Return the HMTL object of for div """
@@ -95,6 +97,7 @@ class List(AresHtml.Html):
               var listResult = data.join('</li><li class="list-group-item">')
               %s.html('<li class="list-group-item">' + listResult + '</li>') ;
             ''' % self.jqId
+
 
 class ListBadge(AresHtml.Html):
   """

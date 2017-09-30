@@ -37,6 +37,8 @@ class Table(AresHtml.Html):
   linkedObjs = None
   pageLength = 50
   jsTableConf, jsMenu, jsClick, jsInitCallBack = '', '', '', ''
+  reqCss = ['dataTables']
+  reqJs = ['jquery']
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
