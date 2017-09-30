@@ -47,6 +47,7 @@ from ares.Lib import AresItem
 from ares.Lib import AresHtmlHRef
 from ares.Lib import AresHtmlButton
 from ares.Lib import AresLog
+from ares.Lib import AresHtmlAjaxCall
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
@@ -321,11 +322,15 @@ class Report(object):
   def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self, value, cssCls), sys._getframe().f_code.co_name)
 
+  def ajaxCall(self, values='', cssCls=None): return self.add(AresHtmlAjaxCall.AjaxCall(), sys._getframe().f_code.co_name)
+
+
 
   # Designer objects
   def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self, 'Put your text here', cssCls), sys._getframe().f_code.co_name)
   def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self, 'Drop here', cssCls), sys._getframe().f_code.co_name)
   def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self, vals, cssCls), sys._getframe().f_code.co_name)
+
 
   def components(self):
     """ Get the list of component available in the framework """

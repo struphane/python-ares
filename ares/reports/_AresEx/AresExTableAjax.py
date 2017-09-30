@@ -22,3 +22,4 @@ def report(aresObj):
                   %s ;
                ''' % table.jsUpdate()
                )
+
