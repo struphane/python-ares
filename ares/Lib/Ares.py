@@ -48,7 +48,7 @@ from ares.Lib import AresHtmlHRef
 from ares.Lib import AresHtmlButton
 from ares.Lib import AresLog
 from ares.Lib import AresJsModules
-from ares.Lib import AresHtmlMeter
+#from ares.Lib import AresHtmlMeter
 
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
@@ -274,7 +274,7 @@ class Report(object):
   def ok(self, value, cssCls=None): return self.add(AresHtmlButton.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
 
   # Meter
-  def meter(self, value, cssCls=None): return self.add(AresHtmlMeter.Meter(self, value, cssCls), sys._getframe().f_code.co_name)
+  #def meter(self, value, cssCls=None): return self.add(AresHtmlMeter.Meter(self, value, cssCls), sys._getframe().f_code.co_name)
 
 
   # Generic Action section
