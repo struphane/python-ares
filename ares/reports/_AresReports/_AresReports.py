@@ -90,6 +90,3 @@ def report(aresObj):
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Folder')
   aresObj.row([barComp, pieComp])
-
-  aresObj.updown(100000, 4)
-  aresObj.progressbar(40)
