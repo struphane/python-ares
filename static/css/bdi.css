@@ -134,3 +134,10 @@
    overflow: auto;
    overflow-y: auto;
 }
+
+.ares-meter-text {
+  font-weight: bold;
+  font-size: 3em;
+  font-family: monospace;
+  color: #111;
+}
