@@ -64,16 +64,19 @@ class Html(object):
     self.vals = vals
     if cssCls is not None:
       self.attr['class'] = cssCls
-    if self.reqJs is not None:
-      self.aresObj.jsImports = [self.reqJs]
-    else:
-      self.aresObj.cssImport.append(self.reqJs)
 
-    if self.reqCss is not None:
-      if self.aresObj.cssImport is None:
-        self.aresObj.cssImport = [self.reqCss]
+    if self.aresObj is not None:
+      # Some components are not using aresObj because they are directly used for the display
+      if self.reqJs is not None:
+        self.aresObj.jsImports.add(self.reqJs)
       else:
-        self.aresObj.cssImport.append(self.reqCss)
+        self.aresObj.cssImport.add(self.reqJs)
+
+      if self.reqCss is not None:
+        if self.aresObj.cssImport is None:
+          self.aresObj.cssImport = [self.reqCss]
+        else:
+          self.aresObj.cssImport.add(self.reqCss)
 
 
   @property

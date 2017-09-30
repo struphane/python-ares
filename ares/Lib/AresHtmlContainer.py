@@ -511,6 +511,33 @@ class Vignet(AresHtml.Html):
     return str(res)
 
 
+class AresBox(AresHtml.Html):
+  """
+
+  """
+  cssCls = 'panel ares-panel-success'
+
+  def __init__(self, aresObj, vals, headerBox, cssCls=None):
+    """  """
+    super(AresBox, self).__init__(aresObj, vals, cssCls)
+    self.headerBox = headerBox
+
+  def __str__(self):
+    """  Return the HTML representation of the Box objects """
+    item = AresItem.Item('<div class="%s">' % self.cssCls)
+    item.add(1, '<div class="ares-panel-heading">')
+    item.add(2, '<strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
+    #item.add(2, '<span class="border:1px solid black; width:100%; float: right; text-align: right">')
+    item.add(3, '<a href="#" class="btn"  style="float: right; text-decoration: none; color: black"><i class="fa fa-window-close" aria-hidden="true"></i></a>')
+    item.add(3, '<a href="#" class="btn"  style="float: right; text-decoration: none; color: black"><i class="fa fa-window-minimize" aria-hidden="true"></i></a>')
+    #item.add(2, '</span>')
+    item.add(1, '</div>')
+    item.add(1, '<div class="panel-body">')
+    item.add(2, self.vals)
+    item.add(1, '</div>')
+    item.add(0, '</div>')
+    return str(item)
+
 if __name__ == '__main__':
   obj = Tabs(0, ['!', '2'])
   echo(obj)
