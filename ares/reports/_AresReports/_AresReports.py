@@ -79,10 +79,10 @@ def report(aresObj):
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Scripts per folder')
   inputModal = aresObj.input("Report Name", '')
-  createReport = aresObj.button('Create the Report')
-  createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal, 'js': "%s.modal('toggle') ; display(data) ;" % modal.jqId})
+  #createReport = aresObj.button('Create the Report')
+  #createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal, 'js': "%s.modal('toggle') ; display(data) ;" % modal.jqId})
   aresObj.addTo(modal, inputModal)
-  aresObj.addTo(modal, createReport)
+  #aresObj.addTo(modal, createReport)
   pieComp = aresObj.donut(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
                                   {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
                                   {'key': 'Date', 'colName': 'Last Modification'},
