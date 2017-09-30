@@ -36,5 +36,4 @@ def getRecordSet(aresObj):
 
 def call(aresObj):
   """ This will return fake data to feed the different test components in this framework """
-  print aresObj.http
   return {"status": "Updated", "data": getRecordSet(aresObj), "content": ""}
