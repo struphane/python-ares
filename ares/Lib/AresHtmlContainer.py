@@ -1,9 +1,7 @@
-""" Python Module to define all the HTML Containers
+"""
+Definition of all the different HTML Containers wrappers.
 
 """
-
-
-from click import echo
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -536,8 +534,5 @@ class AresBox(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-if __name__ == '__main__':
-  obj = Tabs(0, ['!', '2'])
-  echo(obj)
 
 

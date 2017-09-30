@@ -1,9 +1,9 @@
-""" Python Module to define all the HTML component dedicated to handle events
+"""
+
 
 """
 
 
-from click import echo
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
@@ -542,13 +542,3 @@ class Progress(AresHtml.Html):
     items.add(0, '</div>')
     return str(items)
 
-if __name__ == '__main__':
-  obj = DropZone(0, 'Drop files here')
-  echo('\n'.join(obj.jsEvents()))
-  echo('\n'.join(obj.onLoad()))
-  echo(obj)
-
-  obj = DatePicker(0, 'Drop files here')
-  echo('\n'.join(obj.jsEvents()))
-  echo('\n'.join(obj.onLoad()))
-  echo(obj)

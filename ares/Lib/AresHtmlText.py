@@ -1,11 +1,10 @@
-""" Python Module to define all the HTML component dedicated to display plain text
+"""
+Definition of all the different HTML Text wrappers.
 
 """
 
 import os
 import locale
-
-from click import echo
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -415,13 +414,3 @@ class Wiki(AresHtml.Html):
               box.hide() ;
             }
            """ % (self.http['REPORT_NAME'], self.dataSourceName)
-
-if __name__ == '__main__':
-  obj = Title(0, 'Reports Environment (Beta)')
-  #echo(obj.jsEvents())
-  echo('\n'.join(obj.onLoad()))
-  #echo(obj)
-
-  Numeric(1, 34455656)
-  objText = Paragraph(0, "Youpi {0}", htmlComp=[Numeric(1, 34455656)])
-  echo(objText)
