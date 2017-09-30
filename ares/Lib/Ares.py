@@ -48,6 +48,7 @@ from ares.Lib import AresHtmlHRef
 from ares.Lib import AresHtmlButton
 from ares.Lib import AresLog
 from ares.Lib import AresJsModules
+from ares.Lib import AresHtmlMeter
 
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
@@ -272,6 +273,9 @@ class Report(object):
   def button(self, value, cssCls=None): return self.add(AresHtmlButton.Button(self, value, cssCls), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None): return self.add(AresHtmlButton.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
 
+  # Meter
+  def meter(self, value, cssCls=None): return self.add(AresHtmlMeter.Meter(self, value, cssCls), sys._getframe().f_code.co_name)
+
 
   # Generic Action section
   def slider(self, value, cssCls=None): return self.add(AresHtmlEvent.Slider(self, value, cssCls), sys._getframe().f_code.co_name)
@@ -456,7 +460,7 @@ class Report(object):
         else:
           jsSection.append("\n".join(jsFncs))
 
-    print self.jsImports, self.cssImport
+    echo(str(self.jsImports) + ' ' + str(self.cssImport))
     importMng = AresJsModules.ImportManager()
     importMng.cssResolve(self.cssImport)
     importMng.jsResolve(self.jsImports)
