@@ -301,7 +301,7 @@ def ajaxCall(report_name, script):
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
     mod = __import__(script.replace(".py", ""))
-    result = mod.call(reportObj)
+    result = {'status': 'Success', "data": mod.call(reportObj)}
   except Exception as e:
     content = traceback.format_exc()
     error = True
@@ -317,7 +317,15 @@ def ajaxCall(report_name, script):
 
   return json.dumps(result)
 
-
+@report.route("/handlerequest/<module_name>/<function>", methods = ['GET', 'POST'])
+def handleRequest(module_name, function):
+  onload, js, error = '', '', False
+  try:
+    mod = __import__(module_name)
+    results = {"status": "success", "data": getattr(mod, function)(getHttpParams(request))}
+  except Exception as e:
+    results = {"status": "Error", "message": str(e), "data": []}
+  return json.dumps(results)
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to upload files to a shared environment on the server

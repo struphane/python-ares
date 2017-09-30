@@ -322,9 +322,7 @@ class Report(object):
   def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self, value, cssCls), sys._getframe().f_code.co_name)
 
-  def ajaxCall(self, values='', cssCls=None): return self.add(AresHtmlAjaxCall.AjaxCall(), sys._getframe().f_code.co_name)
-
-
+  def handleRequest(self, method, params, js="", cssCls=None): return self.add(AresHtmlAjaxCall.HandleRequest(self, method, params, js, cssCls), sys._getframe().f_code.co_name)
 
   # Designer objects
   def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self, 'Put your text here', cssCls), sys._getframe().f_code.co_name)

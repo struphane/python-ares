@@ -192,6 +192,7 @@ class ButtonRefresh(ButtonRemove):
       pyVars.add("user_script='%s'" % self.aresObj.http.get('USER_SCRIPT', self.aresObj.http['REPORT_NAME']))
 
     strUrl = render_template_string('''{{ url_for('ares.ajaxCall', %s) }}''' % ",".join(pyVars))
+    print(strUrl)
     if "?" in strUrl and jsVars:
       strUrl = "%s&amp;%s +'" % (strUrl, " + '&amp;".join(jsVars))
     self.js('click',
