@@ -7,6 +7,8 @@ import os
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
+from ares.Lib import AresHtmlContainer
+
 from flask import render_template_string
 
 
@@ -35,6 +37,8 @@ class Table(AresHtml.Html):
   linkedObjs = None
   pageLength = 50
   jsTableConf, jsMenu, jsClick, jsInitCallBack = '', '', '', ''
+  reqCss = ['dataTables']
+  reqJs = ['bootstrap', 'dataTables']
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
     """
@@ -73,14 +77,12 @@ class Table(AresHtml.Html):
   def __str__(self):
     """ Return the string representation of a HTML table """
     item = AresItem.Item(None, self.incIndent)
-    if self.headerBox is not None:
-      item.add(0, '<div class="panel ares-panel-success">')
-      item.add(1, '<div class="ares-panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
-      item.add(1, '<div class="panel-body">')
+
+    #
+    #
     if self.filt is not None:
       item.join(self.filt)
     item.add(0, '<table %s>' % self.strAttr())
-
     if len(self.header) > 1:
       item.add(1, "<thead>")
       for headerLine in self.header[:-1]:
@@ -101,8 +103,7 @@ class Table(AresHtml.Html):
     item.add(0, '</table>')
 
     if self.headerBox is not None:
-      item.add(0, '</div>')
-      item.add(0, '</div>')
+      item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox)
     return str(item)
 
   def update(self, newRecordSet):

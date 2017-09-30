@@ -1,9 +1,7 @@
-""" Python Module to define all the HTML Containers
+"""
+Definition of all the different HTML Containers wrappers.
 
 """
-
-
-from click import echo
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -14,6 +12,8 @@ class Div(AresHtml.Html):
   """ Python Wrapper for a simple DIV tag """
   reference = 'https://www.w3schools.com/tags/tag_div.asp'
   alias = 'div'
+  reqCss = ['bootstrap']
+  reqJs = ['jquery']
 
   def __str__(self):
     """ Return the HMTL object of for div """
@@ -56,7 +56,6 @@ class IFrame(AresHtml.Html):
     </iframe>''' % (self.vals, styleStr)
 
 
-
 class List(AresHtml.Html):
   """
   HTML List
@@ -96,6 +95,7 @@ class List(AresHtml.Html):
               var listResult = data.join('</li><li class="list-group-item">')
               %s.html('<li class="list-group-item">' + listResult + '</li>') ;
             ''' % self.jqId
+
 
 class ListBadge(AresHtml.Html):
   """
@@ -142,14 +142,10 @@ class Container(Div):
 
   def __str__(self):
     """ Return the String representation of a HTML List """
-    item = AresItem.Item('<div class="panel ares-panel-success">') #% self.strAttr())
-    item.add(2, '<div class="ares-panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
-    item.add(2, '<div class="panel-body">')
+    item = AresItem.Item(None)
     for val in self.vals:
       item.add(3, val)
-    item.add(2, '</div>')
-    item.add(1, '</div>')
-    return str(item)
+    return str(AresBox(self.htmlId, item, self.headerBox))
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -188,9 +184,6 @@ class GraphSvG(AresHtml.Html):
     self.selectSeries()
 
     item = AresItem.Item('')
-    if self.headerBox is not None:
-      item.add(0, '<div class="panel ares-panel-success" style="width:%s%%;height:100%%;">' % self.width)
-      item.add(1, '<div class="ares-panel-heading"><strong><i class="%s" aria-hidden="true"></i>&nbsp;%s</strong></div>' % (self.icon, self.headerBox))
     item.add(1, '<div style="width:95%%;height:100%%;" %s>' % self.strAttr())
     #TODO put a better display for this section
     item.add(1, '<div class="container">')
@@ -204,11 +197,10 @@ class GraphSvG(AresHtml.Html):
     if self.series is not None:
       item.join(self.series)
     item.add(1, '</div>')
-
     item.add(1, '<svg style="width:100%;height:400px;"></svg>')
-    if self.headerBox is not None:
-      item.add(0, '</div>')
     item.add(0, '</div>')
+    item = AresBox(self.htmlId, item, self.headerBox)
+
     return str(item)
 
   def selectKey(self):
@@ -511,8 +503,36 @@ class Vignet(AresHtml.Html):
     return str(res)
 
 
-if __name__ == '__main__':
-  obj = Tabs(0, ['!', '2'])
-  echo(obj)
+class AresBox(AresHtml.Html):
+  """
+
+  """
+  cssCls = 'panel ares-panel-success'
+
+  def __init__(self, htmlId, vals, headerBox):
+    """  """
+    self.idContainer = htmlId
+    self.vals = vals
+    self.headerBox = headerBox
+
+  @property
+  def htmlId(self):
+    """ Property to get the HTML ID of a python HTML object """
+    return "win_%s" % self.idContainer
+
+  def __str__(self):
+    """  Return the HTML representation of the Box objects """
+    item = AresItem.Item('<div class="%s" id="%s_main">' % (self.cssCls, self.htmlId))
+    item.add(1, '<div class="ares-panel-heading">')
+    item.add(2, '<strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
+    item.add(3, '<button class="btn btn-xs" id="%s_close" name="ares_close" style="text-align: center;float:right;"><i class="fa fa-window-close" aria-hidden="true"></i></button>' % self.htmlId)
+    item.add(3, '<button class="btn btn-xs" id="%s_min" name="ares_min" style="text-align: center;float:right;"><i class="fa fa-window-minimize" aria-hidden="true"></i></button>' % self.htmlId)
+    item.add(1, '</div>')
+    item.add(1, '<div class="panel-body" id="%s">' % self.htmlId)
+    item.add(2, self.vals)
+    item.add(1, '</div>')
+    item.add(0, '</div>')
+    return str(item)
+
 
 

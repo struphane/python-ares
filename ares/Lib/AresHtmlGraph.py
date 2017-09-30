@@ -30,6 +30,7 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   pyDataSource = None
   chartObject = 'to be overriden'
   jsFrag = '''.x(function(d) { return d[0]; }).y(function(d) { return d[1]; })'''
+  jsFiles = ['jquery']
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
@@ -140,6 +141,8 @@ class Pie(JsNvD3Graph):
   clickObject = 'pie'
   style = {'chartStyle': {'showLabels': '1'}}
   chartObject = 'pieChart'
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['d3']
 
   def update(self, data):
     """ Update the content of an HTML component """
@@ -164,6 +167,8 @@ class Donut(Pie):
   alias = 'donut'
   clickObject = 'pie'
   style = {'chartStyle': {'showLabels': '1', 'labelThreshold': '.05', 'labelType': '"percent"', 'donut': 'true', 'donutRatio': '0.35'} }
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
 
 class Bar(JsNvD3Graph):
@@ -178,8 +183,12 @@ class Bar(JsNvD3Graph):
   clickObject = 'discretebar'
   icon = 'fa fa-bar-chart'
   chartObject = 'discreteBarChart'
-  style = {'chartStyle': {'staggerLabels': 'true', 'showValues': 'true',
-                          'transitionDuration': '350'} }
+  style = {'chartStyle': {'staggerLabels': 'true',
+                          'showValues': 'true',
+                          'transitionDuration': '350'
+                          } }
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -198,6 +207,8 @@ class Line(JsNvD3Graph):
   mockData = r'json\line.json'
   alias = 'lineChart'
   chartObject = 'lineChart'
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
   style = {'chartStyle': {'margin': '{left: 100}', 'useInteractiveGuideline': 'true', 'showLegend': 'true',
                           'showYAxis': 'true', 'showXAxis': 'true'},
@@ -226,6 +237,8 @@ class StackedArea(JsNvD3Graph):
                          }}
 
   clickObject = 'scatter'
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
 
 class MultiBars(JsNvD3Graph):
@@ -260,6 +273,8 @@ class MultiBars(JsNvD3Graph):
                                    },
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
 
 class LineWithFocus(JsNvD3Graph):
@@ -297,6 +312,8 @@ class LineWithFocus(JsNvD3Graph):
                                     'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }",},
                          'y2Axis': {'tickFormat': "d3.format(',.2f')"}
                          }}
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
 
 class HorizontalBars(JsNvD3Graph):
@@ -334,6 +351,8 @@ class HorizontalBars(JsNvD3Graph):
                                    'tickFormat':"function(d) { return d3.time.format('%x')(new Date(d)) }",},
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
 
 class ComboLineBar(JsNvD3Graph):
@@ -357,6 +376,8 @@ class ComboLineBar(JsNvD3Graph):
                          'y1Axis': {'tickFormat': "d3.format(',.2f')"},
                          'y2Axis': {'tickFormat': "d3.format(',.2f')"}
                          }}
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
 
 class ScatterChart(JsNvD3Graph):
@@ -390,6 +411,8 @@ class ScatterChart(JsNvD3Graph):
                                    'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }"},
                          'yAxis': {'tickFormat': "d3.format(',.2f')"}
                          }}
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
 
 class Network(JsNvD3Graph):
@@ -419,6 +442,8 @@ class IndentedTree(JsNvD3Graph):
   """
   showCount = 1
   alias = 'tree'
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['jquery', 'd3']
 
   def __init__(self, aresObj, cols, data, useMockData=False):
     """
@@ -474,6 +499,7 @@ class WordCloud(JsNvD3Graph):
   """
   mockData = r'json\pie.json'
   alias = 'cloudChart'
+  reqJs = ['jquery', 'd3', 'cloud']
 
   def pyDataToJs(self, localPath=None):
     """ """
@@ -547,10 +573,3 @@ class WordCloud(JsNvD3Graph):
           };
           '''
 
-
-if __name__ == '__main__':
-  obj = Pie(0, [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}])
-
-  echo(obj.jsEvents())
-  echo('\n'.join(obj.onLoad()))
-  echo(obj)

@@ -5,14 +5,18 @@
 
 NAME = 'Ares Example'
 # Just to set up the menu on the left hand side
-SHORTCUTS = [('Tables', [('Basic Table', 'AresExTables'),
+SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
+
+                         ]),
+
+              ('Tables', [('Basic Table', 'AresExTables'),
                          ('Complex Table', 'AresExTablesComplex'),
                          ('Ajax Table', 'AresExTableAjax'),
                          ('Table with Chart', 'AresExTablePie')
                          ]),
              ('Graphs', [('Basic Charts', 'AresExSimpleCharts'),
-                          ('Multi Charts', 'AresExMultiCharts'),
-
+                         ('Other Charts', 'AresExMultiCharts'),
+                         ('Multi Bar Charts', 'AresExMultiBarChart'),
                          ]),
 
              ('Templates', [

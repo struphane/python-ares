@@ -20,6 +20,8 @@ class A(AresHtml.Html):
   """
   alias, cssCls = 'anchor', 'btn btn-success'
   flask = 'ares.run_report'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['jquery']
 
   def __init__(self, aresObj, vals, **kwargs):
     super(A, self).__init__(aresObj, vals, kwargs.get('cssCls'))
@@ -62,6 +64,8 @@ class ScriptPage(A):
   """
   alias, cssCls = 'main', ''
   flask = 'ares.run_report'
+  reqCss = ['bootstrap']
+  reqJs = ['jquery']
 
 
 class Download(A):
@@ -70,6 +74,8 @@ class Download(A):
   """
   alias, cssCls = 'anchor_download', 'fa fa-download'
   flask = 'ares.downloadFiles'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['jquery']
 
 
 class CreateEnv(A):
@@ -78,14 +84,16 @@ class CreateEnv(A):
   """
   alias, cssCls = 'anchor_set_env', 'btn btn-primary'
   flask = 'ares.ajaxCreate'
+  reqCss = ['bootstrap']
+  reqJs = ['jquery']
 
 
 class AddScript(A):
-    """
-
-    """
-    alias, cssCls = 'anchor_add_scripts', 'btn btn-primary'
-    flask = 'ares.addScripts'
+  """ """
+  alias, cssCls = 'anchor_add_scripts', 'btn btn-primary'
+  flask = 'ares.addScripts'
+  reqCss = ['bootstrap']
+  reqJs = ['jquery']
 
 
 class ABespoke(AresHtml.Html):
@@ -94,6 +102,8 @@ class ABespoke(AresHtml.Html):
   In this class no Javascript is used in the click event
   """
   alias, cssCls = 'external_link', ''
+  reqCss = ['bootstrap']
+  reqJs = ['jquery']
 
   def __init__(self, aresObj, vals, url, **kwargs):
     super(ABespoke, self).__init__(aresObj, vals, kwargs.get('cssCls'))

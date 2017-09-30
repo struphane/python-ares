@@ -1,11 +1,10 @@
-""" Python Module to define all the HTML component dedicated to display plain text
+"""
+Definition of all the different HTML Text wrappers.
 
 """
 
 import os
 import locale
-
-from click import echo
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -38,6 +37,7 @@ class Code(AresHtml.Html):
   reference = 'https://v4-alpha.getbootstrap.com/content/code/'
   alias = 'code'
   htmlComp = None
+  reqCss = ['bootstrap']
 
   def __init__(self, aresObj, vals, cssCls=None, htmlComp=None):
     super(Code, self).__init__(aresObj, vals, cssCls)
@@ -57,7 +57,6 @@ class Code(AresHtml.Html):
 
 class Preformat(AresHtml.Html):
   """ Python Wrapper for the HTML preformatted tag """
-
   reference = "https://www.w3schools.com/html/html_styles.asp"
   alias = 'preformat'
 
@@ -96,6 +95,7 @@ class BlockQuote(AresHtml.Html):
   """ Python Wrapper to the HTML Block qutoe Bootstrap object """
   alias, cssCls = 'blockquote', 'blockquote'
   reference = 'https://v4-alpha.getbootstrap.com/content/typography/'
+  reqCss = ['bootstrap']
 
   def __str__(self):
     """  String representation of the HTML object """
@@ -205,10 +205,10 @@ class Line(AresHtml.Html):
 
 
 class Icon(AresHtml.Html):
-  """
-  """
+  """ Wrapper for the HTML awesome icons """
   reference = 'http://fontawesome.io/icons/'
   alias = 'icon'
+  reqCss = ['font-awesome']
 
   def __str__(self):
     """ Return the String representation of a line tag """
@@ -237,10 +237,9 @@ class Numeric(AresHtml.Html):
 
 
 class Tick(AresHtml.Html):
-  """
-
-  """
+  """ Wrapper for a numerical component with a up and down arrow """
   alias = 'tick'
+  reqCss = ['font-awesome']
 
   def __str__(self):
     """ Return the String representation of a line tag """
@@ -260,6 +259,8 @@ class Tick(AresHtml.Html):
 class TextInput(AresHtml.Html):
   """ special HTML object in charge of changing properties when double clicked """
   alias = 'aresInput'
+  reqJs = ['jquery']
+  reqCss = ['bootstrap', 'font-awesome']
 
   def __str__(self):
     """ Return the html string representation """
@@ -388,13 +389,3 @@ class Wiki(AresHtml.Html):
               box.hide() ;
             }
            """ % (self.http['REPORT_NAME'], self.dataSourceName)
-
-if __name__ == '__main__':
-  obj = Title(0, 'Reports Environment (Beta)')
-  #echo(obj.jsEvents())
-  echo('\n'.join(obj.onLoad()))
-  #echo(obj)
-
-  Numeric(1, 34455656)
-  objText = Paragraph(0, "Youpi {0}", htmlComp=[Numeric(1, 34455656)])
-  echo(objText)

@@ -47,6 +47,9 @@ from ares.Lib import AresItem
 from ares.Lib import AresHtmlHRef
 from ares.Lib import AresHtmlButton
 from ares.Lib import AresLog
+from ares.Lib import AresJsModules
+#from ares.Lib import AresHtmlMeter
+
 from ares.Lib import AresHtmlAjaxCall
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
@@ -117,8 +120,7 @@ class Report(object):
   showNavMenu = False
 
   def __init__(self, prefix=''):
-    """
-    """
+    """ Instanciate the Ares object """
     # Internal variable that should not be used directly
     # Those variable will drive the report generation
     self.countItems, self.countNotif = 0, 0
@@ -129,6 +131,7 @@ class Report(object):
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
     self.jsRegistered, self.jsGlobal, self.fileManager = {}, {}, {}
+    self.jsImports, self.cssImport = set(['ares']), set(['ares'])
 
   def structure(self):
     return self.content
@@ -240,7 +243,9 @@ class Report(object):
   # ---------------------------------------------------------------------------------------------------------
   def vignet(self, header, text, recordSet, fnc, col,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self, header, text, recordSet, fnc, col, cssCls), sys._getframe().f_code.co_name)
   def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def progressbar(self, value, cssCls=None): return self.add(AresHtmlEvent.Progress(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def tick(self, value, cssCls=None): return self.add(AresHtmlText.Tick(self, value, cssCls), sys._getframe().f_code.co_name)
+  def updown(self, value, delta, cssCls=None): return self.add(AresHtmlText.UpDown(self, value, delta, cssCls), sys._getframe().f_code.co_name)
   def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def preformat(self, value, cssCls=None): return self.add(AresHtmlText.Preformat(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def blockquote(self, value, cssCls=None): return self.add(AresHtmlText.BlockQuote(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
@@ -268,6 +273,9 @@ class Report(object):
   def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlButton.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)
   def button(self, value, cssCls=None): return self.add(AresHtmlButton.Button(self, value, cssCls), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None): return self.add(AresHtmlButton.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
+
+  # Meter
+  #def meter(self, value, cssCls=None): return self.add(AresHtmlMeter.Meter(self, value, cssCls), sys._getframe().f_code.co_name)
 
 
   # Generic Action section
@@ -328,7 +336,6 @@ class Report(object):
   def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self, 'Put your text here', cssCls), sys._getframe().f_code.co_name)
   def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self, 'Drop here', cssCls), sys._getframe().f_code.co_name)
   def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self, vals, cssCls), sys._getframe().f_code.co_name)
-
 
   def components(self):
     """ Get the list of component available in the framework """
@@ -455,5 +462,6 @@ class Report(object):
         else:
           jsSection.append("\n".join(jsFncs))
 
+    importMng = AresJsModules.ImportManager()
     jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n".join(jsGraphs))
-    return "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)
+    return importMng.cssResolve(self.cssImport), importMng.jsResolve(self.jsImports), "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)
