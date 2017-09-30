@@ -129,7 +129,7 @@ class Report(object):
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
     self.jsRegistered, self.jsGlobal, self.fileManager = {}, {}, {}
-    self.jsImports, self.cssImport = set(), set()
+    self.jsImports, self.cssImport = set(['ares']), set(['ares'])
 
   def structure(self):
     return self.content
@@ -456,5 +456,6 @@ class Report(object):
         else:
           jsSection.append("\n".join(jsFncs))
 
+    print self.jsImports, self.cssImport
     jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n".join(jsGraphs))
     return "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

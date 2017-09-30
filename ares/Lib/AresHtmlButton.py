@@ -1,5 +1,13 @@
 """
+Definition of all the different HTML button wrappers.
+From this module lot of different sort of HTML buttons can be displayed like:
+  - ButtonDownload, the button dedicated to download files
+  - ButtonRefresh, the button dedicated to query another script in the framework and then to refresh data
+  - ButtonOk, to validate something and return a notification
+  - GeneratePdf, to generate a Pdf report
 
+Also it is possible to use the generic and basic button object - Button - to then change it to a specific one in your report.
+Some based functions are available in order to change more or less everything in the python
 """
 
 import os
@@ -7,8 +15,8 @@ import json
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from flask import render_template_string
 from datetime import datetime
+from flask import render_template_string
 
 
 class Button(AresHtml.Html):
@@ -233,6 +241,7 @@ class GeneratePdf(ButtonRemove):
   alias = "generatePdf"
   glyphicon, cssCls = "book", "btn btn-default"
   source = r"http://pdfmake.org/#/gettingstarted"
+  reqJs = ['pdfmake']
 
   def __init__(self, aresObj, fileName=None, cssCls=None): # Hack: I need the whole aresObj as param since I need to retrieve everything that has been created so far
     super(GeneratePdf, self).__init__(aresObj, "", cssCls)
