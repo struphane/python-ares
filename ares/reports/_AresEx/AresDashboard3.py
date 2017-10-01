@@ -1,4 +1,6 @@
+
 import ExAjaxRec
+import random
 
 DOWNLOAD = 'SCRIPT'
 
@@ -9,8 +11,8 @@ def report(aresObj):
                                     {'key': 'PTF', 'colName': 'Portfolio'}
                                     ], headerBox="Currency")
 
-  meter = aresObj.meter(0.60, headerBox='Percentage Completion')
-  cols = aresObj.col([meter, aresObj.vignet('Current Value and evolution', 'The value has decreased from yesterday', aresObj.updown(2000, -30))])
+  meter = aresObj.meter(random.randint(0, 100) / 100.0, headerBox='Percentage Completion')
+  cols = aresObj.col([meter, aresObj.vignet('Current Value and evolution', 'The value has decreased from yesterday', aresObj.updown(random.randint(1000, 1000), random.randint(-10, 10)))])
   aresObj.row([cloud, cols])
 
   tableObj = aresObj.table( recordSet
