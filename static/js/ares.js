@@ -140,5 +140,5 @@ function getRecordSetFromTable(htmlTableId){
 
 function buildCountRecordSet(){
 
-    return [{text: 'Ok', size: 20}, {text: 'Aurelie', size: 120}]
+    return [{text: 'Remi', size: 20}, {text: 'Alfredo', size: 120}, {text: 'Olivier', size: 40}, {text: 'Nelson', size: 200}]
 }
