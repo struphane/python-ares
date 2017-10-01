@@ -91,5 +91,5 @@ def report(aresObj):
                                   {'key': 'delete', 'colName': ''}], 'Folder')
   aresObj.row([barComp, pieComp])
   aresObj.meter(0.60)
-  aresObj.cloud([{'TEST': 'YES'}], [{'key': 'TEST', 'colName': 'Test'}], headerBox="Test")
+  aresObj.paragraph("dgfgf")
   aresObj.cloud([{'TEST': 'YES'}], [{'key': 'TEST', 'colName': 'Test'}], headerBox="Test")
