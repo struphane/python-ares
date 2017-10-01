@@ -232,7 +232,7 @@ class Numeric(AresHtml.Html):
   def __str__(self):
     """ Return the String representation of a line tag """
     locale.setlocale(locale.LC_ALL, '')
-    html = "<font %s>{:,d}/font>" % self.strAttr()
+    html = "<font %s>{:,d}</font>" % self.strAttr()
     return html.format(int(float(self.vals)))
 
 
@@ -249,6 +249,33 @@ class Tick(AresHtml.Html):
     else:
       html = "<i class='fa fa-times' aria-hidden='true' %s style='color:red'></i>" % self.strAttr()
     return html.format(int(float(self.vals)))
+
+
+class UpDown(AresHtml.Html):
+  """ Up and down Text component """
+  alias = 'updown'
+  default = {'color': 'green', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal',
+             'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '15px'}
+
+  def __init__(self, aresObj, vals, delta, cssCls=None, htmlComp=None):
+    super(UpDown, self).__init__(aresObj, vals, cssCls)
+    self.delta = delta
+
+  def addStyle(self, name, value):
+    """ Add the style to the Title object """
+    if self.style is None:
+      self.style = dict(self.default)
+    self.style[name] = value
+
+  def __str__(self):
+    """ Return the String representation of a line tag """
+    if not hasattr(self, 'style'):
+      self.style = dict(self.default)
+    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
+    if self.delta > 0:
+      return "<i class='fa fa-arrow-up' aria-hidden='true' %s style='%s'>%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
+
+    return "<i class='fa fa-arrow-down' aria-hidden='true' %s style='%s'>%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
 
 
 # --------------------------------------------------------------------

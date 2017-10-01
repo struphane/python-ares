@@ -9,13 +9,9 @@ def report(aresObj):
                                     {'key': 'PTF', 'colName': 'Portfolio'}
                                     ], headerBox="Currency")
 
-  pieObj = aresObj.pie( recordSet
-                      , [ {'key': 'CTY', 'colName': 'Portfolio'}
-                        , {'key': 'VAL', 'colName': 'Value', 'type': 'number'}
-                        ,
-                        ]
-                      , headerBox='Concentration per Country')
-  aresObj.row([cloud, pieObj])
+  meter = aresObj.meter(0.60, headerBox='Percentage Completion')
+  cols = aresObj.col([meter, aresObj.updown(2000, -30)])
+  aresObj.row([cloud, cols])
 
   tableObj = aresObj.table( recordSet
                           , [ {'key': 'PTF', 'colName': 'Portfolio'}

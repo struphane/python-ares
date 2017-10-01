@@ -276,7 +276,7 @@ class Report(object):
   def ok(self, value, cssCls=None): return self.add(AresHtmlButton.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
 
   # Meter
-  def meter(self, value, cssCls=None): return self.add(AresHtmlMeter.Meter(self, value, cssCls), sys._getframe().f_code.co_name)
+  def meter(self, value, headerBox=None, cssCls=None): return self.add(AresHtmlMeter.Meter(self, headerBox, value, cssCls), sys._getframe().f_code.co_name)
 
   # Map
   def map(self, cssCls=None): return self.add(AresHtmlMap.Map(self, cssCls), sys._getframe().f_code.co_name)

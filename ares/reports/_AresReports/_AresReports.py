@@ -90,4 +90,3 @@ def report(aresObj):
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Folder')
   aresObj.row([barComp, pieComp])
-  aresObj.meter(0.60)

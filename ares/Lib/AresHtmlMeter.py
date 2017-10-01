@@ -15,7 +15,7 @@ import os
 import json
 
 from ares.Lib import AresHtml
-
+from ares.Lib import AresHtmlContainer
 
 class Meter(AresHtml.Html):
   """
@@ -25,7 +25,7 @@ class Meter(AresHtml.Html):
   reqCss = []
   reqJs = ['meter']
 
-  def __init__(self, aresObj, value, cssCls=None):
+  def __init__(self, aresObj, headerBox, value, cssCls=None):
     """Initialise a new meter object.
 
     ARGUMENTS
@@ -36,11 +36,15 @@ class Meter(AresHtml.Html):
       raise ValueError('Value must be in range 0..1')
 
     super(Meter, self).__init__(aresObj, [], cssCls)
+    self.headerBox = headerBox
     self.value = value
 
   def __str__(self):
     """ Return the String representation of HTML button """
-    return '<div %s></div><script>var %s = meter("%s", %f);</script>' % (self.strAttr(), self.htmlId, self.htmlId, self.value)
+    strItem = '<div %s></div><script>var %s = meter("%s", %f);</script>' % (self.strAttr(), self.htmlId, self.htmlId, self.value)
+    if self.headerBox is not None:
+      return str(AresHtmlContainer.AresBox(self.htmlId, strItem, self.headerBox))
+    return strItem
 
   @classmethod
   def aresExample(cls, aresObj):
