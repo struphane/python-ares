@@ -22,7 +22,7 @@ from ares.Lib import Ares
 # Path for the server on which you are testing the report
 # The name of the report you are working on (The folder name)
 SERVER_PATH = 'http://127.0.0.1:5000'
-REPORT = "Youpi" # The name of the main script with the report
+REPORT = "NewReport" # The name of the main script with the report
 
 # CSS imports
 CSS = ['bootstrap.min.css',
