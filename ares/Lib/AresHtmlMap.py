@@ -22,7 +22,7 @@ class Map(AresHtml.Html):
       setattr(aresObj, 'maps_included', set())
 
   def set_default_area(self, cfg):
-    slf.defaultarea = dict(cfg)
+    self.defaultarea = dict(cfg)
 
   def update_areas(self, areas):
     self.areas.update(areas)

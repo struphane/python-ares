@@ -9,7 +9,6 @@ DOWNLOAD = 'SCRIPT'
 def report(aresObj):
 
   # Write your report here
-  #recordSet = ExAjaxRec.getRecordSet(aresObj)
   table = aresObj.table([], [
                               {'key': 'PTF', 'colName': 'Portfolio'},
                               {'key': 'CCY', 'colName': 'Currency'},

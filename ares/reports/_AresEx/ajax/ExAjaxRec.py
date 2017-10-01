@@ -22,6 +22,7 @@ def getRecordSet(aresObj):
 
   """
   CCYS = ['EUR', 'GBP', 'USD']
+  CTIES = ['US', 'CA', 'BR', 'GB', 'FR', 'IT', 'DE', 'RU', 'DZ', 'CN', 'JP', 'AU']
   PRODUCTS = ['Bond', 'CDS', 'TRS', 'Option', 'Index']
   recordSet = []
   for i in range(20):
@@ -32,7 +33,8 @@ def getRecordSet(aresObj):
                       'VAL2': random.uniform(0, 100),
                       'VAL3': random.uniform(0, 320),
                       'VAL': random.uniform(0, 100),
-                      'CCY': CCYS[random.randint(0, 2)]})
+                      'CCY': CCYS[random.randint(0, 2)],
+                      'CTY': CTIES[random.randint(0, len(CTIES)-1)]})
   return recordSet
 
 def call(aresObj):
