@@ -313,7 +313,7 @@ class Report(object):
   def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def cloudChart(self, header, values, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self, header, values, cssCls), sys._getframe().f_code.co_name)
+  def cloud(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.WordCloud(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
   def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
 
   # File HTML Section

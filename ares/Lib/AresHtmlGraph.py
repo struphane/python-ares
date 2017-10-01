@@ -498,8 +498,8 @@ class WordCloud(JsNvD3Graph):
   the update method should appear once and only once in the javascript section of the page
   """
   mockData = r'json\pie.json'
-  alias = 'cloudChart'
-  reqJs = ['jquery', 'd3', 'cloud']
+  alias = 'cloud'
+  reqJs = ['cloud']
 
   def pyDataToJs(self, localPath=None):
     """ """
@@ -511,7 +511,7 @@ class WordCloud(JsNvD3Graph):
   def js(self, localPath=None):
     """ Return the entries to be added to the Javascript to create the graph during the loading """
     res = ["var fill = d3.scale.category20();"]
-    res.append("%svar data_%s = %s ;" % (INDENT, self.htmlId, self.pyDataToJs(localPath)))
+    res.append("var data_%s = %s ;" % (self.htmlId, self.pyDataToJs(localPath)))
     res.append('''
           d3.layout.cloud().size([960, 600])
             .words(data_%s) // Refer to the data variable

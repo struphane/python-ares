@@ -7,7 +7,7 @@ from flask import render_template_string
 
 JS_IMPORTS = {
   # module are written from the first one to load to the last one
-  'bootstrap': {'modules': ['bootstrap.min.js']},
+  'bootstrap': {'req': ['jquery'], 'modules': ['bootstrap.min.js']},
 
   # Javascript packages to handle DataTables
   'dataTables': {'req': ['jquery', 'bootstrap'],
@@ -21,18 +21,17 @@ JS_IMPORTS = {
   'pdfmake': {'modules': ['pdfmake.min.js', 'vfs_fonts.js']},
 
   # Javascript dependencies for D3 and NVD2 components
-  'd3': {'req': ['jquery'],
-         'modules': ['nv.d3.js', 'd3.v3.js']},
+  'd3': {'req': ['jquery', 'bootstrap'],
+         'modules': ['d3.v3.js', 'nv.d3.js']},
 
   # Javascript modules for the Cloud graph object
-  'cloud': {'req': ['d3', 'jquery'],
-            'modules': ['colorbrewer.js', 'd3.layout.cloud.js']},
+  'cloud': {'req': ['d3'], 'modules': ['colorbrewer.js', 'd3.layout.cloud.js']},
 
   # Internal javascript packages for Ares
   'ares': {'req': ['bootstrap'], 'modules': ['ares.js']},
 
   # Cannot add properly the dependency in this one as my algorithm does not work for shared dependencies ....
-  'meter': {'modules': ['d3.meter.js']},
+  'meter': {'req': ['d3'], 'modules': ['d3.meter.js']},
   }
 
 CSS_IMPORTS = {
@@ -139,40 +138,38 @@ class ImportManager(object):
     for req in defModule[alias].get('req', []):
       self.getModules(modules, req, folder, defModule)
 
+  def getReq(self, mod, modList,importHierarchy ):
+    modList.append(mod)
+    for req in importHierarchy[mod].get("req", []):
+      self.getReq(req, modList, importHierarchy)
+
   def cleanImports(self, imports, importHierarchy):
     """  Remove the underlying imports to avoid duplicated entries """
-    for alias, definition in importHierarchy.items():
-      if 'req' in definition:
-        if alias in imports:
-          for req in definition['req']:
-            if req in imports:
-              imports.remove(req)
-    return imports
+    importResolve = []
+    for mod in imports:
+      self.getReq(mod, importResolve, importHierarchy)
+    setImport = set(importResolve)
+    for a in setImport:
+      occurences = [j for j, x in enumerate(importResolve) if x == a]
+      if len(occurences) > 1:
+        for j in occurences[::-1][1:]:
+          importResolve.pop(j)
+    return importResolve[::-1]
 
   def cssResolve(self, cssAliases):
     """ Return the list of CSS modules to add to the header """
-    cssList = OrderedSet()
+    cssList = []
     cssAliases = self.cleanImports(cssAliases, CSS_IMPORTS)
     for cssAlias in cssAliases:
-      modules = list(self.cssImports[cssAlias]['main'])
       for urlModule in list(self.cssImports[cssAlias]['main']):
-        cssList.add('<link rel="stylesheet" href="%s" type="text/css">' % urlModule)
-    # Add the CSS dependencies modules
-    for cssAlias in cssAliases:
-      for urlModule in list(self.cssImports[cssAlias]['dep'])[::-1]:
-        cssList.add('<link rel="stylesheet" href="%s" type="text/css">' % urlModule)
-    return render_template_string("\n".join(cssList.__reversed__()))
+        cssList.append('<link rel="stylesheet" href="%s" type="text/css">' % urlModule)
+    return render_template_string("\n".join(cssList))
 
   def jsResolve(self, jsAliases):
     """ Return the list of Javascript modules to add to the header """
-    jsList = OrderedSet()
+    jsList = []
     jsAliases = self.cleanImports(jsAliases, JS_IMPORTS)
     for jsAlias in jsAliases:
-      modules = list(self.jsImports[jsAlias]['main'])
       for urlModule in list(self.jsImports[jsAlias]['main']):
-        jsList.add('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
-    # Add the dependencies modules
-    for jsAlias in jsAliases:
-      for urlModule in list(self.jsImports[jsAlias]['dep'])[::-1]:
-        jsList.add('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
-    return render_template_string("\n".join(jsList.__reversed__()))
+        jsList.append('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
+    return render_template_string("\n".join(jsList))
