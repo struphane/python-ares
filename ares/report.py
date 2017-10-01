@@ -249,7 +249,6 @@ def run_report(report_name, script_name):
       side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadReport\', report_name=\'%s\') }}" >environment</a></li>' % report_name))
     report = __import__(report_name) # run the report
     envName = getattr(report, 'NAME', '')
-    #side_bar = [render_template_string('<h4 style="color:white"><strong><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></strong></h4>' % (report_name, report_name.replace(".py", ""), getattr(report, 'NAME', 'Missing NAME')))]
     side_bar.append('<h5 style="color:white"><b>&nbsp;<i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Dashboard</b></h5>')
     for categories, links in getattr(report, 'SHORTCUTS', []):
       side_bar.append('<h6 style="color:white"><b>&nbsp;&nbsp;&nbsp;<i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;%s</b></h6>' % categories)

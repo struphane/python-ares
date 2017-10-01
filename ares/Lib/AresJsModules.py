@@ -29,9 +29,10 @@ JS_IMPORTS = {
             'modules': ['colorbrewer.js', 'd3.layout.cloud.js']},
 
   # Internal javascript packages for Ares
-  'ares': {'req': ['jquery', 'bootstrap', 'd3'], 'modules': ['ares.js', 'components.js']}, # TODO: Detach these two and create a proper, working 'meter' entry
-  #'ares': {'req': ['jquery', 'bootstrap'], 'modules': ['ares.js']},
-  #'meter': {'req': ['d3'], 'modules': ['components.js']},
+  'ares': {'req': ['jquery', 'bootstrap'], 'modules': ['ares.js']},
+
+  #
+  'meter': {'req': ['d3'], 'modules': ['components.js']},
   }
 
 CSS_IMPORTS = {

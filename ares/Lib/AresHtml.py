@@ -63,6 +63,7 @@ class Html(object):
   alias, jsEvent = None, None
   cssCls, reference = None, None
   incIndent = 0
+  reqJs, reqCss = None, None
 
   def __init__(self, aresObj, vals, cssCls=None):
     """ Create an python HTML object """
@@ -72,6 +73,16 @@ class Html(object):
     self.vals = vals
     if cssCls is not None:
       self.attr['class'] = cssCls
+
+    if self.aresObj is not None:
+       # Some components are not using aresObj because they are directly used for the display
+       if self.reqJs is not None:
+         for js in self.reqJs:
+           self.aresObj.jsImports.add(js)
+
+       if self.reqCss is not None:
+         for css in self.reqCss:
+           self.aresObj.cssImport.add(css)
 
   @property
   def htmlId(self):
