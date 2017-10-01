@@ -36,12 +36,10 @@ class Meter(AresHtml.Html):
       raise ValueError('Value must be in range 0..1')
 
     super(Meter, self).__init__(aresObj, [], cssCls)
-
     self.value = value
 
   def __str__(self):
     """ Return the String representation of HTML button """
-    print('<div %s></div><script>var %s = meter("%s", %f);</script>' % (self.strAttr(), self.htmlId, self.htmlId, self.value))
     return '<div %s></div><script>var %s = meter("%s", %f);</script>' % (self.strAttr(), self.htmlId, self.htmlId, self.value)
 
   @classmethod

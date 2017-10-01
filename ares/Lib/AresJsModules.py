@@ -22,17 +22,17 @@ JS_IMPORTS = {
 
   # Javascript dependencies for D3 and NVD2 components
   'd3': {'req': ['jquery'],
-         'modules': [ 'nv.d3.js', 'd3.v3.js']},
+         'modules': ['nv.d3.js', 'd3.v3.js']},
 
   # Javascript modules for the Cloud graph object
   'cloud': {'req': ['d3', 'jquery'],
             'modules': ['colorbrewer.js', 'd3.layout.cloud.js']},
 
   # Internal javascript packages for Ares
-  'ares': {'req': ['jquery', 'bootstrap'], 'modules': ['ares.js']},
+  'ares': {'req': ['bootstrap'], 'modules': ['ares.js']},
 
-  #
-  'meter': {'req': ['d3'], 'modules': ['components.js']},
+  # Cannot add properly the dependency in this one as my algorithm does not work for shared dependencies ....
+  'meter': {'modules': ['components.js']},
   }
 
 CSS_IMPORTS = {
@@ -173,7 +173,7 @@ class ImportManager(object):
         jsList.add('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
     # Add the dependencies modules
     for jsAlias in jsAliases:
+      print jsAlias
       for urlModule in list(self.jsImports[jsAlias]['dep'])[::-1]:
         jsList.add('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
-
     return render_template_string("\n".join(jsList.__reversed__()))
