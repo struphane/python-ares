@@ -88,7 +88,7 @@ def getBarRecordset():
 
 def call(aresObj):
   """ This will return fake data to feed the different test components in this framework """
-  return {"status": "Updated", "data": getRecordSet(), "content": ""}
+  return getRecordSet()
 
 # def call(aresObj):
 #   """
