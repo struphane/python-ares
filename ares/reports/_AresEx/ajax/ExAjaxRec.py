@@ -17,7 +17,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for _ in range(size))
 
 
-def getRecordSet(aresObj):
+def getRecordSet(aresObj, n=20):
   """
 
   """
@@ -25,7 +25,7 @@ def getRecordSet(aresObj):
   CTIES = ['US', 'CA', 'BR', 'GB', 'FR', 'IT', 'DE', 'RU', 'DZ', 'CN', 'JP', 'AU']
   PRODUCTS = ['Bond', 'CDS', 'TRS', 'Option', 'Index']
   recordSet = []
-  for i in range(20):
+  for i in range(n):
     recordSet.append({'ID': id_generator(),
                       'PTF': random.randint(1, 1010),
                       'PTF2': random.randint(900, 1005),

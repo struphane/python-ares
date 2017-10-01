@@ -3,12 +3,11 @@ import ExAjaxRec
 DOWNLOAD = 'SCRIPT'
 
 def report(aresObj):
-  recordSet = ExAjaxRec.getRecordSet(aresObj)
-  mapObj = aresObj.map()
-  areasCfg = {}
-  for rec in recordSet:
-    areasCfg[rec["CTY"]] = areasCfg.get(rec["CTY"], 0) + rec["VAL"]
-  mapObj.update_areas(areasCfg)
+  recordSet = ExAjaxRec.getRecordSet(aresObj, n=200)
+  cloud = aresObj.cloud(recordSet, [{'key': 'CCY', 'colName': 'Currency'},
+                                    {'key': 'CATEGORY', 'colName': 'Category'},
+                                    {'key': 'PTF', 'colName': 'Portfolio'}
+                                    ], headerBox="Currency")
 
   pieObj = aresObj.pie( recordSet
                       , [ {'key': 'CTY', 'colName': 'Portfolio'}
@@ -16,7 +15,7 @@ def report(aresObj):
                         ,
                         ]
                       , headerBox='Concentration per Country')
-  aresObj.row([mapObj, pieObj])
+  aresObj.row([cloud, pieObj])
 
   tableObj = aresObj.table( recordSet
                           , [ {'key': 'PTF', 'colName': 'Portfolio'}
