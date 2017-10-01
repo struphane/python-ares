@@ -16,12 +16,15 @@ SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
                          ]),
              ('Graphs', [('Basic Charts', 'AresExSimpleCharts'),
                          ('Other Charts', 'AresExMultiCharts'),
+                         ('Word Cloud', 'AresExChartWordCloud'),
                          ('Multi Bar Charts', 'AresExMultiBarChart'),
                          ]),
 
              ('Templates', [
                ('Data Extraction', 'AresDataExtract'),
                ('Dashboard 1', 'AresDashboard1.py'),
+               ('Dashboard 2', 'AresDashboard2.py'),
+               ('Dashboard 3', 'AresDashboard3.py'),
                       ]),
               ]
 
