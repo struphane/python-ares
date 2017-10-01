@@ -21,7 +21,6 @@ class WordCloud(AresHtmlContainer.GraphSvG):
 
   def js(self):
     """ Return the entries to be added to the Javascript to create the graph during the loading """
-    print self.jqSeriesKey
     res = ["var fill = d3.scale.category20();"]
     #res.append("var data_%s = buildCountRecordSet(%s, %s, %s, %s, %s) ;" % (self.jqRecordSet, self.jqSeriesKey, self.jqCategory, self.jqValue, self.jqSeries))
     res.append("var data_%s = buildCountRecordSet(%s, %s.val()) ; " % (self.htmlId, self.jqRecordSet, self.jqCategory))

@@ -242,7 +242,7 @@ class Report(object):
   # This part is done in python 3 in order to ensure users will put the right type of objects
   # del self.content[self.content.index(val.htmlId)]
   # ---------------------------------------------------------------------------------------------------------
-  def vignet(self, header, text, recordSet, fnc, col,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self, header, text, recordSet, fnc, col, cssCls), sys._getframe().f_code.co_name)
+  def vignet(self, header, text, recordSet, fnc=None, col=None,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self, header, text, self.supp(recordSet), fnc, col, cssCls), sys._getframe().f_code.co_name)
   def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def progressbar(self, value, cssCls=None): return self.add(AresHtmlEvent.Progress(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
   def tick(self, value, cssCls=None): return self.add(AresHtmlText.Tick(self, value, cssCls), sys._getframe().f_code.co_name)

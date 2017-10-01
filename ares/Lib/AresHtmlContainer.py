@@ -487,19 +487,19 @@ class Vignet(AresHtml.Html):
 
   cssCls, alias = "panel panel-success", 'vignet'
 
-  def __init__(self, aresObj, title, content, recordSet, fnc, col, cssCls=None):
-    vals = fnc(recordSet, col)
+  def __init__(self, aresObj, title, content, recordSet, fnc=None, col=None, cssCls=None):
+    vals = recordSet if fnc is None else fnc(recordSet, col)
     super(Vignet, self).__init__(aresObj, vals, cssCls)
     self.title = title
     self.text = content
 
   def __str__(self):
-    res = AresItem.Item('<div %s style="padding:5px">' % self.strAttr())
-    res.add(1, "<p><strong>%s</strong></p>" % self.title)
-    res.add(1, "<p>%s</p>" % self.text)
+    res = AresItem.Item("<p>%s</p>" % self.text)
     res.add(1, "<p><h1><center>%s</center></h1></p>" % self.vals)
     res.add(0, "</div>")
-    return str(res)
+    box = AresBox(self.htmlId, res, self.title)
+    box.cssCls = self.cssCls
+    return str(box)
 
 
 class AresBox(AresHtml.Html):

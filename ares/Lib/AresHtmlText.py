@@ -255,7 +255,8 @@ class UpDown(AresHtml.Html):
   """ Up and down Text component """
   alias = 'updown'
   default = {'color': 'green', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal',
-             'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '15px'}
+             'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '45px'}
+  reqCss = ['font-awesome']
 
   def __init__(self, aresObj, vals, delta, cssCls=None, htmlComp=None):
     super(UpDown, self).__init__(aresObj, vals, cssCls)
@@ -271,11 +272,13 @@ class UpDown(AresHtml.Html):
     """ Return the String representation of a line tag """
     if not hasattr(self, 'style'):
       self.style = dict(self.default)
-    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
     if self.delta > 0:
-      return "<i class='fa fa-arrow-up' aria-hidden='true' %s style='%s'>%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
+      styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
+      return "<i class='fa fa-arrow-up' aria-hidden='true' %s style='%s'>&nbsp;%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
 
-    return "<i class='fa fa-arrow-down' aria-hidden='true' %s style='%s'>%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
+    self.style['color'] = 'red'
+    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
+    return "<i class='fa fa-arrow-down' aria-hidden='true' %s style='%s'>&nbsp;%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
 
 
 # --------------------------------------------------------------------

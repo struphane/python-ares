@@ -3,14 +3,14 @@ import ExAjaxRec
 DOWNLOAD = 'SCRIPT'
 
 def report(aresObj):
-  recordSet = ExAjaxRec.getRecordSet(aresObj, n=200)
+  recordSet = ExAjaxRec.getRecordSet(aresObj, n=1000)
   cloud = aresObj.cloud(recordSet, [{'key': 'CCY', 'colName': 'Currency'},
                                     {'key': 'CATEGORY', 'colName': 'Category'},
                                     {'key': 'PTF', 'colName': 'Portfolio'}
                                     ], headerBox="Currency")
 
   meter = aresObj.meter(0.60, headerBox='Percentage Completion')
-  cols = aresObj.col([meter, aresObj.updown(2000, -30)])
+  cols = aresObj.col([meter, aresObj.vignet('Current Value and evolution', 'The value has decreased from yesterday', aresObj.updown(2000, -30))])
   aresObj.row([cloud, cols])
 
   tableObj = aresObj.table( recordSet
@@ -22,3 +22,4 @@ def report(aresObj):
                             , {'key': 'VAL3', 'colName': 'Value 3'}
                             ]
                           , headerBox='Population')
+  tableObj.pageLength = 10
