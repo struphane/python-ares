@@ -607,14 +607,16 @@ def downloadAres():
   memory_file = io.BytesIO()
   aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
   with zipfile.ZipFile(memory_file, 'w') as zf:
-    for pyFile in os.listdir(aresModulePath):
-      if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
-        continue
+    for paths in ['Lib', 'tmpl']:
+      aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, paths)
+      for pyFile in os.listdir(aresModulePath):
+        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
+          continue
 
-      if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
-        zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares', 'Lib', pyFile))
-      else:
-        zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
+        if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
+          zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares', paths, pyFile))
+        else:
+          zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
 
     # Add all the external libraries
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
