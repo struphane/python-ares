@@ -138,7 +138,19 @@ function getRecordSetFromTable(htmlTableId){
     return recordSet ;
 } ;
 
-function buildCountRecordSet(data){
+function buildCountRecordSet(data, cursor){
+    var result = {} ;
+    for (var i = 0, len = data.length; i < len; i++) {
+        var category = data[i][cursor];
+        if (category in result){
+            result[category] = result[category] + 1 ;}
+        else {
+            result[category] = 1;}
+    } ;
 
-    return [{text: 'Remi', size: 20}, {text: 'Alfredo', size: 120}, {text: 'Olivier', size: 40}, {text: 'Nelson', size: 200}]
+    var recordSet = [];
+    for (var key in result) {
+        recordSet.push({text: key, size: result[key]});
+    }
+    return recordSet ;
 }

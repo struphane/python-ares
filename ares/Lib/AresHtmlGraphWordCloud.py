@@ -24,7 +24,7 @@ class WordCloud(AresHtmlContainer.GraphSvG):
     print self.jqSeriesKey
     res = ["var fill = d3.scale.category20();"]
     #res.append("var data_%s = buildCountRecordSet(%s, %s, %s, %s, %s) ;" % (self.jqRecordSet, self.jqSeriesKey, self.jqCategory, self.jqValue, self.jqSeries))
-    res.append("var data_%s = buildCountRecordSet() ; " % (self.htmlId))
+    res.append("var data_%s = buildCountRecordSet(%s, %s.val()) ; " % (self.htmlId, self.jqRecordSet, self.jqCategory))
     res.append('''
           d3.layout.cloud().size([960, 600])
             .words(data_%s) // Refer to the data variable
@@ -98,8 +98,7 @@ class WordCloud(AresHtmlContainer.GraphSvG):
   def update(self, data):
     """ Update the content of an HTML component """
     return '''
-
-              var filterRecordSet = [{text: 'Aurelie', size: 20}, {text: 'Moi', size: 120}] ;
+              var filterRecordSet = buildCountRecordSet(%s, %s.val()) ;
 
               d3.layout.cloud().size([960, 600])
                 .words(filterRecordSet) // Refer to the data variable
@@ -139,7 +138,7 @@ class WordCloud(AresHtmlContainer.GraphSvG):
               };
 
 
-           ''' % (self.htmlId, self.htmlId, self.htmlId, self.htmlId)
+           ''' % (self.jqRecordSet, self.jqCategory, self.htmlId, self.htmlId, self.htmlId, self.htmlId)
 
   def __str__(self):
     """ Return the String representation of a DIV containing a SVG tag """
