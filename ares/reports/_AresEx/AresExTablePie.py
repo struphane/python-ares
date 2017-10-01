@@ -25,4 +25,4 @@ def report(aresObj):
                     'Graph')
   aresInput = aresObj.input("Report Name", '')
   button = aresObj.button("Refresh Data")
-  button.click('ExAjaxQuery', '%s ; %s ;' % (table.jsUpdate(), pie.jsUpdate()), {'Ok': 1, 'deux': {'ddd': 'dsfdsf', 'input': aresInput}})
+  button.click('ExAjaxQuery', '%s%s' % (table.jsUpdate(), pie.jsUpdate()), {'Ok': 1, 'deux': {'ddd': 'dsfdsf', 'input': aresInput}})

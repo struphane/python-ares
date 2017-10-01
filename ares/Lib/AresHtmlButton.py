@@ -53,15 +53,15 @@ class Button(AresHtml.Html):
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     preAjax.add(0, attr.get('preAjaxJs', ''))
     jsDef = '''
-              %s ;
+              %s
               $.post("%s", %s, function(data) {
                   var res = JSON.parse(data) ;
                   var data = res.data ;
                   var status = res.status ;
-                  %s.html(%s);
                   %s
+                  %s.html(%s);
               } );
-            ''' % (preAjax, url, data, self.jqId, self.htmlId, jsDef)
+            ''' % (preAjax, url, data, jsDef, self.jqId, self.htmlId)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef, url=url)
 
   def click(self, scriptName, jsDef, attr):
