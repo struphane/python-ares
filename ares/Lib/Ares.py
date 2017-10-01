@@ -51,6 +51,7 @@ from ares.Lib import AresJsModules
 from ares.Lib import AresHtmlMeter
 from ares.Lib import AresHtmlGraphWordCloud
 from ares.Lib import AresHtmlAjaxCall
+from ares.Lib import AresHtmlMap
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
@@ -276,6 +277,9 @@ class Report(object):
 
   # Meter
   def meter(self, value, cssCls=None): return self.add(AresHtmlMeter.Meter(self, value, cssCls), sys._getframe().f_code.co_name)
+
+  # Map
+  def map(self, cssCls=None): return self.add(AresHtmlMap.Map(self, cssCls), sys._getframe().f_code.co_name)
 
 
   # Generic Action section

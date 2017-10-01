@@ -32,6 +32,10 @@ JS_IMPORTS = {
 
   # Cannot add properly the dependency in this one as my algorithm does not work for shared dependencies ....
   'meter': {'req': ['d3'], 'modules': ['d3.meter.js']},
+
+  # Mapael library
+  'raphael': {'req': ['jquery'], 'modules': ['raphael.min.js']},
+  'mapael': {'req': ['jquery', 'raphael'], 'modules': ['jquery.mapael.min.js']},
   }
 
 CSS_IMPORTS = {
