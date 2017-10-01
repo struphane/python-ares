@@ -21,6 +21,7 @@ SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
                          ]),
 
              ('Templates', [
+               ('World Population', 'AresWorldPopulation'),
                ('Data Extraction', 'AresDataExtract'),
                ('Dashboard 1', 'AresDashboard1.py'),
                ('Dashboard 2', 'AresDashboard2.py'),
