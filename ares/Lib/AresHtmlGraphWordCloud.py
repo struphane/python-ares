@@ -81,7 +81,7 @@ class WordCloud(AresHtmlContainer.GraphSvG):
                                                      "$('#%s_col_selector')" % self.htmlId,
                                                      'change', self.update(self.vals), '')
 
-  def jsUpdate(self):
+  def jsUpdate(self, jsDataVar='data'):
     """ This function allow different component to update the world Cloud chart
 
     For example:
@@ -89,10 +89,47 @@ class WordCloud(AresHtmlContainer.GraphSvG):
     """
 
     return '''
-          // words should be the javascript version of the data set expected by the graph
-          // Should be the select to the svg component
-            alert("Youpi");
-          '''
+              var filterRecordSet = buildCountRecordSet(data, %s.val()) ;
+
+              d3.layout.cloud().size([1200, 400])
+                .words(filterRecordSet) // Refer to the data variable
+                .rotate(function() { return ~~(Math.random() * 2) * 90; })
+                .font("Impact")
+                .fontSize(function(d) { return d.size; })
+                .on("end", draw_new_%s)
+                .start()
+              ;
+
+              function draw_new_%s(words) {
+                d3.select("#%s svg g").remove();
+                d3.select("#%s svg") // Refer to the chart variable
+                  .append("g")
+                  .attr("transform", "translate(150,150)")
+                  .selectAll("text")
+                  .data(words)
+                  .enter().append("text")
+                  .style("font-size", function(d) { return d.size + "px"; })
+                  .style("font-family", "Impact")
+                  .style("fill", function(d, i) {  return d3.scale.category20()(i); })
+                  .attr("text-anchor", "middle")
+                  .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+                  .text(function(d) {  return d.text; });
+              } ;
+
+              function drawCloudUpdate(words, jsGraphRef){
+                 jsGraphRef
+                    .selectAll("g").attr("transform", "translate(150,150)")
+                    .selectAll("text")
+                      .data(words).enter().append("text")
+                      .style("font-size", function(d) { return d.size + "px"; })
+                      .style("font-family", "Impact")
+                      .style("fill", function(d, i) { return fill(i); })
+                      .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";  })
+                      .text(function(d) { return d.text; });
+              };
+
+
+           ''' % (self.jqCategory, self.htmlId, self.htmlId, self.htmlId, self.htmlId)
 
   def update(self, data):
     """ Update the content of an HTML component """
