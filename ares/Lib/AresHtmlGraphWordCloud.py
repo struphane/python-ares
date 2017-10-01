@@ -25,7 +25,7 @@ class WordCloud(AresHtmlContainer.GraphSvG):
     #res.append("var data_%s = buildCountRecordSet(%s, %s, %s, %s, %s) ;" % (self.jqRecordSet, self.jqSeriesKey, self.jqCategory, self.jqValue, self.jqSeries))
     res.append("var data_%s = buildCountRecordSet(%s, %s.val()) ; " % (self.htmlId, self.jqRecordSet, self.jqCategory))
     res.append('''
-          d3.layout.cloud().size([960, 600])
+          d3.layout.cloud().size([1200, 400])
             .words(data_%s) // Refer to the data variable
             .rotate(function() { return ~~(Math.random() * 2) * 90; })
             .font("Impact")
@@ -99,7 +99,7 @@ class WordCloud(AresHtmlContainer.GraphSvG):
     return '''
               var filterRecordSet = buildCountRecordSet(%s, %s.val()) ;
 
-              d3.layout.cloud().size([960, 600])
+              d3.layout.cloud().size([1200, 400])
                 .words(filterRecordSet) // Refer to the data variable
                 .rotate(function() { return ~~(Math.random() * 2) * 90; })
                 .font("Impact")
