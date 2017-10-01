@@ -32,7 +32,7 @@ JS_IMPORTS = {
   'ares': {'req': ['bootstrap'], 'modules': ['ares.js']},
 
   # Cannot add properly the dependency in this one as my algorithm does not work for shared dependencies ....
-  'meter': {'modules': ['components.js']},
+  'meter': {'modules': ['d3.meter.js']},
   }
 
 CSS_IMPORTS = {
