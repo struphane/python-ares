@@ -49,8 +49,7 @@ from ares.Lib import AresHtmlButton
 from ares.Lib import AresLog
 from ares.Lib import AresJsModules
 from ares.Lib import AresHtmlMeter
-
-#from ares.Lib import AresHtmlAjaxCall
+from ares.Lib import AresHtmlAjaxCall
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
