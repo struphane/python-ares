@@ -59,8 +59,7 @@ function meter(id, value, r, width, color) {
   // UI
   var s = d3.select('#' + id).append('svg')
     .attr('class', 'ares-meter')
-    .attr('width', 2.1 * r)
-    .attr('height', 2.1 * r)
+    .attr('style', 'width: ' + 2.1 * r + 'px; height: ' + 2.1 * r + 'px')
     .append('g');
 
 
