@@ -9,9 +9,12 @@ function meter(id, value, r, width, color) {
 
   //r = r || document.getElementById(id).clientWidth * .98;
   r = r || 128;
-
   width = width || (r / 5);
-  color = color || '#ee7777';
+  // To change the color with the value
+  if (value > 0.5)
+    color = color || 'green';
+  else
+    color = color || '#ee7777';
 
   // Initial settings
   var meter_obj = {

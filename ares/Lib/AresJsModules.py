@@ -173,7 +173,6 @@ class ImportManager(object):
         jsList.add('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
     # Add the dependencies modules
     for jsAlias in jsAliases:
-      print jsAlias
       for urlModule in list(self.jsImports[jsAlias]['dep'])[::-1]:
         jsList.add('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
     return render_template_string("\n".join(jsList.__reversed__()))
