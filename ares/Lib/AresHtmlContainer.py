@@ -200,7 +200,6 @@ class GraphSvG(AresHtml.Html):
     item.add(1, '<svg style="width:100%;height:400px;"></svg>')
     item.add(0, '</div>')
     item = AresBox(self.htmlId, item, self.headerBox)
-
     return str(item)
 
   def selectKey(self):

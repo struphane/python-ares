@@ -137,3 +137,8 @@ function getRecordSetFromTable(htmlTableId){
     } );
     return recordSet ;
 } ;
+
+function buildCountRecordSet(){
+
+    return [{text: 'Ok', size: 20}, {text: 'Aurelie', size: 120}]
+}
