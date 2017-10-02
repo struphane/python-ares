@@ -29,6 +29,9 @@ if __name__ == '__main__':
           filePath = os.path.join(*currPath)
           if not os.path.exists(filePath):
             os.makedirs(filePath)
+          if splitName[-1] == '':
+            continue
+
           inFile = open(os.path.join(filePath, splitName[-1]), "wb")
           inFile.write(archive.read(member))
           inFile.close()
