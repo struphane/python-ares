@@ -29,8 +29,6 @@ SHORTCUTS = [] # All the possible link to other pages
 def report(aresObj):
   # Write your report here
 
-  return aresObj
-
 
 
 
