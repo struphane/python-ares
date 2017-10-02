@@ -167,6 +167,7 @@ class GraphSvG(AresHtml.Html):
   categories, values, seriesKey, series = None, None, None, None
   hasSeries = False
   recordSetKey = None
+  multiOptions = False
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None):
     """ selectors is a tuple with the category first and the value list second """
@@ -220,7 +221,7 @@ class GraphSvG(AresHtml.Html):
   def selectSeries(self):
     """ """
     style = 'style="margin-bottom:5px"' if len(self.header) > 2 else 'style="display:none"'
-    if self.hasSeries:
+    if self.hasSeries and self.multiOptions:
       item = AresItem.Item('<select id="%s_series_selector" class ="form-control input-sm" multiple="true" %s>' % (self.htmlId, style))
       item.add(1, '<optgroup label="Series">')
     else:
@@ -247,7 +248,7 @@ class GraphSvG(AresHtml.Html):
 
   def selectCategory(self):
     """ Return the category to be selected in the graph display """
-    style = 'style="margin-bottom:5px"' if len(self.header) > 2 else 'style="display:none"'
+    style = 'style="margin-bottom:5px"' if len(self.header) > 2 and self.multiOptions else 'style="display:none"'
     item = AresItem.Item('<select id="%s_col_selector" class ="form-control input-sm" %s>' % (self.htmlId, style))
     item.add(1, '<optgroup label="X-Axis">')
     for headerLine in self.header:
@@ -270,7 +271,7 @@ class GraphSvG(AresHtml.Html):
       if headerLine.get('type') == 'number':
         isSelected = '' if headerLine.get('selected') else 'selected'
         values.append((isSelected, headerLine.get('key', headerLine['colName']), headerLine['colName']))
-    style = 'style="margin-bottom:5px"' if len(values) > 2 else 'style="display:none"'
+    style = 'style="margin-bottom:5px"' if len(values) > 2 and self.multiOptions else 'style="display:none"'
     item = AresItem.Item('<select id="%s_val_selector" class ="form-control input-sm" %s>' % (self.htmlId, style))
     item.add(1, '<optgroup label="Y-Axis">')
     for isSelect, key, val in values:
