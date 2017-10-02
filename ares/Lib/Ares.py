@@ -28,6 +28,9 @@ import inspect
 import collections
 import json
 
+from importlib import import_module
+from ares.Lib import AresJsModules
+
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
   import numpy
@@ -36,22 +39,21 @@ def jsonDefault(obj):
 
 from click import echo
 
-from ares.Lib import AresHtmlContainer
-from ares.Lib import AresHtmlEvent
-from ares.Lib import AresHtmlText
-from ares.Lib import AresHtmlTable
-from ares.Lib import AresHtmlGraph
-from ares.Lib import AresHtmlAlert
-from ares.Lib import AresHtmlModal
-from ares.Lib import AresItem
-from ares.Lib import AresHtmlHRef
-from ares.Lib import AresHtmlButton
-from ares.Lib import AresLog
-from ares.Lib import AresJsModules
-from ares.Lib import AresHtmlMeter
-from ares.Lib import AresHtmlGraphWordCloud
-from ares.Lib import AresHtmlAjaxCall
-from ares.Lib import AresHtmlMap
+aresFactory = None
+if aresFactory is None:
+  tmpFactory = {}
+  for aresFolder in ["html", "graph"]:
+    for script in os.listdir(os.path.join(os.getcwd(), 'ares', 'Lib', aresFolder)):
+      if not script.endswith('py'):
+        continue
+
+      module = import_module("ares.Lib.%s.%s" % (aresFolder, script.replace('.py', '')))
+      for name in dir(module):
+        obj = getattr(module, name)
+        if inspect.isclass(obj):
+          tmpFactory[name] = obj
+  # Atomic build of the factory
+  aresFactory = tmpFactory
 
 def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
   """ Add the header to the report when we are producing a text file - namely local run """
@@ -242,104 +244,104 @@ class Report(object):
   # This part is done in python 3 in order to ensure users will put the right type of objects
   # del self.content[self.content.index(val.htmlId)]
   # ---------------------------------------------------------------------------------------------------------
-  def vignet(self, header, text, recordSet, fnc=None, col=None,  cssCls=None, htmlComp=None): return self.add(AresHtmlContainer.Vignet(self, header, text, self.supp(recordSet), fnc, col, cssCls), sys._getframe().f_code.co_name)
-  def text(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Text(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
-  def progressbar(self, value, cssCls=None): return self.add(AresHtmlEvent.Progress(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
-  def tick(self, value, cssCls=None): return self.add(AresHtmlText.Tick(self, value, cssCls), sys._getframe().f_code.co_name)
-  def updown(self, value, delta, cssCls=None): return self.add(AresHtmlText.UpDown(self, value, delta, cssCls), sys._getframe().f_code.co_name)
-  def code(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Code(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
-  def preformat(self, value, cssCls=None): return self.add(AresHtmlText.Preformat(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
-  def blockquote(self, value, cssCls=None): return self.add(AresHtmlText.BlockQuote(self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
-  def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(AresHtmlText.Paragraph(self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
-  def dropzone(self, value, cssCls=None): return self.add(AresHtmlEvent.DropZone(self, value, cssCls), sys._getframe().f_code.co_name)
-  def dropfile(self, value, cssCls=None): return self.add(AresHtmlEvent.DropFile(self, value, cssCls), sys._getframe().f_code.co_name)
-  def newline(self, cssCls=None): return self.add(AresHtmlText.Newline(self, '', cssCls), sys._getframe().f_code.co_name)
-  def line(self, cssCls=None): return self.add(AresHtmlText.Line(self, '', cssCls), sys._getframe().f_code.co_name)
-  def icon(self, value, cssCls=None): return self.add(AresHtmlText.Icon(self, value, cssCls), sys._getframe().f_code.co_name)
-  def number(self, value, cssCls=None): return self.add(AresHtmlText.Numeric(self, value, cssCls), sys._getframe().f_code.co_name)
-  def wiki(self, dataSourceName, value, cssCls=None): return self.add(AresHtmlText.Wiki(self, dataSourceName, value, cssCls), sys._getframe().f_code.co_name)
+  def vignet(self, header, text, recordSet, fnc=None, col=None,  cssCls=None, htmlComp=None): return self.add(aresFactory['Vignet'](self, header, text, self.supp(recordSet), fnc, col, cssCls), sys._getframe().f_code.co_name)
+  def text(self, value, cssCls=None, htmlComp=None): return self.add(aresFactory['Text'](self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def progressbar(self, value, cssCls=None): return self.add(aresFactory['Progress'](self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def tick(self, value, cssCls=None): return self.add(aresFactory['Tick'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def updown(self, value, delta, cssCls=None): return self.add(aresFactory['UpDown'](self, value, delta, cssCls), sys._getframe().f_code.co_name)
+  def code(self, value, cssCls=None, htmlComp=None): return self.add(aresFactory['Code'](self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def preformat(self, value, cssCls=None): return self.add(aresFactory['Preformat'](self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def blockquote(self, value, cssCls=None): return self.add(aresFactory['BlockQuote'](self, self.supp(value), cssCls), sys._getframe().f_code.co_name)
+  def paragraph(self, value, cssCls=None, htmlComp=None): return self.add(aresFactory['Paragraph'](self, self.supp(value), cssCls, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def dropzone(self, value, cssCls=None): return self.add(aresFactory['DropZone'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def dropfile(self, value, cssCls=None): return self.add(aresFactory['DropFile'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def newline(self, cssCls=None): return self.add(aresFactory['Newline'](self, '', cssCls), sys._getframe().f_code.co_name)
+  def line(self, cssCls=None): return self.add(aresFactory['Line'](self, '', cssCls), sys._getframe().f_code.co_name)
+  def icon(self, value, cssCls=None): return self.add(aresFactory['Icon'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def number(self, value, cssCls=None): return self.add(aresFactory['Numeric'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def wiki(self, dataSourceName, value, cssCls=None): return self.add(aresFactory['Wiki'](self, dataSourceName, value, cssCls), sys._getframe().f_code.co_name)
 
 
   # Title section
-  def title(self, value, cssCls=None): return self.add(AresHtmlText.Title(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
-  def title2(self, value, cssCls=None): return self.add(AresHtmlText.Title2(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
-  def title3(self, value, cssCls=None): return self.add(AresHtmlText.Title3(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
-  def title4(self, value, cssCls=None): return self.add(AresHtmlText.Title4(self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title(self, value, cssCls=None): return self.add(aresFactory['Title'](self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title2(self, value, cssCls=None): return self.add(aresFactory['Title2'](self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title3(self, value, cssCls=None): return self.add(aresFactory['Title3'](self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
+  def title4(self, value, cssCls=None): return self.add(aresFactory['Title4'](self, value, cssCls), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
 
 
   # Button Section
-  def refresh(self, value, recordSet, ajaxScript, withDataFiles=False, cssCls=None): return self.add(AresHtmlButton.ButtonRefresh(self, value, recordSet, ajaxScript, withDataFiles, cssCls), sys._getframe().f_code.co_name)
-  def remove(self, cssCls=None): return self.add(AresHtmlButton.ButtonRemove(self, '', cssCls), sys._getframe().f_code.co_name)
-  def download(self, cssCls=None): return self.add(AresHtmlButton.ButtonDownload(self, '', cssCls), sys._getframe().f_code.co_name)
-  def downloadAll(self, value='', cssCls=None): return self.add(AresHtmlButton.ButtonDownloadAll(self, value, cssCls), sys._getframe().f_code.co_name)
-  def button(self, value, cssCls=None): return self.add(AresHtmlButton.Button(self, value, cssCls), sys._getframe().f_code.co_name)
-  def ok(self, value, cssCls=None): return self.add(AresHtmlButton.ButtonOk(self, value, cssCls), sys._getframe().f_code.co_name)
+  def refresh(self, value, recordSet, ajaxScript, withDataFiles=False, cssCls=None): return self.add(aresFactory['ButtonRefresh'](self, value, recordSet, ajaxScript, withDataFiles, cssCls), sys._getframe().f_code.co_name)
+  def remove(self, cssCls=None): return self.add(aresFactory['ButtonRemove'](self, '', cssCls), sys._getframe().f_code.co_name)
+  def download(self, cssCls=None): return self.add(aresFactory['ButtonDownload'](self, '', cssCls), sys._getframe().f_code.co_name)
+  def downloadAll(self, value='', cssCls=None): return self.add(aresFactory['ButtonDownloadAll'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def button(self, value, cssCls=None): return self.add(aresFactory['Button'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def ok(self, value, cssCls=None): return self.add(aresFactory['ButtonOk'](self, value, cssCls), sys._getframe().f_code.co_name)
 
   # Meter
-  def meter(self, value, headerBox=None, cssCls=None): return self.add(AresHtmlMeter.Meter(self, headerBox, value, cssCls), sys._getframe().f_code.co_name)
+  def meter(self, value, headerBox=None, cssCls=None): return self.add(aresFactory['Meter'](self, headerBox, value, cssCls), sys._getframe().f_code.co_name)
 
   # Map
-  def map(self, cssCls=None): return self.add(AresHtmlMap.Map(self, cssCls), sys._getframe().f_code.co_name)
+  def map(self, cssCls=None): return self.add(aresFactory['Map'](self, cssCls), sys._getframe().f_code.co_name)
 
 
   # Generic Action section
-  def slider(self, value, cssCls=None): return self.add(AresHtmlEvent.Slider(self, value, cssCls), sys._getframe().f_code.co_name)
-  def date(self, label='Date', cssCls=None): return self.add(AresHtmlEvent.DatePicker(self, label, cssCls), sys._getframe().f_code.co_name)
-  def textArea(self, value, cssCls=None): return self.add(AresHtmlEvent.TextArea(self, value, cssCls), sys._getframe().f_code.co_name)
-  def generatePdf(self, fileName=None, cssCls=None): return self.add(AresHtmlButton.GeneratePdf(self, fileName, cssCls), sys._getframe().f_code.co_name)
+  def slider(self, value, cssCls=None): return self.add(aresFactory['Slider'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def date(self, label='Date', cssCls=None): return self.add(aresFactory['DatePicker'](self, label, cssCls), sys._getframe().f_code.co_name)
+  def textArea(self, value, cssCls=None): return self.add(aresFactory['TextArea'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def generatePdf(self, fileName=None, cssCls=None): return self.add(aresFactory['GeneratePdf'](self, fileName, cssCls), sys._getframe().f_code.co_name)
 
   # Containers section
-  def div(self, value, cssCls=None): return self.add(AresHtmlContainer.Div(self, value, cssCls), sys._getframe().f_code.co_name)
-  def list(self, values, headerBox=None, cssCls=None): return self.add(AresHtmlContainer.List(self, headerBox, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def listbadge(self, values, cssCls=None): return self.add(AresHtmlContainer.ListBadge(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def table(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlTable.Table(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def tabs(self, values, cssCls=None): return self.add(AresHtmlContainer.Tabs(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def dropdown(self, values, cssCls=None): return self.add(AresHtmlEvent.DropDown(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def select(self, values, selected=None, cssCls=None): return self.add(AresHtmlEvent.Select(self, self.supp(values), selected, cssCls), sys._getframe().f_code.co_name)
-  def select_group(self, values, cssCls=None): return self.add(AresHtmlEvent.SelectWithGroup(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def container(self, header, values, cssCls=None): return self.add(AresHtmlContainer.Container(self, header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def row(self, values, cssCls=None): return self.add(AresHtmlContainer.Row(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def col(self, values, cssCls=None): return self.add(AresHtmlContainer.Col(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def img(self, values, cssCls=None): return self.add(AresHtmlContainer.Image(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
-  def iframe(self, values, cssCls=None): return self.add(AresHtmlContainer.IFrame(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def div(self, value, cssCls=None): return self.add(aresFactory['Div'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def list(self, values, headerBox=None, cssCls=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def listbadge(self, values, cssCls=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def table(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['Table'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def tabs(self, values, cssCls=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def dropdown(self, values, cssCls=None): return self.add(aresFactory['DropDown'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def select(self, values, selected=None, cssCls=None): return self.add(aresFactory['Select'](self, self.supp(values), selected, cssCls), sys._getframe().f_code.co_name)
+  def select_group(self, values, cssCls=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def container(self, header, values, cssCls=None): return self.add(aresFactory['Container'](self, header, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def row(self, values, cssCls=None): return self.add(aresFactory['Row'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def col(self, values, cssCls=None): return self.add(aresFactory['Col'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def img(self, values, cssCls=None): return self.add(aresFactory['Image'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def iframe(self, values, cssCls=None): return self.add(aresFactory['IFrame'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Modal Section
-  def modal(self, values, cssCls=None): return self.add(AresHtmlModal.Modal(self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
+  def modal(self, values, cssCls=None): return self.add(aresFactory['Modal'](self, self.supp(values), cssCls), sys._getframe().f_code.co_name)
 
   # Chart section
-  def bar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Bar(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def pie(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Pie(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def donut(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Donut(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def lineChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.Line(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def stackedAreaChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.StackedArea(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def multiBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.MultiBars(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def lineChartFocus(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.LineWithFocus(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.HorizontalBars(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ComboLineBar(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraph.ScatterChart(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def cloud(self, values, header, headerBox=None, cssCls=None): return self.add(AresHtmlGraphWordCloud.WordCloud(self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
-  def tree(self, values, header, cssCls=None): return self.add(AresHtmlGraph.IndentedTree(self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
+  def bar(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['Bar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def pie(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['Pie'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def donut(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['Donut'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def lineChart(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['Line'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def stackedAreaChart(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['StackedArea'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def multiBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['MultiBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def lineChartFocus(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['LineWithFocus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def horizBarChart(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['HorizontalBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def comboLineBar(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['ComboLineBar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def scatterChart(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['ScatterChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def cloud(self, values, header, headerBox=None, cssCls=None): return self.add(aresFactory['WordCloud'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls), sys._getframe().f_code.co_name)
+  def tree(self, values, header, cssCls=None): return self.add(aresFactory['IndentedTree'](self, header, values, mapCols, selectors, cssCls), sys._getframe().f_code.co_name)
 
   # File HTML Section
-  def upload(self, values='', cssCls=None): return self.add(AresHtmlEvent.UploadFile(self, values, cssCls), sys._getframe().f_code.co_name)
+  def upload(self, values='', cssCls=None): return self.add(aresFactory['UploadFile'](self, values, cssCls), sys._getframe().f_code.co_name)
 
 
   # Anchor section
-  def anchor(self, value, **kwargs): return self.add(AresHtmlHRef.A(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def external_link(self, value, url, **kwargs): return self.add(AresHtmlHRef.ABespoke(self, self.supp(value), url, **kwargs), sys._getframe().f_code.co_name)
+  def anchor(self, value, **kwargs): return self.add(aresFactory['A'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def external_link(self, value, url, **kwargs): return self.add(aresFactory['ABespoke'](self, self.supp(value), url, **kwargs), sys._getframe().f_code.co_name)
 
-  def anchor_download(self, value, **kwargs): return self.add(AresHtmlHRef.Download(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def anchor_set_env(self, value, **kwargs): return self.add(AresHtmlHRef.CreateEnv(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def anchor_add_scripts(self, value, **kwargs): return self.add(AresHtmlHRef.AddScript(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def main(self, value, **kwargs): return self.add(AresHtmlHRef.ScriptPage(self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def input(self, value='', cssCls=None): return self.add(AresHtmlEvent.Input(self, value, cssCls), sys._getframe().f_code.co_name)
+  def anchor_download(self, value, **kwargs): return self.add(aresFactory['Download'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_set_env(self, value, **kwargs): return self.add(aresFactory['CreateEnv'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def anchor_add_scripts(self, value, **kwargs): return self.add(aresFactory['AddScript'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def main(self, value, **kwargs): return self.add(aresFactory['ScriptPage'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
+  def input(self, value='', cssCls=None): return self.add(aresFactory['Input'](self, value, cssCls), sys._getframe().f_code.co_name)
 
-  def handleRequest(self, method, params, js="", cssCls=None): return self.add(AresHtmlAjaxCall.HandleRequest(self, method, params, js, cssCls), sys._getframe().f_code.co_name)
+  def handleRequest(self, method, params, js="", cssCls=None): return self.add(resFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
 
   # Designer objects
-  def aresInput(self, cssCls=None): return self.add(AresHtmlText.TextInput(self, 'Put your text here', cssCls), sys._getframe().f_code.co_name)
-  def aresDataSource(self, cssCls=None): return self.add(AresHtmlText.DataSource(self, 'Drop here', cssCls), sys._getframe().f_code.co_name)
-  def aresDragItems(self, vals, cssCls=None): return self.add(AresHtmlText.DragItems(self, vals, cssCls), sys._getframe().f_code.co_name)
+  def aresInput(self, cssCls=None): return self.add(aresFactory['TextInput'](self, 'Put your text here', cssCls), sys._getframe().f_code.co_name)
+  def aresDataSource(self, cssCls=None): return self.add(aresFactory['DataSource'](self, 'Drop here', cssCls), sys._getframe().f_code.co_name)
+  def aresDragItems(self, vals, cssCls=None): return self.add(aresFactory['DragItems'](self, vals, cssCls), sys._getframe().f_code.co_name)
 
   def components(self):
     """ Get the list of component available in the framework """
