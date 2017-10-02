@@ -607,13 +607,17 @@ def downloadAres():
   memory_file = io.BytesIO()
   aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
   with zipfile.ZipFile(memory_file, 'w') as zf:
-    for paths in ['Lib', 'tmpl']:
+    for paths in ['Lib', 'tmpl', os.path.join('Lib', 'graph'), os.path.join('Lib', 'html'), os.path.join('Lib', 'tools')]:
       aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, paths)
       for pyFile in os.listdir(aresModulePath):
         if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
-        if pyFile not in ['AresWrapper.py', 'AresWrapperDeploy.py']:
+        if pyFile == 'AresInstall.py':
+          # Install cannot be copied and it is available in the SVN repository directly
+          continue
+
+        if pyFile not in ['AresDeploy.py', 'AresLocalRuns.py']:
           zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares', paths, pyFile))
         else:
           zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
