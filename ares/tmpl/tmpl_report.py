@@ -27,7 +27,9 @@ NAME = 'Report' # The Report Name in the left menu
 SHORTCUTS = [] # All the possible link to other pages
 
 def report(aresObj):
-  # Write your report here
+  '''
+  Write your function below
+  '''
 
 
 
