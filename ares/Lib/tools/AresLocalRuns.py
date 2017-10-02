@@ -64,11 +64,11 @@ def getReport(results, scriptPath):
       reportModule = __import__(report.replace(".py", ""))
       if hasattr(reportModule, 'report'):
         print("  > Loading report %s" % report)
-        aresObj = Ares.Report()
-        aresObj.http['DIRECTORY'] = scriptPath
-        aresObj.http['REPORT_NAME'] = report.replace(".py", "")
+        results[reportModule.__name__] = Ares.Report()
+        results[reportModule.__name__].http['DIRECTORY'] = scriptPath
+        results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
         try:
-          results[reportModule.__name__] = reportModule.report(aresObj)
+          reportModule.report(results[reportModule.__name__])
         except Exception as e:
           print("Error with report %s" % report)
           print(e)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")
-    jsOnload, html, js = htmlReport.html()
+    cssImports, jsImports, jsOnload, html, js = htmlReport.html()
     htmlFile.write(header)
     htmlFile.write("\n  <script>\n")
     htmlFile.write(jsOnload)
@@ -119,9 +119,3 @@ if __name__ == '__main__':
     htmlFile.write("\n</script>\n</div></div>")
     htmlFile.write(footer)
     htmlFile.close()
-
-
-
-
-
-
