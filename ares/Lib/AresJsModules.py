@@ -46,7 +46,7 @@ CSS_IMPORTS = {
   'bootstrap': {'modules': ['bootstrap.min.css', 'metro-bootstrap.min.css']},
 
   'font-awesome': {'modules': ['font-awesome.min.css'],
-                   'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css'
+                   #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css'
                    },
 
   'd3': {'modules': ['svg.css', 'nv.d3.css']},
