@@ -167,7 +167,7 @@ class GraphSvG(AresHtml.Html):
   categories, values, seriesKey, series = None, None, None, None
   hasSeries = False
   recordSetKey = None
-  multiOptions = False
+  multiOptions = True
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None):
     """ selectors is a tuple with the category first and the value list second """

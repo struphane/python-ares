@@ -67,12 +67,15 @@ class JsNvD3Graph(AresHtmlContainer.GraphSvG):
   def formatChart(self):
     """ """
     chartStyle, chartAttr = [], []
+    itemChartAttr = AresItem.Item(None)
     for style, attr in self.style.get('chartStyle', {}).items():
       chartStyle.append('%s(%s)' % (style, attr))
     for subObj, attr in self.style.get('chartAttr', {}).items():
       for subAttr, val in attr.items():
-        chartAttr.append('chart_%s.%s.%s(%s)' % (self.htmlId, subObj, subAttr, val))
-    return ('\n.'.join(chartStyle), ';'.join(chartAttr))
+        itemChartAttr.add(1, 'chart_%s.%s.%s(%s) ;' % (self.htmlId, subObj, subAttr, val))
+    for subAttr, val in self.style.get('chartDef', {}).items():
+      itemChartAttr.add(1, 'chart_%s.%s(%s) ;' % (self.htmlId, subAttr, val))
+    return ('\n.'.join(chartStyle), str(itemChartAttr))
 
   def addClick(self, fnc):
     """ Add Click function on a graph """
@@ -218,62 +221,6 @@ class Line(JsNvD3Graph):
                                    'tickFormat': "d3.format('.02f')"}
                         }
            }
-
-
-class StackedArea(JsNvD3Graph):
-  """ This object will output a simple stacked area chart
-
-  Reference website: http://nvd3.org/examples/stackedArea.html
-  """
-  alias = 'stackedAreaChart'
-  mockData = r'json\stackedAreaData.json'
-  chartObject = 'stackedAreaChart'
-  style = {'chartStyle': {'useInteractiveGuideline': 'true', 'clipEdge': 'true'},
-           'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   # 'tickFormat' :"function(d) { return d3.time.format('%%x')(new Date(d)) }",
-                                   },
-                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
-                         }}
-
-  clickObject = 'scatter'
-  reqCss = ['bootstrap', 'font-awesome', 'd3']
-  reqJs = ['jquery', 'd3']
-
-
-class MultiBars(JsNvD3Graph):
-  """ Simple multi bar chart
-
-    http://nvd3.org/examples/multiBar.html
-
-    Expected data should look like:
-
-    [
-    {
-      "key" : "North America" ,
-      "values" : [ [ 1025409600000 , 23.041422681023] , [ 1028088000000 , 19.854291255832] , [ 1030766400000 , 21.02286281168] ,
-        ...]
-    },
-
-    {
-      "key" : "Africa" ,
-      "values" : [ [ 1025409600000 , 7.9356392949025] , [ 1028088000000 , 7.4514668527298] , [ 1030766400000 , 7.9085410566608] ,
-        ... ]
-    },
-    ...
-    ]
-"""
-
-  mockData = r'json\multiBar.json'
-  chartObject = 'multiBarChart'
-  alias = 'multiBarChart'
-  clickObject = 'multibar'
-  style = {'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }",
-                                   },
-                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
-                         }}
-  reqCss = ['bootstrap', 'font-awesome', 'd3']
-  reqJs = ['jquery', 'd3']
 
 
 class LineWithFocus(JsNvD3Graph):
