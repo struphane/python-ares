@@ -30,14 +30,15 @@ class Button(AresHtml.Html):
   Default class parameters
     - CSS Default Class = button
   """
-  alias, cssCls = 'button', 'btn btn-success'
+  alias, cssCls = 'button', ['btn', 'btn-success']
   reference = 'https://www.w3schools.com/tags/tag_button.asp'
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
+  css = {'margin-bottom': '20p', 'margin-top': '-10p'}
 
   def __str__(self):
     """ Return the String representation of HTML button """
-    return '<button %s type="button" style="margin-bottom:20px;margin-top:-10px;">%s</button>' % (self.strAttr(), self.vals)
+    return '<button %s>%s</button>' % (self.strAttr(), self.vals)
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -78,7 +79,7 @@ class ButtonRemove(AresHtml.Html):
     - CSS Default Class = btn btn-danger
     - glyphicon = remove
   """
-  glyphicon, cssCls = 'remove', 'btn btn-danger'
+  glyphicon, cssCls = 'remove', ['btn', 'btn-danger']
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'remove'
   reqCss = ['bootstrap', 'font-awesome']
@@ -103,7 +104,7 @@ class ButtonDownload(ButtonRemove):
     - CSS Default Class = btn btn-success
     - glyphicon = download
   """
-  glyphicon, cssCls = 'download', 'btn btn-success'
+  glyphicon, cssCls = 'download', ['btn', 'btn-success']
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'download'
   reqCss = ['bootstrap', 'font-awesome']
@@ -124,7 +125,7 @@ class ButtonDownloadAll(ButtonRemove):
     - CSS Default Class = btn btn-success
     - glyphicon = downloadAll
   """
-  glyphicon, cssCls = 'cloud-download', 'btn btn-success'
+  glyphicon, cssCls = 'cloud-download', ['btn', 'btn-success']
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'downloadAll'
   reqCss = ['bootstrap', 'font-awesome']
@@ -145,7 +146,7 @@ class ButtonOk(ButtonRemove):
     - CSS Default Class = btn btn-success
     - glyphicon = ok
   """
-  glyphicon, cssCls = 'check-square-o', 'success'
+  glyphicon, cssCls = 'check-square-o', ['success']
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'ok'
   reqCss = ['bootstrap', 'font-awesome']
@@ -161,7 +162,7 @@ class ButtonRefresh(ButtonRemove):
   Python wrapper to the HTML Button Refresh component
 
   """
-  glyphicon, cssCls = 'refresh', 'btn btn-success'
+  glyphicon, cssCls = 'refresh', ['btn', 'btn-success']
   reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
   alias = 'refresh'
   reqCss = ['bootstrap', 'font-awesome']
@@ -234,7 +235,7 @@ class ButtonRefresh(ButtonRemove):
 
 class GeneratePdf(ButtonRemove):
   alias = "generatePdf"
-  glyphicon, cssCls = "book", "btn btn-default"
+  glyphicon, cssCls = "book", ['btn', 'btn-default']
   source = r"http://pdfmake.org/#/gettingstarted"
   reqJs = ['pdfmake']
 

@@ -18,7 +18,6 @@ class WordCloud(AresHtmlContainer.GraphSvG):
   alias = 'cloud'
   reqJs = ['cloud']
 
-
   def js(self):
     """ Return the entries to be added to the Javascript to create the graph during the loading """
     res = ["var fill = d3.scale.category20();"]

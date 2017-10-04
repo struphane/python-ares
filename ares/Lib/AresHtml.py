@@ -61,18 +61,27 @@ class Html(object):
 
   """
   alias, jsEvent = None, None
-  cssCls, reference = None, None
+  cssCls, css, reference = None, None, None
   incIndent = 0
   reqJs, reqCss = None, None
 
-  def __init__(self, aresObj, vals, cssCls=None):
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None):
     """ Create an python HTML object """
     self.aresObj = aresObj # The html object ID
-    self.attr = {} if self.cssCls is None else {'class': self.cssCls} # default HTML attributes
+    self.attr = {'class': set([])} if self.cssCls is None else {'class': set(self.cssCls)} # default HTML attributes
+    if cssCls is not None:
+      for clsName in cssCls:
+        self.attr['class'].add(clsName)
+    if self.css is not None:
+      # we need to do a copy of the CSS style at this stage
+      self.attr['css'] = dict(self.css)
+    if cssAttr is not None:
+      if self.css is None:
+        self.attr['css'] = cssAttr
+      else:
+        self.attr['css'].update(cssAttr)
     self.jsOnLoad, self.jsEvent, self.jsEventFnc = set(), {}, collections.defaultdict(set)
     self.vals = vals
-    if cssCls is not None:
-      self.attr['class'] = cssCls
 
     if self.aresObj is not None:
        # Some components are not using aresObj because they are directly used for the display
@@ -103,9 +112,19 @@ class Html(object):
     """ Property to get the jquery value of the HTML objec in a python HTML object """
     return '%s.val()' % self.jqId
 
-  def addClass(self, cssCls, replace=False):
+
+  # CSS Classes management
+  def addClass(self, cssCls):
     """ Change the CSS Style of the HTML object """
-    self.attr['class'] = cssCls if replace else "%s %s" % (self.attr['class'], cssCls)
+    self.attr['class'].add(cssCls)
+
+  def getClass(self):
+    """ Return as a string the list of classes """
+    return " ".join(self.attr['class'])
+
+  def delClass(self, cssCls):
+    """ Remove a class from the list of CSS classes """
+    self.attr['class'].pop(cssCls)
 
   def toolTip(self, value):
     """ Add the Tooltip feature when the mouse is over the component """
@@ -113,11 +132,27 @@ class Html(object):
 
   def attr(self, name, value):
     """ Set an attribute to the HTML object """
-    self.attr[name] = value
+    if name == 'css':
+      # Section for the Style attributes
+      if 'css' in self.attr:
+        self.attr['css'] = value
+      else:
+        self.attr['css'].update(value)
+    elif name == 'class':
+      # Section dedicated to manage the CSS classes
+      self.attr['css'].add(value)
+    else:
+      # Section for all the other attributes
+      self.attr[name] = value
 
   def strAttr(self):
     """ Return the string line with all the attributes """
-    return 'id="%s" %s' % (self.htmlId, " ".join(['%s="%s"' % (key, val) for key, val in self.attr.items()]))
+    cssStyle, cssClass = '', ''
+    if 'css' in self.attr:
+      cssStyle = 'style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.attr["css"].items()])
+    if 'class' in self.attr:
+      cssClass = 'class="%s"' % self.getClass()
+    return 'id="%s" %s %s %s' % (self.htmlId, " ".join(['%s="%s"' % (key, val) for key, val in self.attr.items() if key not in ('css', 'class')]), cssStyle, cssClass)
 
   def __str__(self):
     """ Return the String representation of an Python HTML object """

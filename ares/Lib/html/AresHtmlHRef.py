@@ -8,8 +8,9 @@ cssCls is also passed in the args
 
 """
 
+import json
 from ares.Lib import AresHtml
-
+from ares.Lib import AresJs
 from flask import render_template_string
 
 
@@ -18,43 +19,42 @@ class A(AresHtml.Html):
   Class to link a script to another sub script in a report
   In this class no Javascript is used in the click event
   """
-  alias, cssCls = 'anchor', 'btn btn-success'
+  alias, cssCls = 'anchor', ['btn', 'btn-success']
   flask = 'ares.run_report'
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['jquery']
 
-  def __init__(self, aresObj, vals, **kwargs):
-    super(A, self).__init__(aresObj, vals, kwargs.get('cssCls'))
-    self.kwargs = kwargs
+  def __init__(self, aresObj, vals, attrs, cssCls, cssAttr):
+    super(A, self).__init__(aresObj, vals,  cssCls, cssAttr)
+    self.getData = attrs if attrs is not None else {} # Special attributes to add to the URL
+    if not 'REPORT_NAME' in self.getData:
+      self.getData['REPORT_NAME'] = self.aresObj.http['REPORT_NAME']
+    if not 'SCRIPT_NAME' in self.getData:
+      self.getData['SCRIPT_NAME'] = self.aresObj.http['REPORT_NAME']
+
+  def resolve(self):
+    """ Use Flak modules to translave the URL from the function name """
+    url = render_template_string('''{{ url_for(\'ares.run_report\', report_name=\'%(REPORT_NAME)s\', script_name=\'%(SCRIPT_NAME)s\') }}''' % self.getData)
+    return url
 
   def __str__(self):
     """ Return the String representation of a Anchor HTML object """
-    values, needJs, jsData = [], False, []
-    for key, data in self.kwargs.items():
-      if key not in ('cssCls', ):
-        if issubclass(data.__class__, AresHtml.Html):
-          # In this case we cannot have the parameters hard coded
-          # So we need to use Javascript and the Ajax Get and Post features to deduce it on the fly
-          jsData.append("'%s=' + %s" % (key, data.val))
-          needJs = True
+    url = self.resolve()
+    if len(self.getData) < 3:
+      return '<a href="%s" %s>%s</a>' % (url, self.strAttr(), self.vals)
 
-        else:
-          values.append("%s='%s'" % (key, data))
-
-    if needJs:
-      self.jsEvent['click'] = render_template_string(
-        '''
-          %s.on("click", function (event){  
-                var baseUrl = "{{ url_for(\'%s\', %s ) }}";
+    data = json.dumps(self.getData, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()')
+    jsDef = '''
+              %s.on("click", function (event){
+                var baseUrl = "%s";
                 if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + %s ; }
                 else { var ullUrl = baseUrl + "?" + %s ; }
                 window.location.href = ullUrl ;
-            }
-          ) ;
-        ''' % (self.jqId, self.flask, ",".join(values), "+ '&' +".join(jsData), "+ '&' +".join(jsData)), **self.kwargs)
-      return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
-
-    return render_template_string('<a %s href="{{ url_for(\'%s\', %s ) }}">%s</a>' % (self.strAttr(), self.flask, ",".join(values), self.vals), **self.kwargs)
+              }
+            ) ;
+            ''' % (url, data, self.jqId, self.htmlId)
+    self.jsEvent['click'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'click', jsDef, url=url)
+    return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
 
 
 class ScriptPage(A):
@@ -62,7 +62,7 @@ class ScriptPage(A):
   Class to link a script to another sub script in a report
   In this class no Javascript is used in the click event
   """
-  alias, cssCls = 'main', ''
+  alias, cssCls = 'main', ['']
   flask = 'ares.run_report'
   reqCss = ['bootstrap']
   reqJs = ['jquery']
@@ -72,7 +72,7 @@ class Download(A):
   """
 
   """
-  alias, cssCls = 'anchor_download', 'fa fa-download'
+  alias, cssCls = 'anchor_download', ['fa fa-download']
   flask = 'ares.downloadFiles'
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['jquery']
@@ -82,7 +82,7 @@ class CreateEnv(A):
   """
 
   """
-  alias, cssCls = 'anchor_set_env', 'btn btn-primary'
+  alias, cssCls = 'anchor_set_env', ['btn', 'btn-primary']
   flask = 'ares.ajaxCreate'
   reqCss = ['bootstrap']
   reqJs = ['jquery']
@@ -90,7 +90,7 @@ class CreateEnv(A):
 
 class AddScript(A):
   """ """
-  alias, cssCls = 'anchor_add_scripts', 'btn btn-primary'
+  alias, cssCls = 'anchor_add_scripts', ['btn', 'btn-primary']
   flask = 'ares.addScripts'
   reqCss = ['bootstrap']
   reqJs = ['jquery']
@@ -101,7 +101,7 @@ class ABespoke(AresHtml.Html):
   Class to link a script to another sub script in a report
   In this class no Javascript is used in the click event
   """
-  alias, cssCls = 'external_link', ''
+  alias = 'external_link'
   reqCss = ['bootstrap']
   reqJs = ['jquery']
 

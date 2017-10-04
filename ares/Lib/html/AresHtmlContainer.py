@@ -38,22 +38,11 @@ class IFrame(AresHtml.Html):
 
   reference = 'https://www.w3schools.com/TAgs/tag_iframe.asp'
   alias = 'iframe'
-  default = {'width': '1000px', 'height': '700px', 'margin': 'auto 0', 'display': 'block'}
-
-  def addStyle(self, name, value):
-    """ Add the style to the Title object """
-    if self.style is None:
-      self.style = dict(self.default)
-    self.style[name] = value
+  css = {'width': '1000px', 'height': '700px', 'margin': 'auto 0', 'display': 'block'}
 
   def __str__(self):
     """ Return an iFrame Tag """
-    if not hasattr(self, 'style'):
-      self.style = dict(self.default)
-    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
-    return '''<iframe src="%s" style=%s">  
-    <p>Your browser does not support iframes.</p>
-    </iframe>''' % (self.vals, styleStr)
+    return '<iframe src="%s" %s><p>Your browser does not support iframes.</p></iframe>' % (self.vals, self.strAttr())
 
 
 class List(AresHtml.Html):
@@ -67,12 +56,12 @@ class List(AresHtml.Html):
   Default class parameters
     - CSS Default Class = list-group
   """
-  cssCls = 'list-group'
+  cssCls = ['list-group']
   reference = 'https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp'
   alias = 'list'
 
-  def __init__(self, aresObj, headerBox, vals, cssCls=None):
-    super(List, self).__init__(aresObj, vals, cssCls)
+  def __init__(self, aresObj, headerBox, vals, cssCls=None, cssAttr=None):
+    super(List, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = headerBox
 
   def __str__(self):
@@ -132,12 +121,12 @@ class Container(Div):
   Default class parameters
     - CSS Default Class = container
   """
-  cssCls, alias = 'container-fluid', 'container'
+  cssCls, alias = ['container-fluid'], 'container'
   reference = 'https://getbootstrap.com/docs/3.3/css/'
 
-  def __init__(self, aresObj, header, vals, cssCls=None):
-    """  """
-    super(Container, self).__init__(aresObj, vals, cssCls)
+  def __init__(self, aresObj, header, vals, cssCls=None, cssAttr=None):
+    """ Instanciate a container object """
+    super(Container, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
 
   def __str__(self):
@@ -160,7 +149,7 @@ class GraphSvG(AresHtml.Html):
     - CSS Default Class = span4 (for the DIV component)
     - width, height = 960, 500 (for the SVG component)
   """
-  cssCls = 'panel-body span4'
+  cssCls = ['panel-body', 'span4']
   width, height = 100, 400
   reference = 'https://www.w3schools.com/html/html5_svg.asp'
   icon = 'fa fa-pie-chart'
@@ -169,9 +158,9 @@ class GraphSvG(AresHtml.Html):
   recordSetKey = None
   multiOptions = True
 
-  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None):
+  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None):
     """ selectors is a tuple with the category first and the value list second """
-    super(GraphSvG, self).__init__(aresObj, vals, cssCls)
+    super(GraphSvG, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
     self.recordSetId = id(vals)
     self.header = recordSetDef
@@ -320,7 +309,7 @@ class Network(AresHtml.Html):
     - CSS Default Class = container-fluid
   """
   dim = None
-  cssCls = 'container-fluid'
+  cssCls = ['container-fluid']
 
   def __str__(self):
     """ Return the Graph container for D3 and DVD3 """
@@ -344,7 +333,7 @@ class Tabs(AresHtml.Html):
     - title = Home
   """
   alias = 'tabs'
-  cssCls = 'nav nav-tabs'
+  cssCls = ['nav', 'nav-tabs']
 
   def __str__(self):
     """ Return the HTML representation of a Tabular object """
@@ -369,7 +358,7 @@ class Image(AresHtml.Html):
     - title = Home
   """
   alias =  'img'
-  cssCls = 'img-responsive'
+  cssCls = ['img-responsive']
   reference = 'https://www.w3schools.com/bootstrap/bootstrap_ref_css_images.asp'
   doubleDots = 1
 
@@ -387,11 +376,11 @@ class Row(AresHtml.Html):
   """
 
   """
-  cssCls, alias = "row", 'row'
+  cssCls, alias = ['row'], 'row'
   gridCss = 'panel panel-success'
   reference = 'https://getbootstrap.com/docs/3.3/css/'
 
-  def __init__(self, aresObj, hltmObjs, cssCls=None):
+  def __init__(self, aresObj, hltmObjs, cssCls=None, cssAttr=None):
     if len(hltmObjs) > 3:
       raise Exception('Row object can only display maximum 3 components')
 
@@ -399,7 +388,7 @@ class Row(AresHtml.Html):
       vals = [('col-6 col-md-4', htmlObj) for htmlObj in hltmObjs]
     elif len(hltmObjs) == 2:
       vals = [('col-xs-6', htmlObj) for htmlObj in hltmObjs]
-    super(Row, self).__init__(aresObj, vals, cssCls)
+    super(Row, self).__init__(aresObj, vals, cssCls, cssAttr)
 
   def extend(self, component):
     """ Extend one of the objects on to columns """
@@ -486,11 +475,11 @@ class Vignet(AresHtml.Html):
   This Vignet can be
   """
 
-  cssCls, alias = "panel panel-success", 'vignet'
+  cssCls, alias = ['panel', 'panel-success'], 'vignet'
 
-  def __init__(self, aresObj, title, content, recordSet, fnc=None, col=None, cssCls=None):
+  def __init__(self, aresObj, title, content, recordSet, fnc=None, col=None, cssCls=None, cssAttr=None):
     vals = recordSet if fnc is None else fnc(recordSet, col)
-    super(Vignet, self).__init__(aresObj, vals, cssCls)
+    super(Vignet, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.title = title
     self.text = content
 
@@ -504,10 +493,8 @@ class Vignet(AresHtml.Html):
 
 
 class AresBox(AresHtml.Html):
-  """
-
-  """
-  cssCls = 'panel ares-panel-success'
+  """ Internal object cannot be used directly from ares.py """
+  cssCls = ['panel', 'ares-panel-success']
 
   def __init__(self, htmlId, vals, headerBox):
     """  """
@@ -522,7 +509,7 @@ class AresBox(AresHtml.Html):
 
   def __str__(self):
     """  Return the HTML representation of the Box objects """
-    item = AresItem.Item('<div class="%s" id="%s_main">' % (self.cssCls, self.htmlId))
+    item = AresItem.Item('<div class="%s" id="%s_main">' % (" ".join(self.cssCls), self.htmlId))
     item.add(1, '<div class="ares-panel-heading">')
     item.add(2, '<strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
     item.add(3, '<button class="btn btn-xs" id="%s_close" name="ares_close" style="text-align: center;float:right;"><i class="fa fa-window-close" aria-hidden="true"></i></button>' % self.htmlId)

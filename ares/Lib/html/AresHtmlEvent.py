@@ -9,61 +9,6 @@ from ares.Lib import AresItem
 from ares.Lib import AresJs
 
 
-class A(AresHtml.Html):
-  """
-  Wrapper for a Anchor HTML tag
-
-  """
-  link, alias = '', 'anchor'
-  reference = 'https://www.w3schools.com/tags/att_a_href.asp'
-
-  def __init__(self, aresObj, vals, reportName, childPages, directory, cssCls=None):
-    super(A, self).__init__(aresObj, vals, cssCls)
-    self.childPages = childPages
-    self.reportName = reportName
-    self.directory = directory
-
-  def addLink(self, link, dots='..'):
-    """ Add the link to another page to this object """
-    if self.directory is None:
-      splitUrl  = link.split("?")
-      if len(splitUrl) > 1:
-        link = "%s/child:%s/%s?%s" % (dots, self.reportName, self.childPages[splitUrl[0]].replace(".py", ""), splitUrl[1])
-      else:
-        link = "%s/child:%s/%s" % (dots, self.reportName, self.childPages[splitUrl[0]].replace(".py", ""))
-      self.link = link
-    else:
-      # There is a child and we need to produce the sub Report attached to it
-      # The below part allow also to test locally the get and post method that we put in the URL
-      # Basically the Wrapper will create all tehe secondary pages using all the different parameters
-      splitUrl  = link.split("?")
-      childReport = self.childPages[splitUrl[0]].replace(".py", "")
-      link = "%s.html" % childReport
-    self.link = link
-
-  def __str__(self):
-    """ Return the String representation of a Anchor HTML object """
-    if self.link is None:
-      self.link = '#' if self.jsEvent is not None else self.link
-    return '<a href="%s" %s>%s</a>' % (self.link , self.strAttr(), self.vals)
-
-  def preload(self, evenType, jsDef='', preloading=True):
-    """
-    Common implementation to add javascript callback functions
-
-    This javascript wrapper include on purpose a defined set of javascript methods in order to control the calls
-    If some Ajax / DB calls are required, users will have to directly defined those items when they are writing
-    the python report
-    """
-    if preloading:
-      jsDef = "preloader(); %s" % jsDef
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, "%s window.location = '%s' ;" % (jsDef, self.link), jsDef)
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.anchor("MyAnchor")
-
-
 class Input(AresHtml.Html):
   """
   Python wrapper to the HTML INPUT component
@@ -73,7 +18,7 @@ class Input(AresHtml.Html):
   Default class parameters
     - CSS Default Class = form-control
   """
-  cssCls, alias = 'form-control', 'input'
+  cssCls, alias = ['form-control'], 'input'
 
   def autocomplete(self, values):
     """ Fill the auto completion box with a data source """
@@ -113,7 +58,7 @@ class Comment(AresHtml.Html):
     - rows = 5 (the size of the Textarea)
     - dflt - '' (The default value of the Textarea)
   """
-  cssCls, rows, dflt = 'form-control', 5, ''
+  cssCls, rows, dflt = ['form-control'], 5, ''
   reference = 'https://www.w3schools.com/tags/tag_textarea.asp'
 
   def addVal(self, dflt):
@@ -148,7 +93,7 @@ class TextArea(AresHtml.Html):
     - rows = 3 (the size of the Textarea)
     - dflt - '' (The default value of the Textarea)
   """
-  cssCls, rows, dflt = 'form-control custom-control', 5, ''
+  cssCls, rows, dflt = ['form-control', 'custom-control'], 5, ''
   reference = 'https://www.w3schools.com/tags/tag_textarea.asp'
   alias = 'textArea'
 
@@ -191,7 +136,7 @@ class DropDown(AresHtml.Html):
     - jQueryEvent = click
     - CSS Default Class = dropdown (Bootstrap default style)
   """
-  title, cssCls = 'Title', 'dropdown'
+  title, cssCls = 'Title', ['dropdown']
   alias = 'dropdown'
 
   def __str__(self):
@@ -231,11 +176,11 @@ class Select(AresHtml.Html):
   cssCls = selectpicker
   """
   # TODO: Extend the python object to handle multi select and all the cool features
-  alias, cssCls = 'select', 'form-control'
+  alias, cssCls = 'select', ['form-control']
 
-  def __init__(self, aresObj, vals, selected, cssCls=None):
+  def __init__(self, aresObj, vals, selected, cssCls=None, cssAttr=None):
     """ Instanciate the object and store the selected item """
-    super(Select, self).__init__(aresObj, vals, cssCls)
+    super(Select, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.selected = selected
 
   def __str__(self):
@@ -273,7 +218,7 @@ class SelectWithGroup(AresHtml.Html):
   cssCls = selectpicker
   """
   # TODO: Extend the python object to handle multi select and all the cool features
-  alias, cssCls = 'select_group', 'selectpicker'
+  alias, cssCls = 'select_group', ['selectpicker']
 
   def __str__(self):
     """ Return the HTML string for a select """
@@ -331,7 +276,7 @@ class DatePicker(AresHtml.Html):
   reference = 'https://jqueryui.com/datepicker/'
   requirements = ['jquery-ui.js']
   alias = 'date'
-  cssCls = 'datepicker'
+  cssCls = ['datepicker']
   dflt = ''
 
   def addVal(self, dflt):
@@ -408,8 +353,8 @@ class DropFile(AresHtml.Html):
   alias = 'dropfile'
   reportName = ''
 
-  def __init__(self, aresObj, vals, cssCls=None):
-    super(DropFile, self).__init__(aresObj, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None):
+    super(DropFile, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.js('dragover', '''
                           event.originalEvent.preventDefault();
                           event.originalEvent.stopPropagation();
@@ -468,7 +413,7 @@ class UploadFile(AresHtml.Html):
 
   """
   alias = 'upload'
-  clss = 'custom-file-input'
+  cssCls = ['custom-file-input']
 
   def __str__(self):
     """ Display the file upload object """

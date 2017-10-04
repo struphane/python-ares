@@ -40,11 +40,11 @@ class Table(AresHtml.Html):
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
 
-  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None):
+  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
     """
 
     """
-    super(Table, self).__init__(aresObj, vals, cssCls)
+    super(Table, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.aresObj.jsGlobal[self.htmlId] = True # table has to be registered as a global variable in js
     self.headerBox = headerBox
     self.recordSetId = id(vals)

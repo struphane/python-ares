@@ -14,10 +14,11 @@ class Text(AresHtml.Html):
   """ Python Wrapper to the FONT HTNL Tag """
   reference = 'https://www.w3schools.com/tags/tag_font.asp'
   alias = 'text'
+  css = {'font-style': 'normal', 'font-variant': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
   htmlComp = None
 
-  def __init__(self, aresObj, vals, cssCls=None, htmlComp=None):
-    super(Text, self).__init__(aresObj, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, htmlComp=None):
+    super(Text, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.htmlComp = htmlComp
 
   def __str__(self):
@@ -109,22 +110,13 @@ class BlockQuote(AresHtml.Html):
 class Title(AresHtml.Html):
   """ Python Wrapper to the HTML H1 Tag """
   dim, alias = 1, 'title'
-  default = {'color': '#398438', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
+  css = {'color': '#398438', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
-
-  def addStyle(self, name, value):
-    """ Add the style to the Title object """
-    if self.style is None:
-      self.style = dict(self.default)
-    self.style[name] = value
 
   def __str__(self):
     """ Return a header HTML Tag """
-    if not hasattr(self, 'style'):
-      self.style = dict(self.default)
-    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
-    items = AresItem.Item('<H%s class="page-header" %s style="%s">' % (self.dim, self.strAttr(), styleStr))
-    items.add(1, '<a class="anchorjs-link " style="%s">%s</a>' % (styleStr, self.vals))
+    items = AresItem.Item('<H%s class="page-header" %s>' % (self.dim, self.strAttr()))
+    items.add(1, '<a class="anchorjs-link" style="color:inherit">%s</a>' % self.vals)
     items.add(0, '</H%s>' % self.dim)
     return str(items)
 
@@ -146,7 +138,7 @@ class Title(AresHtml.Html):
 class Title2(Title):
   """ Python Wrapper to the HTML H2 Tag """
   dim, alias = 2, 'title2'
-  default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
+  css = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   @classmethod
@@ -157,7 +149,7 @@ class Title2(Title):
 class Title3(Title):
   """ Python Wrapper to the HTML H3 Tag """
   dim, alias = 3, 'title3'
-  default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
+  css = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   @classmethod
@@ -168,7 +160,7 @@ class Title3(Title):
 class Title4(Title):
   """ Python Wrapper to the HTML H4 Tag """
   dim, alias = 4, 'title4'
-  default = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
+  css = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   @classmethod
@@ -254,31 +246,21 @@ class Tick(AresHtml.Html):
 class UpDown(AresHtml.Html):
   """ Up and down Text component """
   alias = 'updown'
-  default = {'color': 'green', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal',
-             'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '45px'}
+  css = {'color': 'green', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal',
+         'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '45px'}
   reqCss = ['font-awesome']
 
-  def __init__(self, aresObj, vals, delta, cssCls=None, htmlComp=None):
-    super(UpDown, self).__init__(aresObj, vals, cssCls)
+  def __init__(self, aresObj, vals, delta, cssCls=None, cssAttr=None, htmlComp=None):
+    super(UpDown, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.delta = delta
-
-  def addStyle(self, name, value):
-    """ Add the style to the Title object """
-    if self.style is None:
-      self.style = dict(self.default)
-    self.style[name] = value
 
   def __str__(self):
     """ Return the String representation of a line tag """
-    if not hasattr(self, 'style'):
-      self.style = dict(self.default)
     if self.delta > 0:
-      styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
-      return "<i class='fa fa-arrow-up' aria-hidden='true' %s style='%s'>&nbsp;%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
+      return "<i class='fa fa-arrow-up' aria-hidden='true' %s>&nbsp;%s</i>" % (self.strAttr(), Numeric(None, self.vals))
 
-    self.style['color'] = 'red'
-    styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
-    return "<i class='fa fa-arrow-down' aria-hidden='true' %s style='%s'>&nbsp;%s</i>" % (self.strAttr(), styleStr, Numeric(None, self.vals))
+    self.attr['css']['color'] = 'red'
+    return "<i class='fa fa-arrow-down' aria-hidden='true' %s>&nbsp;%s</i>" % (self.strAttr(), Numeric(None, self.vals))
 
 
 # --------------------------------------------------------------------

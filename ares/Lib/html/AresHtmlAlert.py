@@ -18,14 +18,14 @@ class DangerAlert(AresHtml.Html):
   level = 'Danger'
   backgroundColor = '#f44336'
   closeButton = False
-  cssCls = 'alert-danger'
+  cssCls = ['alert-danger']
   jsEvent = None
 
-  def __init__(self, aresObj, title, value, countNotif, closeButton=False, backgroundColor=None, cssCls=None):
-    """ """
+  def __init__(self, aresObj, title, value, countNotif, closeButton=False, backgroundColor=None, cssCls=None, cssAttr=None):
+    """ Instantiate the Danger notification box """
     if cssCls:
       self.cssCls = cssCls
-    super(DangerAlert, self).__init__(aresObj, self.cssCls)
+    super(DangerAlert, self).__init__(aresObj, '', self.cssCls, cssAttr)
     self.title = title
     self.val = value
     self.closeButton = closeButton

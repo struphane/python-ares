@@ -20,12 +20,12 @@ from ares.Lib.html import AresHtmlContainer
 class Meter(AresHtml.Html):
   """
   """
-  alias, cssCls = 'meter', 'ares-meter'
+  alias, cssCls = 'meter', ['ares-meter']
   reference = ''
   reqCss = []
   reqJs = ['meter']
 
-  def __init__(self, aresObj, headerBox, value, cssCls=None):
+  def __init__(self, aresObj, headerBox, value, cssCls=None, cssAttr=None):
     """Initialise a new meter object.
 
     ARGUMENTS
@@ -35,7 +35,7 @@ class Meter(AresHtml.Html):
     if value < 0 or value > 1:
       raise ValueError('Value must be in range 0..1')
 
-    super(Meter, self).__init__(aresObj, [], cssCls)
+    super(Meter, self).__init__(aresObj, [], cssCls, cssAttr)
     self.headerBox = headerBox
     self.value = value
 

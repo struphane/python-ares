@@ -1,10 +1,17 @@
+"""
+
+"""
+
 from ares.Lib import AresHtml
 
 class HandleRequest(AresHtml.Html):
+  """
+
+  """
   alias = "handleRequest"
 
-  def __init__(self, aresObj, method, params, js="", cssCls=None):
-    super(HandleRequest, self).__init__(aresObj, None, cssCls)
+  def __init__(self, aresObj, method, params, js="", cssCls=None, cssAttr=None):
+    super(HandleRequest, self).__init__(aresObj, None, cssCls, cssAttr)
     self.method = method
     self.params = params
     self.js = js

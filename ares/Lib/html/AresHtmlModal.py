@@ -16,15 +16,15 @@ class Modal(AresHtml.Html):
     - CSS Default Class = table
 
   """
-  cssCls, alias = 'modal fade', 'modal'
+  cssCls, alias = ['modal fade'], 'modal'
   modal_header = '' # The title for the modal popup
   reference = 'https://v4-alpha.getbootstrap.com/components/modal/'
   default = {'color': '#398438', 'font-family': 'anchorjs-icons', 'font-style': 'normal', 'font-varian': 'normal',
              'font-weight': 'normal', 'line-height': 'inherit'}
 
-  def __init__(self, aresObj, name, cssCls=None):
+  def __init__(self, aresObj, name, cssCls=None, cssAttr=None):
     """ Create an python HTML object """
-    super(Modal, self).__init__(aresObj, None, cssCls)
+    super(Modal, self).__init__(aresObj, None, cssCls, cssAttr)
     self.name = name
     self.vals = []
 
@@ -60,7 +60,3 @@ class Modal(AresHtml.Html):
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.modal("My modal")
-
-if __name__ == '__main__':
-  obj = Modal(0, 'Hey', [['Olivier', 'Aurelie'], [1, 2]])
-  echo(obj)

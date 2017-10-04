@@ -1,4 +1,7 @@
-import os
+"""
+
+"""
+
 import json
 
 from ares.Lib import AresHtml, AresItem
@@ -6,13 +9,12 @@ from flask import render_template_string
 
 
 class Map(AresHtml.Html):
-  cssCls, alias = 'ares-map', 'map'
+  cssCls, alias = ['ares-map'], 'map'
   reference = 'https://www.vincentbroute.fr/mapael'
   reqJs = ['mapael']
 
-  def __init__(self, aresObj, cssCls=None):
-    super(Map, self).__init__(aresObj, None, cssCls)
-
+  def __init__(self, aresObj, cssCls=None, cssAttr=None):
+    super(Map, self).__init__(aresObj, None, cssCls, cssAttr)
     self.areas = {}
     self.mapname = 'world_countries'
     self.defaultarea = {}
