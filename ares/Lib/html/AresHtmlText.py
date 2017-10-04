@@ -40,8 +40,8 @@ class Code(AresHtml.Html):
   htmlComp = None
   reqCss = ['bootstrap']
 
-  def __init__(self, aresObj, vals, cssCls=None, htmlComp=None):
-    super(Code, self).__init__(aresObj, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, htmlComp=None):
+    super(Code, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.htmlComp = htmlComp
 
   def __str__(self):
@@ -72,8 +72,8 @@ class Paragraph(AresHtml.Html):
   alias = 'paragraph'
   htmlComp = None
 
-  def __init__(self, aresObj, vals, cssCls=None, htmlComp=None):
-    super(Paragraph, self).__init__(aresObj, vals, cssCls)
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, htmlComp=None):
+    super(Paragraph, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.htmlComp = htmlComp
 
   def __str__(self):
