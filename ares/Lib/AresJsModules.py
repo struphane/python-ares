@@ -54,6 +54,7 @@ CSS_IMPORTS = {
   'ares': {'req': ['bootstrap'], 'modules': ['bdi.css', 'bootstrap-simple-sidebar.css']},
   }
 
+
 class OrderedSet(collections.MutableSet):
 
     def __init__(self, iterable=None):
@@ -112,10 +113,8 @@ class OrderedSet(collections.MutableSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
 
-
 class ImportManager(object):
   """
-
   """
   def __init__(self):
     """ Load the hierarchy of modules """
