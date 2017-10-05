@@ -44,7 +44,7 @@ class Button(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of HTML button """
-    if self.icon is not None:
+    if self.awsIcon is not None:
       return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.awsIcon, self.vals)
 
     return '<button %s>%s</button>' % (self.strAttr(), self.vals)
