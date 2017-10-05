@@ -20,5 +20,4 @@ def report(aresObj):
                                     {'key': 'CATEGORY', 'colName': 'Category'},
                                     {'key': 'PTF', 'colName': 'Portfolio'}
                                     ], headerBox="Currency")
-  aresObj.row([mapObj, meter])
-  cloud
+  aresObj.row([cloud, meter])
