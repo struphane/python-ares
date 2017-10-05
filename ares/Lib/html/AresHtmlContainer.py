@@ -320,13 +320,23 @@ class Svg(AresHtml.Html):
     self.header = recordSetDef
     self.svgProp = dict(self._Svg__prop)
 
-  def addChartAttr(self, attr):
+  def addChartAttr(self, attrs):
     """ Change the object chart properties """
-    self.chartAttrs.update(attr)
+    self.chartAttrs.update(attrs)
 
-  def addChartProp(self, attr):
+  def delChartAttr(self, attrsList):
     """ Change the object chart properties """
-    self.chartProps.update(attr)
+    for attr in attrsList:
+      if attr in self.chartAttrs:
+        del self.chartAttrs[attr]
+
+  def addChartProp(self, attrs):
+    """ Change the object chart properties """
+    self.chartProps.update(attrs)
+
+  def delChartProp(self, attrs):
+    """ Change the object chart properties """
+    self.chartProps.update(attrs)
 
   def addSvgProp(self, attr):
     """ Change the object SVG properties """
@@ -397,6 +407,9 @@ class Svg(AresHtml.Html):
     """ Returns the selected category for the graph """
     return 'serie_%s' % self.htmlId
 
+  def dataFnc(self):
+    """ Return the json data """
+    return open(r"E:\GitHub\Ares\ares\json\%sData.json" % self.alias).read().strip()
 
 class Network(AresHtml.Html):
   """

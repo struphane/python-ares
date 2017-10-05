@@ -3,23 +3,33 @@
 
 """
 
-from ares.Lib.graph import AresHtmlGraph
+from ares.Lib.html import AresHtmlContainer
 
-class LineWithFocus(AresHtmlGraph.JsNvD3Graph):
+class NvD3LineWithFocus(AresHtmlContainer.Svg):
   """
 
   """
+  alias, chartObject = 'lineChartFocus', 'lineWithFocusChart'
+  references = ['http://nvd3.org/examples/lineWithFocus.html']
+  __chartProp = {
+    'xAxis': {'tickFormat': "d3.format(',f')"},
+    'yAxis': {'tickFormat': "d3.format(',.2f')"},
+    'y2Axis': {'tickFormat': "d3.format(',.2f')"},
+  }
 
-  mockData = r'json\lineWithFocus.json'
-  chartObject = 'lineWithFocusChart'
-  alias = 'lineChartFocus'
-
-  style = {'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('x')(new Date(d)) }",},
-                         'yAxis': {'tickFormat': "d3.format(',.2f')",},
-                         'x2Axis': {'showMaxMin': 'false',
-                                    'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }",},
-                         'y2Axis': {'tickFormat': "d3.format(',.2f')"}
-                         }}
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['jquery', 'd3']
+
+  def graph(self):
+    """ Add the Graph definition in the Javascript method """
+    self.aresObj.jsGraphs.append(
+      '''
+        var %s = nv.models.%s()
+            .%s ;
+
+        %s
+
+        d3.select("#%s svg").datum(%s).call(%s);
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
+             self.htmlId, self.dataFnc(), self.htmlId)
+    )

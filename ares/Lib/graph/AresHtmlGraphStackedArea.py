@@ -8,19 +8,21 @@ from ares.Lib.html import AresHtmlContainer
 class NvD3StackedArea(AresHtmlContainer.Svg):
   """ This object will output a simple stacked area chart
 
-  Reference website: http://nvd3.org/examples/stackedArea.html
   """
-  alias, chartObject = 'stackedAreaChart', 'multiBarChart'
-  __chartStyle = {'transitionDuration': 350,
-                  'reduceXTicks': 'true',
-                  'rotateLabels': 0,
+  alias, chartObject = 'stackedAreaChart', 'stackedAreaChart'
+  references = ['http://nvd3.org/examples/stackedArea.html']
+  __chartStyle = {'margin': '{right: 100}',
+                  'x': 'function(d) { return d[0] }',
+                  'y': 'function(d) { return d[1] }',
+                  'useInteractiveGuideline': 'true',
+                  'rightAlignYAxis': 'true',
+                  'transitionDuration': '500',
                   'showControls': 'true',
-                  'groupSpacing': 0.1
+                  'clipEdge': 'true'
   }
-
   __chartProp = {
-     'xAxis': {'tickFormat': "d3.format(',f')"},
-     'yAxis': {'tickFormat': "d3.format(',.1f'"},
+     'xAxis': {'tickFormat': "function(d) { return d3.time.format('%x')( new Date(d) ) }"},
+     'yAxis': {'tickFormat': "d3.format(',.2f')"},
   }
 
   # Required modules
@@ -30,7 +32,7 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
   def dataFnc(self):
     """
     """
-    return json.dumps(json.load(open(r"E:\GitHub\Ares\ares\json\stackedAreaData.json")))
+    return open(r"E:\GitHub\Ares\ares\json\stackedAreaData.json").read().strip()
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """

@@ -15,9 +15,10 @@ class NvD3Pie(AresHtmlContainer.Svg):
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   alias, chartObject = 'pie', 'pieChart'
+  references = ['http://nvd3.org/examples/pie.html']
   __chartStyle = {'showLabels': 'true',
-                'x': "function(d) { return d[0]; }",
-                'y': "function(d) { return d[1]; }"}
+                  'x': "function(d) { return d[0]; }",
+                  'y': "function(d) { return d[1]; }"}
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']

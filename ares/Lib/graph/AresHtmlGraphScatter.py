@@ -11,6 +11,7 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
 
   """
   alias, chartObject = 'scatterChart', 'scatterChart'
+  references = ['http://nvd3.org/examples/scatter.html']
   __chartStyle = {'showDistX': 'true',
                 'showDistY': 'true',
                 'transitionDuration': 350,
