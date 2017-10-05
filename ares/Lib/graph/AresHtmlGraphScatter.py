@@ -10,12 +10,14 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
   """
 
   """
-  alias, chartObject = 'scatterChart', 'scatterChart'
+  alias, chartObject = 'scatter', 'scatterChart'
   references = ['http://nvd3.org/examples/scatter.html']
   __chartStyle = {'showDistX': 'true',
-                'showDistY': 'true',
-                'transitionDuration': 350,
-                'color': 'd3.scale.category10().range()',
+                  'showDistY': 'true',
+                  'x': 'function(d) { return d[0] }',
+                  'y': 'function(d) { return d[1] }',
+                  'transitionDuration': 350,
+                  'color': 'd3.scale.category10().range()',
   }
 
   __chartProp = {
@@ -28,11 +30,6 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
-
-  def dataFnc(self):
-    """
-    """
-    return '''[{key: 'test', values: [{x: 1.4, y: 2.3}]}] '''
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """

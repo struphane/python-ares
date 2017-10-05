@@ -384,7 +384,7 @@ class Svg(AresHtml.Html):
 
   def __str__(self):
     """ Return the svg container """
-    return '<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr()
+    return str(AresBox(self.htmlId, '<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr(), self.headerBox))
 
   @property
   def jqId(self):
@@ -414,6 +414,7 @@ class Svg(AresHtml.Html):
   def dataFnc(self):
     """ Return the json data """
     return open(r"E:\GitHub\Ares\ares\json\%sData.json" % self.alias).read().strip()
+
 
 class Network(AresHtml.Html):
   """

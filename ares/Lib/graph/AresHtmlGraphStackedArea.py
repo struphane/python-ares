@@ -9,7 +9,7 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
   """ This object will output a simple stacked area chart
 
   """
-  alias, chartObject = 'stackedAreaChart', 'stackedAreaChart'
+  alias, chartObject = 'stackedArea', 'stackedAreaChart'
   references = ['http://nvd3.org/examples/stackedArea.html']
   __chartStyle = {'margin': '{right: 100}',
                   'x': 'function(d) { return d[0] }',
@@ -20,6 +20,7 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
                   'showControls': 'true',
                   'clipEdge': 'true',
   }
+
   __chartProp = {
      'xAxis': {'tickFormat': "function(d) { return d3.time.format('%x')( new Date(d) ) }", 'showMaxMin': 'false'},
      'yAxis': {'tickFormat': "d3.format(',.2f')"},
@@ -30,11 +31,6 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
-
-  def dataFnc(self):
-    """
-    """
-    return open(r"E:\GitHub\Ares\ares\json\stackedAreaData.json").read().strip()
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
