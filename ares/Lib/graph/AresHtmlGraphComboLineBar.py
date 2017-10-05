@@ -27,6 +27,10 @@ class NvD3ComboLineBar(AresHtmlContainer.Svg):
           'bars': {'forceY': '[0]'}
   }
 
+  __svgProp = {
+    'transition': '',
+  }
+
   # Required CSS and JS modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['jquery', 'd3']
@@ -40,12 +44,11 @@ class NvD3ComboLineBar(AresHtmlContainer.Svg):
 
         %s
 
-        d3.select("#%s svg").datum(%s)
-          .transition()
-          .duration(0)
-          .call(%s);
+        d3.select("#%s svg").datum(%s)%s.call(%s);
+
+        nv.utils.windowResize(%s.update);
       ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-             self.htmlId, self.dataFnc(), self.htmlId)
+             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
     )
 
   def dataFnc(self):

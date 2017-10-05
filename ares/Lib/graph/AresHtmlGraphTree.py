@@ -16,10 +16,6 @@ class NvD3Tree(AresHtmlContainer.Svg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
 
-  def dataFnc(self):
-    """ """
-    return open(r"E:\GitHub\Ares\ares\json\tree.json").read().strip()
-
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     chartAttributes = []

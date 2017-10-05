@@ -45,6 +45,8 @@ class NvD3Donut(AresHtmlContainer.Svg):
             .%s ;
 
         d3.select("#%s svg").datum(%s)%s.call(%s);
+
+        nv.utils.windowResize(%s.update);
       ''' % (self.htmlId, self.chartObject, self.attrToStr(),
-             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId)
+             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
     )

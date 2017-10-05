@@ -54,9 +54,10 @@ class NvD3Bar(AresHtmlContainer.Svg):
         var %s = nv.models.%s()
             .%s ;
 
-        d3.select("#%s svg").datum(%s)
-          .call(%s);
+        d3.select("#%s svg").datum(%s).call(%s);
+
+        nv.utils.windowResize(%s.update);
       ''' % (self.htmlId, self.chartObject, self.attrToStr(),
-             self.htmlId, self.dataFnc(), self.htmlId)
+             self.htmlId, self.dataFnc(), self.htmlId, self.htmlId)
     )
 

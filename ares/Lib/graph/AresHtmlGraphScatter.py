@@ -43,9 +43,10 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
 
         %s
 
-        d3.select("#%s svg").datum(%s)
-          .call(%s);
+        d3.select("#%s svg").datum(%s).call(%s);
+
+        nv.utils.windowResize(%s.update);
       ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-             self.htmlId, self.dataFnc(), self.htmlId)
+             self.htmlId, self.dataFnc(), self.htmlId, self.htmlId)
     )
 
