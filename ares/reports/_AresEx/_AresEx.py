@@ -6,7 +6,6 @@
 NAME = 'Ares Example'
 # Just to set up the menu on the left hand side
 SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
-
                          ]),
 
               ('Tables', [('Basic Table', 'AresExTables'),
@@ -15,6 +14,7 @@ SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
                          ('Table with Chart', 'AresExTablePie')
                          ]),
              ('Graphs', [('NvD3', 'AresExSimpleCharts'),
+                         ('Others', 'AresExOtherCharts'),
                          ]),
 
              ('Templates', [
