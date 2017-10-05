@@ -316,12 +316,17 @@ class Svg(AresHtml.Html):
     self.headerBox = header
     self.recordSetId = id(vals)
     self.header = recordSetDef
-    self.chartProp = dict(self.chartStyle)
+    self.chartAttrs = dict(self.chartStyle)
+    self.chartProps = dict(self.chartProp)
     self.svgProp = dict(self.prop)
+
+  def addChartAttr(self, attr):
+    """ Change the object chart properties """
+    self.chartAttrs.update(attr)
 
   def addChartProp(self, attr):
     """ Change the object chart properties """
-    self.chartProp.update(attr)
+    self.chartProps.update(attr)
 
   def addSvgProp(self, attr):
     """ Change the object SVG properties """
@@ -337,6 +342,8 @@ class Svg(AresHtml.Html):
         else:
           # First sub level of the NVD3 Chart property
           self.resolveProperties(res, jsVal, jsKey)
+        continue
+
       if prefix is not None:
         res.append('%s.%s(%s)' % (prefix, jsKey, jsVal))
       else:

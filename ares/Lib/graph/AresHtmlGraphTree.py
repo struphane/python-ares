@@ -90,8 +90,8 @@ class NvD3Tree(AresHtmlContainer.Svg):
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
-    chartProperties = []
-    self.resolveProperties(chartProperties, self.chartProp, None)
+    chartAttributes = []
+    self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(
       '''
         var %s = nv.models.%s()
@@ -119,6 +119,6 @@ class NvD3Tree(AresHtmlContainer.Svg):
         %s.remove() ;
         d3.select("#%s").datum(%s)
           .call(%s);
-      ''' % (self.htmlId, self.chartObject, "\n.".join(chartProperties),
+      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes),
              self.jqId, self.htmlId, self.dataFnc(), self.htmlId)
     )

@@ -3,38 +3,52 @@
 
 """
 
-from ares.Lib.graph import AresHtmlGraph
+from ares.Lib.html import AresHtmlContainer
 
-class ScatterChart(AresHtmlGraph.JsNvD3Graph):
-  """ Simple Scatter chart
 
-    http://nvd3.org/livecode/index.html#codemirrorNav
-
-    Expected data should look like:
-
-    [
-    {
-      "key" : "North America" ,
-      "values" : [ [ 1025409600000 , 23.041422681023] , [ 1028088000000 , 19.854291255832] , [ 1030766400000 , 21.02286281168] ,
-        ...]
-    },
-
-    {
-      "key" : "Africa" ,
-      "values" : [ [ 1025409600000 , 7.9356392949025] , [ 1028088000000 , 7.4514668527298] , [ 1030766400000 , 7.9085410566608] ,
-        ... ]
-    },
-    ...
-    ]
+class NvD3ScatterChart(AresHtmlContainer.Svg):
+  """
 
   """
-  mockData = r'json\multiBar.json'
-  chartObject = 'scatterChart'
-  alias = 'scatterChart'
-  style = {'chartStyle': {},
-           'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }"},
-                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
-                         }}
+  alias, chartObject = 'scatterChart', 'scatterChart'
+  chartStyle = {'showDistX': 'true',
+                'showDistY': 'true',
+                'transitionDuration': 350,
+                'color': 'd3.scale.category10().range()',
+  }
+
+  chartProp = {
+        'tooltipContent': "function(key) {return '<h3>' + key + '</h3>' ;}",
+        'xAxis': {'tickFormat': "d3.format('.02f')"},
+        'yAxis': {'tickFormat': "d3.format('.02f')"},
+        'scatter': {'onlyCircles': 'false'}
+  }
+
+  # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
-  reqJs = ['jquery', 'd3']
+  reqJs = ['d3']
+
+  def dataFnc(self):
+    """
+    """
+    return '''[{key: 'test', values: [{x: 1.4, y: 2.3}]}] '''
+
+  def graph(self):
+    """ Add the Graph definition in the Javascript method """
+    chartAttributes, chartProperties = [], []
+    self.resolveProperties(chartAttributes, self.chartAttrs, None)
+    self.resolveProperties(chartProperties, self.chartProps, None)
+    specialProperties = ['%s.%s;' % (self.htmlId, prop) for prop in chartProperties]
+    self.aresObj.jsGraphs.append(
+      '''
+        var %s = nv.models.%s()
+            .%s ;
+
+        %s
+
+        d3.select("#%s svg").datum(%s)
+          .call(%s);
+      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes), "\n".join(specialProperties),
+             self.htmlId, self.dataFnc(), self.htmlId)
+    )
+
