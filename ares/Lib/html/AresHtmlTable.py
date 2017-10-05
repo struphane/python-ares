@@ -305,7 +305,7 @@ class Table(AresHtml.Html):
       },
       ''' % js % self.htmlId
 
-  def contextMenu(self, contextMenu):
+  def contextMenu(self, contextMenu, attrList=None):
     """
     Add a Click event feature
 
@@ -318,12 +318,16 @@ class Table(AresHtml.Html):
         }
     );
     """
-    items = []
+    items, staticVars = [], []
+    sizeAttr = len(attrList)
+    if attrList is not None:
+      staticVars = ["VAR%s='%s'" % (i, val) for i, val in enumerate(attrList)]
     for menu, script, keys in contextMenu:
-      vars = ["VAR%s=' + rowData[0].%s +'" % (i, key) for i, key in enumerate(keys)]
+      vars = ["VAR%s=' + rowData[0].%s +'" % (i + sizeAttr, key) for i, key in enumerate(keys)]
+      vars.extend(staticVars)
       items.append('''<a href="{{ url_for('ares.run_report', report_name='%s', script_name='%s' )}}?%s" class="btn btn-secondary" style="width:100%%; height:30px">%s</a>''' % (self.aresObj.http['REPORT_NAME'], script, "&".join(vars), menu))
     strItems = render_template_string("".join(items))
-    self.jsMenu = '''
+    self.jsMenu.append('''
       $('#%s').on('contextmenu', 'tr', function (e) {
           var posX = $(this).offset().left,
               posY = $(this).offset().top;
@@ -334,4 +338,4 @@ class Table(AresHtml.Html):
           $('#context-menu').show() ;
           }
       );
-      ''' % (self.htmlId, self.htmlId, strItems)
+      ''' % (self.htmlId, self.htmlId, strItems))

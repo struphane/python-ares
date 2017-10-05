@@ -256,11 +256,15 @@ class Html(object):
 
   def html(self):
     """ Return the onload, the HTML object and the javascript events """
+    self.graph()
     return self.onLoad(), str(self), self.jsEvents()
 
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj
+
+  def graph(self):
+    return None
 
 
 class NavBar(object):
