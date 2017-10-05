@@ -24,6 +24,7 @@ class Meter(AresHtml.Html):
   reference = ''
   reqCss = []
   reqJs = ['meter']
+  references = []
 
   def __init__(self, aresObj, headerBox, value, cssCls=None, cssAttr=None):
     """Initialise a new meter object.

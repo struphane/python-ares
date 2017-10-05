@@ -559,6 +559,7 @@ class Col(AresHtml.Html):
     res = AresItem.Item('')
     for htmlObj in self.vals:
       res.add(1, str(htmlObj))
+      htmlObj.graph()
     return str(res)
 
   def jsEvents(self, jsEventFnc=None):

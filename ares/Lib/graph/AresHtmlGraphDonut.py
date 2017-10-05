@@ -16,7 +16,7 @@ class NvD3Donut(AresHtmlContainer.Svg):
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   alias, chartObject = 'donut', 'pieChart'
-  reference = ['http://nvd3.org/examples/pie.html']
+  references = ['http://nvd3.org/examples/pie.html']
   __chartStyle = {'showLabels': 'true',
                   'labelThreshold': .05,
                   'labelType': '"percent"',

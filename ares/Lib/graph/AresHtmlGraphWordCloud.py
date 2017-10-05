@@ -17,6 +17,7 @@ class WordCloud(AresHtmlContainer.GraphSvG):
   mockData = r'json\pie.json'
   alias = 'cloud'
   reqJs = ['cloud']
+  references = []
 
   def js(self):
     """ Return the entries to be added to the Javascript to create the graph during the loading """

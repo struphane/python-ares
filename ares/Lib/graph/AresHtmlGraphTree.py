@@ -11,6 +11,7 @@ class NvD3Tree(AresHtmlContainer.Svg):
   """
   alias, chartObject = 'tree', 'indentedTree'
   __chartStyle = {'tableClass': '"table table-striped"'}
+  references = ['http://nvd3.org/examples/indentedtree.html']
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']

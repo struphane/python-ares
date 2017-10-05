@@ -64,6 +64,7 @@ class Html(object):
   cssCls, css, reference = None, None, None
   incIndent = 0
   reqJs, reqCss = None, None
+  references = []
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None):
     """ Create an python HTML object """
