@@ -301,6 +301,83 @@ class GraphSvG(AresHtml.Html):
     return '$("#%s_val_selector option:selected")' % self.htmlId
 
 
+class Svg(AresHtml.Html):
+  """
+
+  """
+  css = {'width': '95%', 'height': '100%'}
+  prop = {
+           #'transition': '',
+         }
+
+  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None):
+    """ selectors is a tuple with the category first and the value list second """
+    super(Svg, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.headerBox = header
+    self.recordSetId = id(vals)
+    self.header = recordSetDef
+    self.chartProp = dict(self.chartStyle)
+    self.svgProp = dict(self.prop)
+
+  def addChartProp(self, attr):
+    """ Change the object chart properties """
+    self.chartProp.update(attr)
+
+  def addSvgProp(self, attr):
+    """ Change the object SVG properties """
+    self.svgProp.update(attr)
+
+  def resolveProperties(self, res, data, prefix):
+    """ Convert the dictionary of properties to a flat javascript definition """
+    for jsKey, jsVal in data.items():
+      if isinstance(jsVal, dict):
+        if prefix is not None:
+          # Deeper sub level in the NVD3 Chart property
+          self.resolveProperties(res, jsVal, "%s.%s" % (prefix, jsKey))
+        else:
+          # First sub level of the NVD3 Chart property
+          self.resolveProperties(res, jsVal, jsKey)
+      if prefix is not None:
+        res.append('%s.%s(%s)' % (prefix, jsKey, jsVal))
+      else:
+        res.append('%s(%s)' % (jsKey, jsVal))
+
+  def getSvg(self):
+    """ Return the SVG properties as a string """
+    svgProperties = []
+    self.resolveProperties(svgProperties, self.svgProp, None)
+    return "\n.".join(svgProperties)
+
+  def __str__(self):
+    """ Return the svg container """
+    return '<div %s><svg style="width:100%%;height:400px;"></svg>' % self.strAttr()
+
+  @property
+  def jqId(self):
+    """ Returns the javascript SVG reference """
+    return '$("#%s svg")' % self.htmlId
+
+  @property
+  def jqRecordSet(self):
+    """ Returns the javascript SVG reference """
+    return 'recordSet_%s' % self.recordSetId
+
+  @property
+  def jqCategory(self):
+    """ Returns the selected category for the graph """
+    return '$("#%s_col_selector option:selected")'% self.htmlId
+
+  @property
+  def jqValue(self):
+    """ Return the selected value to use for the graph """
+    return '$("#%s_val_selector option:selected")' % self.htmlId
+
+  @property
+  def jqSeriesKey(self):
+    """ Returns the selected category for the graph """
+    return 'serie_%s' % self.htmlId
+
+
 class Network(AresHtml.Html):
   """
   Wrapper to create a Network graph container

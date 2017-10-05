@@ -2,29 +2,60 @@
 
 """
 
-from ares.Lib.graph import AresHtmlGraph
+from ares.Lib.html import AresHtmlContainer
 
 
-class Bar(AresHtmlGraph.JsNvD3Graph):
+class NvD3Bar(AresHtmlContainer.Svg):
   """
 
   data format expected in the graph:
     [{key: "Cumulative Return", values: [{ "label": "One","value" : 29.765957771107},  {"label": "Four", "value" : 196.45946739256}]}]
   """
-  duration = 200
-  mockData = r'json\bar.json'
-  alias = 'bar'
-  clickObject = 'discretebar'
-  icon = 'fa fa-bar-chart'
-  chartObject = 'discreteBarChart'
-  style = {'chartStyle': {'staggerLabels': 'true',
-                          'showValues': 'true',
-                          'transitionDuration': '350'
-                          } }
+  alias, chartObject = 'bar', 'discreteBarChart'
+  chartStyle = {'showValues': 'true',
+                'staggerLabels': 'true',
+                'transitionDuration': 350,
+                'x': "function(d) { return d[0]; }",
+                'y': "function(d) { return d[1]; }"}
+  # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
-  reqJs = ['jquery', 'd3']
+  reqJs = ['d3']
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    #return aresObj.bar([{"key": "Cumulative Return", "values": [{ "label": "One","value" : 29.765957771107},  {"label": "Four", "value": 196.45946739256}]}])
-    return aresObj.bar([{"key": "Cumulative Return", "values": [1, 2, 3, 4, 5]}])
+  def dataFnc(self):
+    """
+    """
+    return '''
+            [
+            {
+              key: "Cumulative Return",
+              values: [
+                  ["A Label" , -29.765957771107],
+                  ["B Label" , -9.765957771107]
+              ]
+            },
+            {
+              key: "Cumulative Test",
+              values: [
+                  ["A Label" , 29.765957771107],
+                  ["B Label" , 9.765957771107]
+              ]
+            }
+          ]
+           '''
+
+
+  def graph(self):
+    """ Add the Graph definition in the Javascript method """
+    chartProperties = []
+    self.resolveProperties(chartProperties, self.chartProp, None)
+    self.aresObj.jsGraphs.append(
+      '''
+        var %s = nv.models.%s()
+            .%s ;
+
+        d3.select("#%s svg").datum(%s)
+          .call(%s);
+      ''' % (self.htmlId, self.chartObject, "\n.".join(chartProperties),
+             self.htmlId, self.dataFnc(), self.htmlId)
+    )
+

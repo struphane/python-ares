@@ -128,7 +128,7 @@ class Report(object):
     # Those variable will drive the report generation
     self.countItems, self.countNotif = 0, 0
     self.prefix, self.directory = prefix, None
-    self.content, self.jsGraph = [], []
+    self.content, self.jsGraphs = [], []
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
@@ -309,9 +309,9 @@ class Report(object):
   def modal(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Modal'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Chart section
-  def bar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Bar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def pie(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Pie'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def donut(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Donut'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def bar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Bar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def pie(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Pie'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def donut(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Donut'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def lineChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Line'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def stackedAreaChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['StackedArea'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def multiBarChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['MultiBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -320,23 +320,23 @@ class Report(object):
   def comboLineBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['ComboLineBar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def scatterChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['ScatterChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def cloud(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['WordCloud'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def tree(self, values, header, cssCls=None, cssAttr=None): return self.add(aresFactory['IndentedTree'](self, header, values, mapCols, selectors, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def tree(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Tree'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # File HTML Section
   def upload(self, values='', cssCls=None, cssAttr=None): return self.add(aresFactory['UploadFile'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
-  # Anchor section
+  # Anchor section): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def input(self, value='', cssCls=None): return self.add(aresFactory['Input'](self, value, cssCls), sys._getframe().f_code.co_name)
+
+  def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
   def anchor(self, value, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['A'](self, self.supp(value), attrs, cssCls, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def external_link(self, value, url, **kwargs): return self.add(aresFactory['ABespoke'](self, self.supp(value), url, **kwargs), sys._getframe().f_code.co_name)
 
   def anchor_download(self, value, **kwargs): return self.add(aresFactory['Download'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_set_env(self, value, **kwargs): return self.add(aresFactory['CreateEnv'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_add_scripts(self, value, **kwargs): return self.add(aresFactory['AddScript'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def main(self, value,  attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def input(self, value='', cssCls=None): return self.add(aresFactory['Input'](self, value, cssCls), sys._getframe().f_code.co_name)
-
-  def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
+  def main(self, value,  attrs=None, cssCls=None): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls), sys._getframe().f_code.co_name)
 
   # Designer objects
   def aresInput(self, cssCls=None, cssAttr=None): return self.add(aresFactory['TextInput'](self, 'Put your text here', cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -464,10 +464,14 @@ class Report(object):
       htmlParts.append(html)
       for jsType, jsFncs in js.items():
         if jsType == 'addGraph':
-          jsGraphs.append("\n".join(jsFncs))
+          continue
+          #jsGraphs.append("\n".join(jsFncs))
         else:
           jsSection.append("\n".join(jsFncs))
 
     importMng = AresJsModules.ImportManager()
-    jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n".join(jsGraphs))
+    jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
+    print('----------------------------------------------------')
+    print('Test')
+    print("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
     return importMng.cssResolve(self.cssImport), importMng.jsResolve(self.jsImports), "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

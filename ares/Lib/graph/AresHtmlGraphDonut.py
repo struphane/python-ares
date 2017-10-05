@@ -15,8 +15,7 @@ class NvD3Donut(AresHtmlContainer.Svg):
   data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
-  alias = 'donut'
-
+  alias, chartObject = 'donut', 'pieChart'
   chartStyle = {'showLabels': 'true',
                 'labelThreshold': .05,
                 'labelType': '"percent"',
@@ -24,7 +23,6 @@ class NvD3Donut(AresHtmlContainer.Svg):
                 'donutRatio': 0.35,
                 'x': "function(d) { return d[0]; }",
                 'y': "function(d) { return d[1]; }"}
-  chartObject = 'pieChart'
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
