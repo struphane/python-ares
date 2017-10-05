@@ -16,13 +16,14 @@ class NvD3Donut(AresHtmlContainer.Svg):
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
   alias, chartObject = 'donut', 'pieChart'
-  chartStyle = {'showLabels': 'true',
-                'labelThreshold': .05,
-                'labelType': '"percent"',
-                'donut': 'true',
-                'donutRatio': 0.35,
-                'x': "function(d) { return d[0]; }",
-                'y': "function(d) { return d[1]; }"}
+  reference = ['http://nvd3.org/examples/pie.html']
+  __chartStyle = {'showLabels': 'true',
+                  'labelThreshold': .05,
+                  'labelType': '"percent"',
+                  'donut': 'true',
+                  'donutRatio': 0.35,
+                  'x': "function(d) { return d[0]; }",
+                  'y': "function(d) { return d[1]; }"}
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
@@ -34,8 +35,6 @@ class NvD3Donut(AresHtmlContainer.Svg):
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
-    chartAttributes = []
-    self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(
       '''
         var %s = nv.models.%s()
@@ -44,6 +43,6 @@ class NvD3Donut(AresHtmlContainer.Svg):
         d3.select("#%s svg").datum(%s)
             .%s
             .call(%s);
-      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes),
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(),
              self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId)
     )

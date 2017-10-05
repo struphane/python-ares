@@ -306,19 +306,19 @@ class Svg(AresHtml.Html):
 
   """
   css = {'width': '95%', 'height': '100%'}
-  prop = {
+  __prop = {
            #'transition': '',
          }
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None):
     """ selectors is a tuple with the category first and the value list second """
+    self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
+    self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
     super(Svg, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
     self.recordSetId = id(vals)
     self.header = recordSetDef
-    self.chartAttrs = dict(self.chartStyle)
-    self.chartProps = dict(self.chartProp)
-    self.svgProp = dict(self.prop)
+    self.svgProp = dict(self._Svg__prop)
 
   def addChartAttr(self, attr):
     """ Change the object chart properties """
@@ -331,6 +331,19 @@ class Svg(AresHtml.Html):
   def addSvgProp(self, attr):
     """ Change the object SVG properties """
     self.svgProp.update(attr)
+
+  def attrToStr(self):
+    """ Convert the list of dictionary attribute to class attributes """
+    res = []
+    self.resolveProperties(res, self.chartAttrs, None)
+    return "\n.".join(res)
+
+  def propToStr(self):
+    """ Convert the list of dictionary object attributes to proper object attributes """
+    res = []
+    self.resolveProperties(res, self.chartProps, None)
+    specialProperties = ['%s.%s;' % (self.htmlId, prop) for prop in res]
+    return "\n".join(specialProperties)
 
   def resolveProperties(self, res, data, prefix):
     """ Convert the dictionary of properties to a flat javascript definition """

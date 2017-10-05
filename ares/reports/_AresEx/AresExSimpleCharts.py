@@ -35,17 +35,17 @@ def report(aresObj):
         ''' % recordSet
                                  ))
 
-  pie = aresObj.pie(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+  #pie = aresObj.pie(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+  #                              {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+  #                   'Graph')
+
+  donut = aresObj.stackedAreaChart(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Graph')
 
-  donut = aresObj.donut(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
-                                {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
-                    'Graph')
-
-  button = aresObj.refresh("", recordSet, 'ExAjaxRec')
-  button.click('''
-                  %s ;
-                  %s ;
-               ''' % (donut.jsUpdate(), pie.jsUpdate())
-               )
+  #button = aresObj.refresh("", recordSet, 'ExAjaxRec')
+  #button.click('''
+  #                %s ;
+  #                %s ;
+  #             ''' % (donut.jsUpdate(), pie.jsUpdate())
+  #             )

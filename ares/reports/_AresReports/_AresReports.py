@@ -35,7 +35,7 @@ def report(aresObj):
         log.close()
   # Add this list to the auto completion of the input item
   aresInput.autocomplete(foldersReports)
-  aresButton = aresObj.main('Open Report Section', **{'report_name': aresInput, 'cssCls': 'btn btn-success'})
+  aresButton = aresObj.main('Open Report Section', attrs={'report_name': aresInput}, cssCls=['btn', 'btn-success'])
   modal = aresObj.modal('click on the link to create a new report section')
   modal.modal_header = "Set New Environment"
   grid = aresObj.row([aresButton, modal])
@@ -55,7 +55,8 @@ def report(aresObj):
     iconComp = aresObj.icon('trash')
     iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
     content.append({'folderName': name, 'Date': folderInfo['LAST_MOD_DT'], 'Size': folderInfo['SIZE'],
-                    'folderLink': aresObj.anchor(name, **{'report_name': folder, 'cssCls': ''}),
+                    'folderLink': aresObj.main(name, attrs={'REPORT_NAME': folder, 'SCRIPT_NAME': folder}),
+                    #'folderLink': aresObj.anchor(name, **{'report_name': folder, 'cssCls': ''}),
                     # TODO add this page in the bottom right section
                     #'folderLink': aresObj.main(folder, **{'report_name': '_AresReports', 'script_name': 'AresIndexPage', 'user_script': folder}),
                     'FolderFiles': len(aresObj.getFiles([folder])), 'delete': iconComp,
@@ -89,4 +90,4 @@ def report(aresObj):
                                   {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Folder')
-  aresObj.row([barComp, pieComp])
+  #aresObj.row([barComp, pieComp])

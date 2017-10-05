@@ -12,7 +12,8 @@ class NvD3Bar(AresHtmlContainer.Svg):
     [{key: "Cumulative Return", values: [{ "label": "One","value" : 29.765957771107},  {"label": "Four", "value" : 196.45946739256}]}]
   """
   alias, chartObject = 'bar', 'discreteBarChart'
-  chartStyle = {'showValues': 'true',
+  references = ['http://nvd3.org/examples/discreteBar.html']
+  __chartStyle = {'showValues': 'true',
                 'staggerLabels': 'true',
                 'transitionDuration': 350,
                 'x': "function(d) { return d[0]; }",
@@ -55,7 +56,7 @@ class NvD3Bar(AresHtmlContainer.Svg):
 
         d3.select("#%s svg").datum(%s)
           .call(%s);
-      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes),
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(),
              self.htmlId, self.dataFnc(), self.htmlId)
     )
 

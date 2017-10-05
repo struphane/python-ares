@@ -11,13 +11,13 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
 
   """
   alias, chartObject = 'scatterChart', 'scatterChart'
-  chartStyle = {'showDistX': 'true',
+  __chartStyle = {'showDistX': 'true',
                 'showDistY': 'true',
                 'transitionDuration': 350,
                 'color': 'd3.scale.category10().range()',
   }
 
-  chartProp = {
+  __chartProp = {
         'tooltipContent': "function(key) {return '<h3>' + key + '</h3>' ;}",
         'xAxis': {'tickFormat': "d3.format('.02f')"},
         'yAxis': {'tickFormat': "d3.format('.02f')"},
@@ -35,10 +35,6 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
-    chartAttributes, chartProperties = [], []
-    self.resolveProperties(chartAttributes, self.chartAttrs, None)
-    self.resolveProperties(chartProperties, self.chartProps, None)
-    specialProperties = ['%s.%s;' % (self.htmlId, prop) for prop in chartProperties]
     self.aresObj.jsGraphs.append(
       '''
         var %s = nv.models.%s()
@@ -48,7 +44,7 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
 
         d3.select("#%s svg").datum(%s)
           .call(%s);
-      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes), "\n".join(specialProperties),
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
              self.htmlId, self.dataFnc(), self.htmlId)
     )
 

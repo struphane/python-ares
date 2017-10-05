@@ -3,6 +3,7 @@
 
 """
 
+import this
 import collections
 import os
 
@@ -58,11 +59,11 @@ def report(aresObj):
     If you need more information about all the components and how to build a report please refer to the left side bar
     ''', htmlComp=[aresObj.code('/YouLocalEnv'),
                    aresObj.code('YouLocalEnv.py'),
-                   aresObj.main('see templates', cssCls='', **{'report_name': '_AresDoc', 'script_name': 'AresDocTmpl'}),
+                   aresObj.main('see templates', {'SCRIPT_NAME': 'AresDocTmpl'}, cssCls=''),
                    aresObj.code('/ajax/'),
                    aresObj.code('/data/'),
                    aresObj.code('/js/'),
                    aresObj.anchor('Golden rules  Good practises', cssCls=''),
                    ])
 
-  aresObj.blockquote(["Youpi", 'Olivier'])
+  aresObj.blockquote([this.s.decode('rot13').split("Peters")[1].strip().replace("\n", "<BR />"), 'Tim Peters'])

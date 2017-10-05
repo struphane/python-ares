@@ -271,11 +271,11 @@ class Report(object):
 
   # Button Section
   def refresh(self, value, recordSet, ajaxScript, withDataFiles=False, cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonRefresh'](self, value, recordSet, ajaxScript, withDataFiles, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def remove(self, cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonRemove'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def download(self, cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonDownload'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def downloadAll(self, value='', cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonDownloadAll'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def button(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def ok(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonOk'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def remove(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, '', cssCls, cssAttr, 'remove'), sys._getframe().f_code.co_name)
+  def download(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, '', cssCls, cssAttr, 'download'), sys._getframe().f_code.co_name)
+  def downloadAll(self, value='', cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, 'cloud-download'), sys._getframe().f_code.co_name)
+  def button(self, value, cssCls=None, cssAttr=None, awsIcon=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, awsIcon), sys._getframe().f_code.co_name)
+  def ok(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, 'check-square-o'), sys._getframe().f_code.co_name)
 
   # Meter
   def meter(self, value, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Meter'](self, headerBox, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -316,8 +316,8 @@ class Report(object):
   def stackedAreaChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3StackedArea'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def multiBarChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['MultiBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def lineChartFocus(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['LineWithFocus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def horizBarChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['HorizontalBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def comboLineBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['ComboLineBar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def horizBarChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3HorizontalBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def comboLineBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3ComboLineBar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def scatterChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3ScatterChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def cloud(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['WordCloud'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def tree(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Tree'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -471,7 +471,4 @@ class Report(object):
 
     importMng = AresJsModules.ImportManager()
     jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
-    print('----------------------------------------------------')
-    print('Test')
-    print("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
     return importMng.cssResolve(self.cssImport), importMng.jsResolve(self.jsImports), "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

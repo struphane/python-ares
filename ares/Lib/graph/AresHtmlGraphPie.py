@@ -3,7 +3,6 @@
 """
 
 from ares.Lib.html import AresHtmlContainer
-from ares.Lib import AresItem
 
 
 class NvD3Pie(AresHtmlContainer.Svg):
@@ -15,12 +14,10 @@ class NvD3Pie(AresHtmlContainer.Svg):
   data format expected in the Graph:
     [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
   """
-  alias = 'pie'
-
-  chartStyle = {'showLabels': 'true',
+  alias, chartObject = 'pie', 'pieChart'
+  __chartStyle = {'showLabels': 'true',
                 'x': "function(d) { return d[0]; }",
                 'y': "function(d) { return d[1]; }"}
-  chartObject = 'pieChart'
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
@@ -32,8 +29,6 @@ class NvD3Pie(AresHtmlContainer.Svg):
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
-    chartAttributes = []
-    self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(
       '''
         var %s = nv.models.%s()
@@ -43,6 +38,6 @@ class NvD3Pie(AresHtmlContainer.Svg):
           .%s
           .call(%s);
 
-      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes),
+      ''' % (self.htmlId, self.chartObject, self.strAttr(),
              self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId)
     )

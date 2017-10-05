@@ -10,7 +10,7 @@ class NvD3Tree(AresHtmlContainer.Svg):
 
   """
   alias, chartObject = 'tree', 'indentedTree'
-  chartStyle = {'tableClass': '"table table-striped"'}
+  __chartStyle = {'tableClass': '"table table-striped"'}
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
@@ -119,6 +119,6 @@ class NvD3Tree(AresHtmlContainer.Svg):
         %s.remove() ;
         d3.select("#%s").datum(%s)
           .call(%s);
-      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes),
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(),
              self.jqId, self.htmlId, self.dataFnc(), self.htmlId)
     )

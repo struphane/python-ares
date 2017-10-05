@@ -31,13 +31,22 @@ class Button(AresHtml.Html):
     - CSS Default Class = button
   """
   alias, cssCls = 'button', ['btn', 'btn-success']
-  reference = 'https://www.w3schools.com/tags/tag_button.asp'
+  references = ['https://www.w3schools.com/tags/tag_button.asp',
+                'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html']
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
   css = {'margin-bottom': '20p', 'margin-top': '-10p'}
 
+  def __init__(self, aresObj, vals, cssCls, cssAttr, awsIcon):
+    """  Instantiate the object and store the icon """
+    super(Button, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.awsIcon = awsIcon
+
   def __str__(self):
     """ Return the String representation of HTML button """
+    if self.icon is not None:
+      return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.awsIcon, self.vals)
+
     return '<button %s>%s</button>' % (self.strAttr(), self.vals)
 
   @classmethod
@@ -69,95 +78,8 @@ class Button(AresHtml.Html):
     """ Implement the click event on the button object """
     self.post('click', scriptName, jsDef, attr)
 
-class ButtonRemove(AresHtml.Html):
-  """
-  Python wrapper to the HTML Button component
 
-  Input value should be a String
-
-  Default class parameters
-    - CSS Default Class = btn btn-danger
-    - glyphicon = remove
-  """
-  glyphicon, cssCls = 'remove', ['btn', 'btn-danger']
-  reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
-  alias = 'remove'
-  reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['bootstrap', 'jquery']
-
-  def __str__(self):
-    """ Return the String representation of a HTML Style Twitter button """
-    return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.remove()
-
-
-class ButtonDownload(ButtonRemove):
-  """
-  Python wrapper to the HTML Button component
-
-  Input value should be a String
-
-  Default class parameters
-    - CSS Default Class = btn btn-success
-    - glyphicon = download
-  """
-  glyphicon, cssCls = 'download', ['btn', 'btn-success']
-  reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
-  alias = 'download'
-  reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['bootstrap', 'jquery']
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.download()
-
-
-class ButtonDownloadAll(ButtonRemove):
-  """
-  Python wrapper to the HTML Button component
-
-  Input value should be a String
-
-  Default class parameters
-    - CSS Default Class = btn btn-success
-    - glyphicon = downloadAll
-  """
-  glyphicon, cssCls = 'cloud-download', ['btn', 'btn-success']
-  reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
-  alias = 'downloadAll'
-  reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['bootstrap', 'jquery']
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.downloadAll()
-
-
-class ButtonOk(ButtonRemove):
-  """
-  Python wrapper to the HTML Button component
-
-  Input value should be a String
-
-  Default class parameters
-    - CSS Default Class = btn btn-success
-    - glyphicon = ok
-  """
-  glyphicon, cssCls = 'check-square-o', ['success']
-  reference =  'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html'
-  alias = 'ok'
-  reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['bootstrap', 'jquery']
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.ok("OK Button")
-
-
-class ButtonRefresh(ButtonRemove):
+class ButtonRefresh(AresHtml.Html):
   """
   Python wrapper to the HTML Button Refresh component
 
@@ -233,7 +155,7 @@ class ButtonRefresh(ButtonRemove):
     return '<button type="button" %s style="margin-bottom: 20px;margin-top: -10px;"><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
 
 
-class GeneratePdf(ButtonRemove):
+class GeneratePdf(AresHtml.Html):
   alias = "generatePdf"
   glyphicon, cssCls = "book", ['btn', 'btn-default']
   source = r"http://pdfmake.org/#/gettingstarted"

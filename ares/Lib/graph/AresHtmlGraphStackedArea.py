@@ -2,6 +2,7 @@
 
 """
 
+import json
 from ares.Lib.html import AresHtmlContainer
 
 class NvD3StackedArea(AresHtmlContainer.Svg):
@@ -10,14 +11,14 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
   Reference website: http://nvd3.org/examples/stackedArea.html
   """
   alias, chartObject = 'stackedAreaChart', 'multiBarChart'
-  chartStyle = {'transitionDuration': 350,
-                'reduceXTicks': 'true',
-                'rotateLabels': 0,
-                'showControls': 'true',
-                'groupSpacing': 0.1
+  __chartStyle = {'transitionDuration': 350,
+                  'reduceXTicks': 'true',
+                  'rotateLabels': 0,
+                  'showControls': 'true',
+                  'groupSpacing': 0.1
   }
 
-  chartProp = {
+  __chartProp = {
      'xAxis': {'tickFormat': "d3.format(',f')"},
      'yAxis': {'tickFormat': "d3.format(',.1f'"},
   }
@@ -29,14 +30,10 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
   def dataFnc(self):
     """
     """
-    return '''[{key: 'test', values: [{x: 1.4, y: 2.3}]}] '''
+    return json.dumps(json.load(open(r"E:\GitHub\Ares\ares\json\stackedAreaData.json")))
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
-    chartAttributes, chartProperties = [], []
-    self.resolveProperties(chartAttributes, self.chartAttrs, None)
-    self.resolveProperties(chartProperties, self.chartProps, None)
-    specialProperties = ['%s.%s;' % (self.htmlId, prop) for prop in chartProperties]
     self.aresObj.jsGraphs.append(
       '''
         var %s = nv.models.%s()
@@ -46,6 +43,6 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
 
         d3.select("#%s svg").datum(%s)
           .call(%s);
-      ''' % (self.htmlId, self.chartObject, "\n.".join(chartAttributes), "\n".join(specialProperties),
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
              self.htmlId, self.dataFnc(), self.htmlId)
     )

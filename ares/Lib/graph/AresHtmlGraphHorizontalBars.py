@@ -3,42 +3,49 @@
 
 """
 
-from ares.Lib.graph import AresHtmlGraph
+from ares.Lib.html import AresHtmlContainer
 
-class HorizontalBars(AresHtmlGraph.JsNvD3Graph):
-  """ Simple Horizontal bar chart
 
-    http://nvd3.org/examples/multiBarHorizontal.html
-
-    Expected data should look like:
-
-    [
-    {
-      "key" : "North America" ,
-      "values" : [ [ 1025409600000 , 23.041422681023] , [ 1028088000000 , 19.854291255832] , [ 1030766400000 , 21.02286281168] ,
-        ...]
-    },
-
-    {
-      "key" : "Africa" ,
-      "values" : [ [ 1025409600000 , 7.9356392949025] , [ 1028088000000 , 7.4514668527298] , [ 1030766400000 , 7.9085410566608] ,
-        ... ]
-    },
-    ...
-    ]
-
+class NvD3HorizontalBars(AresHtmlContainer.Svg):
   """
-  alias = 'horizBarChart'
-  mockData = r'json\horizBars.json'
-  chartObject = 'multiBarHorizontalChart'
-
-  style = {'chartStyle': {'margin': '{top: 30, right: 20, bottom: 50, left: 175}',
-                          'showValues': 'true',
-                          'tooltips': 'false',
-                          'showControls': 'false'},
-           'chartAttr': {'xAxis': {'showMaxMin': 'false',
-                                   'tickFormat':"function(d) { return d3.time.format('%x')(new Date(d)) }",},
-                         'yAxis': {'tickFormat': "d3.format(',.2f')"}
-                         }}
+  """
+  alias, chartObject = 'horizBarChart', 'multiBarHorizontalChart'
+  references = ['http://nvd3.org/examples/multiBarHorizontal.html']
+  __chartStyle = {'x': 'function(d) { return d[0] }',
+                  'y': 'function(d) { return d[1] }',
+                  'margin': '{top: 30, right: 20, bottom: 50, left: 175}',
+                  'showValues': 'true',
+                  'tooltips': 'true',
+                  'transitionDuration': '350',
+                  'showControls': 'true'
+  }
+  __chartProp = {
+          'yAxis': {'tickFormat': "d3.format(',.2f')"}
+  }
+  # Required CSS and JS modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['jquery', 'd3']
+
+  def graph(self):
+    """ Add the Graph definition in the Javascript method """
+    self.aresObj.jsGraphs.append(
+      '''
+        var %s = nv.models.%s()
+            .%s ;
+
+        %s
+
+        d3.select("#%s svg").datum(%s)
+          .call(%s);
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
+             self.htmlId, self.dataFnc(), self.htmlId)
+    )
+
+
+  def dataFnc(self):
+    """ """
+    return '''
+            [{key: 'test 1', values: [['A', 2.3], ['B', -10]]},
+             {key: 'test 2', values: [['C', 12.3], ['D', -19]]}
+            ]
+           '''
