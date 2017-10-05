@@ -167,9 +167,6 @@ class Report(object):
 
   def add(self, htmlObj, fncName):
     """ Register the HTML component to the Ares object """
-    if fncName != htmlObj.alias:
-      raise Exception("%s not register for the Ares function %s" % (htmlObj.alias, fncName))
-
     self.htmlItems[id(htmlObj)] = htmlObj
     self.content.append(id(htmlObj))
     return htmlObj

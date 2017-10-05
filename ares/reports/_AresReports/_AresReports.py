@@ -80,7 +80,7 @@ def report(aresObj):
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Scripts per folder')
   inputModal = aresObj.input("Report Name", '')
-  createReport = aresObj.button('Create the Report')
+  createReport = aresObj.ok('Create the Report')
   #createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal, 'js': "%s.modal('toggle') ; display(data) ;" % modal.jqId})
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)
