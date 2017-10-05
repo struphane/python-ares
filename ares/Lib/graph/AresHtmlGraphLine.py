@@ -5,16 +5,24 @@
 
 from ares.Lib.html import AresHtmlContainer
 
-class NvD3LineWithFocus(AresHtmlContainer.Svg):
+class NvD3Line(AresHtmlContainer.Svg):
   """
 
   """
-  alias, chartObject = 'lineChartFocus', 'lineWithFocusChart'
-  references = ['http://nvd3.org/examples/lineWithFocus.html']
+  alias, chartObject = 'line', 'lineChart'
+  references = ['http://nvd3.org/examples/line.html']
+  __chartStyle = {
+    'margin': '{left: 100}',
+    'transitionDuration': '350',
+    'showLegend': 'true',
+    'showYAxis': 'true',
+    'showXAxis': 'true'
+
+  }
+
   __chartProp = {
-    'xAxis': {'tickFormat': "d3.format(',f')"},
-    'yAxis': {'tickFormat': "d3.format(',.2f')"},
-    #'y2Axis': {'tickFormat': "d3.format(',.2f')"},
+    'xAxis': {'axisLabel': "'Time (ms)'", 'tickFormat': "d3.format(',r')"},
+    'yAxis': {'axisLabel': "'Voltage (v)'", 'tickFormat': "d3.format('.02f')"},
   }
 
   reqCss = ['bootstrap', 'font-awesome', 'd3']

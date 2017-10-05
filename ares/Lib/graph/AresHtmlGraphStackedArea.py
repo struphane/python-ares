@@ -18,11 +18,13 @@ class NvD3StackedArea(AresHtmlContainer.Svg):
                   'rightAlignYAxis': 'true',
                   'transitionDuration': '500',
                   'showControls': 'true',
-                  'clipEdge': 'true'
+                  'clipEdge': 'true',
   }
   __chartProp = {
-     'xAxis': {'tickFormat': "function(d) { return d3.time.format('%x')( new Date(d) ) }"},
+     'xAxis': {'tickFormat': "function(d) { return d3.time.format('%x')( new Date(d) ) }", 'showMaxMin': 'false'},
      'yAxis': {'tickFormat': "d3.format(',.2f')"},
+     #'zoom': {'enabled': 'true', 'scaleExtent': '[1,10]', 'useFixedDomain': 'false', 'useNiceScale': 'false',
+     #         'horizontalOff': 'false', 'verticalOff': 'true', 'unzoomEventType': '"dblclick.zoom"'}
   }
 
   # Required modules
