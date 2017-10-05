@@ -20,6 +20,10 @@ class NvD3Pie(AresHtmlContainer.Svg):
                   'x': "function(d) { return d[0]; }",
                   'y': "function(d) { return d[1]; }"}
 
+  __svgProp = {
+    'transition': '',
+  }
+
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
@@ -35,10 +39,8 @@ class NvD3Pie(AresHtmlContainer.Svg):
         var %s = nv.models.%s()
             .%s ;
 
-        d3.select("#%s svg").datum(%s)
-          .%s
-          .call(%s);
-
-      ''' % (self.htmlId, self.chartObject, self.strAttr(),
-             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId)
+        d3.select("#%s svg").datum(%s)%s.call(%s);
+        return %s;
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(),
+             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
     )

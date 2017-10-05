@@ -319,6 +319,8 @@ class Svg(AresHtml.Html):
     self.recordSetId = id(vals)
     self.header = recordSetDef
     self.svgProp = dict(self._Svg__prop)
+    for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
+      self.svgProp[key] = val
 
   def addChartAttr(self, attrs):
     """ Change the object chart properties """
@@ -376,11 +378,13 @@ class Svg(AresHtml.Html):
     """ Return the SVG properties as a string """
     svgProperties = []
     self.resolveProperties(svgProperties, self.svgProp, None)
-    return "\n.".join(svgProperties)
+    if svgProperties:
+      return ".%s" % "\n.".join(svgProperties)
+    return ''
 
   def __str__(self):
     """ Return the svg container """
-    return '<div %s><svg style="width:100%%;height:400px;"></svg>' % self.strAttr()
+    return '<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr()
 
   @property
   def jqId(self):
