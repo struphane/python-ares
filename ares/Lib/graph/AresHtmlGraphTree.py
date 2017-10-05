@@ -33,9 +33,7 @@ class NvD3Tree(AresHtmlContainer.Svg):
                     width: '75%%',
                     type: 'text',
                     classes: function(d) { return d.url ? 'clickable name' : 'name' },
-                    click: function(d) {
-                       if (d.url) window.location.href = d.url;
-                    }
+                    click: function(d) { if (d.url) window.location.href = d.url; }
                   },
                   {
                     key: 'type',

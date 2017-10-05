@@ -49,7 +49,7 @@ CSS_IMPORTS = {
                    #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css'
                    },
 
-  'd3': {'modules': ['svg.css', 'nv.d3.css']},
+  'd3': {'modules': ['nv.d3.css']},
 
   'ares': {'req': ['bootstrap'], 'modules': ['bdi.css', 'bootstrap-simple-sidebar.css']},
   }
