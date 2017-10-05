@@ -40,7 +40,6 @@ class NvD3Pie(AresHtmlContainer.Svg):
             .%s ;
 
         d3.select("#%s svg").datum(%s)%s.call(%s);
-        return %s;
       ''' % (self.htmlId, self.chartObject, self.attrToStr(),
-             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
+             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId)
     )

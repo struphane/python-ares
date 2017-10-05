@@ -14,10 +14,7 @@ SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
                          ('Ajax Table', 'AresExTableAjax'),
                          ('Table with Chart', 'AresExTablePie')
                          ]),
-             ('Graphs', [('Basic Charts', 'AresExSimpleCharts'),
-                         ('Other Charts', 'AresExMultiCharts'),
-                         ('Word Cloud', 'AresExChartWordCloud'),
-                         ('Multi Bar Charts', 'AresExMultiBarChart'),
+             ('Graphs', [('NvD3', 'AresExSimpleCharts'),
                          ]),
 
              ('Templates', [

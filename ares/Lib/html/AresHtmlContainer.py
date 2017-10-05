@@ -519,6 +519,7 @@ class Row(AresHtml.Html):
     res = AresItem.Item('<div %s>' % self.strAttr())
     for css, htmlObj in self.vals:
       res.add(1, '<div class="%s">%s</div>' % (css, htmlObj))
+      htmlObj.graph()
     res.add(0, '</div>')
     return str(res)
 
