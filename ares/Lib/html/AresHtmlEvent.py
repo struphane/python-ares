@@ -19,6 +19,8 @@ class Input(AresHtml.Html):
     - CSS Default Class = form-control
   """
   cssCls, alias = ['form-control'], 'input'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def autocomplete(self, values):
     """ Fill the auto completion box with a data source """
@@ -35,7 +37,6 @@ class Input(AresHtml.Html):
     item.add(2, '<input type="text" style="width:100%%; height:32px" %s>' %  self.strAttr())
     item.add(0, '</div>')
     return str(item)
-
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -59,7 +60,9 @@ class Comment(AresHtml.Html):
     - dflt - '' (The default value of the Textarea)
   """
   cssCls, rows, dflt = ['form-control'], 5, ''
-  reference = 'https://www.w3schools.com/tags/tag_textarea.asp'
+  references = ['https://www.w3schools.com/tags/tag_textarea.asp']
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def addVal(self, dflt):
     """ Add a default value to this object """
@@ -94,8 +97,10 @@ class TextArea(AresHtml.Html):
     - dflt - '' (The default value of the Textarea)
   """
   cssCls, rows, dflt = ['form-control', 'custom-control'], 5, ''
-  reference = 'https://www.w3schools.com/tags/tag_textarea.asp'
+  references = ['https://www.w3schools.com/tags/tag_textarea.asp']
   alias = 'textArea'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def addVal(self, dflt):
     """ Add a default value to this object """
@@ -138,6 +143,8 @@ class DropDown(AresHtml.Html):
   """
   title, cssCls = 'Title', ['dropdown']
   alias = 'dropdown'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def __str__(self):
     """ Return the HTML String of a Drop Down list """
@@ -177,6 +184,8 @@ class Select(AresHtml.Html):
   """
   # TODO: Extend the python object to handle multi select and all the cool features
   alias, cssCls = 'select', ['form-control']
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def __init__(self, aresObj, vals, selected, cssCls=None, cssAttr=None):
     """ Instanciate the object and store the selected item """
@@ -219,6 +228,8 @@ class SelectWithGroup(AresHtml.Html):
   """
   # TODO: Extend the python object to handle multi select and all the cool features
   alias, cssCls = 'select_group', ['selectpicker']
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def __str__(self):
     """ Return the HTML string for a select """
@@ -247,9 +258,10 @@ class Slider(AresHtml.Html):
 
   Input value should be a float
   """
-  reference = 'https://jqueryui.com/slider/'
-  requirements = ['jquery-ui.js']
+  references = ['https://jqueryui.com/slider/']
   alias = 'slider'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap', 'jquery']
 
   def __str__(self):
     """ Return the HMTL object of for div """
@@ -273,11 +285,12 @@ class DatePicker(AresHtml.Html):
     - INPUT
 
   """
-  reference = 'https://jqueryui.com/datepicker/'
-  requirements = ['jquery-ui.js']
+  references = ['https://jqueryui.com/datepicker/']
   alias = 'date'
   cssCls = ['datepicker']
   dflt = ''
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap', 'jquery']
 
   def addVal(self, dflt):
     """ Add a default value to this object """
@@ -303,6 +316,8 @@ class DropZone(AresHtml.Html):
 
   """
   alias = 'dropzone'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def __init__(self, aresObj, vals, cssCls=None):
     super(DropZone, self).__init__(aresObj, vals, cssCls)
@@ -352,6 +367,8 @@ class DropFile(AresHtml.Html):
   """
   alias = 'dropfile'
   reportName = ''
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None):
     super(DropFile, self).__init__(aresObj, vals, cssCls, cssAttr)
@@ -414,7 +431,9 @@ class UploadFile(AresHtml.Html):
   """
   alias = 'upload'
   cssCls = ['custom-file-input']
-
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
+  
   def __str__(self):
     """ Display the file upload object """
     self.headerBox = 'Select a file '
