@@ -41,6 +41,7 @@ def report(aresObj):
                                                       {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                                     headerBox='Stacked Bar Chart Example')
   meter = aresObj.meter(1, headerBox='Meter Chart Example', cssAttr={'height': '400px'})
+
   # Graph documentation
   graphRefs = []
   for script in os.listdir(os.path.join(aresObj.http['DIRECTORY'], '..', 'ares', 'Lib', 'graph')):
@@ -49,20 +50,20 @@ def report(aresObj):
       for name, obj in inspect.getmembers(mod):
         if inspect.isclass(obj):
           for ref in getattr(obj, 'references'):
-            graphRefs.append(str(aresObj.externalLink('', ref)))
+            graphRefs.append(aresObj.externalLink(None, ref))
+
   # HTML Objects documentation
-  graphRefs = []
+  htmlRefs = []
   for script in os.listdir(os.path.join(aresObj.http['DIRECTORY'], '..', 'ares', 'Lib', 'html')):
     if script.endswith(".py"):
       mod = importlib.import_module("ares.Lib.html.%s" % script.replace(".py", ""))
       for name, obj in inspect.getmembers(mod):
         if inspect.isclass(obj) and issubclass(obj, AresHtml.Html):
           for ref in getattr(obj, 'references'):
-            graphRefs.append(str(aresObj.externalLink(None, ref)))
+            htmlRefs.append(aresObj.externalLink(None, ref))
 
-  paragraph = aresObj.paragraph("\n".join(graphRefs))
   titleGraph = aresObj.title2("Reference for the charts")
-  colLeft = aresObj.col([stackedArea, titleGraph, paragraph])
+  colLeft = aresObj.col([stackedArea, titleGraph, aresObj.list(graphRefs)])
   titlehtml = aresObj.title2("Reference for the HTLM")
-  colRight = aresObj.col([meter, titlehtml, paragraph])
+  colRight = aresObj.col([meter, titlehtml, aresObj.list(htmlRefs)])
   aresObj.row([colLeft, colRight])

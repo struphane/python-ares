@@ -57,7 +57,7 @@ class List(AresHtml.Html):
     - CSS Default Class = list-group
   """
   cssCls = ['list-group']
-  reference = 'https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp'
+  references = ['https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp']
   alias = 'list'
 
   def __init__(self, aresObj, headerBox, vals, cssCls=None, cssAttr=None):
@@ -66,15 +66,13 @@ class List(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of a HTML List """
-    item = AresItem.Item('<div class="panel panel-success">')
-    item.add(1, '<div class="ares-panel-heading"><strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong></div>' % self.headerBox)
-    item.add(1, '<div class="panel-body">')
-    item.add(2, '<ul %s>' % self.strAttr())
+    item = AresItem.Item('<ul %s>' % self.strAttr())
     for label in self.vals:
       item.add(3, '<li class="list-group-item">%s</li>' % label)
     item.add(2, '</ul>')
-    item.add(1, '</div>')
-    item.add(0, '</div>')
+    if self.headerBox is not None:
+      return str(AresBox(self.htmlId, item, self.headerBox))
+
     return str(item)
 
   def jsUpdate(self, jsDataVar='data'):
