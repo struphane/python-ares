@@ -433,7 +433,7 @@ class UploadFile(AresHtml.Html):
   cssCls = ['custom-file-input']
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap']
-  
+
   def __str__(self):
     """ Display the file upload object """
     self.headerBox = 'Select a file '

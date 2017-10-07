@@ -13,8 +13,8 @@ class NvD3ForceDirected(AresHtmlContainer.Svg):
   alias, chartObject = 'forceDirected', 'forceDirectedGraph'
   references = []
   __chartStyle = {
-    #'width ': 'nv.utils.windowSize().width - 40',
-    #'height': 'nv.utils.windowSize().height - 40',
+    'width ': '500',
+    'height': '400',
     'margin': '{top: 20, right: 20, bottom: 20, left: 20}',
     'color': 'function(d) { return d3.scale.category20()(d.group)}',
     'nodeExtras': 'function(node) { node.append("text").attr("dx", 12).attr("dy", ".35em").text(function(d) { return d.name }); }'

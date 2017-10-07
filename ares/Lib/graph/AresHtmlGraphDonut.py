@@ -29,6 +29,11 @@ class NvD3Donut(AresHtmlContainer.Svg):
     'transition': '',
   }
 
+  __chartProp = {
+  #  'pie': {'startAngle': 'function(d) { return d.startAngle/2 -Math.PI/2 }',
+  #          'endAngle': 'function(d) { return d.endAngle/2 -Math.PI/2 }'}
+  }
+
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
@@ -41,12 +46,13 @@ class NvD3Donut(AresHtmlContainer.Svg):
     """ Add the Graph definition in the Javascript method """
     self.aresObj.jsGraphs.append(
       '''
-        var %s = nv.models.%s()
-            .%s ;
+        var %s = nv.models.%s().%s ;
+
+        %s
 
         d3.select("#%s svg").datum(%s)%s.call(%s);
 
         nv.utils.windowResize(%s.update);
-      ''' % (self.htmlId, self.chartObject, self.attrToStr(),
+      ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
              self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
     )
