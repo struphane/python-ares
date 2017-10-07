@@ -18,6 +18,7 @@ class ExternalLink(AresHtml.Html):
   """
   """
   alias, cssCls = 'externalLink', None
+  references = ['https://www.w3schools.com/TagS/att_a_href.asp']
 
   def __init__(self, aresObj, vals, url, cssCls, cssAttr):
     """ """
