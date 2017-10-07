@@ -7,7 +7,7 @@ from flask import render_template_string
 
 JS_IMPORTS = {
   # module are written from the first one to load to the last one
-  'bootstrap': {'req': ['jquery'], 'modules': ['bootstrap.min.js']},
+  'bootstrap': {'req': ['jquery'], 'modules': ['tether.min.js', 'bootstrap.min.js']},
 
   # Javascript packages to handle DataTables
   'dataTables': {'req': ['jquery', 'bootstrap'],
@@ -22,7 +22,7 @@ JS_IMPORTS = {
 
   # Javascript dependencies for D3 and NVD2 components
   'd3': {'req': ['jquery', 'bootstrap'],
-         'modules': ['d3.v3.js', 'nv.d3.js']},
+         'modules': ['d3.v3.min.js', 'nv.d3.min.js']},
 
   # Javascript modules for the Cloud graph object
   'cloud': {'req': ['d3'], 'modules': ['colorbrewer.js', 'd3.layout.cloud.js']},
@@ -49,7 +49,7 @@ CSS_IMPORTS = {
                    #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css'
                    },
 
-  'd3': {'modules': ['nv.d3.css']},
+  'd3': {'modules': ['nv.d3.min.css']},
 
   'ares': {'req': ['bootstrap'], 'modules': ['bdi.css', 'bootstrap-simple-sidebar.css']},
   }

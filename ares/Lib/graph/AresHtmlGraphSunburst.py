@@ -5,23 +5,14 @@
 
 from ares.Lib.html import AresHtmlContainer
 
-class NvD3Line(AresHtmlContainer.Svg):
+class NvD3Sunburst(AresHtmlContainer.Svg):
   """
 
   """
-  alias, chartObject = 'line', 'lineChart'
+  alias, chartObject = 'sunburst', 'sunburstChart'
   references = ['http://nvd3.org/examples/line.html']
   __chartStyle = {
-    'margin': '{left: 100}',
-    'showLegend': 'true',
-    'showYAxis': 'true',
-    'showXAxis': 'true'
-
-  }
-
-  __chartProp = {
-    'xAxis': {'axisLabel': "'Time (ms)'", 'tickFormat': "d3.format(',r')"},
-    'yAxis': {'axisLabel': "'Voltage (v)'", 'tickFormat': "d3.format('.02f')"},
+    'color': 'd3.scale.category20c()',
   }
 
   reqCss = ['bootstrap', 'font-awesome', 'd3']

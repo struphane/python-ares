@@ -5,26 +5,26 @@
 import json
 from ares.Lib.html import AresHtmlContainer
 
-class NvD3StackedArea(AresHtmlContainer.Svg):
+class NvD3StackedAreaWithFocus(AresHtmlContainer.Svg):
   """ This object will output a simple stacked area chart
 
   """
-  alias, chartObject = 'stackedArea', 'stackedAreaChart'
+  alias, chartObject = 'stackedAreaWithFocus', 'stackedAreaWithFocusChart'
   references = ['http://nvd3.org/examples/stackedArea.html']
-  __chartStyle = {'margin': '{right: 100}',
+  __chartStyle = {'useInteractiveGuideline': 'true',
                   'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
-                  'useInteractiveGuideline': 'true',
-                  'rightAlignYAxis': 'true',
-                  'showControls': 'true',
-                  'clipEdge': 'true',
+                  'controlLabels': '{stacked: "Stacked"}',
+                  'duration': 'true',
+                  'showControls': '300',
   }
 
   __chartProp = {
-     'xAxis': {'tickFormat': "function(d) { return d3.time.format('%x')( new Date(d) ) }", 'showMaxMin': 'false'},
+     'xAxis': {'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }", 'showMaxMin': 'false'},
+     'x2Axis': {'tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }"},
      'yAxis': {'tickFormat': "d3.format(',.2f')"},
-     #'zoom': {'enabled': 'true', 'scaleExtent': '[1,10]', 'useFixedDomain': 'false', 'useNiceScale': 'false',
-     #         'horizontalOff': 'false', 'verticalOff': 'true', 'unzoomEventType': '"dblclick.zoom"'}
+     'y2Axis': {'tickFormat': "d3.format(',.2f')"},
+     'legend': {'vers': "'furious'"}
   }
 
   # Required modules

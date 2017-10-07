@@ -15,8 +15,6 @@ class NvD3HorizontalBars(AresHtmlContainer.Svg):
                   'y': 'function(d) { return d[1] }',
                   'margin': '{top: 30, right: 20, bottom: 50, left: 175}',
                   'showValues': 'true',
-                  'tooltips': 'true',
-                  'transitionDuration': '350',
                   'showControls': 'true'
   }
   __chartProp = {

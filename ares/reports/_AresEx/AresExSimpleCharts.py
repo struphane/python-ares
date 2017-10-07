@@ -54,12 +54,33 @@ def report(aresObj):
                                  headerBox='Scatter Chart Example')
 
 
-  tree = aresObj.tree(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+  sunburst = aresObj.sunburst(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                                       {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
-                      headerBox='Tree Chart Example')
+                      headerBox='SunBurst Example')
+
+  sparklineplus = aresObj.sparklineplus(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                                      {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+                                                    headerBox='Spark Line Plus Example')
+
+  stackedAreaWithFocus = aresObj.stackedAreaWithFocus(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                                      {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+                                                    headerBox='Stacked Area with Focus Example')
+
+  plotBox = aresObj.boxplot(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                                      {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+                                                    headerBox='Plot Box Example')
+
+  candlestickbar = aresObj.candlestickbar(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                                      {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+                                                      headerBox='Candle Stick Bar Example')
 
 
+  forceDirected = aresObj.forceDirected(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                                      {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+                                                      headerBox='Network Example')
+  aresObj.row([candlestickbar, forceDirected])
   aresObj.row([pie, lineCumulative, bar])
   aresObj.row([horizBarChart, line, donut])
   aresObj.row([lineChartFocus, stackedArea, scatterChart])
-  aresObj.row([tree, multiBar])
+  aresObj.row([sunburst, multiBar, stackedAreaWithFocus])
+  aresObj.row([plotBox, sparklineplus])

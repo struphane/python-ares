@@ -6,14 +6,15 @@
 from ares.Lib.html import AresHtmlContainer
 
 
-class NvD3ScatterChart(AresHtmlContainer.Svg):
+class NvD3ScatterPlusLineChart(AresHtmlContainer.Svg):
   """
 
   """
-  alias, chartObject = 'scatter', 'scatterChart'
-  references = ['http://nvd3.org/examples/scatter.html']
+  alias, chartObject = 'scatterPlusLine', 'scatterChart'
+  references = ['']
   __chartStyle = {'showDistX': 'true',
                   'showDistY': 'true',
+                  'duration': '300',
                   'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
                   'color': 'd3.scale.category10().range()',
@@ -37,7 +38,7 @@ class NvD3ScatterChart(AresHtmlContainer.Svg):
 
         %s
 
-        d3.select("#%s svg").datum(%s).call(%s);
+        d3.select("#%s svg").datum(nv.log(%s)).call(%s);
 
         nv.utils.windowResize(%s.update);
       ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),

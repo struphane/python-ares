@@ -11,8 +11,7 @@ class NvD3MultiBars(AresHtmlContainer.Svg):
   """
   alias, chartObject = 'multiBar', 'multiBarChart'
   references = ['http://nvd3.org/examples/multiBar.html']
-  __chartStyle = {'transitionDuration': '350',
-                  'x': 'function(d) { return d[0] }',
+  __chartStyle = {'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
                   'reduceXTicks': 'true',
                   'rotateLabels': '0',

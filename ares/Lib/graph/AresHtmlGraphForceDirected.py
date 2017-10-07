@@ -11,23 +11,28 @@ class NvD3ForceDirected(AresHtmlContainer.Svg):
 
   """
   alias, chartObject = 'forceDirected', 'forceDirectedGraph'
-  references = ['http://nvd3.org/examples/lineWithFocus.html']
+  references = []
   __chartStyle = {
+    #'width ': 'nv.utils.windowSize().width - 40',
+    #'height': 'nv.utils.windowSize().height - 40',
     'margin': '{top: 20, right: 20, bottom: 20, left: 20}',
-    'color': 'function(d) { return d3Colors(d.group)',
+    'color': 'function(d) { return d3.scale.category20()(d.group)}',
     'nodeExtras': 'function(node) { node.append("text").attr("dx", 12).attr("dy", ".35em").text(function(d) { return d.name }); }'
     }
+
+  __chartProp = {
+    'dispatch': {'on': "'renderEnd', function(){console.log('render complete');}"}
+  }
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     self.aresObj.jsGraphs.append(
       '''
-        var %s = nv.models.%s()
-            .%s ;
+        var %s = nv.models.%s().%s ;
 
         %s
 
-        d3.select("#%s").datum(%s).call(%s);
+        d3.select("#%s svg").datum(%s).call(%s);
 
       ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
              self.htmlId, self.dataFnc(), self.htmlId)

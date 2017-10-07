@@ -5,23 +5,17 @@
 
 from ares.Lib.html import AresHtmlContainer
 
-class NvD3Line(AresHtmlContainer.Svg):
+class NvD3SparkLinePlus(AresHtmlContainer.Svg):
   """
 
   """
-  alias, chartObject = 'line', 'lineChart'
+  alias, chartObject = 'sparklineplus', 'sparklinePlus'
   references = ['http://nvd3.org/examples/line.html']
   __chartStyle = {
-    'margin': '{left: 100}',
-    'showLegend': 'true',
-    'showYAxis': 'true',
-    'showXAxis': 'true'
-
-  }
-
-  __chartProp = {
-    'xAxis': {'axisLabel': "'Time (ms)'", 'tickFormat': "d3.format(',r')"},
-    'yAxis': {'axisLabel': "'Voltage (v)'", 'tickFormat': "d3.format('.02f')"},
+    'margin': '{left:70}',
+    'x': 'function(d,i) { return i }',
+    'showLastValue': 'true',
+    'showLastValue': "function(d) {return d3.time.format('%x')(new Date(data[d].x))}",
   }
 
   reqCss = ['bootstrap', 'font-awesome', 'd3']

@@ -14,10 +14,9 @@ class NvD3Bar(AresHtmlContainer.Svg):
   alias, chartObject = 'bar', 'discreteBarChart'
   references = ['http://nvd3.org/examples/discreteBar.html']
   __chartStyle = {'showValues': 'true',
-                'staggerLabels': 'true',
-                'transitionDuration': 350,
-                'x': "function(d) { return d[0]; }",
-                'y': "function(d) { return d[1]; }"}
+                  'staggerLabels': 'true',
+                  'x': "function(d) { return d[0]; }",
+                  'y': "function(d) { return d[1]; }"}
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
@@ -51,8 +50,7 @@ class NvD3Bar(AresHtmlContainer.Svg):
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(
       '''
-        var %s = nv.models.%s()
-            .%s ;
+        var %s = nv.models.%s().%s ;
 
         d3.select("#%s svg").datum(%s).call(%s);
 
