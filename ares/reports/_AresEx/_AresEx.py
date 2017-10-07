@@ -49,7 +49,7 @@ def report(aresObj):
       for name, obj in inspect.getmembers(mod):
         if inspect.isclass(obj):
           for ref in getattr(obj, 'references'):
-            graphRefs.append(ref)
+            graphRefs.append(str(aresObj.externalLink('', ref)))
   # HTML Objects documentation
   graphRefs = []
   for script in os.listdir(os.path.join(aresObj.http['DIRECTORY'], '..', 'ares', 'Lib', 'html')):
@@ -58,7 +58,7 @@ def report(aresObj):
       for name, obj in inspect.getmembers(mod):
         if inspect.isclass(obj) and issubclass(obj, AresHtml.Html):
           for ref in getattr(obj, 'references'):
-            graphRefs.append(ref)
+            graphRefs.append(str(aresObj.externalLink(None, ref)))
 
   paragraph = aresObj.paragraph("\n".join(graphRefs))
   titleGraph = aresObj.title2("Reference for the charts")

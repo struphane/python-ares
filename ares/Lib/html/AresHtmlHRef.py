@@ -14,6 +14,23 @@ from ares.Lib import AresJs
 from flask import render_template_string
 
 
+class ExternalLink(AresHtml.Html):
+  """
+  """
+  alias, cssCls = 'externalLink', None
+
+  def __init__(self, aresObj, vals, url, cssCls, cssAttr):
+    """ """
+    super(ExternalLink, self).__init__(aresObj, vals,  cssCls, cssAttr)
+    self.url = url
+
+  def __str__(self):
+    """ Return the HTML representation of the hyperlink object """
+    if self.vals is None:
+      return '<a href="%s" %s target="_blank">%s</a>' % (self.url, self.strAttr(), self.url)
+
+    return '<a href="%s" %s target="_blank">%s</a>' % (self.url, self.strAttr(), self.vals)
+
 class A(AresHtml.Html):
   """
   Class to link a script to another sub script in a report
@@ -95,20 +112,3 @@ class AddScript(A):
   reqCss = ['bootstrap']
   reqJs = ['jquery']
 
-
-class ABespoke(AresHtml.Html):
-  """
-  Class to link a script to another sub script in a report
-  In this class no Javascript is used in the click event
-  """
-  alias = 'external_link'
-  reqCss = ['bootstrap']
-  reqJs = ['jquery']
-
-  def __init__(self, aresObj, vals, url, **kwargs):
-    super(ABespoke, self).__init__(aresObj, vals, kwargs.get('cssCls'))
-    self.url = url
-
-  def __str__(self):
-    """ Standard string representation for a href """
-    return '<a %s href="%s" target="_blank">%s</a>' % (self.strAttr(), self.url, self.vals)

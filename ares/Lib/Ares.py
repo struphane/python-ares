@@ -336,7 +336,7 @@ class Report(object):
 
   def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
   def anchor(self, value, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['A'](self, self.supp(value), attrs, cssCls, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def external_link(self, value, url, **kwargs): return self.add(aresFactory['ABespoke'](self, self.supp(value), url, **kwargs), sys._getframe().f_code.co_name)
+  def externalLink(self, value, url, cssCls=None, cssAttr=None): return self.add(aresFactory['ExternalLink'](self, self.supp(value), url, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   def anchor_download(self, value, **kwargs): return self.add(aresFactory['Download'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_set_env(self, value, **kwargs): return self.add(aresFactory['CreateEnv'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
