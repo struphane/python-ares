@@ -325,7 +325,7 @@ class Report(object):
   def refresh(self, value, recordSet, ajaxScript, withDataFiles=False, cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonRefresh'](self, value, recordSet, ajaxScript, withDataFiles, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def remove(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, '', cssCls, cssAttr, 'remove'), sys._getframe().f_code.co_name)
   def download(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonDownload'](self, value, self.http['REPORT_NAME'], cssCls, cssAttr, 'download'), sys._getframe().f_code.co_name)
-  def downloadAll(self, value='', cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, 'cloud-download'), sys._getframe().f_code.co_name)
+  def downloadAll(self, value='', cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonDownloadEnv'](self, value, self.http['REPORT_NAME'], cssCls, cssAttr, 'suitcase'), sys._getframe().f_code.co_name)
   def button(self, value, cssCls=None, cssAttr=None, awsIcon=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, awsIcon), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, 'check-square-o'), sys._getframe().f_code.co_name)
 
