@@ -155,6 +155,25 @@ class ButtonRefresh(AresHtml.Html):
     return '<button type="button" %s style="margin-bottom: 20px;margin-top: -10px;"><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.glyphicon, self.vals)
 
 
+class ButtonDownload(Button):
+  """ """
+  alias = "download"
+  glyphicon, cssCls = "download", ['btn', 'btn-default']
+  reqCss = ['bootstrap', 'font-awesome']
+
+  def __init__(self, aresObj, vals, reportName, cssCls=None, cssAttr=None, awsIcon=None):
+    """ """
+    super(ButtonDownload, self).__init__(aresObj, vals, cssCls, cssAttr, awsIcon)
+    self.reportName = reportName
+
+  def __str__(self):
+    """ """
+    items = AresItem.Item('<button type="button" %s>' % self.strAttr())
+    items.add(1, render_template_string('<a href="{{ url_for(\'ares.downloadOutputs\', report_name=\'%s\', file_name=\'%s\') }}" download />' % (self.reportName, self.vals)))
+    items.add(0, 'Download</button>')
+    return str(items)
+
+
 class GeneratePdf(AresHtml.Html):
   alias = "generatePdf"
   glyphicon, cssCls = "book", ['btn', 'btn-default']

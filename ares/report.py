@@ -684,6 +684,15 @@ def downloadAres():
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
+
+@noCache
+@report.route("/download/<report_name>/outputs/<file_name>", methods = ['GET'])
+def downloadOutputs(report_name, file_name):
+  """ Download the up to date Ares package """
+  aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'outputs', file_name)
+  #no need to check for error the normal raise should be fine
+  return send_file(aresoutputFile)
+
 @report.route("/ares/version", methods = ['GET', 'POST'])
 def getAresFilesVersions():
   """ Return the files, the version and the size """
