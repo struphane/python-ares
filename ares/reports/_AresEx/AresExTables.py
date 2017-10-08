@@ -43,14 +43,6 @@ def report(aresObj):
     '''
   ))
 
-  dropdown = aresObj.dropdown('Test', [('link 1', None),
-                            ('Other', [('link 2', None),
-                                       ('link 3', [('link 4', None)] )]
-                             )
-                           ])
-  dropdown.disable('link 1', None)
-  dropdown.click(None);
-
   aresObj.title3("Result")
   table = aresObj.table(recordSet, [
                                     [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
@@ -68,10 +60,4 @@ def report(aresObj):
                         ],
                         'Test Table')
   table.initCallBack()
-  radio = aresObj.radio(recordSet, 'CCY',[{'key': 'PTF', 'colName': 'Portfolio'},
-                                           {'key': 'CCY', 'colName': 'Currency'},
-                                           {'key': 'VAL2', 'colName': 'Value 2'},
-                                           {'key': 'VAL3', 'colName': 'Value 3'}])
 
-  radio.select('HUF')
-  radio.click(None)
