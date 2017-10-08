@@ -38,14 +38,28 @@ class NvD3Pie(AresHtmlContainer.Svg):
     return "getDataFromRecordSet(%s, ['%s', '%s'])" % (self.jqRecordSet, self.selectedCat, self.selectedVal)
 
   def setKeys(self, keys, selected=None):
-    """ """
+    """ Set a default key for the graph """
     if len(keys) == 1:
       self.selectedCat = keys[0]
+      self.multiCat = False
+    else:
+      if selected is None:
+        raise Exception("A selected category should be defined")
+
+      self.selectedCat = selected
+      self.multiCat = keys
 
   def setVals(self, vals, selected=None):
-    """ """
+    """ Set a default value for the graph """
     if len(vals) == 1:
       self.selectedVal = vals[0]
+      self.multiVal = False
+    else:
+      if selected is None:
+        raise Exception("A selected value should be defined")
+
+      self.selectedVal = selected
+      self.multiVal = vals
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
@@ -61,6 +75,28 @@ class NvD3Pie(AresHtmlContainer.Svg):
       ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
              self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
     )
+
+  def selections(self):
+    """ Return the possible data display option in the graph """
+    categories, values = '', ''
+    if self.multiCat:
+      categories = AresHtmlRadio.Radio(self.aresObj, self.multiCat)
+      categories.select(self.selectedCat)
+
+    if self.multiVal:
+      values = AresHtmlRadio.Radio(self.aresObj, self.multiVal)
+      values.select(self.selectedVal)
+    return "%s%s" % (categories, values)
+
+  @property
+  def jqCategory(self):
+    """ Returns the selected category for the graph """
+    return '$("#%s_col_selector option:selected")'% self.htmlId
+
+  @property
+  def jqValue(self):
+    """ Return the selected value to use for the graph """
+    return '$("#%s_val_selector option:selected")' % self.htmlId
 
   def jsUpdate(self):
     return ''

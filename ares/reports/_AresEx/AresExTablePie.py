@@ -23,9 +23,13 @@ def report(aresObj):
   pie = aresObj.pie(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                 {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Chart per product')
+
+  # To change the chart properties and only display half of the circle
   pie.addChartProp('pie', {'startAngle': 'function(d) { return d.startAngle/2 -Math.PI/2 }',
                            'endAngle': 'function(d) { return d.endAngle/2 -Math.PI/2 }'})
-  pie.setKeys(['CCY'])
+
+  #
+  pie.setKeys(['CCY', 'PTF'], 'CCY')
   pie.setVals(['VAL'])
   donut = aresObj.donut(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                     {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],

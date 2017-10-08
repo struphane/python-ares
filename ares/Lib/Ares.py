@@ -311,7 +311,7 @@ class Report(object):
   def dropdown(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectDropDown'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Radio Section
-  def radio(self, col, recordSet, header, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, col, self.register(self.suppRec(recordSet), header), cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet if header is None else self.register(self.suppRec(recordSet), header), col, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
   # Title section

@@ -15,12 +15,15 @@ class Radio(AresHtml.Html):
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
-  def __init__(self, aresObj, col, recordSet, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, recordSet, col=None, cssCls=None, cssAttr=None):
     """ Instantiate a Python Radio button """
-    vals = set([])
-    for rec in recordSet:
-      if col in rec:
-        vals.add(rec[col])
+    if col is not None:
+      vals = set([])
+      for rec in recordSet:
+        if col in rec:
+          vals.add(rec[col])
+    else:
+      vals = set(recordSet)
     super(Radio, self).__init__(aresObj, list(vals), cssCls, cssAttr)
     self.selected = None
     self.col = col
