@@ -51,3 +51,6 @@ class NvD3Pie(AresHtmlContainer.Svg):
       ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
              self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
     )
+
+  def jsUpdate(self):
+    return None

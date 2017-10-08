@@ -161,14 +161,6 @@ def isExcluded(rootPath, file=None, folders=None):
 
   return False
 
-def moduleFromAlias(alias):
-  for aresModule in [AresHtmlText]:
-      for name, cls in inspect.getmembers(aresModule):
-        if inspect.isclass(cls) and cls.alias is not None and alias == cls.alias:
-          return cls
-
-  return None
-
 
 class Report(object):
   """

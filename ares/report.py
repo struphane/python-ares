@@ -443,8 +443,8 @@ def designerComponent(component, compId):
   """
   echo(compId)
   echo(component)
-  echo(Ares.moduleFromAlias(component))
-  echo(Ares.moduleFromAlias(component).aresDesigner(compId))
+  #echo(Ares.moduleFromAlias(component))
+  #echo(Ares.moduleFromAlias(component).aresDesigner(compId))
   return json.dumps('')
 
 # ---------------------------------------------------------------------------------------------------------
