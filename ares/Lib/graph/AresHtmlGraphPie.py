@@ -47,7 +47,7 @@ class NvD3Pie(AresHtmlContainer.Svg):
       if selected is None:
         raise Exception("A selected category should be defined")
 
-      self.selectedCat = selected
+      self.selectedCat = "'%s'" % selected
       self.multiCat = keys
       self.dfltCat =  "'%s'" % selected
 
@@ -61,7 +61,7 @@ class NvD3Pie(AresHtmlContainer.Svg):
       if selected is None:
         raise Exception("A selected value should be defined")
 
-      self.selectedVal = selected
+      self.selectedVal = "'%s'" % selected
       self.multiVal = vals
       self.dfltVal =  "'%s'" % selected
 
@@ -90,14 +90,14 @@ class NvD3Pie(AresHtmlContainer.Svg):
     if self.multiCat:
       categories = AresHtmlRadio.Radio(self.aresObj, self.multiCat)
       categories.select(self.selectedCat)
-      self.selectedCat = categories.val
+      self.selectedCat = 'radio_val_%s' % categories.htmlId
       categories.click([self])
       self.jsEvent['cat_%s' % self.htmlId] = categories.jsEvent['mouseup']
 
     if self.multiVal:
       values = AresHtmlRadio.Radio(self.aresObj, self.multiVal)
       values.select(self.selectedVal)
-      self.selectedVal = values.val
+      self.selectedVal = 'radio_val_%s' % values.htmlId
       values.click([self])
       self.jsEvent['val_%s' % self.htmlId] = values.jsEvent['mouseup']
 

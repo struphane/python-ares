@@ -10,7 +10,8 @@ function getDict(dict, key, dflt){
 
 function getDataFromRecordSet(data, cols) {
     // Return the list of tuples as expected in a graph
-    // It will use a temporary dictionary for the aggregatio
+    // It will use a temporary dictionary for the aggregation
+    alert(cols.toSource()) ;
     var tmpDict = {};
     for (var i = 0, len = data.length; i < len; i++) {
         tmpDict[data[i][cols[0]]] = getDict(tmpDict, data[i][cols[0]], 0) + parseFloat(data[i][cols[1]]) ;
