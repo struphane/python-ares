@@ -24,6 +24,7 @@ import config
 # Ares Framework
 from ares.Lib import Ares
 from ares.Lib import AresLog
+from ares.Lib import AresJsModules
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -316,6 +317,39 @@ def ajaxCall(report_name, script):
     return json.dumps({'status': 'Error', "data": [], 'message': str(content)})
 
   return json.dumps(result)
+
+@report.route("/saved/<report_name>/<html_report>", methods = ['GET'])
+def savedHtmlReport(report_name, html_report):
+  """  """
+  reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'saved', html_report)
+  html_report = []
+  if os.path.exists(reportPath):
+    htmlReport = open(reportPath)
+    contentReport = False
+    for line in htmlReport:
+      if contentReport:
+        html_report.append(line)
+        continue
+
+      if line.upper().startswith('<BODY '):
+        contentReport = True
+        html_report.append(line)
+
+  importManager = AresJsModules.ImportManager()
+  cssPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name, 'css')
+  cssImports = [importManager.cssGetAll()]
+  if os.path.exists(cssPath):
+    for cssFile in os.listdir(cssPath):
+      cssImports.append(render_template_string('<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"' % (report_name, cssFile)))
+
+  jsPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name, 'js')
+  jsImports = [importManager.jsGetAll()]
+  if os.path.exists(jsPath):
+    for jsFile in os.listdir(jsPath):
+      if jsFile.endswith('.js'):
+        jsImports.append(render_template_string('<script rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"' % (report_name, jsFile)))
+
+  return render_template('ares_empty.html', cssImports="\n".join(cssImports), jsImports="\n".join(jsImports), html_report="".join(html_report))
 
 @report.route("/handlerequest/<module_name>/<function>", methods = ['GET', 'POST'])
 def handleRequest(module_name, function):

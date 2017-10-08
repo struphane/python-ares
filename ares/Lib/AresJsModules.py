@@ -43,13 +43,13 @@ CSS_IMPORTS = {
 
   'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css', 'buttons.dataTables.min.css']},
 
-  'bootstrap': {'modules': ['bootstrap.min.css', 'metro-bootstrap.min.css']},
+  'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css', 'metro-bootstrap.min.css']},
 
   'font-awesome': {'modules': ['font-awesome.min.css'],
                    #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css'
                    },
 
-  'd3': {'modules': ['nv.d3.min.css']},
+  'd3': {'req': ['bootstrap'], 'modules': ['nv.d3.min.css']},
 
   'ares': {'req': ['bootstrap'], 'modules': ['bdi.css', 'bootstrap-simple-sidebar.css']},
   }
@@ -176,3 +176,11 @@ class ImportManager(object):
       for urlModule in list(self.jsImports[jsAlias]['main']):
         jsList.append('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
     return render_template_string("\n".join(jsList))
+
+  def cssGetAll(self):
+    """ To retrieve the full list of available modules on the server """
+    return self.cssResolve(set(CSS_IMPORTS.keys()))
+
+  def jsGetAll(self):
+    """ To retrieve the full list of available modules on the server """
+    return self.jsResolve(set(JS_IMPORTS.keys()))
