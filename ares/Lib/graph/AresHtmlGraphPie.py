@@ -66,7 +66,6 @@ class NvD3Pie(AresHtmlContainer.Svg):
       self.dfltVal =  "'%s'" % selected
 
   def jsUpdate(self):
-    recFnc = self.dataFnc(self.selectedCat, self.selectedVal)
     return '''
               var %s = nv.models.%s().%s ;
 
@@ -76,7 +75,7 @@ class NvD3Pie(AresHtmlContainer.Svg):
 
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId, recFnc, self.getSvg(), self.htmlId, self.htmlId)
+                   self.htmlId, self.dataFnc(self.selectedCat, self.selectedVal), self.getSvg(), self.htmlId, self.htmlId)
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
