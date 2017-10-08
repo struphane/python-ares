@@ -154,3 +154,22 @@ function buildCountRecordSet(data, cursor){
     }
     return recordSet ;
 }
+
+function getSelectRadio(event, radios){
+    /**
+     * Return the selected value in a Radio component
+     */
+    var checked;
+    radios.each(
+        function() {
+            if ($(this).hasClass('active')) {
+                $(this).attr('class', 'btn btn-info');
+
+            }
+        }
+    ) ;
+
+    selectedItem = $(event.currentTarget) ;
+    selectedItem.attr('class', 'btn btn-success');
+    return selectedItem.text() ;
+}

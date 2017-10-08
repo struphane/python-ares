@@ -36,7 +36,7 @@ class Table(AresHtml.Html):
   filt, filtId = None, None
   linkedObjs = None
   pageLength = 50
-  jsTableConf, jsMenu, jsClick, jsInitCallBack = '', '', '', ''
+  jsTableConf, jsClick, jsInitCallBack = '', '', ''
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
 
@@ -48,7 +48,7 @@ class Table(AresHtml.Html):
     self.aresObj.jsGlobal[self.htmlId] = True # table has to be registered as a global variable in js
     self.headerBox = headerBox
     self.recordSetId = id(vals)
-    self.recordSetHeader = []
+    self.recordSetHeader, self.jsMenu = [], []
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     else: # we have a header on several lines, nothing to do
@@ -318,10 +318,11 @@ class Table(AresHtml.Html):
         }
     );
     """
-    items, staticVars = [], []
-    sizeAttr = len(attrList)
+    items, staticVars, sizeAttr = [], [], 0
     if attrList is not None:
-      staticVars = ["VAR%s='%s'" % (i, val) for i, val in enumerate(attrList)]
+      sizeAttr = len(attrList)
+      if attrList is not None:
+        staticVars = ["VAR%s='%s'" % (i, val) for i, val in enumerate(attrList)]
     for menu, script, keys in contextMenu:
       vars = ["VAR%s=' + rowData[0].%s +'" % (i + sizeAttr, key) for i, key in enumerate(keys)]
       vars.extend(staticVars)

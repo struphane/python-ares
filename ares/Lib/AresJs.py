@@ -24,6 +24,7 @@ class JQueryEvents(object):
               'dragleave': ['%(src)s.on("%(eventType)s", function (event){', '}', ');'],
               'dragenter': ['%(src)s.on("%(eventType)s", function (event){', '}', ');'],
               'click': ['%(src)s.on("%(eventType)s", function (event){', '}', ');'],
+              'mouseup': ['%(src)s.on("%(eventType)s", function (event){', '}', ');'],
               'blur': [''],
               'autocomplete': ['%(src)s.autocomplete({', '}', ');'],
               'change': ['%(src)s.on("%(eventType)s", function (event){', '}', ');'],

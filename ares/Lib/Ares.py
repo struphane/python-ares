@@ -258,6 +258,12 @@ class Report(object):
   def number(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Numeric'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def wiki(self, dataSourceName, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Wiki'](self, dataSourceName, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
+  # Select Section
+  def dropdown(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectDropDown'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
+
+  # Radio Section
+  def radio(self, col, recordSet, header, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, col, self.register(self.suppRec(recordSet), header), cssCls, cssAttr), sys._getframe().f_code.co_name)
+
 
   # Title section
   def title(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Title'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name) # Need to be linked to the NavBar
@@ -293,7 +299,6 @@ class Report(object):
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Table'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def dropdown(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['DropDown'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select(self, values, selected=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.supp(values), selected, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select_group(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Container'](self, header, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)

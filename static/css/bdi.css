@@ -1,4 +1,21 @@
 
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
+}
+
+.btn span.awesomeicon {
+	opacity: 0;
+}
+.btn.active span.awesomeicon {
+	opacity: 1;
+}
+
 .ares-panel-success {
     border: 1px solid #7bb062;
     border-radius: 7px;
