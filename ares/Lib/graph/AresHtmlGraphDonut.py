@@ -70,7 +70,7 @@ class NvD3Donut(AresHtmlContainer.Svg):
       self.multiVal = list(vals)
       self.dfltVal =  "'%s'" % selected
 
-  def jsUpdate(self, dftCat=None, dflVal=None):
+  def jsUpdate(self):
     recFnc = self.dataFnc(self.selectedCat, self.selectedVal)
     return '''
               var %s = nv.models.%s().%s ;
