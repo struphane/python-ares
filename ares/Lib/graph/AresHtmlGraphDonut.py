@@ -53,7 +53,7 @@ class NvD3Donut(AresHtmlContainer.Svg):
         raise Exception("A selected category should be defined")
 
       self.selectedCat = "'%s'" % selected
-      self.multiCat = keys
+      self.multiCat = list(keys)
       self.dfltCat =  "'%s'" % selected
 
   def setVals(self, vals, selected=None):
@@ -67,11 +67,10 @@ class NvD3Donut(AresHtmlContainer.Svg):
         raise Exception("A selected value should be defined")
 
       self.selectedVal = "'%s'" % selected
-      self.multiVal = vals
+      self.multiVal = list(vals)
       self.dfltVal =  "'%s'" % selected
 
-  def jsUpdate(self, dftCat=None, dflVal=None):
-    recFnc = self.dataFnc(dftCat, dflVal) if dftCat is not None else self.dataFnc(self.selectedCat, self.selectedVal)
+  def jsUpdate(self):
     return '''
               var %s = nv.models.%s().%s ;
 
@@ -81,7 +80,7 @@ class NvD3Donut(AresHtmlContainer.Svg):
 
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId, recFnc, self.getSvg(), self.htmlId, self.htmlId)
+                   self.htmlId, self.dataFnc(self.selectedCat, self.selectedVal), self.getSvg(), self.htmlId, self.htmlId)
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
@@ -95,14 +94,14 @@ class NvD3Donut(AresHtmlContainer.Svg):
     if self.multiCat:
       categories = AresHtmlRadio.Radio(self.aresObj, self.multiCat)
       categories.select(self.selectedCat)
-      self.selectedCat = 'radio_val_%s' % categories.htmlId
+      self.selectedCat = categories.val
       categories.click([self])
       self.jsEvent['cat_%s' % self.htmlId] = categories.jsEvent['mouseup']
 
     if self.multiVal:
       values = AresHtmlRadio.Radio(self.aresObj, self.multiVal)
       values.select(self.selectedVal)
-      self.selectedVal = 'radio_val_%s' % values.htmlId
+      self.selectedVal = values.val
       values.click([self])
       self.jsEvent['val_%s' % self.htmlId] = values.jsEvent['mouseup']
 

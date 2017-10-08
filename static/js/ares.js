@@ -11,7 +11,6 @@ function getDict(dict, key, dflt){
 function getDataFromRecordSet(data, cols) {
     // Return the list of tuples as expected in a graph
     // It will use a temporary dictionary for the aggregation
-    alert(cols.toSource()) ;
     var tmpDict = {};
     for (var i = 0, len = data.length; i < len; i++) {
         tmpDict[data[i][cols[0]]] = getDict(tmpDict, data[i][cols[0]], 0) + parseFloat(data[i][cols[1]]) ;
@@ -59,13 +58,13 @@ function buildMultiSeriesRecordSet(data, seriesKey, category, selectedVals, sele
         category = data[i][selCat];
         values = data[i][selVal];
 
-        if (series.includes('default') )
+        if (series.indexOf('default') != -1)
         {
             serie = 'Default';
         }
         else
         {
-            if (!(series.includes(data[i][seriesKey]) || series.includes('All')))
+            if ( ( series.indexOf(data[i][seriesKey]) == -1 && series.indexOf('All') == -1))
             {
                 continue;
             }

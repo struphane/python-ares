@@ -65,8 +65,7 @@ class NvD3Pie(AresHtmlContainer.Svg):
       self.multiVal = vals
       self.dfltVal =  "'%s'" % selected
 
-  def jsUpdate(self, dftCat=None, dflVal=None):
-    recFnc = self.dataFnc(dftCat, dflVal) if dftCat is not None else self.dataFnc(self.selectedCat, self.selectedVal)
+  def jsUpdate(self):
     return '''
               var %s = nv.models.%s().%s ;
 
@@ -76,12 +75,12 @@ class NvD3Pie(AresHtmlContainer.Svg):
 
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId, recFnc, self.getSvg(), self.htmlId, self.htmlId)
+                   self.htmlId, self.dataFnc(self.selectedCat, self.selectedVal), self.getSvg(), self.htmlId, self.htmlId)
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     self.aresObj.jsGraphs.append(
-      self.jsUpdate(self.dfltCat, self.dfltVal)
+      self.jsUpdate()
     )
 
   def selections(self):
@@ -90,14 +89,14 @@ class NvD3Pie(AresHtmlContainer.Svg):
     if self.multiCat:
       categories = AresHtmlRadio.Radio(self.aresObj, self.multiCat)
       categories.select(self.selectedCat)
-      self.selectedCat = 'radio_val_%s' % categories.htmlId
+      self.selectedCat = categories.val
       categories.click([self])
       self.jsEvent['cat_%s' % self.htmlId] = categories.jsEvent['mouseup']
 
     if self.multiVal:
       values = AresHtmlRadio.Radio(self.aresObj, self.multiVal)
       values.select(self.selectedVal)
-      self.selectedVal = 'radio_val_%s' % values.htmlId
+      self.selectedVal = values.val
       values.click([self])
       self.jsEvent['val_%s' % self.htmlId] = values.jsEvent['mouseup']
 
