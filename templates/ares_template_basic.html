@@ -39,6 +39,12 @@
                 $('#' + idEvent + '_main').remove() ;
             });
 
+            $('.dropdown-submenu a.drilldown').on("click", function(e){
+                $(this).next('ul').toggle();
+                e.stopPropagation();
+                e.preventDefault();
+              });
+
             //
             $('button[name="ares_min"]').click(function () {
                 var idEvent = $(this).attr('id').replace("_min", "") ;

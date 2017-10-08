@@ -43,6 +43,12 @@ def report(aresObj):
     '''
   ))
 
+  dropdown = aresObj.dropdown('Test', [('link', 'Val'),
+                            ('Other', [('link 1', 'Val 1'),
+                                       ('link 2', [('link 1', 'Val 4')] )]
+                             )
+                           ])
+  dropdown.disable('link', 'Val')
   aresObj.title3("Result")
   table = aresObj.table(recordSet, [
                                     [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
@@ -67,9 +73,3 @@ def report(aresObj):
 
   radio.select('HUF')
   radio.click(None)
-
-  aresObj.dropdown('Test', [('link', 'Val'),
-                            ('Other', [('link', 'Val'),
-                                       ('link', 'Val')]
-                             )
-                           ])
