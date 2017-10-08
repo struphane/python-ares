@@ -411,7 +411,7 @@ class Svg(AresHtml.Html):
 
   def dataFnc(self):
     """ Return the json data """
-    return open(r"E:\GitHub\Ares\ares\json\%sData.json" % self.alias).read().strip()
+    return open(r"ares\json\%sData.json" % self.alias).read().strip()
 
 
 class Network(AresHtml.Html):
