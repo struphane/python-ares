@@ -79,6 +79,26 @@ tr.nodetails td:first-child {
     border: 1px solid #1e854a;
 }
 
+.btn-info:focus
+{
+
+    color: #fff;
+    background-color: #7bb062;
+    border-color: #7bb062;
+}
+
+.btn-info {
+    color: #7bb062;
+    background-color: #fff;
+    border-color: #7bb062;
+}
+
+.btn-info.active {
+    color: #fff;
+    background-color: #7bb062;
+    border-color: #7bb062;
+}
+
 
 .btn-success {
     border-radius: 7px;
