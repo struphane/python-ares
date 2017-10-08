@@ -55,28 +55,85 @@ if aresFactory is None:
   # Atomic build of the factory
   aresFactory = tmpFactory
 
-def htmlLocalHeader(statisPath, cssFiles, javascriptFiles):
+def htmlLocalHeader(cssFiles, javascriptFiles, onLoad):
   """ Add the header to the report when we are producing a text file - namely local run """
-  item = AresItem.Item('<!DOCTYPE html>')
-  item.add(0, '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">')
-  item.add(0, '<head>')
-  item.add(1, '<meta charset="utf-8">')
-  item.add(1, '<meta http-equiv="X-UA-Compatible" content="IE=edge">')
-  item.add(1, '<meta name="viewport" content="width=device-width, initial-scale=1">')
-  item.add(1, '<title>Local HTML Report</title>')
-  for style in cssFiles:
-    item.add(1, '<link rel="stylesheet" href="%s" type="text/css">' % os.path.join(statisPath, 'css', style))
-  for javascript in javascriptFiles:
-    item.add(1, '<script src="%s"></script>' % os.path.join(statisPath, 'js', javascript))
-  return str(item)
+  return '''
+          <!DOCTYPE html>
+          <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Local HTML Report</title>
+            %s
+
+            %s
+
+
+            <script>
+                function preloader() {
+                    $('#loading').show();
+                }
+
+                function display(data){
+                    $('#temp-message').html(data);
+                    $('#temp-message').show();
+                    $('#temp-message').fadeOut( 4000 );
+                }
+
+                $(window).scroll(function() {
+                    $('#context-menu').hide() ;
+                }) ;
+
+                $(window).click(function() {
+                    // Function to close the context menu
+                    $("#context-menu").hide();
+                });
+
+
+                $(document).ready(function() {
+                    // Remove the dom component fromt the page
+                    $('button[name="ares_close"]').click(function () {
+                        var idEvent = $(this).attr('id').replace("_close", "") ;
+                        $('#' + idEvent + '_main').remove() ;
+                    });
+
+                    $('.dropdown-submenu a.drilldown').on("click", function(e){
+                        $(this).next('ul').toggle();
+                        e.stopPropagation();
+                        e.preventDefault();
+                      });
+
+                    //
+                    $('button[name="ares_min"]').click(function () {
+                        var idEvent = $(this).attr('id').replace("_min", "") ;
+                        $('#' + idEvent).toggle() ;
+                        if ($('#' + idEvent).is(":visible")) {
+                            $(this).html('<i class="fa fa-window-minimize" aria-hidden="true"></i>') ;
+                        }
+                        else {
+                            $(this).html('<i class="fa fa-window-maximize" aria-hidden="true"></i>') ;
+                        }
+
+                    });
+                    //$("#wrapper").toggleClass("toggled");
+                }) ;
+
+            %s
+            </script>
+            <body oncontextmenu="return false;" style="background-color: #f4f4f4">
+              <div id="page-content-wrapper">
+
+         ''' % (cssFiles, javascriptFiles, onLoad)
 
 def htmlLocalFooter():
   """ Close all the HTML report and close the input text File - namely locally """
-  item = AresItem.Item(None)
-  item.add(1, '</div>')
-  item.add(0, '</body>')
-  item.add(0, '</html>')
-  return str(item)
+  return '''
+            </div>
+          </body>
+          </html>
+
+         '''
 
 def convert_bytes(num):
   """
@@ -481,4 +538,6 @@ class Report(object):
 
     importMng = AresJsModules.ImportManager()
     jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
-    return importMng.cssResolve(self.cssImport), importMng.jsResolve(self.jsImports), "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)
+    cssImports = importMng.cssResolve(self.cssImport)
+    jsImports = importMng.jsResolve(self.jsImports)
+    return cssImports, jsImports, "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

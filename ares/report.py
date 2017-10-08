@@ -340,14 +340,14 @@ def savedHtmlReport(report_name, html_report):
   cssImports = [importManager.cssGetAll()]
   if os.path.exists(cssPath):
     for cssFile in os.listdir(cssPath):
-      cssImports.append(render_template_string('<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"' % (report_name, cssFile)))
+      cssImports.append(render_template_string('<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}">' % (report_name, cssFile)))
 
   jsPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name, 'js')
   jsImports = [importManager.jsGetAll()]
   if os.path.exists(jsPath):
     for jsFile in os.listdir(jsPath):
       if jsFile.endswith('.js'):
-        jsImports.append(render_template_string('<script rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"' % (report_name, jsFile)))
+        jsImports.append(render_template_string('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"></script>' % (report_name, jsFile)))
 
   return render_template('ares_empty.html', cssImports="\n".join(cssImports), jsImports="\n".join(jsImports), html_report="".join(html_report))
 
