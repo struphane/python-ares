@@ -417,6 +417,7 @@ def uploadFiles(report_type, report_name):
   reportTypes = {'report': (['.PY'], None), 'configuration': (['.JSON'], 'config'),
                  'ajax': (['.PY'], 'ajax'), 'javascript': (['.JS'], 'js'),
                  'views': (['.TXT', '.CSV'], 'statics'), 'outputs': (None, 'outputs'),
+                 'styles': (['.CSS', '.JS'], 'styles')
                  }
   if not report_type in reportTypes:
     return json.dumps('Error %s category not recognized !' % report_type), 500
@@ -441,6 +442,14 @@ def uploadFiles(report_type, report_name):
       else:
         if path is None:
           fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
+        elif path is 'styles':
+          userFullPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name)
+          if not os.path.exists(userFullPath):
+            os.makedirs(userFullPath)
+          fullPath = os.path.join(userFullPath, file.filename.lower().split('.')[-1])
+          if not os.path.exists(fullPath):
+            os.makedirs(fullPath)
+          fileFullPath = os.path.join(fullPath, file.filename)
         else:
           filePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, path)
           if not os.path.exists(filePath):

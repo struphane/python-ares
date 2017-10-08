@@ -51,5 +51,6 @@ if __name__ == '__main__':
   os.makedirs(os.path.join(dummyReportName, 'ajax')) # for the python dynamic data extraction
   os.makedirs(os.path.join(dummyReportName, 'statics')) # for the MRX Static views
   os.makedirs(os.path.join(dummyReportName, 'outputs')) # for the raw data
+  os.makedirs(os.path.join(dummyReportName, 'styles')) # for the raw data
 
   shutil.copy2(os.path.join('ares', 'tmpl', 'tmpl_report.py'), os.path.join(dummyReportName, "%s.py" % dummyReportName))

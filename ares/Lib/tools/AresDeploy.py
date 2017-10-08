@@ -31,7 +31,7 @@ def uploadFiles(files, reportName, withEnvCreation=False):
       print(response.text)
 
   for filename, fileType in files:
-    folder = {'report': None, 'configuration': 'config', 'ajax': 'ajax', 'javascript': 'js', 'views': 'statics', 'outputs': 'outputs'}[fileType]
+    folder = {'report': None, 'configuration': 'config', 'ajax': 'ajax', 'javascript': 'js', 'views': 'statics', 'outputs': 'outputs', 'styles': 'styles'}[fileType]
     if folder is not None:
       files = {'file': open(os.path.join(os.getcwd(), reportName, folder, filename))}
     else:
@@ -62,6 +62,7 @@ if __name__ == '__main__':
   # javascript - In the folder js For javascript templates (like text files with a js extension)
   # views - in the folder statics For view configuration (like text files extension .txt)
   # outputs - in the folder outputs For any bespoke data - No extension checks)
+  # styles - to add a special section on the server with your styles (CSS and JS)
   files = [('NewReport.py', 'report'),
            #('test.json', 'configuration'),
            #('params.txt', 'views'),
