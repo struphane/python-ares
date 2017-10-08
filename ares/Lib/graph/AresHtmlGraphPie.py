@@ -3,7 +3,7 @@
 """
 
 from ares.Lib.html import AresHtmlContainer
-
+from ares.Lib.html import AresHtmlRadio
 
 class NvD3Pie(AresHtmlContainer.Svg):
   """
@@ -35,7 +35,17 @@ class NvD3Pie(AresHtmlContainer.Svg):
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return "getDataFromRecordSet(%s, ['%s', '%s'])" % (self.jqRecordSet, 'CATEGORY', 'VAL')
+    return "getDataFromRecordSet(%s, ['%s', '%s'])" % (self.jqRecordSet, self.selectedCat, self.selectedVal)
+
+  def setKeys(self, keys, selected=None):
+    """ """
+    if len(keys) == 1:
+      self.selectedCat = keys[0]
+
+  def setVals(self, vals, selected=None):
+    """ """
+    if len(vals) == 1:
+      self.selectedVal = vals[0]
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """

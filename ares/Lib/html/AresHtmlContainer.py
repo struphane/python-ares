@@ -330,9 +330,12 @@ class Svg(AresHtml.Html):
       if attr in self.chartAttrs:
         del self.chartAttrs[attr]
 
-  def addChartProp(self, attrs):
+  def addChartProp(self, key, attrs):
     """ Change the object chart properties """
-    self.chartProps.update(attrs)
+    if key not in self.chartProps:
+      self.chartProps[key] = attrs
+    else:
+      self.chartProps[key].update(attrs)
 
   def delChartProp(self, attrs):
     """ Change the object chart properties """
