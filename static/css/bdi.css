@@ -65,6 +65,20 @@ tr.nodetails td:first-child {
     border: 1px solid rgba(37, 140, 51, 0.72);
 }
 
+.btn-primary:active
+{
+    color: #fff;
+    background-color: #26ab5f;
+    border: 1px solid #1e854a;
+}
+
+.btn-primary:focus
+{
+    color: #fff;
+    background-color: #26ab5f;
+    border: 1px solid #1e854a;
+}
+
 
 .btn-success {
     border-radius: 7px;
