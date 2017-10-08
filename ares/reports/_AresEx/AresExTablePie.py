@@ -31,9 +31,13 @@ def report(aresObj):
   #
   pie.setKeys(['CCY', 'PTF'], 'CCY')
   pie.setVals(['VAL', 'VAL3'], 'VAL')
+
   donut = aresObj.donut(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                     {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Chart per currency ')
+  donut.setKeys(['CCY', 'PTF'], 'CCY')
+  donut.setVals(['VAL', 'VAL3'], 'VAL')
+
   aresObj.row([pie, donut])
   button = aresObj.button("Refresh Data")
   button.click('ExAjaxQuery', '%s%s' % (table.jsUpdate(), pie.jsUpdate()), {})
