@@ -43,12 +43,14 @@ def report(aresObj):
     '''
   ))
 
-  dropdown = aresObj.dropdown('Test', [('link', 'Val'),
-                            ('Other', [('link 1', 'Val 1'),
-                                       ('link 2', [('link 1', 'Val 4')] )]
+  dropdown = aresObj.dropdown('Test', [('link 1', None),
+                            ('Other', [('link 2', None),
+                                       ('link 3', [('link 4', None)] )]
                              )
                            ])
-  dropdown.disable('link', 'Val')
+  dropdown.disable('link 1', None)
+  dropdown.click(None);
+
   aresObj.title3("Result")
   table = aresObj.table(recordSet, [
                                     [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},

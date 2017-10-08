@@ -30,23 +30,39 @@ class SelectDropDown(AresHtml.Html):
         self.addCategory(items, level+1, hyperlink)
         items.add(level, '</ul></li>')
       else:
+        hyperLinkVal = hyperlink if hyperlink is not None else '#'
         if (hyperlink, value) in self.disableItems:
-          items.add(level, '<li><a class="dropdown-item disabled" tabindex="-1" href="%s">%s</a></li>' % (hyperlink, value))
+          items.add(level, '<li><a class="dropdown-item disabled" tabindex="-1" href="%s">%s</a></li>' % (hyperLinkVal, value))
         else:
-          items.add(level, '<li><a class="dropdown-item" tabindex="-1" href="%s">%s</a></li>' % (hyperlink, value))
+          items.add(level, '<li><a class="dropdown-item" tabindex="-1" href="%s">%s</a></li>' % (hyperLinkVal, value))
 
   def disable(self, value, hyperlink):
     """ Disable an item from the dropdown box """
     self.disableItems[(hyperlink, value)] = True
 
+  @property
+  def jqId(self):
+    """
+    Property to get the Jquery ID of a python HTML object
+    The use of ' instead of " is because the dumps will add some \ and it will not be correctly taken into account
+    by the javascript layer
+    """
+    return "$('#%s > li a').not('.drilldown, .disabled')" % self.htmlId
+
   def __str__(self):
     """  String representation of a Drop Down item """
     items = AresItem.Item('<div class="dropdown">')
-    items.add(1, '<button %s type="button" data-toggle="dropdown">%s' % (self.strAttr(), self.title))
-    items.add(2, '<span class="caret"></span>')
+    items.add(1, '<button class="%s" type="button" data-toggle="dropdown">%s' % (self.getClass(), self.title))
+    items.add(3, '<span class="caret"></span>')
     items.add(2, '</button>')
-    items.add(1, '<ul class="dropdown-menu">')
+    items.add(1, '<ul class="dropdown-menu" id="%s">' % self.htmlId)
     self.addCategory(items, 2, self.vals)
     items.add(1, "</ul>")
     items.add(0, "</div>")
     return str(items)
+
+  def click(self, htmlObject):
+    """ Change the component to use javascript functions """
+    evenType = 'click'
+    jsDef = "console.log($(this).text()) ;" #% self.htmlId
+    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef)
