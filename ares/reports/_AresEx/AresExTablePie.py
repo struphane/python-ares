@@ -30,7 +30,7 @@ def report(aresObj):
 
   #
   pie.setKeys(['CCY', 'PTF'], 'CCY')
-  pie.setVals(['VAL'])
+  pie.setVals(['VAL', 'VAL3'], 'VAL')
   donut = aresObj.donut(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                     {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                     'Chart per currency ')

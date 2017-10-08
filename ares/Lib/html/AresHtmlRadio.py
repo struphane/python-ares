@@ -61,8 +61,8 @@ class Radio(AresHtml.Html):
     """ Property to get the jquery value of the HTML objec in a python HTML object """
     return 'getSelectRadio(event, %s)' % self.jqId
 
-  def click(self, htmlObject):
+  def click(self, htmlObjects):
     """ Pure Javascript method to update other components in the page """
     evenType = 'mouseup'
-    jsDef = 'alert(%s) ;' % self.val
+    jsDef = "\n".join([htmlObject.jsUpdate() for htmlObject in htmlObjects])
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef)
