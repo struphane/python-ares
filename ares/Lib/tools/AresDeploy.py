@@ -31,7 +31,8 @@ def uploadFiles(files, reportName, withEnvCreation=False):
       print(response.text)
 
   for filename, fileType in files:
-    folder = {'report': None, 'configuration': 'config', 'ajax': 'ajax', 'javascript': 'js', 'views': 'statics', 'outputs': 'outputs', 'styles': 'styles'}[fileType]
+    folder = {'report': None, 'configuration': 'config', 'ajax': 'ajax', 'javascript': 'js', 'views': 'statics',
+              'outputs': 'outputs', 'styles': 'styles', 'saved': 'saved'}[fileType]
     if folder is not None:
       files = {'file': open(os.path.join(os.getcwd(), reportName, folder, filename))}
     else:
@@ -67,6 +68,7 @@ if __name__ == '__main__':
            #('test.json', 'configuration'),
            #('params.txt', 'views'),
            #('params.zz', 'outputs'),
+           #('report.html', 'saved'),
           ]
   REPORT = 'NewReport'
 
