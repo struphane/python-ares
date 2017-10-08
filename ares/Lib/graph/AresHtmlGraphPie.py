@@ -35,7 +35,7 @@ class NvD3Pie(AresHtmlContainer.Svg):
 
   def dataFnc(self):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return "getDataFromRecordSet(%s, ['%s', '%s'])" % (self.jqRecordSet, 'PTF', 'VAL')
+    return "getDataFromRecordSet(%s, ['%s', '%s'])" % (self.jqRecordSet, 'CATEGORY', 'VAL')
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
@@ -53,4 +53,4 @@ class NvD3Pie(AresHtmlContainer.Svg):
     )
 
   def jsUpdate(self):
-    return None
+    return ''

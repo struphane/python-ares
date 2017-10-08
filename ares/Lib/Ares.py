@@ -524,7 +524,7 @@ class Report(object):
       for jsType, jsFncs in js.items():
         if jsType == 'addGraph':
           continue
-          #jsGraphs.append("\n".join(jsFncs))
+
         else:
           jsSection.append("\n".join(jsFncs))
 
