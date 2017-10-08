@@ -73,21 +73,31 @@ def report(aresObj):
                                       {'key': 'Size', 'colName': 'Size in Ko'},
                                       {'key': 'delete', 'colName': '', 'type': 'object'}], 'Existing Reports')
   tableComp.filters(['Folder Name'])
-  barComp = aresObj.bar(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
+  pie = aresObj.pie(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
                                   {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
                                   {'key': 'Date', 'colName': 'Last Modification'},
                                   {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Scripts per folder')
+
+  #
+  pie.setKeys(['Date'])
+  pie.setVals(['Size'])
+
   inputModal = aresObj.input("Report Name", '')
   createReport = aresObj.ok('Create the Report')
+
   #createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal, 'js': "%s.modal('toggle') ; display(data) ;" % modal.jqId})
   aresObj.addTo(modal, inputModal)
   aresObj.addTo(modal, createReport)
-  pieComp = aresObj.donut(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
+  donut = aresObj.donut(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
                                   {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
                                   {'key': 'Date', 'colName': 'Last Modification'},
                                   {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                                   {'key': 'delete', 'colName': ''}], 'Folder')
-  aresObj.row([barComp, pieComp])
+  #
+  donut.setKeys(['folderName'])
+  donut.setVals(['activity'])
+
+  aresObj.row([pie, donut])
