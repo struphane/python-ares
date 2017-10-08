@@ -9,7 +9,7 @@ def report(aresObj):
   """
 
   """
-  path = r"E:\GitHub\Ares\ares"
+  path = r"ares"
   scriptName = aresObj.http['script'].replace(".py", "")
   wikiObj = aresObj.wiki(aresObj, scriptName, open(r"%s\%s.py" % (path, scriptName)).__doc__.split("\n"))
 
