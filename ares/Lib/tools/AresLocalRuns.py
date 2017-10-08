@@ -19,8 +19,6 @@ import sys
 import AresInstall
 from ares.Lib import Ares
 
-REPORT = "NewReport" # The name of the main script with the report
-
 # CSS imports
 CSS = ['bootstrap.min.css',
        'jquery-ui.css',
@@ -57,9 +55,9 @@ JS = ['jquery-3.2.1.min.js',
       ]
 
 
-def getReport(results, scriptPath):
+def getReport(results, reports, scriptPath):
   """ Recursively runs all the reports """
-  for report in os.listdir(scriptPath):
+  for report in reports:
     if report.endswith(".py"):
       reportModule = __import__(report.replace(".py", ""))
       if hasattr(reportModule, 'report'):
@@ -85,7 +83,12 @@ if __name__ == '__main__':
   directory = os.getcwd() # The path of this script by default
   # This will move all the results in a html folder
   # It only work locally
-  path = os.path.join(directory, result_folder, REPORT)
+  folder = "NewReport" # The name of the main script with the report
+  scripts = [
+    'NewReport.py',
+    ]
+
+  path = os.path.join(directory, result_folder, folder)
   if not os.path.exists(path):
     os.makedirs(path)
   if not serverStatics:
@@ -99,12 +102,12 @@ if __name__ == '__main__':
   footer = Ares.htmlLocalFooter()
 
   res = {}
-  directoryPath = os.path.join(directory, REPORT)
+  directoryPath = os.path.join(directory, folder)
   sys.path.append(directoryPath)
-  ajaxPath = os.path.join(directory, REPORT, 'ajax')
+  ajaxPath = os.path.join(directory, folder, 'ajax')
   if os.path.exists(ajaxPath):
     sys.path.append(ajaxPath)
-  getReport(res, directoryPath)
+  getReport(res, scripts, directoryPath)
 
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")
