@@ -33,14 +33,15 @@ class NvD3Pie(AresHtmlContainer.Svg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
 
-  def dataFnc(self):
+  def dataFnc(self, cat, val):
     """ Return the data Source converted to them be sent to the javascript layer """
-    return "getDataFromRecordSet(%s, ['%s', '%s'])" % (self.jqRecordSet, self.selectedCat, self.selectedVal)
+    return "getDataFromRecordSet(%s, [%s, %s])" % (self.jqRecordSet, cat, val)
 
   def setKeys(self, keys, selected=None):
     """ Set a default key for the graph """
     if len(keys) == 1:
-      self.selectedCat = keys[0]
+      self.selectedCat = "'%s'" % keys[0]
+      self.dfltCat =  "'%s'" % keys[0]
       self.multiCat = False
     else:
       if selected is None:
@@ -48,32 +49,39 @@ class NvD3Pie(AresHtmlContainer.Svg):
 
       self.selectedCat = selected
       self.multiCat = keys
+      self.dfltCat =  "'%s'" % selected
 
   def setVals(self, vals, selected=None):
     """ Set a default value for the graph """
     if len(vals) == 1:
-      self.selectedVal = vals[0]
+      self.selectedVal = "'%s'" % vals[0]
       self.multiVal = False
+      self.dfltVal =  "'%s'" % vals[0]
     else:
       if selected is None:
         raise Exception("A selected value should be defined")
 
       self.selectedVal = selected
       self.multiVal = vals
+      self.dfltVal =  "'%s'" % selected
+
+  def jsUpdate(self, dftCat=None, dflVal=None):
+    recFnc = self.dataFnc(dftCat, dflVal) if dftCat is not None else self.dataFnc(self.selectedCat, self.selectedVal)
+    return '''
+              var %s = nv.models.%s().%s ;
+
+              %s
+
+              d3.select("#%s svg").datum(%s)%s.call(%s);
+
+              nv.utils.windowResize(%s.update);
+            ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
+                   self.htmlId, recFnc, self.getSvg(), self.htmlId, self.htmlId)
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     self.aresObj.jsGraphs.append(
-      '''
-        var %s = nv.models.%s().%s ;
-
-        %s
-
-        d3.select("#%s svg").datum(%s)%s.call(%s);
-
-        nv.utils.windowResize(%s.update);
-      ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-             self.htmlId, self.dataFnc(), self.getSvg(), self.htmlId, self.htmlId)
+      self.jsUpdate(self.dfltCat, self.dfltVal)
     )
 
   def selections(self):
@@ -82,21 +90,16 @@ class NvD3Pie(AresHtmlContainer.Svg):
     if self.multiCat:
       categories = AresHtmlRadio.Radio(self.aresObj, self.multiCat)
       categories.select(self.selectedCat)
+      self.selectedCat = categories.val
+      categories.click([self])
+      self.jsEvent['cat_%s' % self.htmlId] = categories.jsEvent['mouseup']
 
     if self.multiVal:
       values = AresHtmlRadio.Radio(self.aresObj, self.multiVal)
       values.select(self.selectedVal)
-    return "%s%s" % (categories, values)
+      self.selectedVal = values.val
+      values.click([self])
+      self.jsEvent['val_%s' % self.htmlId] = values.jsEvent['mouseup']
 
-  @property
-  def jqCategory(self):
-    """ Returns the selected category for the graph """
-    return '$("#%s_col_selector option:selected")'% self.htmlId
+    return "%s\n%s" % (categories, values)
 
-  @property
-  def jqValue(self):
-    """ Return the selected value to use for the graph """
-    return '$("#%s_val_selector option:selected")' % self.htmlId
-
-  def jsUpdate(self):
-    return ''
