@@ -90,98 +90,6 @@ def noCache(f):
     return resp
   return respFunc
 
-#TO BE REMOVED
-@report.route("/doc/html")
-@report.route("/child:dsc/html")
-def report_dsc_html():
-  """ Function to return the HTML object description and a user guide """
-  import inspect
-  from ares.Lib import AresHtmlText
-  from ares.Lib import AresHtmlEvent
-  from ares.Lib import AresHtmlModal
-  from ares.Lib import AresHtmlTable
-  from ares.Lib import AresHtmlContainer
-
-  aresObj = Ares.Report()
-  aresObj.reportName = 'dsc/html'
-  aresObj.childPages = {}
-  aresObj.title("Html Components")
-  for aresModule in [AresHtmlText, AresHtmlContainer, AresHtmlEvent, AresHtmlModal, AresHtmlTable]:
-    aresObj.title4(aresModule.__doc__)
-    htmlObject = [["Class Name", "Description", "Example", "Render"]]
-    for name, cls in inspect.getmembers(aresModule):
-      if inspect.isclass(cls) and cls.alias is not None:
-        aresObj.childPages[name] = '../../../child:dsc/html/%s' % cls.alias
-        comp = aresObj.anchor(name)
-        comp.addLink(name, dots='.')
-
-        src = inspect.getsource(cls.aresExample).split("\n", 2)[-1].replace("return ", "")
-        htmlObject.append([comp, aresObj.code(cls.__doc__), aresObj.code(src), cls.aresExample(aresObj)])
-    aresObj.table('Available HTML Components',  htmlObject)
-  onload, content, js = aresObj.html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
-
-#TO BE REMOVED
-@report.route("/doc/graph")
-@report.route("/child:dsc/graph")
-def report_dsc_graph():
-  """ Function to return the Graph object description and a user guide """
-  import inspect
-  from ares.Lib import AresHtmlGraph
-
-  aresObj = Ares.Report()
-  aresObj.reportName = 'dsc/graph'
-  aresObj.childPages = {}
-  graphObject = [['Class Name', 'Description']]
-  aresObj.title("Graph Components")
-  aresObj.iframe('http://nvd3.org/livecode/index.html')
-  aresObj.title4(AresHtmlGraph.__doc__)
-  for name, obj in inspect.getmembers(AresHtmlGraph):
-    if inspect.isclass(obj) and name not in ['JsGraph', 'IndentedTree', 'NVD3Chart']:
-      aresObj.childPages[name] = '../../../child:dsc/graph/%s' % name
-      comp = aresObj.anchor(name)
-      comp.addLink(name, dots='.')
-      graphObject.append([comp, aresObj.code(obj.__doc__)])
-  aresObj.table('Available Graph', graphObject)
-  onload, content, js = aresObj.html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
-
-#TO BE REMOVED
-@report.route("/child:dsc/graph/<chartName>")
-def report_dsc_graph_details(chartName):
-  """ """
-  import inspect
-  import json
-  from ares.Lib import AresHtmlGraph
-  from ares.Lib import AresHtml
-
-  aresObj = Ares.Report()
-  aresObj.reportName = 'download'
-  aresObj.childPages = {}
-  aresComponents = {}
-  for name, obj in inspect.getmembers(AresHtmlGraph):
-    if inspect.isclass(obj):
-      aresComponents[name] = obj
-  object = aresComponents[chartName]
-  aresObj.title(chartName)
-  aresObj.title3("%s Components Details" % chartName)
-  aresObj.text(object.__doc__)
-  mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, object.mockData)
-  with open(mokfilePath) as data_file:
-    data = data_file.read()
-  graphCom = getattr(aresObj, object.alias)('Graph Example', data)
-  graphCom.addClick('alert(e.toSource()) ;')
-
-  # Add the mock data as example
-  aresObj.title3('Source Code')
-  aresObj.childPages['graph'] = '../../../download/dsc/%s' % object.mockData
-  comp = aresObj.anchor('Data Source') #, object.mockData, 'html', {'html': '../../../download/dsc/%s' % object.mockData}, None)
-  comp.addLink('graph')
-  aresObj.paragraph(['You can download the input data here: ', comp])
-  compObj = aresComponents[chartName](0, 'Graph Example', data)
-  aresObj.code("%s\n" % "".join(compObj.jsEvents()['addGraph'])[:-3])
-  onload, content, js = aresObj.html()
-  return render_template('ares_template.html', onload=onload, content=content, js=js)
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
@@ -331,23 +239,22 @@ def savedHtmlReport(report_name, html_report):
         html_report.append(line)
         continue
 
-      if line.upper().startswith('<BODY '):
+      if line.upper().startswith('<BODY'):
         contentReport = True
         html_report.append(line)
-
   importManager = AresJsModules.ImportManager()
   cssPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name, 'css')
   cssImports = [importManager.cssGetAll()]
   if os.path.exists(cssPath):
     for cssFile in os.listdir(cssPath):
-      cssImports.append(render_template_string('<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"' % (report_name, cssFile)))
+      cssImports.append(render_template_string('<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}">' % (report_name, cssFile)))
 
   jsPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name, 'js')
   jsImports = [importManager.jsGetAll()]
   if os.path.exists(jsPath):
     for jsFile in os.listdir(jsPath):
       if jsFile.endswith('.js'):
-        jsImports.append(render_template_string('<script rel="stylesheet" href="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"' % (report_name, jsFile)))
+        jsImports.append(render_template_string('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"></script>' % (report_name, jsFile)))
 
   return render_template('ares_empty.html', cssImports="\n".join(cssImports), jsImports="\n".join(jsImports), html_report="".join(html_report))
 
@@ -417,7 +324,7 @@ def uploadFiles(report_type, report_name):
   reportTypes = {'report': (['.PY'], None), 'configuration': (['.JSON'], 'config'),
                  'ajax': (['.PY'], 'ajax'), 'javascript': (['.JS'], 'js'),
                  'views': (['.TXT', '.CSV'], 'statics'), 'outputs': (None, 'outputs'),
-                 'styles': (['.CSS', '.JS'], 'styles')
+                 'styles': (['.CSS', '.JS'], 'styles'), 'saved': (['.HTML'], 'saved')
                  }
   if not report_type in reportTypes:
     return json.dumps('Error %s category not recognized !' % report_type), 500
@@ -536,8 +443,8 @@ def designerComponent(component, compId):
   """
   echo(compId)
   echo(component)
-  echo(Ares.moduleFromAlias(component))
-  echo(Ares.moduleFromAlias(component).aresDesigner(compId))
+  #echo(Ares.moduleFromAlias(component))
+  #echo(Ares.moduleFromAlias(component).aresDesigner(compId))
   return json.dumps('')
 
 # ---------------------------------------------------------------------------------------------------------

@@ -49,8 +49,9 @@ if __name__ == '__main__':
   os.makedirs(os.path.join(dummyReportName, 'js')) # for the javascript fragments
   os.makedirs(os.path.join(dummyReportName, 'json')) # for the static configurations
   os.makedirs(os.path.join(dummyReportName, 'ajax')) # for the python dynamic data extraction
-  os.makedirs(os.path.join(dummyReportName, 'statics')) # for the MRX Static views
-  os.makedirs(os.path.join(dummyReportName, 'outputs')) # for the raw data
-  os.makedirs(os.path.join(dummyReportName, 'styles')) # for the raw data
+  os.makedirs(os.path.join(dummyReportName, 'statics')) # for the MRX Static views (1 view per MRX screen)
+  os.makedirs(os.path.join(dummyReportName, 'outputs')) # To push output files
+  os.makedirs(os.path.join(dummyReportName, 'styles')) # for the special CSS and JS files to be used on the server
+  os.makedirs(os.path.join(dummyReportName, 'saved')) # To push the already ready HTML reports
 
   shutil.copy2(os.path.join('ares', 'tmpl', 'tmpl_report.py'), os.path.join(dummyReportName, "%s.py" % dummyReportName))

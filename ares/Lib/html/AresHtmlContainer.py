@@ -330,9 +330,12 @@ class Svg(AresHtml.Html):
       if attr in self.chartAttrs:
         del self.chartAttrs[attr]
 
-  def addChartProp(self, attrs):
+  def addChartProp(self, key, attrs):
     """ Change the object chart properties """
-    self.chartProps.update(attrs)
+    if key not in self.chartProps:
+      self.chartProps[key] = attrs
+    else:
+      self.chartProps[key].update(attrs)
 
   def delChartProp(self, attrs):
     """ Change the object chart properties """
@@ -382,7 +385,14 @@ class Svg(AresHtml.Html):
 
   def __str__(self):
     """ Return the svg container """
-    return str(AresBox(self.htmlId, '<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr(), self.headerBox))
+    items = AresItem.Item(None)
+    items.add(0, self.selections())
+    items.add(0,  '<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
+    return str(AresBox(self.htmlId, str(items), self.headerBox))
+
+  def selections(self):
+    """ Return the different filters according to the object complexity """
+    return ''
 
   @property
   def jqId(self):
@@ -395,16 +405,6 @@ class Svg(AresHtml.Html):
     return 'recordSet_%s' % self.recordSetId
 
   @property
-  def jqCategory(self):
-    """ Returns the selected category for the graph """
-    return '$("#%s_col_selector option:selected")'% self.htmlId
-
-  @property
-  def jqValue(self):
-    """ Return the selected value to use for the graph """
-    return '$("#%s_val_selector option:selected")' % self.htmlId
-
-  @property
   def jqSeriesKey(self):
     """ Returns the selected category for the graph """
     return 'serie_%s' % self.htmlId
@@ -412,29 +412,6 @@ class Svg(AresHtml.Html):
   def dataFnc(self):
     """ Return the json data """
     return open(r"ares\json\%sData.json" % self.alias).read().strip()
-
-
-class Network(AresHtml.Html):
-  """
-  Wrapper to create a Network graph container
-
-  Default class parameters
-    - CSS Default Class = container-fluid
-  """
-  dim = None
-  cssCls = ['container-fluid']
-
-  def __str__(self):
-    """ Return the Graph container for D3 and DVD3 """
-    items = AresItem.Item('<div %s>' % self.strAttr())
-    items.add(1, '<div class="row">')
-    items.add(2, '<div id="graph-container">')
-    items.add(3, '<div id="graph-bg"></div>')
-    items.add(3, '<div id="graph"></div>')
-    items.add(2, '%s%s</div>')
-    items.add(1, '</div>')
-    items.add(0, '</div>')
-    return str(items)
 
 
 class Tabs(AresHtml.Html):

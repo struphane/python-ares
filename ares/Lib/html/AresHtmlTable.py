@@ -214,7 +214,7 @@ class Table(AresHtml.Html):
 
                   %s
                   ''' % (self.jqId, self.recordSetId, itemsPerPage, ",".join(self.recordSetHeader),
-                         self.jsTableConf, self.jsMenu, self.jsClick))
+                         self.jsTableConf, "\n".join(self.jsMenu), self.jsClick))
     else:
       item.add(1, '''
                   // createdRow
@@ -245,7 +245,7 @@ class Table(AresHtml.Html):
 
                   %s
                   ''' % (self.htmlId, self.jqId, itemsPerPage, self.recordSetId, ",".join(self.recordSetHeader),
-                         self.jsTableConf, self.jsInitCallBack, self.jsMenu, self.jsClick))
+                         self.jsTableConf, self.jsInitCallBack, "\n".join(self.jsMenu), self.jsClick))
     if self.filtId is not None:
       item.add(1, "$('.filter_%s').keyup(function(){" % self.htmlId)
       item.add(2, "%s.draw() ;" % self.htmlId)

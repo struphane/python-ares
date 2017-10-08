@@ -16,44 +16,8 @@ Ares documentation is available here:
 from __future__ import print_function
 import os
 import sys
-import AresInstall
+
 from ares.Lib import Ares
-
-# CSS imports
-CSS = ['bootstrap.min.css',
-       'jquery-ui.css',
-       'bootstrap-theme.min.css',
-       'bootstrap-select.min.css',
-       'nv.d3.css',
-       'svg.css'
-       'jquery.dataTables.min.css',
-       'bootstrap-simple-sidebar.css',
-       'font-awesome.min.cs',
-       'metro-bootstrap.min.css',
-       'buttons.dataTables.min.css',
-       'responsive.dataTables.min.css',
-       'bdi.css']
-
-# Javascript imports
-JS = ['jquery-3.2.1.min.js',
-      'jquery-ui.min.js',
-      'bootstrap.min.js',
-      'bootstrap-select.min.js',
-      'transition.min.js',
-      'collapse.js',
-      'd3.v3.js',
-      'nv.d3.js',
-      'd3.layout.cloud.js',
-      'colorbrewer.js', # The mimifyed version does not contain indentedTree objects. https://stackoverflow.com/questions/35452946/not-running-minimal-example-of-indentedtree
-      'jquery.dataTables.min.js', # world cloud chart
-      'dataTables.buttons.min.js', # world cloud chart
-      'dataTables.responsive.min.js', # world cloud chart
-      'buttons.colVis.min.js', # world cloud chart
-      'pdfmake.min.js', # world cloud chart
-      'vfs_fonts.js', # world cloud chart
-      'ares.js', # world cloud chart
-      ]
-
 
 def getReport(results, reports, scriptPath):
   """ Recursively runs all the reports """
@@ -91,14 +55,24 @@ if __name__ == '__main__':
   path = os.path.join(directory, result_folder, folder)
   if not os.path.exists(path):
     os.makedirs(path)
-  if not serverStatics:
-    localPathSize = len(os.path.split(path))
-    if os.path.split(path)[0] == '':
-      localPathSize -= 1
-    AresInstall.SERVER_PATH = os.path.join(*[".." for i in range(localPathSize)])
+
+  cssPath = os.path.join(directory, folder, 'styles')
+  cssImportsExtra = []
+  if os.path.exists(cssPath):
+    for cssFile in os.listdir(cssPath):
+      if cssFile.endswith('.css'):
+        cssImportsExtra.append('<link rel="stylesheet" href="../../%s/styles/%s">' % (folder, cssFile))
+  cssImportsExtra = "\n".join(cssImportsExtra)
+
+  jsPath = os.path.join(directory, folder, 'styles')
+  jsImportsExtra = []
+  if os.path.exists(jsPath):
+    for jsFile in os.listdir(jsPath):
+      if jsFile.endswith('.js'):
+        jsImportsExtra.append('<script language="javascript" type="text/javascript" src="../../%s/styles/%s"></script>' % (folder, jsFile))
+  jsImportsExtra = "\n".join(jsImportsExtra)
 
   # Create the generic headers and footers
-  header = Ares.htmlLocalHeader(r"%s/static" % AresInstall.SERVER_PATH, CSS, JS)
   footer = Ares.htmlLocalFooter()
 
   res = {}
@@ -112,10 +86,7 @@ if __name__ == '__main__':
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")
     cssImports, jsImports, jsOnload, html, js = htmlReport.html()
-    htmlFile.write(header)
-    htmlFile.write("\n  <script>\n")
-    htmlFile.write(jsOnload)
-    htmlFile.write("\n  </script>\n</head>\n<body oncontextmenu='return false;' style='background-color: #EAEAEA'>\n<div id='wrapper'>\n<div class='container' id='html_content'>\n")
+    htmlFile.write(Ares.htmlLocalHeader("%s\n%s" % (cssImports, cssImportsExtra), "%s\n%s" % (jsImports, jsImportsExtra), jsOnload))
     htmlFile.write(html)
     htmlFile.write("\n<script>\n")
     htmlFile.write(js)

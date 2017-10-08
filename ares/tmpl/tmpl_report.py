@@ -31,6 +31,30 @@ def report(aresObj):
   Write your function below
   '''
 
+  # Example of DropDown selection
+  #   - parameter 1: the title to be displayed in the object
+  #   - parameter 2: the content of the dropdown (the items should be tuple (Name, hyperlink)
+  dropdown = aresObj.dropdown('Test', [('link 1', None),
+                                       ('Other', [('link 2', None),
+                                                 ('link 3', [('link 4', None)] )])
+                                                 ])
+  # To disable some links
+  dropdown.disable('link 1', None)
+  # Because the hyperlink are not defined a click has to be defined to define the action
+  dropdown.click(None)
+
+  # Example of a Radio select HTML object
+  #   - parameter 1: the key in the recordSet to be used to define the range of values
+  #   - parameter 2: the recordset (a list of dictionaries)
+  #   - parameter 3: the header definition of the recordset
+  radio = aresObj.radio('CCY', [{'CCY': 'EUR'}, {'CCY': 'HUF'}, {'CCY': 'USD'}],
+                        [{'key': 'PTF', 'colName': 'Portfolio'},
+                         {'key': 'CCY', 'colName': 'Currency'},
+                         {'key': 'VAL2', 'colName': 'Value 2'},
+                         {'key': 'VAL3', 'colName': 'Value 3'}])
+
+  radio.select('EUR')
+  radio.click(None)
 
 
 
