@@ -86,7 +86,7 @@ class NvD3Donut(AresHtmlContainer.Svg):
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     self.aresObj.jsGraphs.append(
-      self.jsUpdate(self.dfltCat, self.dfltVal)
+      self.jsUpdate()
     )
 
   def selections(self):
