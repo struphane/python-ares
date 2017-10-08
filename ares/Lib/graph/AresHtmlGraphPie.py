@@ -89,14 +89,14 @@ class NvD3Pie(AresHtmlContainer.Svg):
     if self.multiCat:
       categories = AresHtmlRadio.Radio(self.aresObj, self.multiCat)
       categories.select(self.selectedCat)
-      self.selectedCat = 'radio_val_%s' % categories.htmlId
+      self.selectedCat = categories.val
       categories.click([self])
       self.jsEvent['cat_%s' % self.htmlId] = categories.jsEvent['mouseup']
 
     if self.multiVal:
       values = AresHtmlRadio.Radio(self.aresObj, self.multiVal)
       values.select(self.selectedVal)
-      self.selectedVal = 'radio_val_%s' % values.htmlId
+      self.selectedVal = values.val
       values.click([self])
       self.jsEvent['val_%s' % self.htmlId] = values.jsEvent['mouseup']
 
