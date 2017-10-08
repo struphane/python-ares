@@ -53,7 +53,7 @@ class NvD3Donut(AresHtmlContainer.Svg):
         raise Exception("A selected category should be defined")
 
       self.selectedCat = "'%s'" % selected
-      self.multiCat = keys
+      self.multiCat = list(keys)
       self.dfltCat =  "'%s'" % selected
 
   def setVals(self, vals, selected=None):
@@ -67,11 +67,11 @@ class NvD3Donut(AresHtmlContainer.Svg):
         raise Exception("A selected value should be defined")
 
       self.selectedVal = "'%s'" % selected
-      self.multiVal = vals
+      self.multiVal = list(vals)
       self.dfltVal =  "'%s'" % selected
 
   def jsUpdate(self, dftCat=None, dflVal=None):
-    recFnc = self.dataFnc(dftCat, dflVal) if dftCat is not None else self.dataFnc(self.selectedCat, self.selectedVal)
+    recFnc = self.dataFnc(self.selectedCat, self.selectedVal)
     return '''
               var %s = nv.models.%s().%s ;
 

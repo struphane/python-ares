@@ -66,7 +66,7 @@ class NvD3Pie(AresHtmlContainer.Svg):
       self.dfltVal =  "'%s'" % selected
 
   def jsUpdate(self, dftCat=None, dflVal=None):
-    recFnc = self.dataFnc(dftCat, dflVal) if dftCat is not None else self.dataFnc(self.selectedCat, self.selectedVal)
+    recFnc = self.dataFnc(self.selectedCat, self.selectedVal)
     return '''
               var %s = nv.models.%s().%s ;
 
@@ -81,7 +81,7 @@ class NvD3Pie(AresHtmlContainer.Svg):
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     self.aresObj.jsGraphs.append(
-      self.jsUpdate(self.dfltCat, self.dfltVal)
+      self.jsUpdate()
     )
 
   def selections(self):
