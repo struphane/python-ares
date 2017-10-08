@@ -16,6 +16,22 @@
 	opacity: 1;
 }
 
+tr.details td:first-child {
+    color: black;
+    background-image: url("/static/images/grey-plus.png");
+    background-repeat: no-repeat;
+    background-position: left;
+    cursor: pointer ;
+}
+
+tr.nodetails td:first-child {
+    color: black;
+    background-image: url("/static/images/grey-minus.png");
+    background-repeat: no-repeat;
+    background-position: left;
+    cursor: pointer ;
+}
+
 .ares-panel-success {
     border: 1px solid #7bb062;
     border-radius: 7px;
