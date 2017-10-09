@@ -66,3 +66,13 @@ class SelectDropDown(AresHtml.Html):
     evenType = 'click'
     jsDef = "console.log($(this).text()) ;" #% self.htmlId
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef)
+
+  def onLoadFnc(self):
+    """ """
+    return '''
+              $('.dropdown-submenu a.drilldown').on("click", function(e){
+                $(this).next('ul').toggle();
+                e.stopPropagation();
+                e.preventDefault();
+              });
+           '''
