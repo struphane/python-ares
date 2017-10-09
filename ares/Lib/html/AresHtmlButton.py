@@ -176,6 +176,18 @@ class ButtonDownload(Button):
     return str(items)
 
 
+class ButtonDownloadEnv(ButtonDownload):
+  """ """
+  alias = 'dlEnvironment'
+  glyphicon = "suitcase"
+
+  def __str__(self):
+    """ """
+    items = AresItem.Item('<button type="button" %s>' % self.strAttr())
+    items.add(1, render_template_string('<a href="{{ url_for(\'ares.downloadReport\', report_name=\'%s\', file_name=\'%s\') }}" download />' % (self.reportName, self.vals)))
+    items.add(0, ' Get Environment</button>')
+    return str(items)
+
 class GeneratePdf(AresHtml.Html):
   alias = "generatePdf"
   glyphicon, cssCls = "book", ['btn', 'btn-default']
