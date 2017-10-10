@@ -45,7 +45,7 @@ if __name__ == '__main__':
   # Then creation of the dummy report environment
   if os.path.exists(dummyReportName):
     shutil.rmtree(dummyReportName)
-    
+
   os.makedirs(dummyReportName)
 
   # Create the folders
