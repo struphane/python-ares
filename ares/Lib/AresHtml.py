@@ -44,6 +44,7 @@ class SetEncoder(json.JSONEncoder):
 
      return json.JSONEncoder.default(self, obj)
 
+
 class Html(object):
   """
   Base class for any type of HTML object that the page can display
@@ -131,11 +132,11 @@ class Html(object):
     """ Add the Tooltip feature when the mouse is over the component """
     self.attr['title'] = value
 
-  def attr(self, name, value):
+  def addAttr(self, name, value):
     """ Set an attribute to the HTML object """
     if name == 'css':
       # Section for the Style attributes
-      if 'css' in self.attr:
+      if not 'css' in self.attr:
         self.attr['css'] = value
       else:
         self.attr['css'].update(value)

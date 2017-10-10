@@ -15,16 +15,21 @@ class Td(AresHtml.Html):
   """
 
   """
-  x_size = 1
-  h_size = 1
+  colspan = 1
+  rowspan = 1
 
-  def __init__(self, val, cssCls=None, cssAttr=None):
-    self.val = val
+  def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None):
+    super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.cssCls = [] if cssCls is None else cssCls
     self.cssAttr = [] if cssAttr is None else cssCls
+    self.tag = 'th' if isheader else 'td'
 
   def __str__(self):
-    return "<td %s>%s</td>" % (self.strAttr(), self.val)
+    if self.colspan > 1:
+      self.attr['colspan'] = self.colspan
+    if self.rowspan > 1:
+      self.attr['rowspan'] = self.rowspan
+    return '<%s %s>%s</%s>' % (self.tag, self.strAttr(withId=False), self.vals, self.tag)
 
 
 class Table(AresHtml.Html):
@@ -374,15 +379,41 @@ class SimpleTable(AresHtml.Html):
 
   """
   cssCls, alias = 'table', 'table'
-  reference = 'https://www.w3schools.com/html/html_tables.asp'
+  references = ['https://www.w3schools.com/html/html_tables.asp',
+                'https://www.w3schools.com/css/css_table.asp',
+                ]
+
   reqCss = ['bootstrap']
   reqJs = ['bootstrap']
+  dflt = ''
 
-  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
     """  """
-    super(Table, self).__init__(aresObj, vals, cssCls, cssAttr)
+    super(SimpleTable, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = headerBox
     self.header = header
+    if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
+      self.header = [header]
+    self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
+    for val in vals:
+      self.__data.append([Td(aresObj, val.get(self.recKey(header), self.dflt), cssCls=tdCssCls, cssAttr=tdCssAttr) for header in self.header[-1]])
+
+  def recKey(self, col):
+    """ Return the record Key taken into accounr th possible user options """
+    return col.get("key", col.get("colName"))
+
+  def getCell(self, row, col):
+    """ Returns the underlying cell object """
+    return self.__data[row][col]
 
   def __str__(self):
     """  """
+    html = []
+    html.append("<thead>")
+    html.append("<tr>%s</tr>" % "".join([str(td) for td in self.__data[0]]))
+    html.append("</thead>")
+    html.append("<tbody>")
+    for row in self.__data[1:]:
+      html.append("<tr>%s</tr>" % "".join([str(td) for td in row]))
+    html.append("</tbody>")
+    return "<table %s>%s</table>" % (self.strAttr(), "".join(html))
