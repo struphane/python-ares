@@ -142,7 +142,7 @@ class Html(object):
         self.attr['css'].update(value)
     elif name == 'class':
       # Section dedicated to manage the CSS classes
-      self.attr['css'].add(value)
+      self.attr['class'].add(value)
     else:
       # Section for all the other attributes
       self.attr[name] = value

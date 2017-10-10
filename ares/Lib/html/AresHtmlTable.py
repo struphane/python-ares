@@ -392,6 +392,7 @@ class SimpleTable(AresHtml.Html):
     super(SimpleTable, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = headerBox
     self.header = header
+    self.__rows_attr = {}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
@@ -406,10 +407,21 @@ class SimpleTable(AresHtml.Html):
     """ Returns the underlying cell object """
     return self.__data[row][col]
 
+  def addRowsAttr(self, name, value):
+    """ Set an attribute to the TR HTML object """
+    if name == 'css': # Section for the Style attributes
+      if not 'css' in self.attr:
+        self.__rows_attr['css'] = value
+      else:
+        self.__rows_attr['css'].update(value)
+    elif name == 'class': # Section dedicated to manage the CSS classes
+      self.__rows_attr['class'].add(value)
+    else: # Section for all the other attributes
+      self.__rows_attr[name] = value
+
   def __str__(self):
-    """  """
-    html = []
-    html.append("<thead>")
+    """  Returns the string representation of a HTML Table """
+    html = ["<thead>"]
     html.append("<tr>%s</tr>" % "".join([str(td) for td in self.__data[0]]))
     html.append("</thead>")
     html.append("<tbody>")
