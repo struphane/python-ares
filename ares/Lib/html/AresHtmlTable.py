@@ -396,6 +396,7 @@ class SimpleTable(AresHtml.Html):
   cssCls, alias = ['table'], 'table'
   references = ['https://www.w3schools.com/html/html_tables.asp',
                 'https://www.w3schools.com/css/css_table.asp',
+                'https://api.jquery.com/dblclick/'
                 ]
 
   reqCss = ['bootstrap']
