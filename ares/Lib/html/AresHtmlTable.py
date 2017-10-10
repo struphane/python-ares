@@ -392,7 +392,7 @@ class SimpleTable(AresHtml.Html):
     super(SimpleTable, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = headerBox
     self.header = header
-    self.__rows_attr = {}
+    self.__rows_attr = {'rows': {}}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
@@ -407,25 +407,47 @@ class SimpleTable(AresHtml.Html):
     """ Returns the underlying cell object """
     return self.__data[row][col]
 
-  def addRowsAttr(self, name, value):
+  def addRowsAttr(self, name, value, rowNum=None):
     """ Set an attribute to the TR HTML object """
+    if rowNum is None:
+      row = self.__rows_attr
+    else:
+      if not rowNum in self.__rows_attr['rows']:
+        self.__rows_attr['rows'][rowNum] = {}
+      row = self.__rows_attr['rows'][rowNum]
+
     if name == 'css': # Section for the Style attributes
-      if not 'css' in self.attr:
-        self.__rows_attr['css'] = value
+      if not 'css' in row:
+        row['css'] = value
       else:
-        self.__rows_attr['css'].update(value)
+        row['css'].update(value)
     elif name == 'class': # Section dedicated to manage the CSS classes
-      self.__rows_attr['class'].add(value)
+      row['class'].add(value)
     else: # Section for all the other attributes
-      self.__rows_attr[name] = value
+      row[name] = value
 
   def __str__(self):
     """  Returns the string representation of a HTML Table """
+    trAttr, trSpecialAttr = [], {}
+    if 'css' in self.__rows_attr:
+      trAttr.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.__rows_attr["css"].items()]))
+    if 'class' in self.__rows_attr:
+      trAttr.append('class="%s"' % " ".join(self.__rows_attr['class']))
+    strTrAttr = " ".join(trAttr)
+    for row in self.__rows_attr['rows']:
+      attr = self.__rows_attr['rows'][row]
+      trRes = []
+      if 'css' in attr:
+        trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
+      if 'class' in attr:
+        trRes.append('class="%s"' % " ".join(attr['class']))
+      trSpecialAttr[row] = " ".join(trRes)
+
     html = ["<thead>"]
-    html.append("<tr>%s</tr>" % "".join([str(td) for td in self.__data[0]]))
+    html.append("<tr %s>%s</tr>" % (trSpecialAttr[0] if 0 in trSpecialAttr else strTrAttr, "".join([str(td) for td in self.__data[0]])))
     html.append("</thead>")
     html.append("<tbody>")
-    for row in self.__data[1:]:
-      html.append("<tr>%s</tr>" % "".join([str(td) for td in row]))
+    for i, row in enumerate(self.__data[1:]):
+      html.append("<tr %s>%s</tr>" % (trSpecialAttr[i+1] if i+1 in trSpecialAttr else strTrAttr, "".join([str(td) for td in row])))
     html.append("</tbody>")
     return "<table %s>%s</table>" % (self.strAttr(), "".join(html))
