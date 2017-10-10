@@ -24,6 +24,15 @@ class SelectDropDown(AresHtml.Html):
   def addCategory(self, items, level, vals):
     """ Add recursively the sub categories """
     for value, hyperlink in vals:
+      if value is None:
+        # Special keywork to put a delimiter
+        # or a header if the hyperlink information is not None
+        if hyperlink is not None:
+          items.add(level, '<h6 class="dropdown-header">%s</h6>' % hyperlink)
+        else:
+          items.add(level, '<div class="dropdown-divider"></div>')
+        continue
+
       if isinstance(hyperlink, list):
         items.add(level, '<li class="dropdown-submenu"><a href="#" class="drilldown">%s<span class="caret"></span></a>' % value)
         items.add(level, '<ul class="dropdown-menu">')
