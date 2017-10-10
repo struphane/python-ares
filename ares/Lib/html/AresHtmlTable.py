@@ -11,6 +11,21 @@ from ares.Lib.html import AresHtmlContainer
 
 from flask import render_template_string
 
+class Td(AresHtml.Html):
+  """
+
+  """
+  x_size = 1
+  h_size = 1
+
+  def __init__(self, val, cssCls=None, cssAttr=None):
+    self.val = val
+    self.cssCls = [] if cssCls is None else cssCls
+    self.cssAttr = [] if cssAttr is None else cssCls
+
+  def __str__(self):
+    return "<td %s>%s</td>" % (self.strAttr(), self.val)
+
 
 class Table(AresHtml.Html):
   """
@@ -340,3 +355,34 @@ class Table(AresHtml.Html):
           }
       );
       ''' % (self.htmlId, self.htmlId, strItems))
+
+
+class DataTable(AresHtml.Html):
+  """
+
+  """
+  cssCls, alias = 'table', 'table'
+  reference = 'https://datatables.net/'
+  reqCss = ['dataTables']
+  reqJs = ['bootstrap', 'dataTables']
+
+  __context = {}
+
+
+class SimpleTable(AresHtml.Html):
+  """
+
+  """
+  cssCls, alias = 'table', 'table'
+  reference = 'https://www.w3schools.com/html/html_tables.asp'
+  reqCss = ['bootstrap']
+  reqJs = ['bootstrap']
+
+  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
+    """  """
+    super(Table, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.headerBox = headerBox
+    self.header = header
+
+  def __str__(self):
+    """  """

@@ -146,14 +146,17 @@ class Html(object):
       # Section for all the other attributes
       self.attr[name] = value
 
-  def strAttr(self):
+  def strAttr(self, withId=True):
     """ Return the string line with all the attributes """
     cssStyle, cssClass = '', ''
     if 'css' in self.attr:
       cssStyle = 'style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.attr["css"].items()])
     if 'class' in self.attr:
       cssClass = 'class="%s"' % self.getClass()
-    return 'id="%s" %s %s %s' % (self.htmlId, " ".join(['%s="%s"' % (key, val) for key, val in self.attr.items() if key not in ('css', 'class')]), cssStyle, cssClass)
+    if withId:
+      return 'id="%s" %s %s %s' % (self.htmlId, " ".join(['%s="%s"' % (key, val) for key, val in self.attr.items() if key not in ('css', 'class')]), cssStyle, cssClass)
+
+    return '%s %s %s' % (" ".join(['%s="%s"' % (key, val) for key, val in self.attr.items() if key not in ('css', 'class')]), cssStyle, cssClass)
 
   def __str__(self):
     """ Return the String representation of an Python HTML object """

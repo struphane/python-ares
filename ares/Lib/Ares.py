@@ -347,6 +347,7 @@ class Report(object):
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Table'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select(self, values, selected=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.supp(values), selected, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select_group(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
