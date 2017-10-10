@@ -7,6 +7,7 @@ import os
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
+from ares.Lib import AresJs
 from ares.Lib.html import AresHtmlContainer
 
 from flask import render_template_string
@@ -366,26 +367,40 @@ class DataTable(AresHtml.Html):
   """
 
   """
-  cssCls, alias = 'table', 'table'
+  cssCls, alias = ['table'], 'table'
   reference = 'https://datatables.net/'
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
 
-  __context = {}
+  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
+    super(Table, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.aresObj.jsGlobal[self.htmlId] = True # table has to be registered as a global variable in js
+    self.headerBox = headerBox
+    self.__context = {}
+    self.recordSetId = id(vals)
+    self.recordSetHeader, self.jsMenu = [], []
+    if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
+      self.header = [header]
+    else: # we have a header on several lines, nothing to do
+      self.header = header
+    for col in self.header[-1]:
+      if col.get("visible", True):
+        self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
+
 
 
 class SimpleTable(AresHtml.Html):
   """
 
   """
-  cssCls, alias = 'table', 'table'
+  cssCls, alias = ['table'], 'table'
   references = ['https://www.w3schools.com/html/html_tables.asp',
                 'https://www.w3schools.com/css/css_table.asp',
                 ]
 
   reqCss = ['bootstrap']
-  reqJs = ['bootstrap']
-  dflt = ''
+  reqJs = ['bootstrap', 'jquery']
+  dflt = None
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
     """  """
@@ -397,7 +412,12 @@ class SimpleTable(AresHtml.Html):
       self.header = [header]
     self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
     for val in vals:
-      self.__data.append([Td(aresObj, val.get(self.recKey(header), self.dflt), cssCls=tdCssCls, cssAttr=tdCssAttr) for header in self.header[-1]])
+      row = []
+      for header in self.header[-1]:
+        cellVal = val.get(self.recKey(header), self.dflt)
+        if cellVal is not None:
+          row.append(Td(aresObj, cellVal, cssCls=tdCssCls, cssAttr=tdCssAttr))
+      self.__data.append(row)
 
   def recKey(self, col):
     """ Return the record Key taken into accounr th possible user options """
@@ -451,3 +471,11 @@ class SimpleTable(AresHtml.Html):
       html.append("<tr %s>%s</tr>" % (trSpecialAttr[i+1] if i+1 in trSpecialAttr else strTrAttr, "".join([str(td) for td in row])))
     html.append("</tbody>")
     return "<table %s>%s</table>" % (self.strAttr(), "".join(html))
+
+  def cell_dblclick(self, jsFnc):
+    """ Add an event on the cells, $(this).html() will return the selected value """
+    self.jsEvent['dblclick_cell'] = AresJs.JQueryEvents(self.htmlId, "$('#%s td,th')" % self.htmlId, 'dblclick', jsFnc)
+
+  def row_dblclick(self, jsFnc):
+    """ Add an event on the cells, $(this).html() will return the selected value """
+    self.jsEvent['dblclick_row'] = AresJs.JQueryEvents(self.htmlId, "$('#%s tr')" % self.htmlId, 'dblclick', jsFnc)
