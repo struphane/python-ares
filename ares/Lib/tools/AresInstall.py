@@ -37,12 +37,15 @@ if __name__ == '__main__':
           inFile.close()
 
   #
-  for path in (['ares'], ['ares', 'Lib']):
+  for path in (['ares'], ['ares', 'Lib'], ['ares', 'Lib', 'html'], ['ares', 'Lib', 'graph']):
     strPath = os.path.join(*path)
     open(os.path.join(strPath, '__init__.py'), 'w').close()
 
   dummyReportName = 'NewReport'
   # Then creation of the dummy report environment
+  if os.path.exists(dummyReportName):
+    shutil.rmtree(dummyReportName)
+    
   os.makedirs(dummyReportName)
 
   # Create the folders
