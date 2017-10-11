@@ -399,7 +399,7 @@ class SimpleTable(AresHtml.Html):
                 'https://api.jquery.com/dblclick/'
                 ]
 
-  reqCss = ['bootstrap']
+  reqCss = ['bootstrap', 'jquery']
   reqJs = ['bootstrap', 'jquery']
   dflt = None
 
@@ -480,3 +480,27 @@ class SimpleTable(AresHtml.Html):
   def row_dblclick(self, jsFnc):
     """ Add an event on the cells, $(this).html() will return the selected value """
     self.jsEvent['dblclick_row'] = AresJs.JQueryEvents(self.htmlId, "$('#%s tr')" % self.htmlId, 'dblclick', jsFnc)
+
+  def update_cell(self):
+    """ Update a cell in the table """
+    jsFnc = '''
+                var html = '<div id="dialog" title="update value">' ;
+                html = html + '<div class="form-group">';
+                html = html + '<label for="formgroupexampleinput">example label</label>';
+                html = html + '<input id="temp_cell" type="text" class="form-control">';
+                html = html + '</div>';
+                html = html + '<button type="submit" id="temp_submit" class="btn btn-primary">submit</button>' ;
+                html = html + '</div>';
+
+                $('body').append(html) ;
+                $('#temp_cell').val($(event.target).html());
+                $("#dialog").dialog();
+
+                // Update the data to the table
+                $( "#temp_submit" ).on( "click", { item: $(event.target) }, function (event){
+                    event.data.item.html($('#temp_cell').val());
+                    $( "#dialog" ).remove();
+                });
+
+            '''
+    self.jsEvent['dblclick_row'] = AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc)
