@@ -18,7 +18,7 @@ def report(aresObj):
   aresObj.row([aresObj.img('tmpl_rpt.JPG'), aresObj.img("report_example.JPG")])
   aresObj.hr()
 
-  aresObj.title2("Rre-requisite to set up your environment")
+  aresObj.title2("Pre-requisite to set up your environment")
   aresObj.paragraph("Before reading the following part of this tutorial, please make sure that you have installed on your computer Python."
                     "AReS and the Lab are compatible with all the versions of Python and it does not require any further modules (except request) to run,"
                     " so please get a version of python using one of the following links {0}", htmlComp=[aresObj.externalLink('Python', "https://www.python.org/downloads/")])
@@ -33,7 +33,7 @@ def report(aresObj):
   div.addAttr('role', 'alert')
   aresObj.hr()
   aresObj.title2("Set up your environment")
-  aresObj.title4("Using the install")
+  aresObj.title4("Using the installation script")
   content1 = aresObj.paragraph("Using this method you only have to run using your python version the script."
                                "This script will run a query on the server and it will retrieve the full package."
                                "The version of the scripts using this REST service will guarantee a correct synchronisation "
