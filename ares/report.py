@@ -161,7 +161,7 @@ def run_report(report_name, script_name):
     envName = getattr(report, 'NAME', '')
     side_bar.append('<h5 style="color:white"><b>&nbsp;<i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Dashboard</b></h5>')
     for categories, links in getattr(report, 'SHORTCUTS', []):
-      side_bar.append('<h6 style="color:white"><b>&nbsp;&nbsp;&nbsp;<i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;%s</b></h6>' % categories)
+      side_bar.append('<h6 style="color:white"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></h6>' % categories)
       for name, scriptName in links:
         side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
     cssImport, jsImport, onload, content, js = reportObj.html()
