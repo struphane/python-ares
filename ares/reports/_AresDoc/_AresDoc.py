@@ -51,7 +51,7 @@ def report(aresObj):
                            "to extract information from them. Also it is possible to import natively C / C++ modules"
                            " from the platform. No need for extra development work, each team can implement the link to"
                            " this centralise system")
-  moreDetails = aresObj.href("Get more details", "_AresDocReport")
+  moreDetails = aresObj.externalLink("Get to Python website", "https://docs.python.org/3/c-api/index.html")
   title = aresObj.title4(" Benefit from the community of users", cssAttr={'font-weight': 'bold', 'text-align': 'center'})
   aresObj.row([aresObj.col([val1, title, moreDetails]), aresObj.img('link_components.JPG')])
 

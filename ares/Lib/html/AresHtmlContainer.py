@@ -493,7 +493,10 @@ class Row(AresHtml.Html):
       res.add(1, '<div class="%s">%s</div>' % (css, htmlObj))
       htmlObj.graph()
     res.add(0, '</div>')
-    return str(TextContainer(self.aresObj, str(res)))
+    if self.aresObj.withContainer:
+      return str(TextContainer(self.aresObj, str(res)))
+    
+    return str(res)
 
   def jsEvents(self, jsEventFnc=None):
     """ Function to get the Javascript methods for this object and all the underlying objects """

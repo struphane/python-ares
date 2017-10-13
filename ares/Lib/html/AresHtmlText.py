@@ -78,12 +78,14 @@ class Paragraph(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of a Code HTML tag """
-    item = AresItem.Item('<div class="container">')
+    item = AresItem.Item(None)
     if self.htmlComp is not None:
       self.vals = self.vals.format(*self.htmlComp)
     for val in self.vals.split("\n"):
       item.add(1, "<p class='text-justify'>%s</p>" % val.strip())
-    item.add(0, '</div>')
+    if self.aresObj.withContainer:
+      return str(AresHtmlContainer.TextContainer(self.aresObj, str(item)))
+
     return str(item)
 
   @classmethod
@@ -113,12 +115,16 @@ class Title(AresHtml.Html):
   css = {'color': '#398438', 'font-weight': 'normal'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
+
   def __str__(self):
     """ Return a header HTML Tag """
     items = AresItem.Item('<H%s class="page-header" %s>' % (self.dim, self.strAttr()))
     items.add(1, '<a class="anchorjs-link" style="color:inherit">%s</a>' % self.vals)
     items.add(0, '</H%s>' % self.dim)
-    return str(AresHtmlContainer.TextContainer(self.aresObj, str(items)))
+    if self.aresObj.withContainer:
+      return str(AresHtmlContainer.TextContainer(self.aresObj, str(items)))
+
+    return str(items)
 
   def onLoadFnc(self):
     """ Activate the Jquery Tooltips """

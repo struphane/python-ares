@@ -169,7 +169,7 @@ class Report(object):
 
   # This list should not be changed
   definedNotif = {'SUCCESS': 'SuccessAlert', 'INFO': 'InfoAlert', 'WARNING': 'WarningAlert', 'DANGER': 'DangerAlert'}
-  showNavMenu = False
+  showNavMenu, withContainer = False, False
 
   def __init__(self, prefix=''):
     """ Instanciate the Ares object """
@@ -184,6 +184,7 @@ class Report(object):
     self.interruptReport = (False, None)
     self.jsRegistered, self.jsGlobal, self.fileManager = {}, {}, {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
+
 
   def structure(self):
     return self.content
@@ -394,12 +395,12 @@ class Report(object):
   def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
   def anchor(self, value, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['A'](self, self.supp(value), attrs, cssCls, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def externalLink(self, value, url, cssCls=None, cssAttr=None): return self.add(aresFactory['ExternalLink'](self, self.supp(value), url, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def href(self, value, script, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Href'](self, self.supp(value), script, attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   def anchor_download(self, value, **kwargs): return self.add(aresFactory['Download'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_set_env(self, value, **kwargs): return self.add(aresFactory['CreateEnv'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def anchor_add_scripts(self, value, **kwargs): return self.add(aresFactory['AddScript'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def main(self, value, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def href(self, value, script, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Href'](self, self.supp(value), script, attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Designer objects
   def aresInput(self, cssCls=None, cssAttr=None): return self.add(aresFactory['TextInput'](self, 'Put your text here', cssCls, cssAttr), sys._getframe().f_code.co_name)
