@@ -40,18 +40,20 @@
             });
 
             //
-            $('button[name="ares_min"]').click(function () {
-                var idEvent = $(this).attr('id').replace("_min", "") ;
-                $('#' + idEvent).toggle() ;
-                if ($('#' + idEvent).is(":visible")) {
-                    $(this).html('<i class="fa fa-window-minimize" aria-hidden="true"></i>') ;
-                }
-                else {
-                    $(this).html('<i class="fa fa-window-maximize" aria-hidden="true"></i>') ;
-                }
-
+            $('img[name="ares_min"]').click(function () {
+                //var idEvent = $(this).attr('id').replace("_min", "") ;
+                //$('#' + idEvent).toggle() ;
+                //if ($('#' + idEvent).is(":visible")) {
+                //    $(this).html('<i class="fa fa-window-minimize" aria-hidden="true"></i>') ;
+                //}
+                //else {
+                //    $(this).html('<i class="fa fa-window-maximize" aria-hidden="true"></i>') ;
+                //}
+                 $("#wrapper").toggleClass("toggled");
             });
-            //$("#wrapper").toggleClass("toggled");
+            if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+                $("#wrapper").toggleClass("toggled");
+            }
         }) ;
 
     {{ onload|safe }}
