@@ -31,11 +31,11 @@ def report(aresObj):
   fragment = aresObj.img('js_fragment.JPG', cssAttr={'margin-left': '15%'})
   aresObj.row([aresObj.col([content1, content2, fragment]), aresObj.col([aresObj.img('html_part.JPG'), aresObj.img('js_part.JPG')])])
   aresObj.title4("Better reactivity and Shared Dashboards")
-  aresObj.paragraph("Dashboards can be downloaded, thus in case of input data change or important production issue"
+  content1 = aresObj.paragraph("Dashboards can be downloaded, thus in case of input data change or important production issue"
                               " it is possible to adapt the official version of the framework to produce the reports on"
                               " time. Those simple but efficient changes can then be submitted to the IT team to be added"
                               " to the live version")
-  aresObj.paragraph("Any new script and new reports will automatically create a url. Thus it will be easy to "
+  content2 = aresObj.paragraph("Any new script and new reports will automatically create a url. Thus it will be easy to "
                               "test new reports, a change in methodology and to ask for a sign off. Reports generated can be"
                               " displayed on tablet or smartphones.")
-  aresObj.row([aresObj.img('report_example.JPG')])
+  aresObj.row([aresObj.img('report_example.JPG', cssAttr={'margin-left': '10%'}), aresObj.col([content1, content2])])

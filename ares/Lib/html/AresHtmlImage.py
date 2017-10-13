@@ -24,7 +24,7 @@ class Image(AresHtml.Html):
 
   def __str__(self):
     """ Return the HTML representation of a Tabular object """
-    return render_template_string('<img src="{{ url_for(\'static\',filename=\'images/%s\') }}" class="img-responsive" %s> ' % (self.vals, self.strAttr()))
+    return render_template_string('<img src="{{ url_for(\'static\',filename=\'images/%s\') }}" %s> ' % (self.vals, self.strAttr()))
 
   @classmethod
   def aresExample(cls, aresObj):
