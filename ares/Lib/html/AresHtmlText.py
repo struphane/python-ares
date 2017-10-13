@@ -138,7 +138,7 @@ class Title(AresHtml.Html):
 class Title2(Title):
   """ Python Wrapper to the HTML H2 Tag """
   dim, alias = 2, 'title2'
-  css = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
+  css = {'color': '#398438', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   @classmethod
@@ -149,7 +149,7 @@ class Title2(Title):
 class Title3(Title):
   """ Python Wrapper to the HTML H3 Tag """
   dim, alias = 3, 'title3'
-  css = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
+  css = {'color': '#398438', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   @classmethod
@@ -160,7 +160,7 @@ class Title3(Title):
 class Title4(Title):
   """ Python Wrapper to the HTML H4 Tag """
   dim, alias = 4, 'title4'
-  css = {'color': '#398438', 'cursor': 'pointer', 'text-decoration': 'none'}
+  css = {'color': '#398438', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   @classmethod
