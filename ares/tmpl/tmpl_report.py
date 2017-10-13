@@ -30,7 +30,7 @@ def report(aresObj):
   '''
   Write your function below
   '''
-
+  aresObj.title("My report Title")
   # Example of DropDown selection
   #   - parameter 1: the title to be displayed in the object
   #   - parameter 2: the content of the dropdown (the items should be tuple (Name, hyperlink)
@@ -47,14 +47,11 @@ def report(aresObj):
   #   - parameter 1: the key in the recordSet to be used to define the range of values
   #   - parameter 2: the recordset (a list of dictionaries)
   #   - parameter 3: the header definition of the recordset
-  radio = aresObj.radio('CCY', [{'CCY': 'EUR'}, {'CCY': 'HUF'}, {'CCY': 'USD'}],
-                        [{'key': 'PTF', 'colName': 'Portfolio'},
-                         {'key': 'CCY', 'colName': 'Currency'},
-                         {'key': 'VAL2', 'colName': 'Value 2'},
-                         {'key': 'VAL3', 'colName': 'Value 3'}])
+  radio = aresObj.radio([{'CCY': 'EUR'}, {'CCY': 'HUF'}, {'CCY': 'USD'}], 'CCY',
+                        [{'key': 'CCY', 'colName': 'Currency'}])
 
   radio.select('EUR')
-  radio.click(None)
+  radio.jsFnc('alert(%s)' % radio.val)
 
 
 
