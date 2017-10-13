@@ -74,9 +74,16 @@ class Button(AresHtml.Html):
             ''' % (preAjax, url, data, jsDef, self.jqId, self.htmlId)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef, url=url)
 
-  def click(self, scriptName, jsDef, attr):
+  def click(self, jsDef, attr=None, scriptName=None):
     """ Implement the click event on the button object """
-    self.post('click', scriptName, jsDef, attr)
+    if scriptName is not None:
+      self.post('click', scriptName, jsDef, attr)
+    else:
+      self.jsEvent['click'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'click',jsDef)
+
+  def toJs(self, parent):
+    """ Returns the Javascript representation of this item """
+    return '%s.append("%s")' % (parent, self)
 
 
 class ButtonRefresh(AresHtml.Html):

@@ -387,7 +387,9 @@ class Report(object):
 
 
   # Anchor section): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def input(self, value='', cssCls=None): return self.add(aresFactory['Input'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def input(self, value='', cssCls=None): return self.add(aresFactory['InputText'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def inputInt(self, value='', cssCls=None): return self.add(aresFactory['InputInt'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def inputRange(self, value='', cssCls=None): return self.add(aresFactory['InputRange'](self, value, cssCls), sys._getframe().f_code.co_name)
 
   def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
   def anchor(self, value, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['A'](self, self.supp(value), attrs, cssCls, cssCls, cssAttr), sys._getframe().f_code.co_name)
