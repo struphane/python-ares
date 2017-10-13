@@ -472,6 +472,8 @@ class Row(AresHtml.Html):
       vals = [('col-6 col-md-4', htmlObj) for htmlObj in hltmObjs]
     elif len(hltmObjs) == 2:
       vals = [('col-xs-6', htmlObj) for htmlObj in hltmObjs]
+    else:
+      vals = [('', hltmObjs[0])]
     super(Row, self).__init__(aresObj, vals, cssCls, cssAttr)
 
   def extend(self, component):

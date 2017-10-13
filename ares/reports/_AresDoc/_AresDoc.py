@@ -29,9 +29,9 @@ def report(aresObj):
                     " thanks to this framework you will succeed in the below points !")
 
   aresObj.title3(" No need to learn a new language or no dependency on a module ")
-  val = aresObj.paragraph("Different simple components already wrapped in python to step in very quickly"
+  val = aresObj.paragraph("Different simple components already wrapped in python to step in very quickly."
                           " Framework compatible with both Python 2.7 and up. Modules documented and split to allow"
-                          " you or your IT team to change it for your business needs")
+                          " you or your IT teams to fully customize it for your business needs")
   moreDetails = aresObj.href("Get more details", "_AresDocPython")
   aresObj.row([aresObj.col([val, moreDetails]), aresObj.img('tmpl_rpt.JPG')])
 
