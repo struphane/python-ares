@@ -3,7 +3,6 @@
 
 """
 
-import this
 import collections
 import os
 
@@ -20,50 +19,39 @@ def report(aresObj):
   """
 
   """
-  aresObj.title("Report Documentation")
-  aresObj.title2("How to create a report")
+  aresObj.title("Python Lab Principal")
+  aresObj.paragraph("Within this Open Framework, we are trying to give to any users the ability to"
+                    " write small scripts and then to interact with the different modules available."
+                    " This environment will give to people the ability to write scripts in order"
+                    " to extract and tranform the data but also to visualise the data in a very"
+                    " integrated manner. Some extra components are available in this framework to "
+                    " help on embedding the extraction but also the web visualisation. Thus"
+                    " thanks to this framework you will succeed in the below points !")
 
-  aresObj.paragraph('''
-    In this section you can get a better explanation of the different features implemented in this framework.
-    Basically this will provide you with a web framework to let your users a complete flexibility.
+  aresObj.title3(" No need to learn a new language or no dependency on a module ")
+  val = aresObj.paragraph("Different simple components already wrapped in python to step in very quickly"
+                          " Framework compatible with both Python 2.7 and up. Modules documented and split to allow"
+                          " you or your IT team to change it for your business needs")
+  moreDetails = aresObj.href("Get more details", "_AresDocPython")
+  aresObj.row([aresObj.col([val, moreDetails]), aresObj.img('tmpl_rpt.JPG')])
 
-    People will be allowed to create and extend the system in a controlled manner by putting in place shared local
-    environments. Those environments will have a limited impact on the production and let you the ability to play with
-    data.
+  aresObj.title3(" Be more productive and be an actor in your system ")
+  val1 = aresObj.paragraph("Re use any D3 or bespoke charts to display your information in a dynamic manner"
+                           " transform the data using directly your local scripts. Propose a new collaborative way"
+                           " to produce team dashboards")
+  val2 = aresObj.paragraph(" Easy to add or change new Javascript and CSS components. Everything is dynamically"
+                           " managed by the python layer. All the components used are defined in the AresJsModules.py. "
+                           " Each reports and modules can be downloaded from the web interface and can then be run locally")
+  title = aresObj.title4(" Give an new dimension to your local simple scripts", cssAttr={'font-weight': 'bold', 'text-align': 'center'})
+  moreDetails = aresObj.href("Get more details", "_AresDocReport")
+  aresObj.row([aresObj.img('d3_components.JPG'), aresObj.col([val1, val2, title, moreDetails])])
 
-    The web framework will come with HTML and graph components that you can directly use from your report to get a better
-    a HTML 5 display of your results. This layer can be easily integrated with C++ and C solutions.
+  aresObj.title3(" Link all the components within your IT company ")
+  val1 = aresObj.paragraph("As today most of the legacy systems have REST API it is quite easy with python modules "
+                           "to extract information from them. Also it is possible to import natively C / C++ modules"
+                           " from the platform. No need for extra development work, each team can implement the link to"
+                           " this centralise system")
+  moreDetails = aresObj.href("Get more details", "_AresDocReport")
+  title = aresObj.title4(" Benefit from the community of users", cssAttr={'font-weight': 'bold', 'text-align': 'center'})
+  aresObj.row([aresObj.col([val1, title, moreDetails]), aresObj.img('link_components.JPG')])
 
-    The architecture of your local environments should be as followed:
-    {0}
-
-    This is the root path of your environments and it will contain your set of reports.
-    The main report will have the same name as your environment
-      {1}, please have a look at the template structure here: {2}
-      {3}
-
-        The python services that you can call in order to refresh components in your reports.
-        Those call will return python dictionaries with some mandatory keys like (status and data)
-
-      {4}
-
-        The .dat files used in your local environment
-
-      {5}
-
-        The folder to load you javascripts callbacks functions. By using this folder you can load javascript functions from
-        your python objects instead of writing them as string in the code. This is more dedicated for advanced users that
-        could expect to get those functions shared with other environments (and then pushed to the main jasvascript folder)
-
-    If you need more details about the python golden rules please have a look here: {6}.
-    If you need more information about all the components and how to build a report please refer to the left side bar
-    ''', htmlComp=[aresObj.code('/YouLocalEnv'),
-                   aresObj.code('YouLocalEnv.py'),
-                   aresObj.main('see templates', {'SCRIPT_NAME': 'AresDocTmpl'}, cssCls=''),
-                   aresObj.code('/ajax/'),
-                   aresObj.code('/data/'),
-                   aresObj.code('/js/'),
-                   aresObj.anchor('Golden rules  Good practises', cssCls=''),
-                   ])
-
-  aresObj.blockquote([this.s.decode('rot13').split("Peters")[1].strip().replace("\n", "<BR />"), 'Tim Peters'])

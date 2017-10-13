@@ -33,6 +33,23 @@ class Div(AresHtml.Html):
     return aresObj.div("MyDiv")
 
 
+class TextContainer(AresHtml.Html):
+  """ Python Wrapper for a simple DIV tag """
+  reference = 'https://www.w3schools.com/tags/tag_div.asp'
+  alias, cssCls = 'textContainer', ['container']
+  reqCss = ['bootstrap']
+  reqJs = ['jquery']
+
+  def __str__(self):
+    """ Return the HMTL object of for div """
+    return '<div %s>%s</div>' % (self.strAttr(), self.vals)
+
+  @property
+  def val(self):
+    """ Return the Javascript Value """
+    return '$("#%s").html()' % self.htmlId
+
+
 class IFrame(AresHtml.Html):
   """ Python Wrapper for an iFrame object"""
 
@@ -439,29 +456,6 @@ class Tabs(AresHtml.Html):
     return aresObj.tabs(["Tab1", "Tab2"])
 
 
-class Image(AresHtml.Html):
-  """
-  Python wrapper for a multi Tabs component
-
-  Default class parameters
-    - CSS Default Class = nav nav-tabs
-    - title = Home
-  """
-  alias =  'img'
-  cssCls = ['img-responsive']
-  reference = 'https://www.w3schools.com/bootstrap/bootstrap_ref_css_images.asp'
-  doubleDots = 1
-
-  def __str__(self):
-    """ Return the HTML representation of a Tabular object """
-    doubleDotsPath = "/".join([".." for i in range(self.doubleDots)])
-    return ' <img src="%s/static/images/%s" class="img-responsive" %s> ' % (doubleDotsPath, self.vals, self.strAttr())
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.img("../../../static/images/sample_img.jpg")
-
-
 class Row(AresHtml.Html):
   """
 
@@ -497,7 +491,7 @@ class Row(AresHtml.Html):
       res.add(1, '<div class="%s">%s</div>' % (css, htmlObj))
       htmlObj.graph()
     res.add(0, '</div>')
-    return str(res)
+    return str(TextContainer(self.aresObj, str(res)))
 
   def jsEvents(self, jsEventFnc=None):
     """ Function to get the Javascript methods for this object and all the underlying objects """

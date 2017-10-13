@@ -32,6 +32,7 @@ class ExternalLink(AresHtml.Html):
 
     return '<a href="%s" %s target="_blank">%s</a>' % (self.url, self.strAttr(), self.vals)
 
+
 class A(AresHtml.Html):
   """
   Class to link a script to another sub script in a report
@@ -113,3 +114,44 @@ class AddScript(A):
   reqCss = ['bootstrap']
   reqJs = ['jquery']
 
+
+class Href(AresHtml.Html):
+  """
+  Class to link a script to another sub script in a report
+  In this class no Javascript is used in the click event
+  """
+  alias, cssCls = 'anchor', ['btn', 'btn-success']
+  flask = 'ares.run_report'
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['jquery']
+
+  def __init__(self, aresObj, vals, script, attrs, cssCls, cssAttr):
+    super(Href, self).__init__(aresObj, vals,  cssCls, cssAttr)
+    self.getData = attrs if attrs is not None else {} # Special attributes to add to the URL
+    if not 'REPORT_NAME' in self.getData:
+      self.getData['REPORT_NAME'] = self.aresObj.http['REPORT_NAME']
+    self.getData['SCRIPT_NAME'] = script
+
+  def resolve(self):
+    """ Use Flak modules to translave the URL from the function name """
+    url = render_template_string('''{{ url_for(\'ares.run_report\', report_name=\'%(REPORT_NAME)s\', script_name=\'%(SCRIPT_NAME)s\') }}''' % self.getData)
+    return url
+
+  def __str__(self):
+    """ Return the String representation of a Anchor HTML object """
+    url = self.resolve()
+    if len(self.getData) < 3:
+      return '<a href="%s" %s>%s</a>' % (url, self.strAttr(), self.vals)
+
+    data = json.dumps(self.getData, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()')
+    jsDef = '''
+              %s.on("click", function (event){
+                var baseUrl = "%s";
+                if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + %s ; }
+                else { var ullUrl = baseUrl + "?" + %s ; }
+                window.location.href = ullUrl ;
+              }
+            ) ;
+            ''' % (url, data, self.jqId, self.htmlId)
+    self.jsEvent['click'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'click', jsDef, url=url)
+    return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)

@@ -8,7 +8,7 @@ import locale
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-
+from ares.Lib.html import AresHtmlContainer
 
 class Text(AresHtml.Html):
   """ Python Wrapper to the FONT HTNL Tag """
@@ -110,7 +110,7 @@ class BlockQuote(AresHtml.Html):
 class Title(AresHtml.Html):
   """ Python Wrapper to the HTML H1 Tag """
   dim, alias = 1, 'title'
-  css = {'color': '#398438', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
+  css = {'color': '#398438', 'font-weight': 'normal'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
 
   def __str__(self):
@@ -118,7 +118,7 @@ class Title(AresHtml.Html):
     items = AresItem.Item('<H%s class="page-header" %s>' % (self.dim, self.strAttr()))
     items.add(1, '<a class="anchorjs-link" style="color:inherit">%s</a>' % self.vals)
     items.add(0, '</H%s>' % self.dim)
-    return str(items)
+    return str(AresHtmlContainer.TextContainer(self.aresObj, str(items)))
 
   def onLoadFnc(self):
     """ Activate the Jquery Tooltips """
