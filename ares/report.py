@@ -153,6 +153,7 @@ def run_report(report_name, script_name):
     mod.report(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     if typeDownload in ['BOTH', 'SCRIPT']:
+      side_bar.append('<h5 style="color:white">&nbsp;<b><i class="fa fa-download" aria-hidden="true">&nbsp;</i>Download</b></h5>')
       side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadFiles\', report_name=\'%s\', script=\'%s.py\') }}" >Python script</a></li>' % (report_name, script_name)))
     if typeDownload == 'BOTH':
       side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadReport\', report_name=\'%s\') }}" >environment</a></li>' % report_name))
