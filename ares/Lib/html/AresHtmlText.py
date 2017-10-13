@@ -68,7 +68,7 @@ class Preformat(AresHtml.Html):
 
 class Paragraph(AresHtml.Html):
   """ Python Wrapper to the HTML P Tag """
-  reference = "https://www.w3schools.com/html/html_styles.asp"
+  references = ["https://www.w3schools.com/html/html_styles.asp"]
   alias = 'paragraph'
   htmlComp = None
 
@@ -114,11 +114,11 @@ class Title(AresHtml.Html):
   dim, alias = 1, 'title'
   css = {'color': '#398438', 'font-weight': 'normal'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
-
+  cssCls = ["display-3"]
 
   def __str__(self):
     """ Return a header HTML Tag """
-    items = AresItem.Item('<H%s class="page-header" %s>' % (self.dim, self.strAttr()))
+    items = AresItem.Item('<H%s %s>' % (self.dim, self.strAttr()))
     items.add(1, '<a class="anchorjs-link" style="color:inherit">%s</a>' % self.vals)
     items.add(0, '</H%s>' % self.dim)
     if self.aresObj.withContainer:
@@ -146,6 +146,7 @@ class Title2(Title):
   dim, alias = 2, 'title2'
   css = {'color': '#398438', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+  cssCls = []
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -157,6 +158,7 @@ class Title3(Title):
   dim, alias = 3, 'title3'
   css = {'color': '#398438', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+  cssCls = []
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -168,6 +170,7 @@ class Title4(Title):
   dim, alias = 4, 'title4'
   css = {'color': '#398438', 'text-decoration': 'none'}
   reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+  cssCls = []
 
   @classmethod
   def aresExample(cls, aresObj):
