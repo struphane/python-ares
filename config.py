@@ -10,4 +10,4 @@ ARES_USERS_DELETED_FOLDERS = 'user_deleted_reports'
 
 WORK_PATH = os.path.join('E:/', 'GitHub', 'scripts')
 
-COMPANY = "BNP Paribas"
+COMPANY = "your company"
