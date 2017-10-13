@@ -8,7 +8,7 @@ def report(aresObj):
   """
 
   """
-  aresObj.title("How to use ArES locally")
+  aresObj.title("How to use AReS locally")
   aresObj.title2("What is ArES?")
   aresObj.paragraph("AReS is a Automatic Reporting Suite in Python which will allow you easily to display data from different sources. "
                     "The Lab will allow you to extend the environment by implementing in a shared and controlled place new component and the "

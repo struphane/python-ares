@@ -11,7 +11,7 @@ class Hr(AresHtml.Html):
   cssCls, alias = ['table'], 'table'
   css = {'display': 'block', 'margin-top': '1.5em', 'margin-bottom': '2.5em',
          'margin-left': 'auto', 'margin-right': 'auto', 'border-style': 'inset',
-         'border-width': '1px', 'color': '#398438', 'box-shadow': '0 0 10px 1px black'}
+         'border-width': '1px', 'color': '#398438', 'box-shadow': '0 0 10px 1px #398438'}
 
   def __str__(self):
     return '<hr %s/>' % self.strAttr()
