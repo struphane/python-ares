@@ -152,8 +152,9 @@ class Html(object):
     cssStyle, cssClass = '', ''
     if 'css' in self.attr:
       cssStyle = 'style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.attr["css"].items()])
-    if 'class' in self.attr:
-      cssClass = 'class="%s"' % self.getClass()
+    classData = self.getClass()
+    if 'class' in self.attr and classData:
+      cssClass = 'class="%s"' % classData
     if withId:
       return 'id="%s" %s %s %s' % (self.htmlId, " ".join(['%s="%s"' % (key, val) for key, val in self.attr.items() if key not in ('css', 'class')]), cssStyle, cssClass)
 

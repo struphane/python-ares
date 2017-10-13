@@ -1,13 +1,25 @@
 #page-content-wrapper {
-    font-family: "Times New Roman", Times, serif;
+    font-family: Arial, sans-serif ;
     font-size: 2em;
-    font-style: normal;
-    font-weight: normal;
     background-color: white;
     color: #000;
     margin: 0;
     padding: 0;
 }
+
+a.top-slide {
+    background-color: #7bb062;
+    height: 48px;
+    margin-top: -3px;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+}
+
+a.top-slide:hover {
+    background-color: #225d32;
+}
+
 
 .dropdown-submenu {
     position: relative;
