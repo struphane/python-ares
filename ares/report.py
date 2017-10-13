@@ -63,6 +63,7 @@ def getHttpParams(request):
   # Special environment configuration
   httpParams['CONFIG'] = {}
   httpParams['CONFIG']['WRK'] = config.WORK_PATH
+  httpParams['CONFIG']['COMPANY'] = config.COMPANY
   return httpParams
 
 def getFileName(script, exts):

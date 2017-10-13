@@ -10,8 +10,8 @@ NAME = 'Reports Documentation'
 DOWNLOAD = None
 SHORTCUTS = [('Documentation', [
       ('Local Runs', 'AresDocLocalEnv'),
-      ('HTML Components', 'AresDocHtml'),
-      ('Graph Components', 'AresDocGraph'),
+      #('HTML Components', 'AresDocHtml'),
+      #('Graph Components', 'AresDocGraph'),
     ]
    )]
 

@@ -174,20 +174,6 @@ class Title4(Title):
     return aresObj.title4("Level 4 Title")
 
 
-class Newline(AresHtml.Html):
-  """ Python Wrapper to the HTML BR tag """
-  reference = 'https://www.w3schools.com/tags/tag_br.asp'
-  alias = 'newline'
-
-  def __str__(self):
-    """ Return the String representation of a new line tag """
-    return '<br />'
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.newline()
-
-
 class Line(AresHtml.Html):
   """ Python Wrapper to the HTML HR tag """
   reference = 'https://www.w3schools.com/tags/tag_hr.asp'

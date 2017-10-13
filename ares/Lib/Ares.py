@@ -302,11 +302,14 @@ class Report(object):
   def paragraph(self, value, cssCls=None, htmlComp=None, cssAttr=None): return self.add(aresFactory['Paragraph'](self, self.supp(value), cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def dropzone(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['DropZone'](self, value, cssCls), cssAttr, sys._getframe().f_code.co_name)
   def dropfile(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['DropFile'](self, value, cssCls), cssAttr, sys._getframe().f_code.co_name)
-  def newline(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Newline'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
   def line(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Line'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
   def icon(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Icon'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def number(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Numeric'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def wiki(self, dataSourceName, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Wiki'](self, dataSourceName, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
+
+  #
+  def newline(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Newline'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def hr(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Hr'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Select Section
   def dropdown(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectDropDown'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -344,7 +347,7 @@ class Report(object):
   def generatePdf(self, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['GeneratePdf'](self, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Containers section
-  def div(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def div(self, value, cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Table'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)

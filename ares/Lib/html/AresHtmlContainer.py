@@ -10,19 +10,26 @@ from ares.Lib import AresJs
 
 class Div(AresHtml.Html):
   """ Python Wrapper for a simple DIV tag """
-  reference = 'https://www.w3schools.com/tags/tag_div.asp'
+  references = ['https://www.w3schools.com/tags/tag_div.asp']
   alias = 'div'
   reqCss = ['bootstrap']
   reqJs = ['jquery']
 
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, htmlComp=None):
+    super(Div, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.htmlComp = htmlComp
+
   def __str__(self):
     """ Return the HMTL object of for div """
+    if self.htmlComp is not None:
+      self.vals = self.vals.format(*self.htmlComp)
     return '<div %s>%s</div>' % (self.strAttr(), self.vals)
 
   @property
   def val(self):
     """ Return the Javascript Value """
     return '$("#%s").html()' % self.htmlId
+
 
   def onLoadFnc(self):
     """ Activate the Jquery tooltips display """
