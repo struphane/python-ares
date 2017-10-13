@@ -8,8 +8,11 @@ import os
 
 NAME = 'Reports Documentation'
 DOWNLOAD = None
-SHORTCUTS = [('Documentation', [
-      ('Local Runs', 'AresDocLocalEnv'),
+SHORTCUTS = [('Local Runs', [
+      ('Pre-requisite', 'AresDocLocalPreRequisite'),
+      ('Set up', 'AresDocLocalSetUp'),
+      ('First Script', 'AresDocLocalFirstScript'),
+      ('Deployment', 'AresDocLocalEnv'),
       #('HTML Components', 'AresDocHtml'),
       #('Graph Components', 'AresDocGraph'),
     ]
