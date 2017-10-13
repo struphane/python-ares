@@ -495,7 +495,7 @@ class Row(AresHtml.Html):
     res.add(0, '</div>')
     if self.aresObj.withContainer:
       return str(TextContainer(self.aresObj, str(res)))
-    
+
     return str(res)
 
   def jsEvents(self, jsEventFnc=None):

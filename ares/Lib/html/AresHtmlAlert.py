@@ -23,11 +23,8 @@ class DangerAlert(AresHtml.Html):
 
   def __init__(self, aresObj, title, value, countNotif, closeButton=False, backgroundColor=None, cssCls=None, cssAttr=None):
     """ Instantiate the Danger notification box """
-    if cssCls:
-      self.cssCls = cssCls
     super(DangerAlert, self).__init__(aresObj, '', self.cssCls, cssAttr)
     self.title = title
-    self.val = value
     self.closeButton = closeButton
     self.countNotif = countNotif
     if backgroundColor:
@@ -40,7 +37,7 @@ class DangerAlert(AresHtml.Html):
       items.add(1, '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>')
     else:
       items = AresItem.Item('<div class="alert notif %s" style="top:%spx">' % (self.cssCls, self.countNotif * 10))
-    items.add(0, '<strong>%s!</strong> %s </div>' % (self.title, self.val))
+    items.add(0, '<strong>%s!</strong> %s </div>' % (self.title, self.vals))
     return str(items)
 
 
