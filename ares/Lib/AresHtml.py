@@ -34,6 +34,7 @@ def deprecated(func):
         return func(*args, **kwargs)
     return new_func
 
+
 class SetEncoder(json.JSONEncoder):
 
    def default(self, obj):
@@ -304,3 +305,76 @@ class NavBar(object):
     content.append(self.unstackTitles(self.titleAttr['content']))
     content.append(r'</div>')
     return '\n'.join(content)
+
+
+#------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------
+#
+#                      IN PROGRESS TO ADD THE NEW HTML5 FEATURES
+#------------------------------------------------------------------------------------------
+
+class WebStorage(object):
+  """ This module should manage local and also session storage
+  """
+
+
+class WebWorkers(object):
+  """ This module should create web workers for any javascript functions
+  """
+  references = ['https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers']
+
+  def __init__(self, aresObj, htmlObj, jsFile):
+    """ Define the script attached to the worker in the main module """
+    self.aresObj = aresObj
+    self.htmlId = "%s_%s" % (self.__class__.__name__.lower(), id(self))
+    if not 'htmlWorkers' in self.aresObj:
+      self.aresObj['htmlWorkers'] = {self.htmlId: jsFile}
+    else:
+      self.aresObj['htmlWorkers'][self.htmlId] = jsFile
+
+  def onmessage(self, jsFragment):
+    """ Define the javascript event for the worker """
+    return '''
+             .onmessage  = function(e) {
+                  %s ;
+              }
+           ''' % jsFragment
+
+  def terminate(self):
+    """  """
+    return ".terminate() ;"
+
+  def stop(self):
+    """ Returns the javascript function to stop the worker """
+    return ".close() ;"
+
+
+class WebSharedWorkers(object):
+  """ """
+  references = ['https://openclassrooms.com/courses/html5-web-workers-le-monde-parallele-du-javascript/les-shared-workers']
+
+
+class WebSeverSentEvent(object):
+  """ This module should manage the server sent notification
+
+  THis class will create an entry point to update en HTML object
+  automatically when the client will receive messages from the server.
+
+  Basically the client will register to receive events from a Source on the server
+  In Flask it will be a dedicated URL route and once receive it will run the
+  onmessage method on a particular HTML component
+  """
+  references = ['http://www.developerdrive.com/2012/03/pushing-updates-to-the-web-page-with-html5-server-sent-events/']
+
+  def __init__(self, aresObj, htmlObj, serverEntryPoint):
+    """ """
+    self.aresObj = aresObj
+    self.eventSource = serverEntryPoint
+
+  def onmessage(self, jsFragment):
+    """ Python wrapper to the javascript code to receive messages """
+    return '''
+             .onmessage  = function(e) {
+                  %s ;
+              }
+           ''' % jsFragment
