@@ -81,18 +81,24 @@ class List(AresHtml.Html):
     - CSS Default Class = list-group
   """
   cssCls = ['list-group']
-  references = ['https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp']
+  references = ['https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp',
+                'http://astronautweb.co/snippet/font-awesome/']
   alias = 'list'
 
   def __init__(self, aresObj, headerBox, vals, cssCls=None, cssAttr=None):
     super(List, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.cssClsLi = ["list-group-item"] if 'list-group' in self.attr['class'] else []
     self.headerBox = headerBox
 
   def __str__(self):
     """ Return the String representation of a HTML List """
     item = AresItem.Item('<ul %s>' % self.strAttr())
+    cssLi = ""
+    if self.cssClsLi:
+      cssLi = 'class="%s"' % " ".join(self.cssClsLi)
     for label in self.vals:
-      item.add(3, '<li class="list-group-item">%s</li>' % label)
+
+      item.add(3, '<li %s>%s</li>' % (cssLi, label))
     item.add(2, '</ul>')
     if self.headerBox is not None:
       return str(AresBox(self.htmlId, item, self.headerBox))
@@ -475,6 +481,8 @@ class Row(AresHtml.Html):
     if len(hltmObjs) > 3:
       raise Exception('Row object can only display maximum 3 components')
 
+    self.cssRow = {"text-align": "center", "width": "100%",
+                   'display': 'inline-block', "padding": "20%"}
     if len(hltmObjs) == 3:
       vals = [('col-6 col-md-4', htmlObj) for htmlObj in hltmObjs]
     elif len(hltmObjs) == 2:
@@ -497,7 +505,11 @@ class Row(AresHtml.Html):
     """ Return the HTML display of a split container"""
     res = AresItem.Item('<div %s>' % self.strAttr())
     for css, htmlObj in self.vals:
-      res.add(1, '<div class="%s">%s</div>' % (css, htmlObj))
+      if css == '':
+        strAttr = ";".join(["%s:%s" % (key, val) for key, val in self.cssRow.items()])
+        res.add(1, '<div style="%s">%s</div>' % (strAttr, htmlObj))
+      else:
+        res.add(1, '<div class="%s">%s</div>' % (css, htmlObj))
       htmlObj.graph()
     res.add(0, '</div>')
     if self.aresObj.withContainer:

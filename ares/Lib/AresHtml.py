@@ -73,8 +73,9 @@ class Html(object):
     self.aresObj = aresObj # The html object ID
     self.attr = {'class': set([])} if self.cssCls is None else {'class': set(self.cssCls)} # default HTML attributes
     if cssCls is not None:
-      for clsName in cssCls:
-        self.attr['class'].add(clsName)
+      # If the cssCls is defined it will replace the default one
+      # We do not want to extend the list of the class
+      self.attr['class'] = cssCls
     if self.css is not None:
       # we need to do a copy of the CSS style at this stage
       self.attr['css'] = dict(self.css)

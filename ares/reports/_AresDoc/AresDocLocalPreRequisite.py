@@ -28,7 +28,7 @@ def report(aresObj):
   aresObj.paragraph("If you are using Python 2.7, you will have to install the request module in order to be able to psuh scripts on"
                     " the server. If you need help to install packages, please follow this link {0}", htmlComp=[aresObj.externalLink('request', "https://pypi.python.org/pypi/requests/2.7.0")])
   div = aresObj.div("In {0} you might have to set the proxy, so if this is needed plese follow the tutorial here {1}",
-                          htmlComp=[aresObj.http['CONFIG']['COMPANY'], aresObj.externalLink('Proxy configuration', 'https://stackoverflow.com/questions/14149422/using-pip-behind-a-proxy')],
+                          htmlComp=[aresObj.http['CONFIG']['COMPANY'], aresObj.externalLink('Proxy configuration', 'https://stackoverflow.com/questions/14149422/using-pip-behind-a-proxy', cssAttr={'color': 'black'})],
                           cssCls=['alert alert-info'])
   div.addAttr('role', 'alert')
 
