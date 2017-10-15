@@ -1,6 +1,4 @@
-""" Report Comment
-
-
+""" Main Report for the AReS and the Lab documentation
 """
 
 import collections
@@ -12,16 +10,14 @@ SHORTCUTS = [('Local Runs', [
       ('Pre-requisite', 'AresDocLocalPreRequisite'),
       ('Set up', 'AresDocLocalSetUp'),
       ('First Script', 'AresDocLocalFirstScript'),
-      ('Deployment', 'AresDocDeploy'),
+      ('Deployment', 'AresDocLocalDeploy'),
       #('HTML Components', 'AresDocHtml'),
       #('Graph Components', 'AresDocGraph'),
     ]
    )]
 
 def report(aresObj):
-  """
-
-  """
+  """ Function to produce the first entry point of the Documentation framework """
   aresObj.title("Python Lab Principal")
   aresObj.paragraph("Within this Open Framework, we are trying to give to any users the ability to"
                     " write small scripts and then to interact with the different modules available."
@@ -30,14 +26,12 @@ def report(aresObj):
                     " integrated manner. Some extra components are available in this framework to "
                     " help on embedding the extraction but also the web visualisation. Thus"
                     " thanks to this framework you will succeed in the below points !")
-
   aresObj.title3(" No need to learn a new language or no dependency on a module ")
   val = aresObj.paragraph("Different simple components already wrapped in python to step in very quickly."
                           " Framework compatible with both Python 2.7 and up. Modules documented and split to allow"
                           " you or your IT teams to fully customize it for your business needs")
   moreDetails = aresObj.href("Get more details", "_AresDocPython")
   aresObj.row([aresObj.col([val, moreDetails]), aresObj.img('tmpl_rpt.JPG')])
-
   aresObj.title3(" Be more productive and be an actor in your system ")
   val1 = aresObj.paragraph("Re use any D3 or bespoke charts to display your information in a dynamic manner"
                            " transform the data using directly your local scripts. Propose a new collaborative way"

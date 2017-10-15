@@ -1,5 +1,4 @@
-"""
-
+""" This report will explain the purpose of AReS
 """
 
 DOWNLOAD = None

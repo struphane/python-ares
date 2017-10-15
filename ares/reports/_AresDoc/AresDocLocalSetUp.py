@@ -1,13 +1,11 @@
-"""
+""" This report will only detail the way to set up a python environment to work with the Lab
 """
 
 NAME = 'Local Run'
 DOWNLOAD = None
 
 def report(aresObj):
-  """
-
-  """
+  """ Report for the local environment set up """
   aresObj.title("Set up your environment")
   aresObj.title2("Using the installation script")
   content1 = aresObj.paragraph("Using this method you only have to run using your python version the script."
@@ -25,7 +23,6 @@ def report(aresObj):
                aresObj.col([aresObj.img("install_script.JPG"),
                             aresObj.newline(),
                             aresObj.img("install_result.JPG")])])
-
   aresObj.title2("Manual configuration")
   content1 = aresObj.paragraph("The Framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment "
                               "but it will allow you also to deploy your scripts easily on the server. The only thing required is to click on the Download AReS link "
