@@ -184,7 +184,7 @@ class Report(object):
     self.interruptReport = (False, None)
     self.jsRegistered, self.jsGlobal, self.fileManager = {}, {}, {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
-
+    self.jsLocalImports, self.cssLocalImports = set(), set()
 
   def structure(self):
     return self.content
@@ -511,8 +511,13 @@ class Report(object):
     fileDate = time.strftime("%Y-%m-%d %I:%M:%S %p", time.localtime(os.path.getmtime(filePath)))
     return {'SIZE': fileSize, 'LAST_MOD_DT': fileDate}
 
+  def addCss(self, fileName):
+    """ Add a CSS file to the header section """
+    self.cssLocalImports.add("%s/css/%s" % (self.http['REPORT_NAME'], fileName))
 
-
+  def addJs(self, fileName):
+    """ Add a Js File to the header section """
+    self.jsLocalImports.add("%s/js/%s" % (self.http['REPORT_NAME'], fileName))
 
   def html(self):
     """
@@ -539,6 +544,6 @@ class Report(object):
     importMng = AresJsModules.ImportManager()
     if self.jsGraphs:
       jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
-    cssImports = importMng.cssResolve(self.cssImport)
-    jsImports = importMng.jsResolve(self.jsImports)
+    cssImports = importMng.cssResolve(self.cssImport, self.cssLocalImports)
+    jsImports = importMng.jsResolve(self.jsImports, self.jsLocalImports)
     return cssImports, jsImports, "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)

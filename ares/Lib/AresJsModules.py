@@ -115,6 +115,7 @@ class OrderedSet(collections.MutableSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
 
+
 class ImportManager(object):
   """
   """
@@ -161,22 +162,26 @@ class ImportManager(object):
           importResolve.pop(j)
     return importResolve[::-1]
 
-  def cssResolve(self, cssAliases):
+  def cssResolve(self, cssAliases, localCss=None):
     """ Return the list of CSS modules to add to the header """
     cssList = []
     cssAliases = self.cleanImports(cssAliases, CSS_IMPORTS)
     for cssAlias in cssAliases:
       for urlModule in list(self.cssImports[cssAlias]['main']):
         cssList.append('<link rel="stylesheet" href="%s" type="text/css">' % urlModule)
+    for localCssFile in localCss:
+      cssList.append('<link rel="stylesheet" href="{{ url_for(\'static\',filename=\'user/%s\') }}" type="text/css">' % localCssFile)
     return render_template_string("\n".join(cssList))
 
-  def jsResolve(self, jsAliases):
+  def jsResolve(self, jsAliases, localJs=None):
     """ Return the list of Javascript modules to add to the header """
     jsList = []
     jsAliases = self.cleanImports(jsAliases, JS_IMPORTS)
     for jsAlias in jsAliases:
       for urlModule in list(self.jsImports[jsAlias]['main']):
         jsList.append('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
+    for localJsFile in localJs:
+      jsList.append('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\',filename=\'user/%s\') }"></script>' % localJsFile)
     return render_template_string("\n".join(jsList))
 
   def cssGetAll(self):
