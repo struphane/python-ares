@@ -36,6 +36,7 @@ class Button(AresHtml.Html):
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
   css = {'margin-bottom': '20p', 'margin-top': '-10p'}
+  disable = False
 
   def __init__(self, aresObj, vals, cssCls, cssAttr, awsIcon):
     """  Instantiate the object and store the icon """
@@ -44,10 +45,11 @@ class Button(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of HTML button """
+    disFlag = "disabled" if self.disable else ''
     if self.awsIcon is not None:
-      return '<button type="button" %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), self.awsIcon, self.vals)
+      return '<button type="button" %s %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), disFlag, self.awsIcon, self.vals)
 
-    return '<button %s>%s</button>' % (self.strAttr(), self.vals)
+    return '<button %s %s>%s</button>' % (self.strAttr(), disFlag, self.vals)
 
   @classmethod
   def aresExample(cls, aresObj):

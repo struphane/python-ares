@@ -12,7 +12,8 @@ JS_IMPORTS = {
   # Javascript packages to handle DataTables
   'dataTables': {'req': ['jquery', 'bootstrap'],
                  'modules': ['jquery.dataTables.min.js', 'dataTables.buttons.min.js',
-                             'dataTables.responsive.min.js', 'buttons.colVis.min.js']},
+                             'dataTables.responsive.min.js', 'buttons.colVis.min.js',
+                             'dataTables.fixedColumns.min.js']},
 
   # Jquery package
   'jquery': {'modules': ['jquery-3.2.1.min.js', 'jquery-ui.min.js']},
@@ -41,7 +42,8 @@ JS_IMPORTS = {
 CSS_IMPORTS = {
   'jquery': {'modules': ['jquery-ui.css']},
 
-  'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css', 'buttons.dataTables.min.css']},
+  'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css',
+                                                   'buttons.dataTables.min.css']},
 
   'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css', 'metro-bootstrap.min.css']},
 
