@@ -88,7 +88,6 @@ def noCache(f):
     resp = make_response(f(*args, **kwargs))
     resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     resp.headers['Pragma'] = 'no-cache'
-    return resp
   return respFunc
 
 
@@ -569,7 +568,7 @@ def downloadAres():
           # Install cannot be copied and it is available in the SVN repository directly
           continue
 
-        if pyFile not in ['AresDeploy.py', 'AresLocalRuns.py']:
+        if pyFile not in ['AresDeploy.py', 'AresLocalRuns.py', 'AresServiceRun.py']:
           zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares', paths, pyFile))
         else:
           zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
