@@ -10,6 +10,7 @@ SHORTCUTS = [('Local Runs', [
       ('Pre-requisite', 'AresDocLocalPreRequisite'),
       ('Set up', 'AresDocLocalSetUp'),
       ('First Script', 'AresDocLocalFirstScript'),
+      ('First Ajax/Service', 'AresDocLocalService'),
       ('Deployment', 'AresDocLocalDeploy'),
       #('HTML Components', 'AresDocHtml'),
       #('Graph Components', 'AresDocGraph'),
