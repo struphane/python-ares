@@ -2,8 +2,6 @@
 
 """
 
-from click import echo
-
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 
@@ -57,6 +55,27 @@ class Modal(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.modal("My modal")
+
+class DialogValid(AresHtml.Html):
+  """
+
+  """
+  reqCss = ['bootstrap', 'font-awesome', 'jquery']
+  reqJs = ['bootstrap', 'jquery']
+  references = ['https://jqueryui.com/dialog/']
+
+  def __init__(self, aresObj, vals, title, cssCls=None, cssAttr=None):
+    """ Instantiate the Dialog popup object """
+    super(DialogValid, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.title = title
+
+  def append(self, item):
+    """ """
+
+  def __str__(self):
+    """ Return the HTML String representation of a Jquery Dialog popup """
+    return '<div %s title=\'%s\'>%s</div>' % (self.title, self.content)
+
+  def toJs(self, parent):
+    """ Convert to a Js expression """
+    return ".append('%s')" % (parent, self)
