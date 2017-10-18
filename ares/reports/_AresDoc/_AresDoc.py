@@ -38,7 +38,7 @@ def report(aresObj):
                            " transform the data using directly your local scripts. Propose a new collaborative way"
                            " to produce team dashboards")
   val2 = aresObj.paragraph(" Easy to add or change new Javascript and CSS components. Everything is dynamically"
-                           " managed by the python layer. All the components used are defined in the AresJsModules.py. "
+                           " managed by the python layer. All the components used are defined in the AresImports.py. "
                            " Each reports and modules can be downloaded from the web interface and can then be run locally")
   title = aresObj.title4(" Give an new dimension to your local simple scripts", cssAttr={'font-weight': 'bold', 'text-align': 'center'})
   moreDetails = aresObj.href("Get more details", "_AresDocReport")

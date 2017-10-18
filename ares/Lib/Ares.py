@@ -29,7 +29,7 @@ import collections
 import json
 
 from importlib import import_module
-from ares.Lib import AresJsModules
+from ares.Lib import AresImports
 
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
@@ -548,7 +548,7 @@ class Report(object):
     for jsFnc in self.jsFnc:
       onloadParts.append(str(jsFnc))
 
-    importMng = AresJsModules.ImportManager()
+    importMng = AresImports.ImportManager()
     #if self.jsGraphs:
     #  jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
     cssImports = importMng.cssResolve(self.cssImport, self.cssLocalImports)

@@ -24,7 +24,7 @@ import config
 # Ares Framework
 from ares.Lib import Ares
 from ares.Lib import AresLog
-from ares.Lib import AresJsModules
+from ares.Lib import AresImports
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -245,7 +245,7 @@ def savedHtmlReport(report_name, html_report):
       if line.upper().startswith('<BODY'):
         contentReport = True
         html_report.append(line)
-  importManager = AresJsModules.ImportManager()
+  importManager = AresImports.ImportManager()
   cssPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name, 'css')
   cssImports = [importManager.cssGetAll()]
   if os.path.exists(cssPath):
