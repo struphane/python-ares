@@ -170,7 +170,7 @@ class ImportManager(object):
       for urlModule in list(self.cssImports[cssAlias]['main']):
         cssList.append('<link rel="stylesheet" href="%s" type="text/css">' % urlModule)
     for localCssFile in localCss:
-      cssList.append('<link rel="stylesheet" href="{{ url_for(\'static\',filename=\'user/%s\') }}" type="text/css">' % localCssFile)
+      cssList.append('<link rel="stylesheet" href="{{ url_for(\'static\',filename=\'users/%s\') }}" type="text/css">' % localCssFile)
     return render_template_string("\n".join(cssList))
 
   def jsResolve(self, jsAliases, localJs=None):
@@ -181,7 +181,7 @@ class ImportManager(object):
       for urlModule in list(self.jsImports[jsAlias]['main']):
         jsList.append('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
     for localJsFile in localJs:
-      jsList.append('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\',filename=\'user/%s\') }"></script>' % localJsFile)
+      jsList.append('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\',filename=\'users/%s\') }}"></script>' % localJsFile)
     return render_template_string("\n".join(jsList))
 
   def cssGetAll(self):

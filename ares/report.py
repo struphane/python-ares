@@ -88,6 +88,8 @@ def noCache(f):
     resp = make_response(f(*args, **kwargs))
     resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     resp.headers['Pragma'] = 'no-cache'
+    return resp
+
   return respFunc
 
 
@@ -351,7 +353,7 @@ def uploadFiles(report_type, report_name):
         if path is None:
           fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file.filename)
         elif path is 'styles':
-          userFullPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'user', report_name)
+          userFullPath = os.path.join(current_app.config['ROOT_PATH'], 'static', 'users', report_name)
           if not os.path.exists(userFullPath):
             os.makedirs(userFullPath)
           fullPath = os.path.join(userFullPath, file.filename.lower().split('.')[-1])
@@ -564,11 +566,7 @@ def downloadAres():
         if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
-        if pyFile == 'AresInstall.py':
-          # Install cannot be copied and it is available in the SVN repository directly
-          continue
-
-        if pyFile not in ['AresDeploy.py', 'AresLocalRuns.py', 'AresServiceRun.py']:
+        if pyFile not in ['AresDeploy.py', 'AresLocalRuns.py', 'AresServiceRun.py', 'AresInstall.py']:
           zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares', paths, pyFile))
         else:
           zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
