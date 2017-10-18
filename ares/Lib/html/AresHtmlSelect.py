@@ -4,7 +4,7 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresJs
+
 
 class SelectDropDown(AresHtml.Html):
   """
@@ -72,9 +72,7 @@ class SelectDropDown(AresHtml.Html):
 
   def click(self, htmlObject):
     """ Change the component to use javascript functions """
-    evenType = 'click'
-    jsDef = "console.log($(this).text()) ;" #% self.htmlId
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef)
+    self.js('click', "console.log($(this).text()) ;") # % self.htmlId
 
   def onLoadFnc(self):
     """ """

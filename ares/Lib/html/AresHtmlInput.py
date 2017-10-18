@@ -5,7 +5,6 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresJs
 
 
 class InputText(AresHtml.Html):
@@ -21,11 +20,11 @@ class InputText(AresHtml.Html):
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap']
   inputType = "text"
-  css = {'width': '100%', 'height': '32px'}
+  __css = {'width': '100%', 'height': '32px'}
 
   def autocomplete(self, values):
     """ Fill the auto completion box with a data source """
-    self.jsEvent['autocomplete'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'autocomplete', 'source: %s' % values)
+    self.js('autocomplete', 'source: %s' % values)
 
   def addVal(self, dflt):
     """ Add a default value to this object """
@@ -44,10 +43,6 @@ class InputText(AresHtml.Html):
     item.add(2, '<input %s>' %  self.strAttr())
     item.add(0, '</div>')
     return str(item)
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.input("Input text...")
 
 
 class InputInt(InputText):
@@ -86,12 +81,10 @@ class DatePicker(AresHtml.Html):
     """ Return the String representation of a Date picker object """
     if '-' in self.dflt:
       return '<p><strong>%s: </strong><input type="text" %s value="%s"></p>' % (self.vals, self.strAttr(), self.dflt)
+
     return '<p><strong>%s: </strong><input type="text" style="width:100%%;height:32px" %s></p>' % (self.vals, self.strAttr())
 
   def onLoadFnc(self):
     """ Start the Date picker transformation when the document is loaded """
     return AresItem.Item.indents(2, "$( function() {%s.datepicker({dateFormat: 'yy-mm-dd'} ); } );" % self.jqId)
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.date()

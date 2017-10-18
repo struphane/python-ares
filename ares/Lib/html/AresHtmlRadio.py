@@ -4,7 +4,7 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresJs
+
 
 class Radio(AresHtml.Html):
   """
@@ -57,11 +57,6 @@ class Radio(AresHtml.Html):
     """
     return "$('label[name=%s]')" % self.htmlId
 
-  #@property
-  #def val(self):
-  #  """ Property to get the jquery value of the HTML objec in a python HTML object """
-  #  return 'getSelectRadio(event, %s)' % self.jqId
-
   @property
   def val(self):
     """ Property to get the jquery value of the HTML objec in a python HTML object """
@@ -69,9 +64,7 @@ class Radio(AresHtml.Html):
 
   def jsFnc(self, js):
     """ Pure Javascript method to update other components in the page """
-    evenType = 'mouseup'
-    jsDef = "radio_val_%s = $(event.currentTarget).text().trim(); %s" % (self.htmlId, js)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
+    self.js('mouseup', "radio_val_%s = $(event.currentTarget).text().trim(); %s" % (self.htmlId, js))
 
   def click(self, htmlObjects):
     """ Pure Javascript method to update other components in the page """
@@ -79,4 +72,4 @@ class Radio(AresHtml.Html):
     jsDef = ["radio_val_%s = $(event.currentTarget).text().trim();" % self.htmlId]
     for htmlObject in htmlObjects:
       jsDef.append(htmlObject.jsUpdate())
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, "\n".join(jsDef))
+    self.js(evenType, "\n".join(jsDef))

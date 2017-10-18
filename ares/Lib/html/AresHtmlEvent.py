@@ -1,8 +1,6 @@
+""" HTML Module from some HTML object attached to bespoke events
+
 """
-
-
-"""
-
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -85,10 +83,6 @@ class TextArea(AresHtml.Html):
     """ Update the textarea value - set the value of the textarea object """
     return '$("#%s").html(%s)' % (self.htmlId, val)
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.textArea("Enter text...")
-
 
 class DropDown(AresHtml.Html):
   """
@@ -127,10 +121,6 @@ class DropDown(AresHtml.Html):
   def jqId(self):
     """ Return the javascript reference to the dropdown li item """
     return '$("#%s .dropdown-menu li")' % self.htmlId
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.dropdown([["Super", ("A", "a"), ("B", "b")]])
 
 
 class Select(AresHtml.Html):
@@ -172,10 +162,6 @@ class Select(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.select([('Node', ['GBC', 'BNPPAR'])])
-
 
 class SelectWithGroup(AresHtml.Html):
   """
@@ -208,10 +194,6 @@ class SelectWithGroup(AresHtml.Html):
     item.add(0, '</select>')
     return str(item)
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.select([('Node', ['GBC', 'BNPPAR'])])
-
 
 class Slider(AresHtml.Html):
   """
@@ -236,10 +218,6 @@ class Slider(AresHtml.Html):
   def onloadFnc(self):
     """ Use the Jquery UI property to change the DIV in slider object """
     return AresItem.Item.indents(2, '%s.slider();' % self.jqId)
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.slider(100)
 
 
 class DropZone(AresHtml.Html):
@@ -286,10 +264,6 @@ class DropZone(AresHtml.Html):
               e.preventDefault();
             }
            """
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.dropzone("MyFiles")
 
 
 class DropFile(AresHtml.Html):
@@ -351,10 +325,6 @@ class DropFile(AresHtml.Html):
     items.add(0, "</div>")
     return str(items)
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.dropfile("MyFile")
-
 
 class UploadFile(AresHtml.Html):
   """
@@ -388,7 +358,7 @@ class UploadFile(AresHtml.Html):
     if evenType == 'change':
       # .replace(/\\/g, "/").replace(/.*\//, "")
       jsDef = 'var input = %s; $("#value_%s").text(%s).append(input); %s' % (self.jqId, self.htmlId,  self.val, jsDef)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
+    super(UploadFile, self).js(evenType, jsDef)
 
   def jsEvents(self, jsEventFnc=None):
     if not self.jsEvent:
@@ -419,11 +389,8 @@ class UploadFile(AresHtml.Html):
         %s
         $.ajax({url: "%s", method: "POST", data: form_data, contentType: false, cache: false, processData: false, async: false}).done(function(data) {%s location.reload(); } );
                 ''' % (self.htmlId, dstFolder, preAjaxJs, url, jsDef)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, jsRef, evenType, jsDef, data=data, url=url)
+    self.aresObj.jsOnLoadFnc.add(AresJs.JQueryEvents(self.htmlId, jsRef, evenType, jsDef, data=data, url=url))
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.upload("MyFile")
 
 
 

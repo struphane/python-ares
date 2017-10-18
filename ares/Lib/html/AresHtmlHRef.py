@@ -15,13 +15,12 @@ from flask import render_template_string
 
 
 class ExternalLink(AresHtml.Html):
-  """
-  """
+  """ To display a reference to an external website """
   alias, cssCls = 'externalLink', None
   references = ['https://www.w3schools.com/TagS/att_a_href.asp']
 
   def __init__(self, aresObj, vals, url, cssCls, cssAttr):
-    """ """
+    """ The URL has to be mentioned """
     super(ExternalLink, self).__init__(aresObj, vals,  cssCls, cssAttr)
     self.url = url
 
@@ -72,7 +71,7 @@ class A(AresHtml.Html):
               }
             ) ;
             ''' % (url, data, self.jqId, self.htmlId)
-    self.jsEvent['click'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'click', jsDef, url=url)
+    self.js('click', jsDef, url=url)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
 
 
@@ -153,5 +152,5 @@ class Href(AresHtml.Html):
               }
             ) ;
             ''' % (url, data, self.jqId, self.htmlId)
-    self.jsEvent['click'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'click', jsDef, url=url)
+    self.js('click', jsDef, url=url)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)

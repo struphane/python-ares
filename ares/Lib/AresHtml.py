@@ -63,7 +63,7 @@ class Html(object):
 
   """
   alias, jsEvent = None, None
-  cssCls, css, reference = None, None, None
+  cssCls, __css, reference = None, None, None
   incIndent = 0
   reqJs, reqCss = None, None
   references = []
@@ -76,11 +76,11 @@ class Html(object):
       # If the cssCls is defined it will replace the default one
       # We do not want to extend the list of the class
       self.attr['class'] = cssCls
-    if self.css is not None:
+    if self.__css is not None:
       # we need to do a copy of the CSS style at this stage
-      self.attr['css'] = dict(self.css)
+      self.attr['css'] = dict(self.__css)
     if cssAttr is not None:
-      if self.css is None:
+      if self.__css is None:
         self.attr['css'] = cssAttr
       else:
         self.attr['css'].update(cssAttr)
@@ -166,9 +166,9 @@ class Html(object):
     """ Return the String representation of an Python HTML object """
     raise NotImplementedError('subclasses must override __str__()!')
 
-  def js(self, evenType, jsDef):
+  def js(self, evenType, jsDef, url=None):
     """ Add a Javascript Event to an HTML object """
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef)
+    self.aresObj.jsOnLoadFnc.add(AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, url=url))
 
   def jsFromFile(self, evenType, fileName, variables=None):
     """ Add a Javascript even by loading a file """

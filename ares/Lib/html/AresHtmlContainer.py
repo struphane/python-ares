@@ -59,10 +59,9 @@ class TextContainer(AresHtml.Html):
 
 class IFrame(AresHtml.Html):
   """ Python Wrapper for an iFrame object"""
-
-  reference = 'https://www.w3schools.com/TAgs/tag_iframe.asp'
+  references = ['https://www.w3schools.com/TAgs/tag_iframe.asp']
   alias = 'iframe'
-  css = {'width': '1000px', 'height': '700px', 'margin': 'auto 0', 'display': 'block'}
+  __css = {'width': '1000px', 'height': '700px', 'margin': 'auto 0', 'display': 'block'}
 
   def __str__(self):
     """ Return an iFrame Tag """
@@ -125,9 +124,8 @@ class ListBadge(AresHtml.Html):
   Default class parameters
     - CSS Default Class = list-group
   """
-  cssCls = 'list-group'
-  reference = 'https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp'
-  alias = 'listbadge'
+  cssCls, alias = 'list-group', 'listbadge'
+  references = ['https://www.w3schools.com/bootstrap/bootstrap_list_groups.asp']
 
   def __str__(self):
     """ Return the String representation of a HTML List """
@@ -150,7 +148,7 @@ class Container(Div):
     - CSS Default Class = container
   """
   cssCls, alias = ['container-fluid'], 'container'
-  reference = 'https://getbootstrap.com/docs/3.3/css/'
+  references = ['https://getbootstrap.com/docs/3.3/css/']
 
   def __init__(self, aresObj, header, vals, cssCls=None, cssAttr=None):
     """ Instanciate a container object """
@@ -179,7 +177,7 @@ class GraphSvG(AresHtml.Html):
   """
   cssCls = ['panel-body', 'span4']
   width, height = 100, 400
-  reference = 'https://www.w3schools.com/html/html5_svg.asp'
+  references = ['https://www.w3schools.com/html/html5_svg.asp']
   icon = 'fa fa-pie-chart'
   categories, values, seriesKey, series = None, None, None, None
   hasSeries = False
@@ -259,9 +257,8 @@ class GraphSvG(AresHtml.Html):
             item.add(3, '<option value="%s">%s</option>' % (val, val))
     item.add(2, '</select>')
     self.series = item
-    self.jsEvent['serie-change'] = AresJs.JQueryEvents("%s_series_selector" % self.htmlId,
-                                                       "$('#%s_series_selector')" % self.htmlId,
-                                                       'change', self.update(self.vals), '')
+    self.aresObj.jsOnLoadFnc.add(AresJs.JQueryEvents("%s_series_selector" % self.htmlId, "$('#%s_series_selector')" % self.htmlId,
+                                                     'change', self.update(self.vals), ''))
 
   def selectCategory(self):
     """ Return the category to be selected in the graph display """
@@ -276,9 +273,8 @@ class GraphSvG(AresHtml.Html):
           item.add(3, '<option value="%s">%s</option>' % (headerLine.get('key', headerLine['colName']), headerLine['colName']))
     item.add(2, '</select>')
     self.categories = item
-    self.jsEvent['cat-change'] = AresJs.JQueryEvents("%s_col_selector" % self.htmlId,
-                                                     "$('#%s_col_selector')" % self.htmlId,
-                                                     'change', self.update(self.vals), '')
+    self.aresObj.jsOnLoadFnc.add(AresJs.JQueryEvents("%s_col_selector" % self.htmlId, "$('#%s_col_selector')" % self.htmlId,
+                                                     'change', self.update(self.vals), ''))
 
   def selectValues(self):
     """ Return the value to be selected in the graph display """
@@ -295,8 +291,8 @@ class GraphSvG(AresHtml.Html):
       item.add(3, '<option value="%s" %s>%s</option>' % (key, isSelect, val))
     item.add(2, '</select></label>')
     self.values = item
-    self.jsEvent['val-change'] = AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,
-                                                     'change', self.update(self.vals), '')
+    self.aresObj.jsOnLoadFnc.add(AresJs.JQueryEvents("%s_val_selector" % self.htmlId, "$('#%s_val_selector')" % self.htmlId,
+                                                     'change', self.update(self.vals), ''))
 
   @property
   def jqId(self):
@@ -333,10 +329,9 @@ class Svg(AresHtml.Html):
   """
 
   """
-  css = {'width': '95%', 'height': '100%'}
-  __prop = {
-           #'transition': '',
-         }
+  __css = {'width': '95%', 'height': '100%'}
+  references = []
+  __prop = {} #'transition': '',
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None):
     """ selectors is a tuple with the category first and the value list second """
@@ -475,7 +470,7 @@ class Row(AresHtml.Html):
   """
   cssCls, alias = ['row'], 'row'
   gridCss = 'panel panel-success'
-  reference = 'https://getbootstrap.com/docs/3.3/css/'
+  references = ['https://getbootstrap.com/docs/3.3/css/']
 
   def __init__(self, aresObj, hltmObjs, cssCls=None, cssAttr=None):
     if len(hltmObjs) > 3:
@@ -517,29 +512,6 @@ class Row(AresHtml.Html):
 
     return str(res)
 
-  def jsEvents(self, jsEventFnc=None):
-    """ Function to get the Javascript methods for this object and all the underlying objects """
-    if jsEventFnc is None:
-      jsEventFnc = self.jsEventFnc
-    for jEventType, jsEvent in self.jsEvent.items():
-      jsEventFnc[jEventType].add(str(jsEvent))
-    for _, val in self.vals:
-      if hasattr(val, 'jsEvent'):
-        getattr(val, 'jsEvents')(jsEventFnc)
-    return jsEventFnc
-
-  def onLoad(self, loadFnc=None):
-    """ Functions to get all the onload items for this object and all the underlying object """
-    if loadFnc is None:
-      loadFnc = self.jsOnLoad
-    fnc = self.onLoadFnc()
-    if fnc is not None:
-      loadFnc.add(fnc)
-    for _, val in self.vals:
-      if hasattr(val, 'onLoad'):
-        getattr(val, 'onLoad')(loadFnc)
-    return loadFnc
-
 
 class Col(AresHtml.Html):
   """
@@ -554,29 +526,6 @@ class Col(AresHtml.Html):
       res.add(1, str(htmlObj))
       htmlObj.graph()
     return str(res)
-
-  def jsEvents(self, jsEventFnc=None):
-    """ Function to get the Javascript methods for this object and all the underlying objects """
-    if jsEventFnc is None:
-      jsEventFnc = self.jsEventFnc
-    for jEventType, jsEvent in self.jsEvent.items():
-      jsEventFnc[jEventType].add(str(jsEvent))
-    for val in self.vals:
-      if hasattr(val, 'jsEvent'):
-        getattr(val, 'jsEvents')(jsEventFnc)
-    return jsEventFnc
-
-  def onLoad(self, loadFnc=None):
-    """ Functions to get all the onload items for this object and all the underlying object """
-    if loadFnc is None:
-      loadFnc = self.jsOnLoad
-    fnc = self.onLoadFnc()
-    if fnc is not None:
-      loadFnc.add(fnc)
-    for val in self.vals:
-      if hasattr(val, 'onLoad'):
-        getattr(val, 'onLoad')(loadFnc)
-    return loadFnc
 
 
 class Vignet(AresHtml.Html):

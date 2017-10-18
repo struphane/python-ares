@@ -12,12 +12,10 @@ Some based functions are available in order to change more or less everything in
 
 import os
 import json
-from datetime import datetime
 
+from datetime import datetime
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresJs
-
 from flask import render_template_string
 
 
@@ -35,7 +33,7 @@ class Button(AresHtml.Html):
                 'http://www.kodingmadesimple.com/2015/04/custom-twitter-bootstrap-buttons-icons-images.html']
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
-  css = {'margin-bottom': '20p', 'margin-top': '-10p'}
+  __css = {'margin-bottom': '20p', 'margin-top': '-10p'}
   disable = False
 
   def __init__(self, aresObj, vals, cssCls, cssAttr, awsIcon):
@@ -50,10 +48,6 @@ class Button(AresHtml.Html):
       return '<button type="button" %s %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), disFlag, self.awsIcon, self.vals)
 
     return '<button %s %s>%s</button>' % (self.strAttr(), disFlag, self.vals)
-
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.button("MyButton")
 
   def post(self, evenType, scriptName, jsDef, attr):
     """
@@ -74,14 +68,14 @@ class Button(AresHtml.Html):
                   %s.html(%s);
               } );
             ''' % (preAjax, url, data, jsDef, self.jqId, self.htmlId)
-    self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType,jsDef, url=url)
+    self.js(evenType, jsDef, url=url)
 
   def click(self, jsDef, attr=None, scriptName=None):
     """ Implement the click event on the button object """
     if scriptName is not None:
       self.post('click', scriptName, jsDef, attr)
     else:
-      self.jsEvent['click'] = AresJs.JQueryEvents(self.htmlId, self.jqId, 'click',jsDef)
+      self.js('click', jsDef)
 
   def toJs(self, parent):
     """ Returns the Javascript representation of this item """
@@ -197,6 +191,7 @@ class ButtonDownloadEnv(ButtonDownload):
     items.add(0, ' Get Environment</button>')
     return str(items)
 
+
 class GeneratePdf(AresHtml.Html):
   alias = "generatePdf"
   glyphicon, cssCls = "book", ['btn', 'btn-default']
@@ -228,4 +223,4 @@ class GeneratePdf(AresHtml.Html):
       );
     """
     self.jsEvent["var"] = varTxt#"var docDefinition = { content: 'This is an sample PDF printed with pdfMake' };"
-    self.jsEvent["click"] = AresJs.JQueryEvents(self.htmlId, '$("#%s")' % self.htmlId, "click", "pdfMake.createPdf(%s).download('%s.pdf');" % (varName, fileName))
+    self.js("click", "pdfMake.createPdf(%s).download('%s.pdf');" % (varName, fileName))

@@ -12,9 +12,8 @@ from ares.Lib.html import AresHtmlContainer
 
 class Text(AresHtml.Html):
   """ Python Wrapper to the FONT HTNL Tag """
-  reference = 'https://www.w3schools.com/tags/tag_font.asp'
-  alias = 'text'
-  css = {'font-style': 'normal', 'font-variant': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
+  alias, references = 'text', ['https://www.w3schools.com/tags/tag_font.asp']
+  __css = {'font-style': 'normal', 'font-variant': 'normal', 'font-weight': 'normal', 'line-height': 'inherit'}
   htmlComp = None
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, htmlComp=None):
@@ -28,15 +27,10 @@ class Text(AresHtml.Html):
       html = html.format(*self.htmlComp)
     return html
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.text("My dummy text")
-
 
 class Code(AresHtml.Html):
   """ Python Wrapper to the Bootsrap CODE Tag """
-  reference = 'https://v4-alpha.getbootstrap.com/content/code/'
-  alias = 'code'
+  alias, references = 'code', ['https://v4-alpha.getbootstrap.com/content/code/']
   htmlComp = None
   reqCss = ['bootstrap']
 
@@ -51,14 +45,10 @@ class Code(AresHtml.Html):
       html = html.format(*self.htmlComp)
     return html
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.code("def myFct(): pass")
-
 
 class Preformat(AresHtml.Html):
   """ Python Wrapper for the HTML preformatted tag """
-  reference = "https://www.w3schools.com/html/html_styles.asp"
+  references = ["https://www.w3schools.com/html/html_styles.asp"]
   alias = 'preformat'
 
   def __str__(self):
@@ -97,7 +87,7 @@ class Paragraph(AresHtml.Html):
 class BlockQuote(AresHtml.Html):
   """ Python Wrapper to the HTML Block qutoe Bootstrap object """
   alias, cssCls = 'blockquote', 'blockquote'
-  reference = 'https://v4-alpha.getbootstrap.com/content/typography/'
+  references = ['https://v4-alpha.getbootstrap.com/content/typography/']
   reqCss = ['bootstrap']
 
   def __str__(self):
@@ -112,8 +102,8 @@ class BlockQuote(AresHtml.Html):
 class Title(AresHtml.Html):
   """ Python Wrapper to the HTML H1 Tag """
   dim, alias = 1, 'title'
-  css = {'color': '#398438', 'font-weight': 'normal'}
-  reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+  __css = {'color': '#398438', 'font-weight': 'normal'}
+  references = ['https://www.w3schools.com/tags/tag_hn.asp']
   cssCls = ["display-3"]
 
   def __str__(self):
@@ -130,22 +120,12 @@ class Title(AresHtml.Html):
     """ Activate the Jquery Tooltips """
     return "$( function() { $( document ).tooltip() ; }) ;"
 
-  @classmethod
-  def aresExample(cls, aresObj):
-    return aresObj.title("Level 1 Title")
-
-  @classmethod
-  def aresDesigner(cls, id):
-    """ Return a header HTML Tag for the Designer """
-    obj = cls(id, 'Put your text her')
-    return str(obj)
-
 
 class Title2(Title):
   """ Python Wrapper to the HTML H2 Tag """
   dim, alias = 2, 'title2'
-  css = {'color': '#398438', 'text-decoration': 'none'}
-  reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+  __css = {'color': '#398438', 'text-decoration': 'none'}
+  references = ['https://www.w3schools.com/tags/tag_hn.asp']
   cssCls = []
 
   @classmethod
@@ -156,8 +136,8 @@ class Title2(Title):
 class Title3(Title):
   """ Python Wrapper to the HTML H3 Tag """
   dim, alias = 3, 'title3'
-  css = {'color': '#398438', 'text-decoration': 'none'}
-  reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+  __css = {'color': '#398438', 'text-decoration': 'none'}
+  references = ['https://www.w3schools.com/tags/tag_hn.asp']
   cssCls = []
 
   @classmethod
@@ -168,8 +148,8 @@ class Title3(Title):
 class Title4(Title):
   """ Python Wrapper to the HTML H4 Tag """
   dim, alias = 4, 'title4'
-  css = {'color': '#398438', 'text-decoration': 'none'}
-  reference = 'https://www.w3schools.com/tags/tag_hn.asp'
+  __css = {'color': '#398438', 'text-decoration': 'none'}
+  references = ['https://www.w3schools.com/tags/tag_hn.asp']
   cssCls = []
 
   @classmethod
@@ -179,7 +159,7 @@ class Title4(Title):
 
 class Line(AresHtml.Html):
   """ Python Wrapper to the HTML HR tag """
-  reference = 'https://www.w3schools.com/tags/tag_hr.asp'
+  references = ['https://www.w3schools.com/tags/tag_hr.asp']
   alias = 'line'
 
   def __str__(self):
@@ -193,7 +173,7 @@ class Line(AresHtml.Html):
 
 class Icon(AresHtml.Html):
   """ Wrapper for the HTML awesome icons """
-  reference = 'http://fontawesome.io/icons/'
+  references = ['http://fontawesome.io/icons/']
   alias = 'icon'
   reqCss = ['font-awesome']
 
@@ -214,7 +194,6 @@ class Icon(AresHtml.Html):
 class Numeric(AresHtml.Html):
   """ Reprsents a figure in a nice display """
   alias = 'number'
-  reference = ''
 
   def __str__(self):
     """ Return the String representation of a line tag """
@@ -241,8 +220,8 @@ class Tick(AresHtml.Html):
 class UpDown(AresHtml.Html):
   """ Up and down Text component """
   alias = 'updown'
-  css = {'color': 'green', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal',
-         'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '45px'}
+  __css = {'color': 'green', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal',
+           'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '45px'}
   reqCss = ['font-awesome']
 
   def __init__(self, aresObj, vals, delta, cssCls=None, cssAttr=None, htmlComp=None):

@@ -72,7 +72,7 @@ def report(aresObj):
                                       {'key': 'Date', 'colName': 'Last Modification'},
                                       {'key': 'Size', 'colName': 'Size in Ko'},
                                       {'key': 'delete', 'colName': '', 'type': 'object'}], 'Existing Reports')
-  tableComp.filters(['Folder Name'])
+  #tableComp.filters(['Folder Name'])
   pie = aresObj.pie(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
                                   {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
                                   {'key': 'Date', 'colName': 'Last Modification'},

@@ -14,7 +14,6 @@ class DangerAlert(AresHtml.Html):
   """
 
   """
-
   level = 'Danger'
   backgroundColor = '#f44336'
   closeButton = False

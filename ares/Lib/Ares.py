@@ -177,12 +177,16 @@ class Report(object):
     # Those variable will drive the report generation
     self.countItems, self.countNotif = 0, 0
     self.prefix, self.directory = prefix, None
-    self.content, self.jsGraphs = [], []
+    self.content = []
     self.currentTitleObj, self.navBarContent = {}, {'content': []}
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
-    self.jsRegistered, self.jsGlobal, self.fileManager = {}, {}, {}
+    #
+    self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, set(), set()
+    self.jsGraphs, self.jsFnc = [], set()
+
+    self.fileManager = {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
 
@@ -350,7 +354,7 @@ class Report(object):
   def div(self, value, cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Table'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select(self, values, selected=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.supp(values), selected, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -523,16 +527,16 @@ class Report(object):
     """
 
     """
-    onloadParts, htmlParts, jsSection, jsGraphs = set(), [], [], []
+    onloadParts, htmlParts, jsSection, jsGraphs = [], [], [], []
+
+    for ref in self.jsGlobal:
+      onloadParts.append("var %s ;" % ref)
+    for ref, data in self.jsRegistered.items():
+      onloadParts.append("var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
     for objId in self.content:
       jsOnload, html, js = self.htmlItems[objId].html()
-      for ref, data in self.jsRegistered.items():
-        onloadParts.add("        var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
-      for ref in self.jsGlobal.keys():
-        onloadParts.add("        var %s ;" % ref)
-
       for onloadFnc in jsOnload:
-        onloadParts.add(onloadFnc)
+        onloadParts.append(onloadFnc)
       htmlParts.append(html)
       for jsType, jsFncs in js.items():
         if jsType == 'addGraph':
@@ -541,9 +545,12 @@ class Report(object):
         else:
           jsSection.append("\n".join(jsFncs))
 
+    for jsFnc in self.jsFnc:
+      onloadParts.append(jsFnc)
+
     importMng = AresJsModules.ImportManager()
-    if self.jsGraphs:
-      jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
+    #if self.jsGraphs:
+    #  jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
     cssImports = importMng.cssResolve(self.cssImport, self.cssLocalImports)
     jsImports = importMng.jsResolve(self.jsImports, self.jsLocalImports)
     return cssImports, jsImports, "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)
