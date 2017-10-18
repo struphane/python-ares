@@ -59,5 +59,5 @@ def report(aresObj):
                                         {'key': 'VAL3', 'colName': 'Value 3'}]
                         ],
                         'Test Table')
-  table.initCallBack()
+  table.callBackHideHeader()
 

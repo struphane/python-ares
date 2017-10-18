@@ -84,6 +84,10 @@ class DataTable(AresHtml.Html):
     """
     self.__options[callBackName] = jsFnc
 
+  def callBackHideHeader(self):
+    """ Callback to hide the table header """
+    self.callBacks('initComplete', "function(settings, json) {$('#%s thead').find('tr:last').hide();}" % self.htmlId)
+
   def buttons(self, jsParameters):
     """ Add the parameters dedicated to display buttons on the top of the table"""
     self.__options['buttons'] = jsParameters
