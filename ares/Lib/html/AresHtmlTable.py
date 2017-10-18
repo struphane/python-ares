@@ -34,7 +34,8 @@ class DataTable(AresHtml.Html):
   references = ['https://datatables.net/reference/index',
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
-                'https://datatables.net/reference/option/drawCallback']
+                'https://datatables.net/reference/option/drawCallback',
+                'https://datatables.net/extensions/buttons/examples/initialisation/custom.html']
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
 
@@ -88,9 +89,16 @@ class DataTable(AresHtml.Html):
     """ Callback to hide the table header """
     self.callBacks('initComplete', "function(settings, json) {$('#%s thead').find('tr:last').hide();}" % self.htmlId)
 
-  def buttons(self, jsParameters):
+  def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
+    if dom is not None:
+      self.__options['dom'] = "'%s'" % dom
     self.__options['buttons'] = jsParameters
+
+  def buttonAction(self, title, fnc):
+    """ Add simple action https://datatables.net/extensions/buttons/examples/initialisation/custom.html """
+    self.__options['dom'] = "'Bfrtip'"
+    self.__options['buttons'] = "[{ text: '%s', action: function (e, dt, node, config ) {%s ;} }]" % (title, fnc)
 
   def contextMenu(self, contextMenu, attrList=None):
     """
