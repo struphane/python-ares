@@ -546,7 +546,7 @@ class Report(object):
           jsSection.append("\n".join(jsFncs))
 
     for jsFnc in self.jsFnc:
-      onloadParts.append(jsFnc)
+      onloadParts.append(str(jsFnc))
 
     importMng = AresJsModules.ImportManager()
     #if self.jsGraphs:

@@ -31,7 +31,7 @@ class Radio(AresHtml.Html):
   def select(self, val):
     """ Change the selected value """
     self.selected = val
-    self.aresObj.jsGlobal["radio_val_%s = %s" % (self.htmlId, val)] = True
+    self.aresObj.jsGlobal.add("radio_val_%s = %s" % (self.htmlId, val))
 
   def __str__(self):
     """ Return a basic HTML radio component """

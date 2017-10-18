@@ -294,4 +294,4 @@ class SimpleTable(AresHtml.Html):
                 });
 
             '''
-    self.aresObj.jsFnc(AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc))
+    self.aresObj.jsFnc.add(AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc))
