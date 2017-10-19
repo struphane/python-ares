@@ -100,7 +100,7 @@ class List(AresHtml.Html):
       item.add(3, '<li %s>%s</li>' % (cssLi, label))
     item.add(2, '</ul>')
     if self.headerBox is not None:
-      return str(AresBox(self.htmlId, item, self.headerBox))
+      return str(AresBox(self.htmlId, item, self.headerBox, properties=self.references))
 
     return str(item)
 
@@ -160,7 +160,7 @@ class Container(Div):
     item = AresItem.Item(None)
     for val in self.vals:
       item.add(3, val)
-    return str(AresBox(self.htmlId, item, self.headerBox))
+    return str(AresBox(self.htmlId, item, self.headerBox, properties=self.references))
 
   @classmethod
   def aresExample(cls, aresObj):
@@ -413,7 +413,7 @@ class Svg(AresHtml.Html):
     items = AresItem.Item(None)
     items.add(0, self.selections())
     items.add(0,  '<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
-    return str(AresBox(self.htmlId, str(items), self.headerBox))
+    return str(AresBox(self.htmlId, str(items), self.headerBox, properties=self.references))
 
   def selections(self):
     """ Return the different filters according to the object complexity """
@@ -546,7 +546,7 @@ class Vignet(AresHtml.Html):
     res = AresItem.Item("<p>%s</p>" % self.text)
     res.add(1, "<p><h1><center>%s</center></h1></p>" % self.vals)
     res.add(0, "</div>")
-    box = AresBox(self.htmlId, res, self.title)
+    box = AresBox(self.htmlId, res, self.title, properties=self.references)
     box.cssCls = self.cssCls
     return str(box)
 
