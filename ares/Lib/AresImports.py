@@ -45,7 +45,7 @@ CSS_IMPORTS = {
   'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css',
                                                    'buttons.dataTables.min.css']},
 
-  'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css', 'metro-bootstrap.min.css']},
+  'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css']},
 
   'font-awesome': {'modules': ['font-awesome.min.css'],
                    #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css'

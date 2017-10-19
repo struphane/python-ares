@@ -179,7 +179,7 @@ class DataTable(AresHtml.Html):
     item.add(0, '</table>')
 
     if self.headerBox is not None:
-      item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox)
+      item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
 
     # Add the javascript dynamique part to the DataTabe
     options = ["%s: %s" % (key, val) for key, val in self.__options.items()]
