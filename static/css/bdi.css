@@ -14,7 +14,6 @@ ul.tick li:before {
   position: absolute;
   top: 0;
   left: 0;
-  font-family: FontAwesome;
   content: "\f058";
   color: green;
 }
@@ -22,7 +21,7 @@ ul.tick li:before {
 
 #page-content-wrapper {
     font-family: 'Lato', sans-serif;
-    font-size: 2em;
+    font-size: 14px;
     background-color: white;
     color: #000;
     margin: 0;

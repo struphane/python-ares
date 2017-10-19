@@ -104,7 +104,6 @@ class Title(AresHtml.Html):
   dim, alias = 1, 'title'
   __css = {'color': '#398438', 'font-weight': 'normal'}
   references = ['https://www.w3schools.com/tags/tag_hn.asp']
-  cssCls = ["display-3"]
 
   def __str__(self):
     """ Return a header HTML Tag """

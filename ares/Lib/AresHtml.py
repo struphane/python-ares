@@ -72,15 +72,16 @@ class Html(object):
     """ Create an python HTML object """
     self.aresObj = aresObj # The html object ID
     self.attr = {'class': set([])} if self.cssCls is None else {'class': set(self.cssCls)} # default HTML attributes
+    css = getattr(self, '_%s__css' % self.__class__.__name__, None)
     if cssCls is not None:
       # If the cssCls is defined it will replace the default one
       # We do not want to extend the list of the class
       self.attr['class'] = cssCls
-    if self.__css is not None:
+    if css is not None:
       # we need to do a copy of the CSS style at this stage
-      self.attr['css'] = dict(self.__css)
+      self.attr['css'] = dict(css)
     if cssAttr is not None:
-      if self.__css is None:
+      if css is None:
         self.attr['css'] = cssAttr
       else:
         self.attr['css'].update(cssAttr)
