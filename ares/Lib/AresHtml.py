@@ -131,9 +131,12 @@ class Html(object):
     """ Remove a class from the list of CSS classes """
     self.attr['class'].pop(cssCls)
 
-  def toolTip(self, value):
+  def tooltip(self, value, location='top'):
     """ Add the Tooltip feature when the mouse is over the component """
     self.attr['title'] = value
+    self.attr['data-toggle'] = 'tooltip'
+    self.attr['data-placement'] = location
+    self.aresObj.jsFnc.add("%s.tooltip();" % self.jqId)
 
   def addAttr(self, name, value):
     """ Set an attribute to the HTML object """

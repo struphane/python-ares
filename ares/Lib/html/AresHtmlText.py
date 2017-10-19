@@ -107,8 +107,8 @@ class Title(AresHtml.Html):
 
   def __str__(self):
     """ Return a header HTML Tag """
-    items = AresItem.Item('<H%s %s>' % (self.dim, self.strAttr()))
-    items.add(1, '<a class="anchorjs-link" style="color:inherit">%s</a>' % self.vals)
+    items = AresItem.Item('<H%s>' % self.dim)
+    items.add(1, '<a class="anchorjs-link" %s style="color:inherit">%s</a>' % (self.strAttr(), self.vals))
     items.add(0, '</H%s>' % self.dim)
     if self.aresObj.withContainer:
       return str(AresHtmlContainer.TextContainer(self.aresObj, str(items)))
