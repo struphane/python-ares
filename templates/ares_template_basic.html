@@ -12,8 +12,6 @@
 {{ jsImport|safe }}
 
 <script>
-    // https://powerbi.microsoft.com/en-us/documentation/powerbi-service-dashboard-tiles/
-
     function preloader() {
         $('#loading').show();
     }
@@ -35,8 +33,23 @@
 
 
     $(document).ready(function() {
-        $('a[name="ares_min"]').click(function () {
+
+        $('a[name="side_change"]').click(function () {
              $("#wrapper").toggleClass("toggled");
+        });
+
+        $('button[name="ares_prop"]').click(function () {
+             alert("Youpi");
+        });
+
+        $('button[name="ares_min"]').click(function () {
+             var idEvent = $(this).attr('id').replace("_min", "") ;
+             $('#' + idEvent).toggle() ;
+        });
+
+        $('button[name="ares_close"]').click(function () {
+              var idEvent = $(this).attr('id').replace("_close", "") ;
+              $('#' + idEvent + '_main').remove() ;
         });
 
         {{ onload|safe }}
