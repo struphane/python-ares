@@ -65,7 +65,7 @@ class Html(object):
   alias, jsEvent = None, None
   cssCls, __css, reference = None, None, None
   incIndent = 0
-  reqJs, reqCss = None, None
+  reqJs, reqCss = ['jquery'], ['jquery'] # Jquery is already needed
   references = []
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None):
