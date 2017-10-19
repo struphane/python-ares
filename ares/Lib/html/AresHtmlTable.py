@@ -11,8 +11,7 @@ from flask import render_template_string
 
 class Td(AresHtml.Html):
   """ Python class for the TD objects """
-  colspan = 1
-  rowspan = 1
+  colspan, rowspan = 1, 1
 
   def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None):
     super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
@@ -25,7 +24,14 @@ class Td(AresHtml.Html):
       self.attr['colspan'] = self.colspan
     if self.rowspan > 1:
       self.attr['rowspan'] = self.rowspan
-    return '<%s %s>%s</%s>' % (self.tag, self.strAttr(withId=False), self.vals, self.tag)
+    withId = 'title' in self.attr
+    print(self.attr)
+    return '<%s %s>%s</%s>' % (self.tag, self.strAttr(withId=withId), self.vals, self.tag)
+
+  def mouseOver(self, bgcolor, fontColor='#FFFFFF'):
+    """ Change the behaviour of the cell """
+    self.attr['onMouseOver'] = "this.style.background='%s';this.style.color='%s'" % (bgcolor, fontColor)
+    self.attr['onMouseOut'] = "this.style.background='#FFFFFF';this.style.color='#000000'"
 
 
 class DataTable(AresHtml.Html):
