@@ -555,11 +555,12 @@ class AresBox(AresHtml.Html):
   """ Internal object cannot be used directly from ares.py """
   cssCls = ['panel', 'ares-panel-success']
 
-  def __init__(self, htmlId, vals, headerBox):
+  def __init__(self, htmlId, vals, headerBox, properties=None):
     """  """
     self.idContainer = htmlId
     self.vals = vals
     self.headerBox = headerBox
+    self.prop = properties
 
   @property
   def htmlId(self):
@@ -573,11 +574,27 @@ class AresBox(AresHtml.Html):
     item.add(2, '<strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
     item.add(3, '<button class="btn btn-xs" id="%s_close" name="ares_close" style="text-align: center;float:right;"><i class="fa fa-window-close" aria-hidden="true"></i></button>' % self.htmlId)
     item.add(3, '<button class="btn btn-xs" id="%s_min" name="ares_min" style="text-align: center;float:right;"><i class="fa fa-window-minimize" aria-hidden="true"></i></button>' % self.htmlId)
+    if self.prop is not None:
+      item.add(3, '<button class="btn btn-xs" data-toggle="modal" data-target="#%s_prop" style="text-align: center;float:right;"><i class="fa fa-cog" aria-hidden="true"></i></button>' % self.htmlId)
     item.add(1, '</div>')
     item.add(1, '<div class="panel-body" id="%s">' % self.htmlId)
     item.add(2, self.vals)
     item.add(1, '</div>')
     item.add(0, '</div>')
+    if self.prop is not None:
+      item.add(0, '<div class="modal fade" id="%s_prop" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">' % self.htmlId)
+      item.add(1, '<div class="modal-dialog" role="document">')
+      item.add(1, '<div class="modal-content">')
+      item.add(1, '<div class="modal-header">')
+      item.add(1, '<h5 class="modal-title" id="exampleModalLabel">Html / Js documentation</h5>')
+      item.add(1, '</div>')
+      item.add(1, '<div class="modal-body">')
+      for prop in self.prop:
+        item.add(0, '<a href="%s" target="_blank">%s</a>' % (prop, prop))
+      item.add(1, '</div>')
+      item.add(1, '</div>')
+      item.add(1, '</div>')
+      item.add(0, '</div>')
     return str(item)
 
 
