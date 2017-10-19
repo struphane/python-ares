@@ -365,8 +365,11 @@ class Report(object):
   def img(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Image'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['IFrame'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
+
   # Modal Section
   def modal(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Modal'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def fixedModal(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['FixedModal'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
+
 
   # Chart section
   def bar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Bar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -527,12 +530,14 @@ class Report(object):
     """
 
     """
-    onloadParts, htmlParts, jsSection, jsGraphs = [], [], [], []
+    onloadParts, htmlParts, jsGlobal, jsGraphs = [], [], [], []
 
+    #
+    #
     for ref in self.jsGlobal:
-      onloadParts.append("var %s ;" % ref)
+      jsGlobal.append("var %s ;" % ref)
     for ref, data in self.jsRegistered.items():
-      onloadParts.append("var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
+      jsGlobal.append("var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
 
     for objId in self.content:
       jsOnload, html, js = self.htmlItems[objId].html()
@@ -544,14 +549,20 @@ class Report(object):
           continue
 
         else:
-          jsSection.append("\n".join(jsFncs))
+          jsGlobal.append("\n".join(jsFncs))
+
+
+    for jsFnc in self.jsOnLoadFnc:
+      onloadParts.append(str(jsFnc))
 
     for jsFnc in self.jsFnc:
       onloadParts.append(str(jsFnc))
 
+    # Section dedicated to the javascript for all the charts
     importMng = AresImports.ImportManager()
     if self.jsGraphs:
-      jsSection.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
+      jsGraphs.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
+
     cssImports = importMng.cssResolve(self.cssImport, self.cssLocalImports)
     jsImports = importMng.jsResolve(self.jsImports, self.jsLocalImports)
-    return cssImports, jsImports, "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsSection)
+    return cssImports, jsImports, "\n".join(onloadParts), "\n".join(htmlParts), "\n".join(jsGraphs), "\n".join(jsGlobal)

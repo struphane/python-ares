@@ -13,6 +13,7 @@ class Td(AresHtml.Html):
   """ Python class for the TD objects """
   colspan, rowspan = 1, 1
 
+
   def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None):
     super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.cssCls = [] if cssCls is None else cssCls

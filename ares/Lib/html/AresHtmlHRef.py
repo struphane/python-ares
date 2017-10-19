@@ -38,7 +38,6 @@ class A(AresHtml.Html):
   In this class no Javascript is used in the click event
   """
   alias, cssCls = 'anchor', ['btn', 'btn-success']
-  flask = 'ares.run_report'
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['jquery']
 
@@ -70,8 +69,9 @@ class A(AresHtml.Html):
                 window.location.href = ullUrl ;
               }
             ) ;
-            ''' % (url, data, self.jqId, self.htmlId)
-    self.js('click', jsDef, url=url)
+            ''' % (self.jqId, url, data, data)
+    self.get('click', url, data, '')
+    #self.aresObj.jsOnLoadFnc.add(jsDef)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
 
 
@@ -81,7 +81,6 @@ class ScriptPage(A):
   In this class no Javascript is used in the click event
   """
   alias, cssCls = 'main', ['']
-  flask = 'ares.run_report'
   reqCss = ['bootstrap']
   reqJs = ['jquery']
 
@@ -151,6 +150,6 @@ class Href(AresHtml.Html):
                 window.location.href = ullUrl ;
               }
             ) ;
-            ''' % (url, data, self.jqId, self.htmlId)
-    self.js('click', jsDef, url=url)
+            ''' % (self.jqId, url, data, data)
+    self.aresObj.jsOnLoadFnc.add(jsDef)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)

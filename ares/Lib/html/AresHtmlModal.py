@@ -4,7 +4,7 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-
+from ares.Lib import AresJs
 
 class Modal(AresHtml.Html):
   """
@@ -53,6 +53,25 @@ class Modal(AresHtml.Html):
     item.add(2, '</div>')
     item.add(1, '</div>')
     item.add(0, '</div>')
+    return str(item)
+
+
+
+class FixedModal(AresHtml.Html):
+  """
+
+  """
+
+  def __init__(self, aresObj, name, cssCls=None, cssAttr=None):
+    """ Create an python HTML object """
+    super(FixedModal, self).__init__(aresObj, None, cssCls, cssAttr)
+    self.name = name
+    self.vals = []
+
+  def __str__(self):
+    """ Return the String representation of a HTML Modal Object """
+    item = AresItem.Item('<button type="button" class="btn btn-primary" %s style="cursor: pointer">%s</button>' % (self.strAttr(), self.name), self.incIndent)
+    self.js('click', "alert('') ;")
     return str(item)
 
 

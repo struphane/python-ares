@@ -31,7 +31,7 @@
         $("#context-menu").hide();
     });
 
-
+    {{ jsGlobal|safe }}
     $(document).ready(function() {
         $( document ).tooltip();
 
@@ -49,7 +49,7 @@
               $('#' + idEvent + '_main').remove() ;
         });
 
-        {{ onload|safe }}
+        {{ jsOnload|safe }}
     }) ;
 
 </script>
@@ -75,7 +75,7 @@
 </div>	
 
 <script>
-{{ js|safe }}
+{{ jsGraphs|safe }}
 </script>
 
 <div id="loading"><img src="/static/images/loading.gif" alt="Be patient.."/></div>

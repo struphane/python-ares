@@ -30,11 +30,6 @@ class Div(AresHtml.Html):
     """ Return the Javascript Value """
     return '$("#%s").html()' % self.htmlId
 
-
-  def onLoadFnc(self):
-    """ Activate the Jquery tooltips display """
-    return "$( function() { $( document ).tooltip() ; }) ;"
-
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.div("MyDiv")

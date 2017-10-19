@@ -65,6 +65,8 @@ def report(aresObj):
                     }
                    )
 
+
+  aresObj.fixedModal('Open')
   # Create a new report # 'Existing Reports',
   tableComp = aresObj.table(content, [{'key': 'folderLink', 'colName': 'Folder Name', 'type': 'object'},
                                       {'key': 'FolderFiles', 'colName': 'Count Files'},
