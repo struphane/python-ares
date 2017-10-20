@@ -7,7 +7,7 @@ https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/
     <span class="navbar-toggler-icon"></span>
 </button>
 <a name="side_change" href="#" style="color:white"><i class="fa fa-bars fa-2x"></i></a>
-<a class="navbar-brand" href="{{ url_for('ares.run_report') }}" style="margin-left: 40px; margin-bottom: 30px; font-size: 20px;margin-top:25px"><strong>RiskLab</strong></strong></a>
+<a class="navbar-brand" href="{{ url_for('ares.run_report') }}" style="margin-left: 15px; margin-bottom: 30px; font-size: 20px;margin-top:25px"><strong>RiskLab</strong></strong></a>
 
 <div class="collapse navbar-collapse" id="navbarColor01">
   <ul class="navbar-nav mr-auto">
@@ -15,6 +15,18 @@ https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/
       <a href="#" class="btn btn-outline-success active" data-toggle="dropdown">{{ name|safe }}</a>
     </li>
   </ul>
+
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">Packages</a>
+    <div class="dropdown-menu">
+      <h6 class="dropdown-header">System</h6>
+      <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='ARES') }}">AReS</a>
+      <div class="dropdown-divider"></div>
+      <h6 class="dropdown-header">Other Metrics</h6>
+      <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='DUMMY') }}">Test 1</a>
+      <a class="dropdown-item" href="#">Test 2</a>
+    </div>
+  </li>
 
   <form class="form-inline" style="float:right">
     <input class="form-control mr-sm-2 " type="text" style="height: 30px" placeholder="Search" />

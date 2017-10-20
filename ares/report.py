@@ -22,6 +22,7 @@ import config
 # TODO remove the use of chidren pages. Everything should use run
 
 # Ares Framework
+from ares import packages
 from ares.Lib import Ares
 from ares.Lib import AresLog
 from ares.Lib import AresImports
@@ -554,42 +555,59 @@ def download():
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
 @noCache
-@report.route("/download/ares", methods = ['GET', 'POST'])
-def downloadAres():
-  """ Download the up to date Ares package """
+@report.route("/download/package/<name>")
+def downloadPackage(name):
+  modules = getattr(packages, name, None)
   memory_file = io.BytesIO()
-  aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'Lib')
+  files, remap = [], {}
+  # Add the files to the package
+  for folder in modules.get('INCLUDED', {'FOLDERS': []}).get('FOLDERS', []):
+    path = os.path.join(*folder)
+    for file in os.listdir(path):
+      filePath = os.path.join(path, file)
+      if not Ares.isExcluded(current_app.config['ROOT_PATH'], file) and os.path.isfile(filePath):
+        files.append(filePath)
+
+  for folder in modules.get('INCLUDED', {'FILES': []}).get('FILES', []):
+    filePath = os.path.join(*folder)
+    if os.path.isfile(filePath):
+      files.append(filePath)
+
+  # Remove the files from the package
+  for folder in modules.get('EXCLUDED', {'FOLDERS': []}).get('FOLDERS', []):
+    path = os.path.join(*folder)
+    for file in os.listdir(path):
+      filePath = os.path.join(path, file)
+      if not Ares.isExcluded(current_app.config['ROOT_PATH'], file) and os.path.isfile(filePath) and filePath in files:
+        files.remove(filePath)
+  for folder in modules.get('EXCLUDED', {'FILES': []}).get('FILES', []):
+    filePath = os.path.join(*folder)
+    if os.path.isfile(filePath) and filePath in files:
+      files.remove(filePath)
+
+  # Store the file and folder remappings to structure the zip archive
+  for remapSrc, remapDst in modules.get('REMAP', {'FOLDERS': {}}).get('FOLDERS', {}).items():
+    if not remapDst:
+      remap[os.path.join(*remapSrc)] = ''
+    else:
+      remap[os.path.join(*remapSrc)] = os.path.join(*remapDst)
+  for remapSrc, remapDst in modules.get('REMAP', {'FILES': {}}).get('FILES', {}).items():
+    remap[os.path.join(*remapSrc)] = os.path.join(*remapDst)
+
+  # write the zip archive
   with zipfile.ZipFile(memory_file, 'w') as zf:
-    for paths in ['Lib', 'tmpl', os.path.join('Lib', 'graph'), os.path.join('Lib', 'html'), os.path.join('Lib', 'tools')]:
-      aresModulePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, paths)
-      for pyFile in os.listdir(aresModulePath):
-        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
-          continue
+    for file in files:
+      for src, dst in remap.items():
+        if file.startswith(src):
+          remapFile = file.replace(src, dst)
+          zf.write(file, remapFile)
+          break
 
-        if pyFile not in ['AresDeploy.py', 'AresLocalRuns.py', 'AresServiceRun.py', 'AresInstall.py']:
-          zf.write(os.path.join(aresModulePath, pyFile), os.path.join('ares', paths, pyFile))
-        else:
-          zf.write(os.path.join(aresModulePath, pyFile), os.path.join(pyFile))
+      else:
+        zf.write(file, file)
 
-    # Add all the external libraries
-    libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
-    for (path, dirs, files) in os.walk(libPath):
-      for pyFile in  files:
-        if pyFile == 'flask_dummy.py':
-          zf.write(os.path.join(libPath, path, pyFile), os.path.join('flask.py'))
-          continue
-
-        if Ares.isExcluded(path, file=pyFile):
-          continue
-
-        zipArchPath = path.replace(libPath, "").lstrip("\\")
-        if zipArchPath == "":
-          zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", pyFile))
-        else:
-          zf.write(os.path.join(libPath, path, pyFile), os.path.join("Lib", zipArchPath, pyFile))
   memory_file.seek(0)
-  return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
-
+  return send_file(memory_file, attachment_filename='%s.zip' % name, as_attachment=True)
 
 @noCache
 @report.route("/download/<report_name>/outputs/<file_name>", methods = ['GET'])
