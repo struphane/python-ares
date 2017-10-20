@@ -230,6 +230,12 @@ def ajaxCall(report_name, script):
 
   return json.dumps(result)
 
+@report.route("/admin/<report_name>")
+def adminEnv(report_name):
+  """ Admin session for the environment """
+
+  return render_template('ares_admin.html')
+
 @report.route("/saved/<report_name>/<html_report>", methods = ['GET'])
 def savedHtmlReport(report_name, html_report):
   """  """
