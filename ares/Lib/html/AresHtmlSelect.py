@@ -34,16 +34,17 @@ class SelectDropDown(AresHtml.Html):
         continue
 
       if isinstance(hyperlink, list):
-        items.add(level, '<li class="dropdown-submenu"><a href="#" class="drilldown">%s<span class="caret"></span></a>' % value)
+        items.add(level, '<li class="dropdown-submenu">')
+        items.add(level, '<a href="#" class="dropdown-toggle dropdown-item" data-toggle="dropdown">%s</a>' % value)
         items.add(level, '<ul class="dropdown-menu">')
         self.addCategory(items, level+1, hyperlink)
         items.add(level, '</ul></li>')
       else:
         hyperLinkVal = hyperlink if hyperlink is not None else '#'
         if (hyperlink, value) in self.disableItems:
-          items.add(level, '<li><a class="dropdown-item disabled" tabindex="-1" href="%s">%s</a></li>' % (hyperLinkVal, value))
+          items.add(level, '<li><a class="dropdown-item disabled" href="%s">%s</a></li>' % (hyperLinkVal, value))
         else:
-          items.add(level, '<li><a class="dropdown-item" tabindex="-1" href="%s">%s</a></li>' % (hyperLinkVal, value))
+          items.add(level, '<li><a class="dropdown-item" href="%s">%s</a></li>' % (hyperLinkVal, value))
 
   def disable(self, value, hyperlink):
     """ Disable an item from the dropdown box """
@@ -73,13 +74,3 @@ class SelectDropDown(AresHtml.Html):
   def click(self, htmlObject):
     """ Change the component to use javascript functions """
     self.js('click', "console.log($(this).text()) ;") # % self.htmlId
-
-  def onLoadFnc(self):
-    """ """
-    return '''
-              $('.dropdown-submenu a.drilldown').on("click", function(e){
-                $(this).next('ul').toggle();
-                e.stopPropagation();
-                e.preventDefault();
-              });
-           '''
