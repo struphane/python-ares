@@ -2,6 +2,8 @@
 
 """
 
+import json
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
@@ -42,7 +44,8 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
                 'https://datatables.net/reference/option/drawCallback',
-                'https://datatables.net/extensions/buttons/examples/initialisation/custom.html']
+                'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
+                'https://datatables.net/examples/api/multi_filter_select.html']
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
   __callBackWrapper = {
@@ -66,13 +69,18 @@ class DataTable(AresHtml.Html):
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    self.withFooter = False
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
-    if keyOption in ['data', 'ajax', 'buttons']:
+    if keyOption in ['data', 'ajax', 'buttons', 'columnDefs']:
       raise Exception("%s should be added using the dedicated function" % keyOption)
 
     self.__options[keyOption] = value
+
+  def columnDefs(self, columnDefList):
+    """ Set the column definition in the Datatable """
+    self.__options['columnDefs'] = json.dumps(columnDefList)
 
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """
@@ -127,7 +135,6 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, threshold, cssCls))
 
-
   def callBackCreateRowHideThreshold(self, colName, threshold):
     """  Change the row according to a float threshold """
     self.callBacks('createdRow',
@@ -138,6 +145,24 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if (data['%s'] == '%s') {$(row).hide(); }" % (colName, threshold))
 
+  def callBackFooterColumns(self, colNames):
+    """  """
+    self.withFooter = True
+    self.callBacks('initComplete',
+                   '''
+                      this.api().columns().every( function () {
+                            var column = this;
+                            var select = $('<select><option value=""></option></select>').appendTo( $(column.footer()).empty() )
+                                .on( 'change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex( $(this).val());
+                                    column.search( val ? '^'+val+'$' : '', true, false ).draw();
+                                } );
+
+                            column.data().unique().sort().each( function ( d, j ) {
+                              select.append('<option value=' + d+ '>' + d +'</option>' )
+                            } );
+                      } );
+                   ''')
 
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
@@ -195,7 +220,7 @@ class DataTable(AresHtml.Html):
     For example, you can add the below to display the element from the first column of the selected row:
         alert( 'You clicked on ' + rowData[0].script + ' row' );
     """
-    eventLevel, colTag = ('tr', '') if colIndex is None else ('td', "['%s']" % colVal)
+    eventLevel, colTag = ('tr:has(td)', '') if colIndex is None else ('tr td', "['%s']" % colVal)
     if colIndex is not None:
       filterCol = "if (this._DT_CellIndex.column == %s) {var rowData = %s.row(this).data()%s;%s}" % (colIndex, self.htmlId, colTag, jsFnc)
     else:
@@ -225,6 +250,16 @@ class DataTable(AresHtml.Html):
           item.add(3, "<td>%s</td>" % col.get("colName"))
       item.add(2, "</tr>")
       item.add(1, "</thead>")
+      if self.withFooter:
+        item.add(1, "<tfoot>")
+        item.add(2, "<tr>")
+        for col in self.header[-1]:
+          if col.get("visible", True):
+            item.add(3, "<th>%s</th>" % col.get("colName"))
+        item.add(2, "</tr>")
+        item.add(1, "</tfoot>")
+        item.add(1, "<tbody>")
+        item.add(1, "</tbody>")
     item.add(0, '</table>')
 
     if self.headerBox is not None:
