@@ -33,6 +33,19 @@
 
     {{ jsGlobal|safe }}
     $(document).ready(function() {
+        {{ jsOnload|safe }}
+    }) ;
+
+</script>
+</head>
+<body oncontextmenu="return false;" style="background-color: #f4f4f4">
+    {% include 'ares_part_navbar.html' %}
+    <!--
+    Internal javascript functions not related to the HTML content
+    Those are specific to the template on the server and they should not be shared
+    -->
+    <script>
+    $(document).ready(function() {
         $('a[name="side_change"]').click(function () {
              $("#wrapper").toggleClass("toggled");
         });
@@ -48,16 +61,12 @@
         });
 
         $('#save_html').click(function () {
-            alert($('#page-content-wrapper').html());
+            // document.documentElement.outerHTML
+            console.log($("head").html());
+            //console.log($('#page-content-wrapper').html());
         });
-
-        {{ jsOnload|safe }}
     }) ;
-
-</script>
-</head>
-<body oncontextmenu="return false;" style="background-color: #f4f4f4">
-    {% include 'ares_part_navbar.html' %}
+    </script>
 
 <div id="wrapper" class="toggled" style="background-color: #fff">
 	{% include 'ares_part_side_bar.html' %}
