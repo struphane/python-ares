@@ -117,10 +117,27 @@ class DataTable(AresHtml.Html):
     """
     self.callBacks('createdRow', fnc)
 
-  def callBackCreateRowThreshold(self, colName, threshold, dstColIndex, cssCls):
+  def callBackCreateCellThreshold(self, colName, threshold, dstColIndex, cssCls):
     """  Change the cell according to a float threshold """
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
+
+  def callBackCreateRowThreshold(self, colName, threshold, cssCls):
+    """  Change the row according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, threshold, cssCls))
+
+
+  def callBackCreateRowHideThreshold(self, colName, threshold):
+    """  Change the row according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$(row).hide(); }" % (colName, threshold))
+
+  def callBackCreateRowHideFlag(self, colName, threshold):
+    """  Change the row according to tag """
+    self.callBacks('createdRow',
+                   "if (data['%s'] == '%s') {$(row).hide(); }" % (colName, threshold))
+
 
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
@@ -169,7 +186,7 @@ class DataTable(AresHtml.Html):
       );
       ''' % (self.jqId, self.htmlId, strItems))
 
-  def click(self, jsFnc, onTheRowOnly=True):
+  def click(self, jsFnc, colIndex=None, colVal=None):
     """ Add a Click event feature on the row or cell level
 
     The below example will display the column script from the row
@@ -178,13 +195,12 @@ class DataTable(AresHtml.Html):
     For example, you can add the below to display the element from the first column of the selected row:
         alert( 'You clicked on ' + rowData[0].script + ' row' );
     """
-    eventLevel = 'tr' if onTheRowOnly else 'td'
-    self.aresObj.jsFnc.add('''
-      %s.on('click', '%s', function () {
-          var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
-          %s
-      });
-      ''' % (self.jqId, eventLevel, self.htmlId, jsFnc))
+    eventLevel, colTag = ('tr', '') if colIndex is None else ('td', "['%s']" % colVal)
+    if colIndex is not None:
+      filterCol = "if (this._DT_CellIndex.column == %s) {var rowData = %s.row(this).data()%s;%s}" % (colIndex, self.htmlId, colTag, jsFnc)
+    else:
+      filterCol = 'var rowData = %s.row(this).data()%s;%s' % (self.htmlId, colTag, jsFnc)
+    self.aresObj.jsFnc.add("%s.on('click', '%s', function () {%s ;});" % (self.jqId, eventLevel, filterCol))
 
   def __str__(self):
     """ Return the string representation of a HTML table """
