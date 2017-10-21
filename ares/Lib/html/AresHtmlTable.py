@@ -45,6 +45,10 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/extensions/buttons/examples/initialisation/custom.html']
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
+  __callBackWrapper = {
+      'initComplete': "function(settings, json) { %s }",
+      'createdRow': "function ( row, data, index ) { %s }",
+  }
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
     super(DataTable, self).__init__(aresObj, vals, cssCls, cssAttr)
@@ -90,11 +94,33 @@ class DataTable(AresHtml.Html):
     Example of callback functions
       $('#%s thead').find('tr:last').hide();
     """
-    self.__options[callBackName] = jsFnc
+    if callBackName not in self.__options:
+      self.__options[callBackName] = []
+    self.__options[callBackName].append(jsFnc)
 
   def callBackHideHeader(self):
     """ Callback to hide the table header """
-    self.callBacks('initComplete', "function(settings, json) {$('#%s thead').find('tr:last').hide();}" % self.htmlId)
+    self.callBacks('initComplete', "$('#%s thead').find('tr:last').hide();" % self.htmlId)
+
+  def callBackTreeStructure(self):
+    """ Callback to hide the table header """
+    self.callBacks('initComplete', "alert('%s');" % self.htmlId)
+
+  def callBackCreateRow(self, fnc):
+    """
+    Calback to change a cell
+      if ( parseFloat(data['VAL']) > 30 ) {
+                                //alert(data['VAL']);
+                                $('td', row).eq(0).addClass('btn-info');
+                            }
+
+    """
+    self.callBacks('createdRow', fnc)
+
+  def callBackCreateRowThreshold(self, colName, threshold, dstColIndex, cssCls):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
 
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
@@ -189,7 +215,13 @@ class DataTable(AresHtml.Html):
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
 
     # Add the javascript dynamique part to the DataTabe
-    options = ["%s: %s" % (key, val) for key, val in self.__options.items()]
+    options = []
+    for key, val in self.__options.items():
+      if isinstance(val, list):
+        if key in self.__callBackWrapper:
+          options.append("%s: %s" % (key, self.__callBackWrapper[key] % ";".join(val)))
+      else:
+        options.append("%s: %s" % (key, val))
     self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ;' % (self.htmlId, self.jqId, ",".join(options)))
     return str(item)
 
