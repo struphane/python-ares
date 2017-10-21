@@ -51,6 +51,7 @@ class DataTable(AresHtml.Html):
   __callBackWrapper = {
       'initComplete': "function(settings, json) { %s }",
       'createdRow': "function ( row, data, index ) { %s }",
+      'rowCallback': "function ( row, data, index ) { %s }",
   }
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
@@ -140,10 +141,10 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$(row).hide(); }" % (colName, threshold))
 
-  def callBackCreateRowHideFlag(self, colName, threshold):
+  def callBackCreateRowHideFlag(self, colName, value):
     """  Change the row according to tag """
     self.callBacks('createdRow',
-                   "if (data['%s'] == '%s') {$(row).hide(); }" % (colName, threshold))
+                   "if (data['%s'] == '%s') {$(row).hide(); }" % (colName, value))
 
   def callBackFooterColumns(self, colNames):
     """  """
@@ -163,6 +164,11 @@ class DataTable(AresHtml.Html):
                             } );
                       } );
                    ''')
+
+  def callBackRow(self, colName, value, bgColor):
+    """ Row Call back wrapper to change the background color """
+    self.callBacks('rowCallback',
+                   "if (data['%s'] == '%s') {$(row).css('background-color', '%s'); }" % (colName, value, bgColor))
 
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
