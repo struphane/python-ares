@@ -33,8 +33,6 @@
 
     {{ jsGlobal|safe }}
     $(document).ready(function() {
-        $( document ).tooltip();
-
         $('a[name="side_change"]').click(function () {
              $("#wrapper").toggleClass("toggled");
         });
@@ -47,6 +45,10 @@
         $('button[name="ares_close"]').click(function () {
               var idEvent = $(this).attr('id').replace("_close", "") ;
               $('#' + idEvent + '_main').remove() ;
+        });
+
+        $('#save_html').click(function () {
+            alert($('#page-content-wrapper').html());
         });
 
         {{ jsOnload|safe }}
