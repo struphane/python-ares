@@ -7,10 +7,11 @@ import os
 import sys
 import zipfile
 import io
-import collections
 import traceback
 import time
 import shutil
+import sqlite3
+import datetime
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
@@ -168,6 +169,9 @@ def run_report(report_name, script_name):
       for name, scriptName in links:
         side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
     cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
+    # Database caches will be stored in the reportObj.dbCaches
+    # Nothing related to the DB should be done in ares.py in order to allow users to run everything locally
+
   except Exception as e:
     error = True
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
@@ -295,8 +299,8 @@ def handleRequest(module_name, function):
 #    /statics/
 # For more information please look at the documentation of the local runs
 # ------------------------------------------------------------------------------------------------------------
-@report.route("/create/env", methods = ['POST', 'GET'])
-def ajaxCreate():
+@report.route("/create/env/<email_address>", methods = ['POST'])
+def ajaxCreate(email_address):
   """ Special Ajax call to set up the environment
 
   This service will create the environment and also add an emtpy report.
@@ -315,6 +319,24 @@ def ajaxCreate():
   log = AresLog.AresLog(current_app.config['ROOT_PATH'], reportObj.http['REPORT_NAME'], config)
   if not os.path.exists(scriptPath):
     os.makedirs(scriptPath)
+    envKey = os.urandom(24).encode('hex')
+    # Create a dedicated database in the user environment
+    # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
+    dbPath = os.path.join(scriptPath, 'db')
+    conn = sqlite3.connect(os.path.join(dbPath, 'admin.db'))
+    c = conn.cursor()
+
+    # Two tables for the logs
+    c.execute('''CREATE TABLE logs_con (date text, folder text, report text, lst_mod_dt timestamp)''')
+    c.execute('''CREATE TABLE logs_deploy (date text, folder text, script text, address text, lst_mod_dt timestamp)''')
+
+    # Two tables for the admin and users accesses
+    c.execute('''CREATE TABLE admin (date text, address text, key as text, lst_mod_dt timestamp)''')
+    c.execute("INSERT INTO admin VALUES ('%s', '%s', '%s')" % (datetime.datetime.today().strftime('%Y-%m-%d'), email_address, envKey))
+    c.execute('''CREATE TABLE users (date text, address_user text, start timestamp, end timestamp, address_user admin, lst_mod_dt timestamp)''')
+    conn.commit()
+    conn.close()
+
     log.createFolder()
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
     log.addScript('Report', scriptName)
@@ -323,7 +345,7 @@ def ajaxCreate():
       zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
 
     os.makedirs(os.path.join(scriptPath, 'outputs'))
-    return json.dumps("New environment created: %s" % scriptName), 200
+    return json.dumps("New environment created: %s, token %s" % (scriptName, envKey)), 200
 
   return json.dumps("Existing Environment"), 200
 
