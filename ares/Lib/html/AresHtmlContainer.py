@@ -334,6 +334,7 @@ class Svg(AresHtml.Html):
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
     super(Svg, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
+    self.dispatch = {}
     self.recordSetId = id(vals)
     self.header = recordSetDef
     self.svgProp = dict(self._Svg__prop)

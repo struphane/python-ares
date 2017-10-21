@@ -71,6 +71,10 @@ class NvD3Donut(AresHtmlContainer.Svg):
       self.dfltVal =  "'%s'" % selected
 
   def jsUpdate(self):
+
+    dispatchChart = []
+    for displathKey, jsFnc in self.dispatch.items():
+      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
     return '''
               var %s = nv.models.%s().%s ;
 
@@ -78,9 +82,16 @@ class NvD3Donut(AresHtmlContainer.Svg):
 
               d3.select("#%s svg").datum(%s)%s.call(%s);
 
+              %s ;
+
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId, self.dataFnc(self.selectedCat, self.selectedVal), self.getSvg(), self.htmlId, self.htmlId)
+                   self.htmlId, self.dataFnc(self.selectedCat, self.selectedVal), self.getSvg(), self.htmlId,
+                   ";".join(dispatchChart), self.htmlId)
+
+  def click(self, jsFnc):
+    """ Add a click even on the chart  """
+    self.dispatch['elementClick'] = jsFnc
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
@@ -96,13 +107,13 @@ class NvD3Donut(AresHtmlContainer.Svg):
       categories.select(self.selectedCat)
       self.selectedCat = categories.val
       categories.click([self])
-      self.jsEvent['cat_%s' % self.htmlId] = categories.jsEvent['mouseup']
+      #self.jsEvent['cat_%s' % self.htmlId] = categories.jsEvent['mouseup']
 
     if self.multiVal:
       values = AresHtmlRadio.Radio(self.aresObj, self.multiVal)
       values.select(self.selectedVal)
       self.selectedVal = values.val
       values.click([self])
-      self.jsEvent['val_%s' % self.htmlId] = values.jsEvent['mouseup']
+      #self.jsEvent['val_%s' % self.htmlId] = values.jsEvent['mouseup']
 
     return "%s\n%s" % (categories, values)
