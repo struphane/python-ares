@@ -245,6 +245,31 @@ tr.nodetails td:first-child {
     display: none;
 }
 
+#popup-info {
+    background-color: #d7d7d7 ;
+    border: 1px solid #000000 ;
+    position: fixed;
+    width: 200px;
+    display: none;
+    z-index: 2000;
+    left: 50%;
+    top: 50%;
+}
+
+#popup-black-background {
+    background-color: #000000 ;
+    position: fixed;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    z-index: 1000;
+    top:0px;
+    left: 0px;
+    opacity: 0.5;
+    filter: alpha(opacity=50); /* For IE8 and earlier */
+}
+
 .notif {
     margin-top: 10px;
     position: fixed;
