@@ -17,6 +17,13 @@ https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/
   </ul>
 
   <li class="nav-item dropdown">
+       <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">HTML Archives</a>
+      <div class="dropdown-menu">
+          {{ htmlArchives|safe }}
+      </div>
+  </li>
+
+  <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">Packages</a>
     <div class="dropdown-menu">
       <h6 class="dropdown-header">System</h6>

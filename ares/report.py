@@ -178,6 +178,12 @@ def run_report(report_name, script_name):
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
     # Try to unload the module
+    htmlArchives = []
+    savedHtmlLocation = os.path.join(userDirectory, 'saved')
+    if os.path.exists(savedHtmlLocation):
+      for htmlPage in os.listdir(savedHtmlLocation):
+        htmlArchives.append("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1])))
+
     if not report_name.startswith("_"):
       sys.path.remove(userDirectory)
       if os.path.exists(os.path.join(userDirectory, 'ajax')):
@@ -193,7 +199,9 @@ def run_report(report_name, script_name):
   if error:
     return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar=side_bar, jsGlobal=jsGlobal)
 
-  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar), name=envName, jsGlobal=jsGlobal)
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
+                         jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
+                         name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives))
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
