@@ -62,9 +62,9 @@ class NvD3Pie(AresHtmlContainer.Svg):
       if selected is None:
         raise Exception("A selected value should be defined")
 
-      self.selectedVal = "'%s'" % selected
+      self.selectedVal = selected
       self.multiVal = vals
-      self.dfltVal =  "'%s'" % selected
+      self.dfltVal = selected
 
   def jsUpdate(self):
     dispatchChart = []

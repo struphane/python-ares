@@ -2,6 +2,7 @@
 
 """
 
+from Libs import AresChartsService
 from ares.Lib.html import AresHtmlContainer
 
 
@@ -20,7 +21,11 @@ class NvD3Bar(AresHtmlContainer.Svg):
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
+  seriesName = ''
 
+  def dataFnc(self, cat, val):
+    """ Return the json data """
+    return AresChartsService.toBar(self.vals, self.seriesName, cat, val)
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
@@ -34,6 +39,6 @@ class NvD3Bar(AresHtmlContainer.Svg):
 
         nv.utils.windowResize(%s.update);
       ''' % (self.htmlId, self.chartObject, self.attrToStr(),
-             self.htmlId, self.dataFnc(), self.htmlId, self.htmlId)
+             self.htmlId, self.dataFnc(self.selectedCat, self.selectedVal), self.htmlId, self.htmlId)
     )
 
