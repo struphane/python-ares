@@ -10,6 +10,7 @@ button[name="ares_close"]:before {
     position: absolute;
     top: 0px;
     right: 0;
+    font-size: 12px;
 }
 
 button[name="ares_close"] {
@@ -36,6 +37,7 @@ button[name="ares_min"]:before {
     position: absolute;
     top: 0px;
     right: 0;
+    font-size: 12px;
 }
 
 button[name="ares_min"] {
@@ -63,6 +65,7 @@ button[name="ares_prop"]:before {
     position: absolute;
     top: 0px;
     right: 0;
+    font-size: 12px;
 }
 
 button[name="ares_prop"] {
