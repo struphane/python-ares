@@ -15,3 +15,32 @@ in the chart interface in the future your report will not be impacted as this in
 
 """
 
+import json
+import collections
+
+def to2DCharts(recordSet, seriesName, key, val):
+  """ Function dedicated to return from a recordSet for the 2D charts with single series
+
+  The key and val should be some keys defined in the recordSet.
+  The values should be float data and the seriesName should be the name that you would like to display in your chart
+  """
+  data = collections.defaultdict(float)
+  for rec in recordSet:
+    data[rec[key]] += float(rec[val])
+  result = [{'key': seriesName, 'values': []}]
+  for key, aggVal in data.items():
+    result[0]['values'].append([key, aggVal])
+  return result
+
+
+def toPie(recordSet, key, val):
+  """ Function dedicated to the Pie Chart and the Donut chart
+
+  """
+  return json.dumps(to2DCharts(recordSet, None, key, val)[0]['values'])
+
+def toBar(recordSet, seriesName, key, val):
+  """ Function dedicated to the Bar Chart
+
+  """
+  return json.dumps(to2DCharts(recordSet, seriesName, key, val))
