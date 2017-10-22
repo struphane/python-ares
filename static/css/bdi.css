@@ -1,3 +1,84 @@
+
+button[name="ares_close"]:before {
+    content: "\f2d3";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+    font-size: 18px;
+    position: absolute;
+    top: 0px;
+    right: 0;
+}
+
+button[name="ares_close"] {
+    text-align: center;
+    float:right;
+    background:white;
+    position: relative;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 10px;
+    margin-right: 5px;
+}
+
+button[name="ares_min"]:before {
+    content: "\f2d1";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+    font-size: 18px;
+    position: absolute;
+    top: 0px;
+    right: 0;
+}
+
+button[name="ares_min"] {
+    text-align: center;
+    float:right;
+    background:white;
+    position: relative;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 10px;
+    margin-right: 5px;
+}
+
+
+button[name="ares_prop"]:before {
+    content: "\f013";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+    font-size: 18px;
+    position: absolute;
+    top: 0px;
+    right: 0;
+}
+
+button[name="ares_prop"] {
+    text-align: center;
+    float:right;
+    background:white;
+    position: relative;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 10px;
+    margin-right: 5px;
+}
+
+
 .dropdown-submenu {
     position: relative;
 }
