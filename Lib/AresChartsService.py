@@ -69,8 +69,9 @@ def toMultiSeriesChart(recordSet, key, x, val, seriesNames=None, isXDt=None):
   return result
 
 
-
-
+# ------------------------------------------------------------------------------
+# Interface for the different charts
+# ------------------------------------------------------------------------------
 def toPie(recordSet, key, val):
   """ Function dedicated to the Pie Chart and the Donut chart
 
@@ -103,7 +104,6 @@ def toHorizonBar(recordSet, key, x, val, seriesNames=None, isXDt=None):
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
   return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames, isXDt))
-
 
 def toScatter(recordSet, key, x, val, seriesNames=None, isXDt=None):
   """ Function dedicated to the StackedArea Chart
