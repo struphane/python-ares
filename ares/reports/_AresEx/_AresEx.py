@@ -20,6 +20,7 @@ SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
                          ('Table with Chart', 'AresExTablePie')
                          ]),
              ('Graphs', [('NvD3', 'AresExSimpleCharts'),
+                         ('Spider', 'AresExSpiderCharts'),
                          ('Others', 'AresExOtherCharts'),
                          ]),
 

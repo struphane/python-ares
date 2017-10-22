@@ -380,6 +380,8 @@ class Report(object):
   def sparklineplus(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3SparkLinePlus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def boxplot(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3PlotBox'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def spider(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['D3SpiderChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+
 
   #def tree(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Tree'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
