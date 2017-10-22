@@ -19,18 +19,23 @@ import json
 import datetime
 import collections
 
-def to2DCharts(recordSet, seriesName, key, val):
+def to2DCharts(recordSet, seriesName, key, val, isXDt=None):
   """ Function dedicated to return from a recordSet for the 2D charts with single series
 
   The key and val should be some keys defined in the recordSet.
   The values should be float data and the seriesName should be the name that you would like to display in your chart
   """
   data = collections.defaultdict(float)
+  if isXDt is not None: # If there is a timestamp format defined
+    mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+  else:
+    mapFnc = lambda dt, dtFmt: str(dt)
   for rec in recordSet:
-    data[rec[key]] += float(rec[val])
+    data[mapFnc(rec[key], isXDt)] += float(rec[val])
   result = [{'key': seriesName, 'values': []}]
-  for key, aggVal in data.items():
-    result[0]['values'].append([key, aggVal])
+  sortedDt = sorted(data.keys())
+  for key in sortedDt:
+    result[0]['values'].append([key, data[key]])
   return result
 
 def toMultiSeriesChart(recordSet, key, x, val, seriesNames=None, isXDt=None):
@@ -78,11 +83,11 @@ def toPie(recordSet, key, val):
   """
   return json.dumps(to2DCharts(recordSet, None, key, val)[0]['values'])
 
-def toBar(recordSet, seriesName, key, val):
+def toBar(recordSet, seriesName, key, val, isXDt=None):
   """ Function dedicated to the Bar Chart
 
   """
-  return json.dumps(to2DCharts(recordSet, seriesName, key, val))
+  return json.dumps(to2DCharts(recordSet, seriesName, key, val, isXDt=isXDt))
 
 def toMultiSeries(recordSet, key, x, val, seriesNames=None, isXDt=None):
   """ Function dedicated to the StackedArea Chart
