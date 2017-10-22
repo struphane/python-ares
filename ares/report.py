@@ -332,13 +332,14 @@ def ajaxCreate(email_address):
     # Create a dedicated database in the user environment
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
+    os.makedirs(dbPath)
     conn = sqlite3.connect(os.path.join(dbPath, 'admin.db'))
     schemaFile = open(os.path.join(current_app.config['ROOT_PATH'], 'static', 'sql_config', 'create_sqlite_schema.txt')).read()
     c = conn.cursor()
-    c.execute(schemaFile)
+    c.executescript(schemaFile)
     conn.commit()
     #fisrt user insert to appoint an admin on the environment
-    c.execute('''INSERT INTO user_accnt (email_addr, role) VALUES (%s, 'admin');''' % email_address)
+    c.execute('''INSERT INTO user_accnt (email_addr, role) VALUES ('%s', 'admin');''' % email_address)
     conn.commit()
     conn.close()
 
