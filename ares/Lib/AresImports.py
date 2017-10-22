@@ -37,6 +37,9 @@ JS_IMPORTS = {
   # Mapael library
   'raphael': {'req': ['jquery'], 'modules': ['raphael.min.js']},
   'mapael': {'req': ['jquery', 'raphael'], 'modules': ['jquery.mapael.min.js']},
+
+  # Javascript module for Spider chart
+  'spider': {'req': ['ares', 'd3'], 'modules': ['RadarChart.js']}
   }
 
 CSS_IMPORTS = {

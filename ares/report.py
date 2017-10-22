@@ -307,6 +307,13 @@ def handleRequest(module_name, function):
 #    /statics/
 # For more information please look at the documentation of the local runs
 # ------------------------------------------------------------------------------------------------------------
+
+def createSqlLiteEnvironment(path, name, mainUser, userLst=None):
+  """ Create a new sqlLite DB by adding a new connection with a specific path and name
+  This will mostly be used to handle user permission on files ceated in any environment
+  """
+  conn = sqlite3.connect(os.path.join(path, name))
+
 @report.route("/create/env/<email_address>", methods = ['POST'])
 def ajaxCreate(email_address):
   """ Special Ajax call to set up the environment
@@ -332,16 +339,12 @@ def ajaxCreate(email_address):
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
     conn = sqlite3.connect(os.path.join(dbPath, 'admin.db'))
+    schemaFile = open(os.path.join(current_app.config['ROOT_PATH'], 'static', 'sql_config', 'create_sqlite_schema.txt')).read()
     c = conn.cursor()
-
-    # Two tables for the logs
-    c.execute('''CREATE TABLE logs_con (date text, folder text, report text, lst_mod_dt timestamp)''')
-    c.execute('''CREATE TABLE logs_deploy (date text, folder text, script text, address text, lst_mod_dt timestamp)''')
-
-    # Two tables for the admin and users accesses
-    c.execute('''CREATE TABLE admin (date text, address text, key as text, lst_mod_dt timestamp)''')
-    c.execute("INSERT INTO admin VALUES ('%s', '%s', '%s')" % (datetime.datetime.today().strftime('%Y-%m-%d'), email_address, envKey))
-    c.execute('''CREATE TABLE users (date text, address_user text, start timestamp, end timestamp, address_user admin, lst_mod_dt timestamp)''')
+    c.execute(schemaFile)
+    conn.commit()
+    #fisrt user insert to appoint an admin on the environment
+    c.execute('''INSERT INTO user_accnt (email_addr, role) VALUES (%s, 'admin');''' % email_address)
     conn.commit()
     conn.close()
 

@@ -7,7 +7,7 @@ import os
 ARES_FOLDER = 'ares'
 ARES_USERS_LOCATION = 'user_reports'
 ARES_USERS_DELETED_FOLDERS = 'user_deleted_reports'
-
+ARES_MODE = 'local'
 WORK_PATH = os.path.join('E:/', 'GitHub', 'scripts')
 
 COMPANY = "your company"
