@@ -26,7 +26,6 @@ def uploadFiles(files, reportName, username, withEnvCreation=False):
   """ Upload a file on the server """
   if withEnvCreation:
     response = requests.post('%s/%s' % (postUrlCreate, username), {'REPORT_NAME': reportName})
-    print(response.status_code, response.text)
     if response.status_code == 500:
       print("########################################")
       print("Problem in the environment creation")
