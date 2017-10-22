@@ -2,6 +2,7 @@
 
 """
 
+from Lib import AresChartsService
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlRadio
 
@@ -34,29 +35,29 @@ class NvD3Pie(AresHtmlContainer.Svg):
   reqJs = ['d3']
 
   def dataFnc(self, cat, val):
-    """ Return the data Source converted to them be sent to the javascript layer """
-    return "getDataFromRecordSet(%s, [%s, %s])" % (self.jqRecordSet, cat, val)
+    """ Return the json data """
+    return AresChartsService.toPie(self.vals, cat, val)
 
   def setKeys(self, keys, selected=None):
     """ Set a default key for the graph """
     if len(keys) == 1:
-      self.selectedCat = "'%s'" % keys[0]
-      self.dfltCat =  "'%s'" % keys[0]
+      self.selectedCat = keys[0]
+      self.dfltCat = keys[0]
       self.multiCat = False
     else:
       if selected is None:
         raise Exception("A selected category should be defined")
 
-      self.selectedCat = "'%s'" % selected
+      self.selectedCat = selected
       self.multiCat = keys
-      self.dfltCat =  "'%s'" % selected
+      self.dfltCat = selected
 
   def setVals(self, vals, selected=None):
     """ Set a default value for the graph """
     if len(vals) == 1:
-      self.selectedVal = "'%s'" % vals[0]
+      self.selectedVal = vals[0]
       self.multiVal = False
-      self.dfltVal =  "'%s'" % vals[0]
+      self.dfltVal = vals[0]
     else:
       if selected is None:
         raise Exception("A selected value should be defined")
