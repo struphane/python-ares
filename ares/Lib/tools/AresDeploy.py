@@ -36,9 +36,9 @@ def uploadFiles(files, reportName, username, withEnvCreation=False):
     folder = {'report': None, 'configuration': 'config', 'ajax': 'ajax', 'javascript': 'js', 'views': 'statics',
               'outputs': 'outputs', 'styles': 'styles', 'saved': 'saved'}[fileType]
     if folder is not None:
-      files = {'file': open(os.path.join(os.getcwd(), 'user_reports', reportName, folder, filename))}
+      files = {'file': open(os.path.join(os.getcwd(), reportName, folder, filename))}
     else:
-      files = {'file': open(os.path.join(os.getcwd(), 'user_reports', reportName, filename))}
+      files = {'file': open(os.path.join(os.getcwd(), reportName, filename))}
     response = requests.post(postUrlDeploy % (fileType, reportName, username), files=files)
     if response.status_code == 500:
       print("########################################")
