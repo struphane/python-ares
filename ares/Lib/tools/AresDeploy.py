@@ -20,10 +20,11 @@ postUrlDeploy = AresInstall.SERVER_PATH + r'/reports/upload/%s/%s'
 postUrlCreate = r'%s/reports/create/env' % AresInstall.SERVER_PATH
 postUrlScriptVersion = r"%s/reports/ares/version" % AresInstall.SERVER_PATH
 
-def uploadFiles(files, reportName, withEnvCreation=False):
+def uploadFiles(files, reportName, username, withEnvCreation=False):
   """ Upload a file on the server """
   if withEnvCreation:
-    response = requests.post(postUrlCreate, {'REPORT_NAME': reportName})
+    response = requests.post('%s/%s' % (postUrlCreate, username), {'REPORT_NAME': reportName})
+    print(response.status_code, response.text)
     if response.status_code == 500:
       print("########################################")
       print("Problem in the environment creation")
@@ -64,16 +65,19 @@ if __name__ == '__main__':
   # views - in the folder statics For view configuration (like text files extension .txt)
   # outputs - in the folder outputs For any bespoke data - No extension checks)
   # styles - to add a special section on the server with your styles (CSS and JS)
-  files = [('NewReport.py', 'report'),
+  files = [#('TEST_UPLOAD.py', 'report'),
            #('test.json', 'configuration'),
            #('params.txt', 'views'),
            #('params.zz', 'outputs'),
            #('report.html', 'saved'),
           ]
-  REPORT = 'NewReport'
+
+  #email address registered on the server
+  username = ''
+  REPORT = 'TEST_UPLOAD'
 
   # Function used to send files to the server
-  uploadFiles(files, REPORT, withEnvCreation=True)
+  uploadFiles(files, REPORT, username, withEnvCreation=True)
 
 
   # Function used to check your version of your local package
