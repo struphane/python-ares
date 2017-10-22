@@ -53,17 +53,20 @@ CREATE TABLE mrx_calls (
 
 --logs connection
 CREATE TABLE logs_con (
- date text,
- folder text,
- report text,
- lst_mod_dt timestamp
+ uid integer NOT NULL,
+ env_id text NOT NULL,
+ script text NOT NULL,
+ lst_mod_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT FK_EnvDefLogsCon FOREIGN KEY (env_id) REFERENCES env_def(env_id),
+ CONSTRAINT FK_UserAccntLogsCon FOREIGN KEY (uid) REFERENCES user_accnt(uid)
  );
 
 --logs deployment
 CREATE TABLE logs_deploy (
- date text,
- folder text,
- script text,
- address text,
- lst_mod_dt timestamp
+ uid integer NOT NULL,
+ folder text NOT NULL,
+ file text NOT NULL,
+ type text NOT NULL,
+ lst_mod_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ CONSTRAINT FK_UserAccntLogsDeploy FOREIGN KEY (uid) REFERENCES user_accnt(uid)
  );

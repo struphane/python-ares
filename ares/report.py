@@ -101,26 +101,47 @@ def noCache(f):
 
   return respFunc
 
+
+def executeScriptQuery(dbPath, query, params=None):
+  """ simple function to execute queries"""
+
+  conn = sqlite3.connect(dbPath)
+  c = conn.cursor()
+  if params:
+    query = query % params
+  c.executescript(query)
+  conn.commit()
+  conn.close()
+
+def executeSelectQuery(dbPath, query, params=None):
+  """ simple select wrapper """
+
+  conn = sqlite3.connect(dbPath)
+  c = conn.cursor()
+  if params:
+    query = query % params
+  c.execute(query)
+  res = c.fetchall()
+  conn.close()
+  return res
+
 def checkAuth(dbpath, report_name, user_id):
   """ Check whether user has authorization to see data within the environment """
   #TODO add login information to have proper security with Salt
   # cipherId = AresSecurity.encrypt()
+  print(dbpath, report_name, user_id)
   if not os.path.exists(dbpath):
     raise IOError("Path to DB does not exist - the SQLite Database may have been deleted")
 
-  conn = sqlite3.connect(dbpath)
-  c = conn.cursor()
-  c.execute("""SELECT 1 FROM env_auth 
-               INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
-               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%s'""" % (report_name, user_id))
-  res = c.fetchall()
-  conn.close()
+  query = """SELECT 1 FROM env_auth 
+               INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%(report_name)s'
+               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%(user_id)s'"""
+  res = executeSelectQuery(dbpath, query, params={'report_name': report_name, 'user_id': user_id})
   if not res:
     return False
 
   else:
     return True
-
 
 
 # ------------------------------------------------------------------------------------------------------------
@@ -145,6 +166,7 @@ def run_report(report_name, script_name, user_id):
   Run the report
 
   """
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
   cssImport, jsImport = '', ''
   isAuth = True
@@ -155,11 +177,13 @@ def run_report(report_name, script_name, user_id):
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-      if  script_name != report_name or config.ARES_MODE != 'local':
-        if not checkAuth(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'), report_name, user_id):
+      if  script_name != report_name and config.ARES_MODE != 'local':
+        dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
+        if not checkAuth(dbPath, report_name, user_id):
           raise AresExceptions.AuthException('Not authorized to visualize this data')
 
-
+        queryParams = {'script_name': script_name, 'env_name': report_name, 'usr_id': user_id}
+        executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_request.sql')).read(), params=queryParams)
       side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
       if not userDirectory in sys.path:
         sys.path.append(userDirectory)
@@ -374,7 +398,7 @@ def ajaxCreate(email_address):
   This service will create the environment and also add an emtpy report.
   The log file will be produce and the zip archive with the history will be defined
   """
-
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
   reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
@@ -384,50 +408,50 @@ def ajaxCreate(email_address):
   if scriptName.startswith("_"):
     return json.dumps("Environment Name cannot start with _"), 500
 
-  log = AresLog.AresLog(current_app.config['ROOT_PATH'], reportObj.http['REPORT_NAME'], config)
   if not os.path.exists(scriptPath):
     os.makedirs(scriptPath)
-    envKey = os.urandom(24).encode('hex')
+    # envKey = os.urandom(24).encode('hex')
     # Create a dedicated database in the user environment
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
     h = hashlib.new('md5')
     h.update(str.encode(email_address))
     hash_id = h.hexdigest()
-    queryParams = {'usr_id': email_address, 'hash_id': hash_id, 'env_name': reportObj.http['REPORT_NAME']}
     os.makedirs(dbPath)
-    conn = sqlite3.connect(os.path.join(dbPath, 'admin.db'))
-    schemaFile = open(os.path.join(current_app.config['ROOT_PATH'], 'static', 'sql_config', 'create_sqlite_schema.sql')).read()
-    c = conn.cursor()
-    c.executescript(schemaFile)
-    conn.commit()
+    executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
-    firtsUsrRights = open(os.path.join(current_app.config['ROOT_PATH'], 'static', 'sql_config', 'create_env.sql')).read() % queryParams
-    c.executescript(firtsUsrRights)
-    conn.commit()
-    conn.close()
 
-    log.createFolder()
+    queryParams = {'usr_id': email_address, 'hash_id': hash_id, 'env_name': reportObj.http['REPORT_NAME']}
+    firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
+    executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
+    queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'usr_id': email_address}
+    executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
-    log.addScript('Report', scriptName)
     fileFullPath = os.path.join(scriptPath, scriptName)
     with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
       zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
 
     os.makedirs(os.path.join(scriptPath, 'outputs'))
-    return json.dumps("New environment created: %s, token %s" % (scriptName, envKey)), 200
+    return json.dumps("New environment created: %s" % scriptName), 200
 
   return json.dumps("Existing Environment"), 200
 
-@report.route("/upload/<report_type>/<report_name>", methods = ['POST'])
-def uploadFiles(report_type, report_name):
+@report.route("/upload/<report_type>/<report_name>/<user_name>", methods = ['POST'])
+def uploadFiles(report_type, report_name, user_name):
   """ Add all the files that a users will drag and drop in the section """
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   result = []
   reportTypes = {'report': (['.PY'], None), 'configuration': (['.JSON'], 'config'),
                  'ajax': (['.PY'], 'ajax'), 'javascript': (['.JS'], 'js'),
                  'views': (['.TXT', '.CSV'], 'statics'), 'outputs': (None, 'outputs'),
                  'styles': (['.CSS', '.JS'], 'styles'), 'saved': (['.HTML'], 'saved')
                  }
+  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
+
+  if not checkAuth(dbPath, report_name, user_name):
+    return json.dumps('Not authorized to deploy on environment: %s' % report_name), 500
+
   if not report_type in reportTypes:
     return json.dumps('Error %s category not recognized !' % report_type), 500
 
@@ -465,7 +489,8 @@ def uploadFiles(report_type, report_name):
             os.makedirs(filePath)
           fileFullPath = os.path.join(filePath, file.filename)
       file.save(fileFullPath)
-      appendToLog(report_name, 'UPLOAD', file.filename)
+      queryParams = {'report_name': report_name, 'file': file.filename, 'type': report_type, 'usr_id': user_name}
+      executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
       if not os.path.exists("%s.zip" % fileFullPath):
         with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
