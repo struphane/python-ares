@@ -21,28 +21,6 @@ class NvD3Bar(AresHtmlContainer.Svg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
 
-  def dataFnc(self):
-    """
-    """
-    return '''
-            [
-            {
-              key: "Cumulative Return",
-              values: [
-                  ["A Label" , -29.765957771107],
-                  ["B Label" , -9.765957771107]
-              ]
-            },
-            {
-              key: "Cumulative Test",
-              values: [
-                  ["A Label" , 29.765957771107],
-                  ["B Label" , 9.765957771107]
-              ]
-            }
-          ]
-           '''
-
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
