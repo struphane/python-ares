@@ -18,7 +18,7 @@ ARES = {
   },
   'EXCLUDED': {
     'FOLDERS': [],
-    'FILES': [],
+    'FILES': ['AresSecurity.py'],
   },
 
   #
