@@ -1,5 +1,5 @@
 """ Service dedicated to convert your recordSet to an object that your graph will recognise
-@author: Olivier Noguès
+@author: Olivier Nogues
 
 This module is the interface to translate your raw data.
 The right way to use this interface is to locally directly import it (as no ajax call will be possible locally.
