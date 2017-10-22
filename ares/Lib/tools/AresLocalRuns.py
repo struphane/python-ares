@@ -16,7 +16,6 @@ Ares documentation is available here:
 from __future__ import print_function
 import os
 import sys
-import traceback
 
 from ares.Lib import Ares
 
@@ -34,7 +33,6 @@ def getReport(results, reports, scriptPath):
           reportModule.report(results[reportModule.__name__])
         except Exception as e:
           print("Error with report %s" % report)
-          traceback.print_exception(*sys.exc_info())
           print(e)
       else:
         print("Module ignore %s" % report)
@@ -87,11 +85,11 @@ if __name__ == '__main__':
 
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")
-    cssImports, jsImports, jsOnload, html, js = htmlReport.html()
-    htmlFile.write(Ares.htmlLocalHeader("%s\n%s" % (cssImports, cssImportsExtra), "%s\n%s" % (jsImports, jsImportsExtra), jsOnload))
+    cssImports, jsImports, jsOnload, html, jsGraph, jsGlobal = htmlReport.html()
+    htmlFile.write(Ares.htmlLocalHeader("%s\n%s" % (cssImports, cssImportsExtra), "%s\n%s" % (jsImports, jsImportsExtra), jsGlobal, jsOnload))
     htmlFile.write(html)
     htmlFile.write("\n<script>\n")
-    htmlFile.write(js)
+    htmlFile.write(jsGraph)
     htmlFile.write("\n</script>\n</div></div>")
     htmlFile.write(footer)
     htmlFile.close()

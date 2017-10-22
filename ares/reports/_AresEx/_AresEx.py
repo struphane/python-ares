@@ -20,6 +20,7 @@ SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
                          ('Table with Chart', 'AresExTablePie')
                          ]),
              ('Graphs', [('NvD3', 'AresExSimpleCharts'),
+                         ('Spider', 'AresExSpiderCharts'),
                          ('Others', 'AresExOtherCharts'),
                          ]),
 
@@ -39,7 +40,7 @@ def report(aresObj):
   recordSet = ExAjaxRec.getRecordSet(aresObj)
   stackedArea = aresObj.stackedArea(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                                       {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
-                                    headerBox='Stacked Bar Chart Example')
+                                    headerBox='Stacked Bar Chart Example', mockData=True)
   meter = aresObj.meter(1, headerBox='Meter Chart Example', cssAttr={'height': '400px'})
 
   # Graph documentation

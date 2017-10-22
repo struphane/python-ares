@@ -179,7 +179,7 @@ class GraphSvG(AresHtml.Html):
   recordSetKey = None
   multiOptions = True
 
-  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """
     super(GraphSvG, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
@@ -328,7 +328,7 @@ class Svg(AresHtml.Html):
   references = []
   __prop = {} #'transition': '',
 
-  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
@@ -340,6 +340,8 @@ class Svg(AresHtml.Html):
     self.svgProp = dict(self._Svg__prop)
     for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
       self.svgProp[key] = val
+    if mockData:
+      self.dataFnc = self.dataMockFnc
 
   def addChartAttr(self, attrs):
     """ Change the object chart properties """
@@ -430,7 +432,7 @@ class Svg(AresHtml.Html):
     """ Returns the selected category for the graph """
     return 'serie_%s' % self.htmlId
 
-  def dataFnc(self):
+  def dataMockFnc(self, cat=None, val=None):
     """ Return the json data """
     return open(r"ares\json\%sData.json" % self.alias).read().strip()
 

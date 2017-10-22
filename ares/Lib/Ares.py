@@ -55,7 +55,7 @@ if aresFactory is None:
   # Atomic build of the factory
   aresFactory = tmpFactory
 
-def htmlLocalHeader(cssFiles, javascriptFiles, onLoad):
+def htmlLocalHeader(cssFiles, javascriptFiles, jsGlobal, onLoad):
   """ Add the header to the report when we are producing a text file - namely local run """
   return '''
           <!DOCTYPE html>
@@ -90,21 +90,14 @@ def htmlLocalHeader(cssFiles, javascriptFiles, onLoad):
                     $("#context-menu").hide();
                 });
 
-
+                %s
                 $(document).ready(function() {
-                    // Remove the dom component fromt the page
+                    %s
                     $('button[name="ares_close"]').click(function () {
                         var idEvent = $(this).attr('id').replace("_close", "") ;
                         $('#' + idEvent + '_main').remove() ;
                     });
 
-                    $('.dropdown-submenu a.drilldown').on("click", function(e){
-                        $(this).next('ul').toggle();
-                        e.stopPropagation();
-                        e.preventDefault();
-                      });
-
-                    //
                     $('button[name="ares_min"]').click(function () {
                         var idEvent = $(this).attr('id').replace("_min", "") ;
                         $('#' + idEvent).toggle() ;
@@ -116,15 +109,12 @@ def htmlLocalHeader(cssFiles, javascriptFiles, onLoad):
                         }
 
                     });
-                    //$("#wrapper").toggleClass("toggled");
                 }) ;
-
-            %s
             </script>
-            <body oncontextmenu="return false;" style="background-color: #f4f4f4">
+            <body oncontextmenu="return false;">
               <div id="page-content-wrapper">
 
-         ''' % (cssFiles, javascriptFiles, onLoad)
+         ''' % (cssFiles, javascriptFiles, jsGlobal, onLoad)
 
 def htmlLocalFooter():
   """ Close all the HTML report and close the input text File - namely locally """
@@ -372,24 +362,26 @@ class Report(object):
 
 
   # Chart section
-  def bar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Bar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def pie(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Pie'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def donut(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Donut'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def lineCumulative(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3LineCumulative'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def line(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Line'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def forceDirected(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3ForceDirected'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def stackedArea(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3StackedArea'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def stackedAreaWithFocus(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3StackedAreaWithFocus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def multiBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3MultiBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def lineChartFocus(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3LineWithFocus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def horizBarChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3HorizontalBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def comboLineBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3ComboLineBar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def scatter(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3ScatterChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def cloud(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['WordCloud'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def sunburst(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Sunburst'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def sparklineplus(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3SparkLinePlus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def boxplot(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3PlotBox'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def bar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Bar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def pie(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Pie'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def donut(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Donut'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def lineCumulative(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3LineCumulative'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def line(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Line'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def forceDirected(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3ForceDirected'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def stackedArea(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3StackedArea'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def stackedAreaWithFocus(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3StackedAreaWithFocus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def multiBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3MultiBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def lineChartFocus(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3LineWithFocus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def horizBarChart(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3HorizontalBars'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def comboLineBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3ComboLineBar'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def scatter(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3ScatterChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def cloud(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['WordCloud'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def sunburst(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Sunburst'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def sparklineplus(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3SparkLinePlus'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def boxplot(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3PlotBox'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def spider(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['D3SpiderChart'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+
 
   #def tree(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Tree'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
