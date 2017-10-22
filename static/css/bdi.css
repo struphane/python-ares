@@ -1,3 +1,87 @@
+
+button[name="ares_close"]:before {
+    content: "\f2d3";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+    font-size: 18px;
+    position: absolute;
+    top: 0px;
+    right: 0;
+    font-size: 12px;
+}
+
+button[name="ares_close"] {
+    text-align: center;
+    float:right;
+    background:white;
+    position: relative;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 10px;
+    margin-right: 5px;
+}
+
+button[name="ares_min"]:before {
+    content: "\f2d1";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+    font-size: 18px;
+    position: absolute;
+    top: 0px;
+    right: 0;
+    font-size: 12px;
+}
+
+button[name="ares_min"] {
+    text-align: center;
+    float:right;
+    background:white;
+    position: relative;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 10px;
+    margin-right: 5px;
+}
+
+
+button[name="ares_prop"]:before {
+    content: "\f013";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+    font-size: 18px;
+    position: absolute;
+    top: 0px;
+    right: 0;
+    font-size: 12px;
+}
+
+button[name="ares_prop"] {
+    text-align: center;
+    float:right;
+    background:white;
+    position: relative;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 10px;
+    margin-right: 5px;
+}
+
+
 .dropdown-submenu {
     position: relative;
 }
@@ -243,6 +327,31 @@ tr.nodetails td:first-child {
     position: fixed;
     width: 200px;
     display: none;
+}
+
+#popup-info {
+    background-color: #d7d7d7 ;
+    border: 1px solid #000000 ;
+    position: fixed;
+    width: 200px;
+    display: none;
+    z-index: 2000;
+    left: 50%;
+    top: 50%;
+}
+
+#popup-black-background {
+    background-color: #000000 ;
+    position: fixed;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    z-index: 1000;
+    top:0px;
+    left: 0px;
+    opacity: 0.5;
+    filter: alpha(opacity=50); /* For IE8 and earlier */
 }
 
 .notif {

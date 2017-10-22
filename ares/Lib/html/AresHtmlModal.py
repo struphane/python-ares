@@ -71,7 +71,13 @@ class FixedModal(AresHtml.Html):
   def __str__(self):
     """ Return the String representation of a HTML Modal Object """
     item = AresItem.Item('<button type="button" class="btn btn-primary" %s style="cursor: pointer">%s</button>' % (self.strAttr(), self.name), self.incIndent)
-    self.js('click', "alert('') ;")
+    self.js('click',
+            '''
+              $('#popup-info').css('top', '110px');
+              $('#popup-info').css('left', '110px');
+              $('#popup-black-background').toggle();
+              $('#popup-info').toggle();
+            ''')
     return str(item)
 
 

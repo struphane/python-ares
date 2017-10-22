@@ -2,6 +2,8 @@
 
 """
 
+import json
+
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
@@ -42,9 +44,15 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
                 'https://datatables.net/reference/option/drawCallback',
-                'https://datatables.net/extensions/buttons/examples/initialisation/custom.html']
+                'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
+                'https://datatables.net/examples/api/multi_filter_select.html']
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
+  __callBackWrapper = {
+      'initComplete': "function(settings, json) { %s }",
+      'createdRow': "function ( row, data, index ) { %s }",
+      'rowCallback': "function ( row, data, index ) { %s }",
+  }
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
     super(DataTable, self).__init__(aresObj, vals, cssCls, cssAttr)
@@ -62,13 +70,18 @@ class DataTable(AresHtml.Html):
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    self.withFooter = False
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
-    if keyOption in ['data', 'ajax', 'buttons']:
+    if keyOption in ['data', 'ajax', 'buttons', 'columnDefs']:
       raise Exception("%s should be added using the dedicated function" % keyOption)
 
     self.__options[keyOption] = value
+
+  def columnDefs(self, columnDefList):
+    """ Set the column definition in the Datatable """
+    self.__options['columnDefs'] = json.dumps(columnDefList)
 
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """
@@ -90,11 +103,72 @@ class DataTable(AresHtml.Html):
     Example of callback functions
       $('#%s thead').find('tr:last').hide();
     """
-    self.__options[callBackName] = jsFnc
+    if callBackName not in self.__options:
+      self.__options[callBackName] = []
+    self.__options[callBackName].append(jsFnc)
 
   def callBackHideHeader(self):
     """ Callback to hide the table header """
-    self.callBacks('initComplete', "function(settings, json) {$('#%s thead').find('tr:last').hide();}" % self.htmlId)
+    self.callBacks('initComplete', "$('#%s thead').find('tr:last').hide();" % self.htmlId)
+
+  def callBackTreeStructure(self):
+    """ Callback to hide the table header """
+    self.callBacks('initComplete', "alert('%s');" % self.htmlId)
+
+  def callBackCreateRow(self, fnc):
+    """
+    Calback to change a cell
+      if ( parseFloat(data['VAL']) > 30 ) {
+                                //alert(data['VAL']);
+                                $('td', row).eq(0).addClass('btn-info');
+                            }
+
+    """
+    self.callBacks('createdRow', fnc)
+
+  def callBackCreateCellThreshold(self, colName, threshold, dstColIndex, cssCls):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
+
+  def callBackCreateRowThreshold(self, colName, threshold, cssCls):
+    """  Change the row according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, threshold, cssCls))
+
+  def callBackCreateRowHideThreshold(self, colName, threshold):
+    """  Change the row according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$(row).hide(); }" % (colName, threshold))
+
+  def callBackCreateRowHideFlag(self, colName, value):
+    """  Change the row according to tag """
+    self.callBacks('createdRow',
+                   "if (data['%s'] == '%s') {$(row).hide(); }" % (colName, value))
+
+  def callBackFooterColumns(self, colNames):
+    """  """
+    self.withFooter = True
+    self.callBacks('initComplete',
+                   '''
+                      this.api().columns().every( function () {
+                            var column = this;
+                            var select = $('<select><option value=""></option></select>').appendTo( $(column.footer()).empty() )
+                                .on( 'change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex( $(this).val());
+                                    column.search( val ? '^'+val+'$' : '', true, false ).draw();
+                                } );
+
+                            column.data().unique().sort().each( function ( d, j ) {
+                              select.append('<option value=' + d+ '>' + d +'</option>' )
+                            } );
+                      } );
+                   ''')
+
+  def callBackRow(self, colName, value, bgColor):
+    """ Row Call back wrapper to change the background color """
+    self.callBacks('rowCallback',
+                   "if (data['%s'] == '%s') {$(row).css('background-color', '%s'); }" % (colName, value, bgColor))
 
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
@@ -143,7 +217,7 @@ class DataTable(AresHtml.Html):
       );
       ''' % (self.jqId, self.htmlId, strItems))
 
-  def click(self, jsFnc, onTheRowOnly=True):
+  def click(self, jsFnc, colIndex=None, colVal=None):
     """ Add a Click event feature on the row or cell level
 
     The below example will display the column script from the row
@@ -152,13 +226,12 @@ class DataTable(AresHtml.Html):
     For example, you can add the below to display the element from the first column of the selected row:
         alert( 'You clicked on ' + rowData[0].script + ' row' );
     """
-    eventLevel = 'tr' if onTheRowOnly else 'td'
-    self.aresObj.jsFnc.add('''
-      %s.on('click', '%s', function () {
-          var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
-          %s
-      });
-      ''' % (self.jqId, eventLevel, self.htmlId, jsFnc))
+    eventLevel, colTag = ('tr:has(td)', '') if colIndex is None else ('tr td', "['%s']" % colVal)
+    if colIndex is not None:
+      filterCol = "if (this._DT_CellIndex.column == %s) {var rowData = %s.row(this).data()%s;%s}" % (colIndex, self.htmlId, colTag, jsFnc)
+    else:
+      filterCol = 'var rowData = %s.row(this).data()%s;%s' % (self.htmlId, colTag, jsFnc)
+    self.aresObj.jsFnc.add("%s.on('click', '%s', function () {%s ;});" % (self.jqId, eventLevel, filterCol))
 
   def __str__(self):
     """ Return the string representation of a HTML table """
@@ -183,13 +256,29 @@ class DataTable(AresHtml.Html):
           item.add(3, "<td>%s</td>" % col.get("colName"))
       item.add(2, "</tr>")
       item.add(1, "</thead>")
+      if self.withFooter:
+        item.add(1, "<tfoot>")
+        item.add(2, "<tr>")
+        for col in self.header[-1]:
+          if col.get("visible", True):
+            item.add(3, "<th>%s</th>" % col.get("colName"))
+        item.add(2, "</tr>")
+        item.add(1, "</tfoot>")
+        item.add(1, "<tbody>")
+        item.add(1, "</tbody>")
     item.add(0, '</table>')
 
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
 
     # Add the javascript dynamique part to the DataTabe
-    options = ["%s: %s" % (key, val) for key, val in self.__options.items()]
+    options = []
+    for key, val in self.__options.items():
+      if isinstance(val, list):
+        if key in self.__callBackWrapper:
+          options.append("%s: %s" % (key, self.__callBackWrapper[key] % ";".join(val)))
+      else:
+        options.append("%s: %s" % (key, val))
     self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ;' % (self.htmlId, self.jqId, ",".join(options)))
     return str(item)
 
