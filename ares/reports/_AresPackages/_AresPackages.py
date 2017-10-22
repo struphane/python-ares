@@ -2,7 +2,7 @@
 
 """
 
-DOWNLOAD = 'SCRIPT'
+DOWNLOAD = None
 
 NAME = 'Ares Packages'
 SHORTCUTS = [('Text', [('Input Events', 'AresExText')])]
