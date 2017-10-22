@@ -20,6 +20,8 @@ postUrlDeploy = AresInstall.SERVER_PATH + r'/reports/upload/%s/%s'
 postUrlCreate = r'%s/reports/create/env' % AresInstall.SERVER_PATH
 postUrlScriptVersion = r"%s/reports/ares/version" % AresInstall.SERVER_PATH
 
+
+#TODO add password implementation
 def uploadFiles(files, reportName, username, withEnvCreation=False):
   """ Upload a file on the server """
   if withEnvCreation:
