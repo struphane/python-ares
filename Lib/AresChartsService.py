@@ -16,6 +16,7 @@ in the chart interface in the future your report will not be impacted as this in
 """
 
 import json
+import datetime
 import collections
 
 def to2DCharts(recordSet, seriesName, key, val):
@@ -32,6 +33,43 @@ def to2DCharts(recordSet, seriesName, key, val):
     result[0]['values'].append([key, aggVal])
   return result
 
+def toMultiSeriesChart(recordSet, key, x, val, seriesNames=None, isXDt=None):
+  """ Function dedicated to handle charts with multiple series
+
+  In those chart each series will have a certain numboer of points and the series name might be defined.
+  Basically the x will be the series x abscisse, it will correspond to a key in the recordset and it can be
+  converted to a timestamp if a isXDt format is defined. By default we will keep the value defined in the recordset
+  Please have a look at the different keys possible:
+
+  For example 2017-10-20 will be defined with a format %Y-%m-%d
+  https://www.tutorialspoint.com/python/time_strptime.htm
+
+  The special mapping table seriesNames, will allow to define propername for the series keys possible in the
+  recordset
+  """
+
+  # Define the temporary dataSet used to aggregate the data in the recordSet
+  data = collections.defaultdict(lambda: collections.defaultdict(int))
+  if isXDt is not None: # If there is a timestamp format defined
+    mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+  else:
+    mapFnc = lambda dt, dtFmt: str(dt)
+  # Aggregate the data in the recordSet
+  for rec in recordSet:
+    dt = mapFnc(rec[x], isXDt) # Use the map function
+    data[rec[key]][dt] += float(rec[val])
+  # Produce the final data structure required by the multi series charts
+  result = []
+  for key, series in data.items():
+    seriesData = {'key': seriesNames.get(key, key) if seriesNames is not None else key, 'values': []}
+    sortedDt = sorted(series.keys())
+    for dt in sortedDt:
+      seriesData['values'].append([dt, series[dt]])
+    result.append(seriesData)
+  return result
+
+
+
 
 def toPie(recordSet, key, val):
   """ Function dedicated to the Pie Chart and the Donut chart
@@ -44,3 +82,10 @@ def toBar(recordSet, seriesName, key, val):
 
   """
   return json.dumps(to2DCharts(recordSet, seriesName, key, val))
+
+def toStackedArea(recordSet, key, x, val, seriesNames=None, isXDt=None):
+  """ Function dedicated to the StackedArea Chart
+
+  https://www.tutorialspoint.com/python/time_strptime.htm
+  """
+  return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames, isXDt))
