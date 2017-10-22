@@ -89,3 +89,25 @@ def toStackedArea(recordSet, key, x, val, seriesNames=None, isXDt=None):
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
   return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames, isXDt))
+
+def toMultiBar(recordSet, key, x, val, seriesNames=None, isXDt=None):
+  """ Function dedicated to the StackedArea Chart
+
+  https://www.tutorialspoint.com/python/time_strptime.htm
+  """
+  return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames, isXDt))
+
+def toHorizonBar(recordSet, key, x, val, seriesNames=None, isXDt=None):
+  """ Function dedicated to the StackedArea Chart
+
+  https://www.tutorialspoint.com/python/time_strptime.htm
+  """
+  return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames, isXDt))
+
+
+def toScatter(recordSet, key, x, val, seriesNames=None, isXDt=None):
+  """ Function dedicated to the StackedArea Chart
+
+  https://www.tutorialspoint.com/python/time_strptime.htm
+  """
+  return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames, isXDt))
