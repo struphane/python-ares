@@ -26,6 +26,8 @@ NAME = 'Report' # The Report Name in the left menu
 # It is only possible to create new links for scripts in the root
 SHORTCUTS = [] # All the possible link to other pages
 
+import random
+
 def report(aresObj):
   '''
   Write your function below
@@ -53,11 +55,32 @@ def report(aresObj):
   radio.select('EUR')
   radio.jsFnc('alert(%s)' % radio.val)
 
+  # Example of a pie chart
+  ccys = ['AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD', 'AWG', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN', 'BHD', 'BIF']
+         #'BMD', 'BND', 'BOB', 'BRL', 'BSD', 'BTN', 'BWP', 'BYN', 'BZD', 'CAD', 'CDF', 'CHF', 'CLP', 'CNY', 'COP', 'CRC',
+         #'CUC', 'CUP', 'CVE', 'CZK', 'DJF', 'DKK', 'DOP', 'DZD', 'EGP', 'ERN', 'ETB', 'EUR', 'FJD', 'FKP', 'GBP',
+         #'GEL', 'GGP', 'GHS', 'GIP', 'GMD', 'GNF', 'GTQ', 'GYD', 'HKD', 'HNL', 'HRK', 'HTG', 'HUF', 'IDR', 'ILS',
+         #'IMP', 'INR', 'IQD', 'IRR', 'ISK', 'JEP', 'JMD', 'JOD', 'JPY', 'KES', 'KGS', 'KHR', 'KMF', 'KPW', 'KRW',
+         #'KWD', 'KYD', 'KZT', 'LAK', 'LBP', 'LKR', 'LRD', 'LSL', 'LYD', 'MAD', 'MDL', 'MGA', 'MKD', 'MMK', 'MNT',
+         #'MOP', 'MRO', 'MUR', 'MVR', 'MWK', 'MXN', 'MYR', 'MZN', 'NAD', 'NGN', 'NIO', 'NOK', 'NPR', 'NZD', 'OMR',
+         #'PAB', 'PEN', 'PGK', 'PHP', 'PKR', 'PLN', 'PYG', 'QAR', 'RON', 'RSD', 'RUB', 'RWF', 'SAR', 'SBD', 'SCR',
+         #'SDG', 'SEK', 'SGD', 'SHP', 'SLL', 'SOS', 'SPL*', 'SRD', 'STD', 'SVC', 'SYP', 'SZL', 'THB', 'TJS', 'TMT',
+         #'TND', 'TOP', 'TRY', 'TTD', 'TVD', 'TWD', 'TZS', 'UAH', 'UGX', 'USD', 'UYU', 'UZS', 'VEF', 'VND', 'VUV',
+         #'WST', 'XAF', 'XCD', 'XDR', 'XOF', 'XPF', 'YER', 'ZAR', 'ZMW', 'ZWD']
 
+  data = []
+  size = len(ccys)
+  for i in range(1000000):
+    val = random.randrange(0, 1000)
+    mod = val % size
+    data.append({"CCY": ccys[mod], 'VAL': val, 'COB': '2017-10-20'})
 
-# The three below variables are not used anymore but they will need to be defined
-# as some base classes are checking them
-# A revamping will be done to remove this
-REPORT_NAME = ''
-AJAX_CALL = {} # Ajax call definition
-CHILD_PAGES = {} # Child pages call definition e.g {'test': 'MyRepotTestChild.py',}
+  header = [
+    {'key': "CCY", 'colName': 'Currency'},
+    {'key': "VAL", 'colName': 'Value'}
+  ]
+
+  pie = aresObj.pie(data, header, headerBox='Currencies')
+  pie.setKeys(['CCY'])
+  pie.setVals(['VAL'])
+

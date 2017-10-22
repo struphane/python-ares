@@ -55,7 +55,7 @@ if aresFactory is None:
   # Atomic build of the factory
   aresFactory = tmpFactory
 
-def htmlLocalHeader(cssFiles, javascriptFiles, onLoad):
+def htmlLocalHeader(cssFiles, javascriptFiles, jsGlobal, onLoad):
   """ Add the header to the report when we are producing a text file - namely local run """
   return '''
           <!DOCTYPE html>
@@ -90,21 +90,14 @@ def htmlLocalHeader(cssFiles, javascriptFiles, onLoad):
                     $("#context-menu").hide();
                 });
 
-
+                %s
                 $(document).ready(function() {
-                    // Remove the dom component fromt the page
+                    %s
                     $('button[name="ares_close"]').click(function () {
                         var idEvent = $(this).attr('id').replace("_close", "") ;
                         $('#' + idEvent + '_main').remove() ;
                     });
 
-                    $('.dropdown-submenu a.drilldown').on("click", function(e){
-                        $(this).next('ul').toggle();
-                        e.stopPropagation();
-                        e.preventDefault();
-                      });
-
-                    //
                     $('button[name="ares_min"]').click(function () {
                         var idEvent = $(this).attr('id').replace("_min", "") ;
                         $('#' + idEvent).toggle() ;
@@ -116,15 +109,12 @@ def htmlLocalHeader(cssFiles, javascriptFiles, onLoad):
                         }
 
                     });
-                    //$("#wrapper").toggleClass("toggled");
                 }) ;
-
-            %s
             </script>
-            <body oncontextmenu="return false;" style="background-color: #f4f4f4">
+            <body oncontextmenu="return false;">
               <div id="page-content-wrapper">
 
-         ''' % (cssFiles, javascriptFiles, onLoad)
+         ''' % (cssFiles, javascriptFiles, jsGlobal, onLoad)
 
 def htmlLocalFooter():
   """ Close all the HTML report and close the input text File - namely locally """
