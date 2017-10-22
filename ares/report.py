@@ -24,6 +24,7 @@ import config
 # TODO remove the use of chidren pages. Everything should use run
 
 # Ares Framework
+from Libs import AresChartsService
 from ares import packages
 from ares.Lib import Ares
 from ares.Lib import AresLog
@@ -53,7 +54,6 @@ def appendToLog(reportName, event, comment):
   showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
   logFile.write("%s#%s#%s#%s\n" % (event, showtime[0], showtime[1], comment))
   logFile.close()
-
 
 def getHttpParams(request):
   """
@@ -285,6 +285,22 @@ def ajaxCall(report_name, script):
 
   return json.dumps(result)
 
+@report.route("/pivotData/<format>", methods = ['POST'])
+def pivotData(format):
+  """ Dedicated service to translate the data """
+  httpParams = request.get_json()
+  if format.upper() in ['PIE', 'DONUT', 'LINE']:
+    return json.dumps(AresChartsService.toPie(httpParams['RECORDSET'], httpParams['KEY'], httpParams['VAL']))
+
+  if format.upper() in ['BAR']:
+    return json.dumps(AresChartsService.toPie(httpParams['RECORDSET'], httpParams['SERIESNAME'], httpParams['KEY'], httpParams['VAL']))
+
+  if format.upper() in ['HORIZBAR', 'MULTIBAR', 'SCATTER', 'STACKEDAREA']:
+    return json.dumps(AresChartsService.toMultiSeries(httpParams['RECORDSET'], httpParams['SERIESNAME'],
+                                                      httpParams['KEY'], httpParams['VAL']))
+
+  return json.dumps('Format %s not recognised' % format)
+
 @report.route("/admin/<report_name>")
 def adminEnv(report_name):
   """ Admin session for the environment """
@@ -372,7 +388,6 @@ def ajaxCreate(email_address):
   if not os.path.exists(scriptPath):
     os.makedirs(scriptPath)
     envKey = os.urandom(24).encode('hex')
-
     # Create a dedicated database in the user environment
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
@@ -391,6 +406,7 @@ def ajaxCreate(email_address):
     c.executescript(firtsUsrRights)
     conn.commit()
     conn.close()
+
     log.createFolder()
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
     log.addScript('Report', scriptName)

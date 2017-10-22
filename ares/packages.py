@@ -13,9 +13,9 @@ ARES = {
       ('ares', 'tmpl')
     ],
     'FILES': [
-      ('Lib', '__init__.py'),
-      ('Lib', 'AresChartsService.py'),
-      ('Lib', 'flask_dummy.py')
+      ('Libs', '__init__.py'),
+      ('Libs', 'AresChartsService.py'),
+      ('Libs', 'flask_dummy.py')
     ],
   },
   'EXCLUDED': {
@@ -30,7 +30,7 @@ ARES = {
         ('ares', 'Lib', 'tools'): ()
        },
       'FILES': {
-        ('Lib', 'flask_dummy.py'): ('flask.py', )
+        ('Libs', 'flask_dummy.py'): ('flask.py', )
       } ,
     }
 }
@@ -38,7 +38,7 @@ ARES = {
 CHART = {
   'INCLUDED': {
     'FILES': [
-      ('Lib', 'AresChartsService.py')
+      ('Libs', 'AresChartsService.py')
     ]
   }
 }
@@ -46,13 +46,13 @@ CHART = {
 DUMMY = {
    'INCLUDED': {
      'FILES': [
-       ('Lib', 'mailer.py')
+       ('Libs', 'mailer.py')
      ]
    },
 
    'REMAP': {
      'FILES': {
-        ('Lib', 'mailer.py'): ('mailer.py', )}
+        ('Libs', 'mailer.py'): ('mailer.py', )}
    }
 }
 

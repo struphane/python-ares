@@ -9,7 +9,7 @@ from ares.Lib.html import AresHtmlContainer
 class NvD3HorizontalBars(AresHtmlContainer.Svg):
   """
   """
-  alias, chartObject = 'horizBarChart', 'multiBarHorizontalChart'
+  alias, chartObject = 'horizBar', 'multiBarHorizontalChart'
   references = ['http://nvd3.org/examples/multiBarHorizontal.html']
   __chartStyle = {'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
