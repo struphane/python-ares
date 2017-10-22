@@ -6,7 +6,7 @@ import hashlib
 SALT_SIZE = 32
 
 # number of iterations in the key generation
-NUMBER_OF_ITERATIONS = 20
+NUMBER_OF_ITERATIONS = 100
 
 # the size multiple required for AES
 AES_MULTIPLE = 32

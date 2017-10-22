@@ -12,6 +12,7 @@ import time
 import shutil
 import sqlite3
 import datetime
+import hashlib
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
@@ -27,6 +28,11 @@ from ares import packages
 from ares.Lib import Ares
 from ares.Lib import AresLog
 from ares.Lib import AresImports
+try:
+# from ares.Lib import AresSecurity
+  from ares.Lib import AresExceptions
+except:
+  pass
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -47,6 +53,7 @@ def appendToLog(reportName, event, comment):
   showtime = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()).split(" ")
   logFile.write("%s#%s#%s#%s\n" % (event, showtime[0], showtime[1], comment))
   logFile.close()
+
 
 def getHttpParams(request):
   """
@@ -94,6 +101,27 @@ def noCache(f):
 
   return respFunc
 
+def checkAuth(dbpath, report_name, user_id):
+  """ Check whether user has authorization to see data within the environment """
+  #TODO add login information to have proper security with Salt
+  # cipherId = AresSecurity.encrypt()
+  if not os.path.exists(dbpath):
+    raise IOError("Path to DB does not exist - the SQLite Database may have been deleted")
+
+  conn = sqlite3.connect(dbpath)
+  c = conn.cursor()
+  c.execute("""SELECT 1 FROM env_auth 
+               INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
+               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%s'""" % (report_name, user_id))
+  res = c.fetchall()
+  conn.close()
+  if not res:
+    return False
+
+  else:
+    return True
+
+
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
@@ -106,25 +134,33 @@ def noCache(f):
 # Please make sure that this script is never shared and also that no user env start with a _
 # _ is dedicated to internal environments (for BDI only)
 # ------------------------------------------------------------------------------------------------------------
-@report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
-@report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
-@report.route("/run/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
-@report.route("/run/<report_name>/<script_name>", methods = ['GET', 'POST'])
-def run_report(report_name, script_name):
+
+@report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports', 'user_id': None})
+@report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports', 'user_id': None})
+@report.route("/run/<report_name>", defaults={'script_name': None, 'user_id': None}, methods = ['GET', 'POST'])
+@report.route("/run/<report_name>/<script_name>", defaults={'user_id': None}, methods = ['GET', 'POST'])
+@report.route("/run/<report_name>/<script_name>/<user_id>", methods = ['GET', 'POST'])
+def run_report(report_name, script_name, user_id):
   """
   Run the report
 
   """
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
   cssImport, jsImport = '', ''
+  isAuth = True
   try:
     if script_name is None:
       script_name = report_name
     # add the folder directory to the python path in order to run the script
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
-      side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+      if  script_name != report_name or config.ARES_MODE != 'local':
+        if not checkAuth(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'), report_name, user_id):
+          raise AresExceptions.AuthException('Not authorized to visualize this data')
+
+
+      side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
       if not userDirectory in sys.path:
         sys.path.append(userDirectory)
       ajaxPath = os.path.join(userDirectory, 'ajax')
@@ -171,6 +207,10 @@ def run_report(report_name, script_name):
     cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
     # Database caches will be stored in the reportObj.dbCaches
     # Nothing related to the DB should be done in ares.py in order to allow users to run everything locally
+  except AresExceptions.AuthException as e:
+    isAuth = False
+    content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
+    content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
 
   except Exception as e:
     error = True
@@ -183,18 +223,21 @@ def run_report(report_name, script_name):
     if os.path.exists(savedHtmlLocation):
       for htmlPage in os.listdir(savedHtmlLocation):
         htmlArchives.append("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1])))
+    if isAuth:
+      if not report_name.startswith("_"):
+        sys.path.remove(userDirectory)
+        if os.path.exists(os.path.join(userDirectory, 'ajax')):
+          sys.path.remove(os.path.join(userDirectory, 'ajax'))
 
-    if not report_name.startswith("_"):
-      sys.path.remove(userDirectory)
-      if os.path.exists(os.path.join(userDirectory, 'ajax')):
-        sys.path.remove(os.path.join(userDirectory, 'ajax'))
+        for module, ss in sys.modules.items():
+          if userDirectory in str(ss):
+            del sys.modules[module]
+      for f in reportObj.fileManager.values():
+        if not f.closed:
+          f.close()
 
-      for module, ss in sys.modules.items():
-        if userDirectory in str(ss):
-          del sys.modules[module]
-    for f in reportObj.fileManager.values():
-      if not f.closed:
-        f.close()
+  if not isAuth:
+    return render_template('ares_error.html', content=content)
 
   if error:
     return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar=side_bar, jsGlobal=jsGlobal)
@@ -329,20 +372,25 @@ def ajaxCreate(email_address):
   if not os.path.exists(scriptPath):
     os.makedirs(scriptPath)
     envKey = os.urandom(24).encode('hex')
+
     # Create a dedicated database in the user environment
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
+    h = hashlib.new('md5')
+    h.update(str.encode(email_address))
+    hash_id = h.hexdigest()
+    queryParams = {'usr_id': email_address, 'hash_id': hash_id, 'env_name': reportObj.http['REPORT_NAME']}
     os.makedirs(dbPath)
     conn = sqlite3.connect(os.path.join(dbPath, 'admin.db'))
-    schemaFile = open(os.path.join(current_app.config['ROOT_PATH'], 'static', 'sql_config', 'create_sqlite_schema.txt')).read()
+    schemaFile = open(os.path.join(current_app.config['ROOT_PATH'], 'static', 'sql_config', 'create_sqlite_schema.sql')).read()
     c = conn.cursor()
     c.executescript(schemaFile)
     conn.commit()
     #fisrt user insert to appoint an admin on the environment
-    c.execute('''INSERT INTO user_accnt (email_addr, role) VALUES ('%s', 'admin');''' % email_address)
+    firtsUsrRights = open(os.path.join(current_app.config['ROOT_PATH'], 'static', 'sql_config', 'create_env.sql')).read() % queryParams
+    c.executescript(firtsUsrRights)
     conn.commit()
     conn.close()
-
     log.createFolder()
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
     log.addScript('Report', scriptName)

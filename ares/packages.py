@@ -19,8 +19,8 @@ ARES = {
     ],
   },
   'EXCLUDED': {
-    'FOLDERS': [],
-    'FILES': ['AresSecurity.py'],
+    'FOLDERS': ['sql_config'],
+    'FILES': ['AresSecurity.py', 'AresExceptions.py'],
   },
 
   #
