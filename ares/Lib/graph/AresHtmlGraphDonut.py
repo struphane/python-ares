@@ -2,7 +2,7 @@
 
 """
 
-from Lib import AresChartsService
+from Libs import AresChartsService
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlRadio
 
