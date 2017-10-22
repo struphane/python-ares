@@ -179,7 +179,7 @@ class GraphSvG(AresHtml.Html):
   recordSetKey = None
   multiOptions = True
 
-  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """
     super(GraphSvG, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
@@ -340,7 +340,6 @@ class Svg(AresHtml.Html):
     self.svgProp = dict(self._Svg__prop)
     for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
       self.svgProp[key] = val
-    print mockData
     if mockData:
       self.dataFnc = self.dataMockFnc
 
