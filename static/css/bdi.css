@@ -407,3 +407,8 @@ tr.nodetails td:first-child {
   font-family: monospace;
   color: #111;
 }
+
+body {
+    background-color: #f4f4f4;
+    top:0;
+}
