@@ -13,6 +13,8 @@ ARES = {
       ('ares', 'tmpl')
     ],
     'FILES': [
+      ('Lib', '__init__.py'),
+      ('Lib', 'AresChartsService.py'),
       ('Lib', 'flask_dummy.py')
     ],
   },
@@ -29,11 +31,17 @@ ARES = {
        },
       'FILES': {
         ('Lib', 'flask_dummy.py'): ('flask.py', )
-
-        } ,
+      } ,
     }
 }
 
+CHART = {
+  'INCLUDED': {
+    'FILES': [
+      ('Lib', 'AresChartsService.py')
+    ]
+  }
+}
 
 DUMMY = {
    'INCLUDED': {
