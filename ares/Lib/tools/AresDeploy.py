@@ -16,7 +16,7 @@ import AresInstall # This import will work locally (because the structure is a b
 
 # The Url to be used in order to create the environments in Ares
 # This will allow the use of scripts instead of the web interface
-postUrlDeploy = AresInstall.SERVER_PATH + r'/reports/upload/%s/%s'
+postUrlDeploy = AresInstall.SERVER_PATH + r'/reports/upload/%s/%s/%s'
 postUrlCreate = r'%s/reports/create/env' % AresInstall.SERVER_PATH
 postUrlScriptVersion = r"%s/reports/ares/version" % AresInstall.SERVER_PATH
 
@@ -36,10 +36,10 @@ def uploadFiles(files, reportName, username, withEnvCreation=False):
     folder = {'report': None, 'configuration': 'config', 'ajax': 'ajax', 'javascript': 'js', 'views': 'statics',
               'outputs': 'outputs', 'styles': 'styles', 'saved': 'saved'}[fileType]
     if folder is not None:
-      files = {'file': open(os.path.join(os.getcwd(), reportName, folder, filename))}
+      files = {'file': open(os.path.join(os.getcwd(), 'user_reports', reportName, folder, filename))}
     else:
-      files = {'file': open(os.path.join(os.getcwd(), reportName, filename))}
-    response = requests.post(postUrlDeploy % (fileType, reportName), files=files)
+      files = {'file': open(os.path.join(os.getcwd(), 'user_reports', reportName, filename))}
+    response = requests.post(postUrlDeploy % (fileType, reportName, username), files=files)
     if response.status_code == 500:
       print("########################################")
       print("The environment is potentially missing")
@@ -66,16 +66,15 @@ if __name__ == '__main__':
   # views - in the folder statics For view configuration (like text files extension .txt)
   # outputs - in the folder outputs For any bespoke data - No extension checks)
   # styles - to add a special section on the server with your styles (CSS and JS)
-  files = [#('TEST_UPLOAD.py', 'report'),
-           #('test.json', 'configuration'),
-           #('params.txt', 'views'),
-           #('params.zz', 'outputs'),
-           #('report.html', 'saved'),
+  files = [('deploy_test.py', 'report'),
+           ('DataGen.py', 'ajax'),
+           ('test.txt', 'outputs'),
+           ('test2.txt', 'outputs'),
           ]
 
   #email address registered on the server
-  username = ''
-  REPORT = 'TEST_UPLOAD'
+  username = 'blabla@uk.bnpparibas.com'
+  REPORT = 'deploy_test'
 
   # Function used to send files to the server
   uploadFiles(files, REPORT, username, withEnvCreation=True)
