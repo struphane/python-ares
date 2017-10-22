@@ -308,12 +308,6 @@ def handleRequest(module_name, function):
 # For more information please look at the documentation of the local runs
 # ------------------------------------------------------------------------------------------------------------
 
-def createSqlLiteEnvironment(path, name, mainUser, userLst=None):
-  """ Create a new sqlLite DB by adding a new connection with a specific path and name
-  This will mostly be used to handle user permission on files ceated in any environment
-  """
-  conn = sqlite3.connect(os.path.join(path, name))
-
 @report.route("/create/env/<email_address>", methods = ['POST'])
 def ajaxCreate(email_address):
   """ Special Ajax call to set up the environment
