@@ -1,6 +1,5 @@
 """
 
-
 """
 
 from ares.Lib.html import AresHtmlContainer

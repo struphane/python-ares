@@ -27,6 +27,34 @@ class NvD3Bar(AresHtmlContainer.Svg):
     """ Return the json data """
     return AresChartsService.toBar(self.vals, self.seriesName, cat, val)
 
+  def setKeys(self, keys, selected=None):
+    """ Set a default key for the graph """
+    if len(keys) == 1:
+      self.selectedCat = keys[0]
+      self.dfltCat = keys[0]
+      self.multiCat = False
+    else:
+      if selected is None:
+        raise Exception("A selected category should be defined")
+
+      self.selectedCat = selected
+      self.multiCat = keys
+      self.dfltCat = selected
+
+  def setVals(self, vals, selected=None):
+    """ Set a default value for the graph """
+    if len(vals) == 1:
+      self.selectedVal = vals[0]
+      self.multiVal = False
+      self.dfltVal = vals[0]
+    else:
+      if selected is None:
+        raise Exception("A selected value should be defined")
+
+      self.selectedVal = selected
+      self.multiVal = vals
+      self.dfltVal = selected
+
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     chartAttributes = []
