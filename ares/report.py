@@ -11,7 +11,6 @@ import traceback
 import time
 import shutil
 import sqlite3
-import datetime
 
 from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
@@ -23,6 +22,7 @@ import config
 # TODO remove the use of chidren pages. Everything should use run
 
 # Ares Framework
+from Libs import AresChartsService
 from ares import packages
 from ares.Lib import Ares
 from ares.Lib import AresLog
@@ -241,6 +241,22 @@ def ajaxCall(report_name, script):
     return json.dumps({'status': 'Error', "data": [], 'message': str(content)})
 
   return json.dumps(result)
+
+@report.route("/pivotData/<format>", methods = ['POST'])
+def pivotData(format):
+  """ Dedicated service to translate the data """
+  httpParams = request.get_json()
+  if format.upper() in ['PIE', 'DONUT', 'LINE']:
+    return json.dumps(AresChartsService.toPie(httpParams['RECORDSET'], httpParams['KEY'], httpParams['VAL']))
+
+  if format.upper() in ['BAR']:
+    return json.dumps(AresChartsService.toPie(httpParams['RECORDSET'], httpParams['SERIESNAME'], httpParams['KEY'], httpParams['VAL']))
+
+  if format.upper() in ['HORIZBAR', 'MULTIBAR', 'SCATTER', 'STACKEDAREA']:
+    return json.dumps(AresChartsService.toMultiSeries(httpParams['RECORDSET'], httpParams['SERIESNAME'],
+                                                      httpParams['KEY'], httpParams['VAL']))
+
+  return json.dumps('Format %s not recognised' % format)
 
 @report.route("/admin/<report_name>")
 def adminEnv(report_name):
