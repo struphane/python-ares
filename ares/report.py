@@ -413,7 +413,8 @@ def ajaxCreate(email_address):
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
     h = hashlib.new('md5')
-    h.update(str.encode(email_address))
+
+    h.update(bytes(email_address.encode('utf-8')))
     hash_id = h.hexdigest()
     os.makedirs(dbPath)
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
