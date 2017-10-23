@@ -32,7 +32,7 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat):
     if valFormat is None:
       trsnsfValFormat.append((val, float))
     else:
-      trsnsfValFormat.append((val, {'int': int, 'float': float}[valFormat]))
+      trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat]))
   for key, format in keysWithFormat:
     if format is not None: # If there is a timestamp format defined
       mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
@@ -74,7 +74,7 @@ def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, s
     if valFormat is None:
       trsnsfValFormat.append((val, float))
     else:
-      trsnsfValFormat.append((val, {'int': int, 'float': float}[valFormat]))
+      trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat]))
 
   # Define the temporary dataSet used to aggregate the data in the recordSet
   data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))

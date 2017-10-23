@@ -28,9 +28,10 @@ from Libs import AresChartsService
 from ares import packages
 from ares.Lib import Ares
 from ares.Lib import AresImports
+from ares.Lib import AresExceptions
+
 try:
   from Libs import AresUserAuthorization
-  from ares.Lib import AresExceptions
 except:
   pass
 
