@@ -10,7 +10,7 @@ ARES = {
       ('ares', 'Lib', 'html'),
       ('ares', 'Lib', 'tools'),
       ('ares', 'Lib'),
-      ('ares', 'tmpl')
+      ('ares', 'tmpl'),
     ],
     'FILES': [
       ('Libs', '__init__.py'),
@@ -19,12 +19,16 @@ ARES = {
     ],
   },
   'EXCLUDED': {
-    'FOLDERS': ['sql_config'],
-    'FILES': ['AresSecurity.py', 'AresExceptions.py'],
+    'FOLDERS': [
+      ('static', 'sql_config'),
+      ('system'),
+    ],
+    'FILES': [
+      ('Libs', 'AresSecurity.py'),
+      ('Libs', 'AresUserAuthorization.py'),
+      ('ares', 'Lib', 'AresExceptions.py')],
   },
 
-  #
-  #
   'REMAP': {
       'FOLDERS': {
         ('ares', 'Lib', 'tools'): ()

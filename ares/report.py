@@ -29,7 +29,7 @@ from ares import packages
 from ares.Lib import Ares
 from ares.Lib import AresImports
 try:
-# from ares.Lib import AresSecurity
+  from Libs import AresUserAuthorization
   from ares.Lib import AresExceptions
 except:
   pass

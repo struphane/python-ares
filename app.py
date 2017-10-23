@@ -5,6 +5,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import config
 
 app = Flask(__name__)
 app.config['ROOT_PATH'] = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +17,11 @@ POSTGRES = {
     'host': 'localhost',
     'port': '5432',
 }
+
+if config.ARES_MODE == 'LIVE':
+    from system.sqlite.db_config import setup_db_env
+    setup_db_env.launch_db(app.config['ROOT_PATH'])
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
