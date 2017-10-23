@@ -2,6 +2,7 @@
 
 """
 
+import json
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 
@@ -31,7 +32,7 @@ class Radio(AresHtml.Html):
   def select(self, val):
     """ Change the selected value """
     self.selected = val
-    self.aresObj.jsGlobal.add("radio_val_%s = %s" % (self.htmlId, val))
+    self.aresObj.jsGlobal.add("radio_val_%s = %s" % (self.htmlId, json.dumps(val)))
 
   def __str__(self):
     """ Return a basic HTML radio component """

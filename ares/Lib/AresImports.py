@@ -51,7 +51,7 @@ CSS_IMPORTS = {
   'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css']},
 
   'font-awesome': {'modules': ['font-awesome.min.css'],
-                   #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css'
+                   'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css'
                    },
 
   'd3': {'req': ['bootstrap'], 'modules': ['nv.d3.min.css']},
@@ -174,7 +174,7 @@ class ImportManager(object):
         cssList.append('<link rel="stylesheet" href="%s" type="text/css">' % urlModule)
     for localCssFile in localCss:
       cssList.append('<link rel="stylesheet" href="{{ url_for(\'static\',filename=\'users/%s\') }}" type="text/css">' % localCssFile)
-    return render_template_string("\n".join(cssList))
+    return "\n".join([render_template_string(css) for css in cssList])
 
   def jsResolve(self, jsAliases, localJs=None):
     """ Return the list of Javascript modules to add to the header """
@@ -185,7 +185,7 @@ class ImportManager(object):
         jsList.append('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
     for localJsFile in localJs:
       jsList.append('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\',filename=\'users/%s\') }}"></script>' % localJsFile)
-    return render_template_string("\n".join(jsList))
+    return "\n".join([render_template_string(js) for js in jsList])
 
   def cssGetAll(self):
     """ To retrieve the full list of available modules on the server """

@@ -524,13 +524,6 @@ class Report(object):
     """
     onloadParts, htmlParts, jsGlobal, jsGraphs = [], [], [], []
 
-    #
-    #
-    for ref in self.jsGlobal:
-      jsGlobal.append("var %s ;" % ref)
-    for ref, data in self.jsRegistered.items():
-      jsGlobal.append("var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
-
     for objId in self.content:
       jsOnload, html, js = self.htmlItems[objId].html()
       for onloadFnc in jsOnload:
@@ -543,6 +536,11 @@ class Report(object):
         else:
           jsGlobal.append("\n".join(jsFncs))
 
+    # This has to come after the different HTML function for each of teh objects are called
+    for ref in self.jsGlobal:
+      jsGlobal.append("var %s ;" % ref)
+    for ref, data in self.jsRegistered.items():
+      jsGlobal.append("var recordSet_%s = %s ;" % (ref, json.dumps(data, default=jsonDefault)))
 
     for jsFnc in self.jsOnLoadFnc:
       onloadParts.append(str(jsFnc))
