@@ -120,3 +120,17 @@ def toMultiSeries(recordSet, key, x, val, seriesNames=None):
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
   return toMultiSeriesChart(recordSet, key, x, val, seriesNames)
+
+def toComboChart(recordSet, key, x, val, seriesNames=None, barStyle=None, colors=None):
+  """ Function dedicated to the StackedArea Chart
+
+  https://www.tutorialspoint.com/python/time_strptime.htm
+  """
+  res = {}
+  for key, vals in toMultiSeriesChart(recordSet, key, x, val, seriesNames).items():
+    res[key] = []
+    for recordSet in vals:
+      recordSet["bar"] = barStyle.get(recordSet["key"], False)
+      recordSet["color"] = colors.get(recordSet["key"], False)
+      res[key].append(recordSet)
+  return res

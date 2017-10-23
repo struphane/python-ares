@@ -51,8 +51,7 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
               d3.select("#%s svg").datum(eval('%s_' + %s + '_' + %s))%s.call(%s);
               %s ;
               nv.utils.windowResize(%s.update);
-            ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId,
+            ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
                    self.htmlId, self.dynKeySelection, self.dynValSelection, # recordSet key
                    self.getSvg(), self.htmlId,
                    ";".join(dispatchChart), self.htmlId)
