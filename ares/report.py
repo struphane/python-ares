@@ -128,7 +128,6 @@ def checkAuth(dbpath, report_name, user_id):
   """ Check whether user has authorization to see data within the environment """
   #TODO add login information to have proper security with Salt
   # cipherId = AresSecurity.encrypt()
-  print(dbpath, report_name, user_id)
   if not os.path.exists(dbpath):
     raise IOError("Path to DB does not exist - the SQLite Database may have been deleted")
 
