@@ -120,4 +120,3 @@ def toMultiSeries(recordSet, key, x, val, seriesNames=None):
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
   return toMultiSeriesChart(recordSet, key, x, val, seriesNames)
-
