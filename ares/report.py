@@ -175,7 +175,7 @@ def run_report(report_name, script_name, user_id):
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-      if  script_name != report_name and config.ARES_MODE != 'local':
+      if  script_name != report_name and config.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
         if not checkAuth(dbPath, report_name, user_id):
           raise AresExceptions.AuthException('Not authorized to visualize this data')
