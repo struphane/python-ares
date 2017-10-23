@@ -21,7 +21,7 @@ class NvD3ComboLineBar(AresHtmlGraphSvg.MultiSvg):
   __chartStyle = {
         'margin': '{top: 30, right: 60, bottom: 50, left: 70}',
         'x': 'function(d, i) { return i }',
-        'y': 'function(d, i) { return d[1] }'
+        'y': 'function(d, i) { return d[1] }',
   }
   __chartProp = {
           'y1Axis': {'tickFormat': "d3.format(',f')"},
@@ -37,11 +37,14 @@ class NvD3ComboLineBar(AresHtmlGraphSvg.MultiSvg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['jquery', 'd3']
 
+  def formatSeries(self, barStyle, colors):
+    """ Change the style for a given series and customise the color """
+    self.barStyle = barStyle
+    self.colors = colors
+
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
-    colors = dict([(col.get('key', col['colName']), col.get('color', 'green')) for col in self.header])
-    barStyle = dict([(col.get('key', col['colName']), col.get('barStyle', False)) for col in self.header])
-    recordSet = AresChartsService.toComboChart(self.vals, self.chartKeys, self.selectedX , self.chartVals, barStyle, colors)
+    recordSet = AresChartsService.toComboChart(self.vals, self.chartKeys, self.selectedX , self.chartVals, barStyle=self.barStyle, colors=self.colors)
     for key, vals in recordSet.items():
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
