@@ -16,29 +16,42 @@ in the chart interface in the future your report will not be impacted as this in
 """
 
 import json
+import time
 import datetime
 import collections
 
-def to2DCharts(recordSet, seriesName, key, val, isXDt=None):
+def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat):
   """ Function dedicated to return from a recordSet for the 2D charts with single series
 
   The key and val should be some keys defined in the recordSet.
   The values should be float data and the seriesName should be the name that you would like to display in your chart
   """
-  data = collections.defaultdict(float)
-  if isXDt is not None: # If there is a timestamp format defined
-    mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
-  else:
-    mapFnc = lambda dt, dtFmt: str(dt)
-  for rec in recordSet:
-    data[mapFnc(rec[key], isXDt)] += float(rec[val])
-  result = [{'key': seriesName, 'values': []}]
-  sortedDt = sorted(data.keys())
-  for key in sortedDt:
-    result[0]['values'].append([key, data[key]])
-  return result
+  data = collections.defaultdict(lambda: collections.defaultdict(float))
+  trsnsfValFormat = []
+  for val, valFormat in valsWithFormat:
+    if valFormat is None:
+      trsnsfValFormat.append((val, float))
+    else:
+      trsnsfValFormat.append((val, {'int': int, 'float': float}[valFormat]))
+  for key, format in keysWithFormat:
+    if format is not None: # If there is a timestamp format defined
+      mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+    else:
+      mapFnc = lambda dt, dtFmt: str(dt)
+    for rec in recordSet:
+      for val, valFormat in trsnsfValFormat:
+        data[(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
 
-def toMultiSeriesChart(recordSet, key, x, val, seriesNames=None, isXDt=None):
+  resultSets = {}
+  for key, aggVals in data.items():
+    result = [{'key': seriesName, 'values': []}]
+    sortedDt = sorted(aggVals.keys())
+    for dataKey in sortedDt:
+      result[0]['values'].append([dataKey, aggVals[dataKey]])
+    resultSets["_".join(key)] = result
+  return resultSets
+
+def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, seriesNames=None):
   """ Function dedicated to handle charts with multiple series
 
   In those chart each series will have a certain numboer of points and the series name might be defined.
@@ -49,29 +62,40 @@ def toMultiSeriesChart(recordSet, key, x, val, seriesNames=None, isXDt=None):
   For example 2017-10-20 will be defined with a format %Y-%m-%d
   https://www.tutorialspoint.com/python/time_strptime.htm
 
-  The special mapping table seriesNames, will allow to define propername for the series keys possible in the
-  recordset
+  The special mapping table seriesNames, will allow to define propername for the series keys possible in the recordset
   """
-
-  # Define the temporary dataSet used to aggregate the data in the recordSet
-  data = collections.defaultdict(lambda: collections.defaultdict(int))
-  if isXDt is not None: # If there is a timestamp format defined
-    mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+  if xWithFormat[1] is not None: # If there is a timestamp format defined
+    mapFnc = lambda dt, dtFmt: int(time.mktime(datetime.datetime.strptime(dt, dtFmt).timetuple()))
   else:
     mapFnc = lambda dt, dtFmt: str(dt)
+
+  trsnsfValFormat = []
+  for val, valFormat in valsWithFormat:
+    if valFormat is None:
+      trsnsfValFormat.append((val, float))
+    else:
+      trsnsfValFormat.append((val, {'int': int, 'float': float}[valFormat]))
+
+  # Define the temporary dataSet used to aggregate the data in the recordSet
+  data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
   # Aggregate the data in the recordSet
-  for rec in recordSet:
-    dt = mapFnc(rec[x], isXDt) # Use the map function
-    data[rec[key]][dt] += float(rec[val])
+  for key, keyFormat in keysWithFormat:
+    for rec in recordSet:
+      dt = mapFnc(rec[xWithFormat[0]], xWithFormat[1]) # Use the map function
+      for val, valFormat in trsnsfValFormat:
+        data[(key, val)][rec[key]][dt] += valFormat(rec[val])
   # Produce the final data structure required by the multi series charts
-  result = []
-  for key, series in data.items():
-    seriesData = {'key': seriesNames.get(key, key) if seriesNames is not None else key, 'values': []}
-    sortedDt = sorted(series.keys())
-    for dt in sortedDt:
-      seriesData['values'].append([dt, series[dt]])
-    result.append(seriesData)
-  return result
+  resultSets = {}
+  for rawKey, aggVals in data.items():
+    result = []
+    for key, series in aggVals.items():
+      seriesData = {'key': seriesNames.get(key, key) if seriesNames is not None else key, 'values': []}
+      sortedDt = sorted(series.keys())
+      for dt in sortedDt:
+        seriesData['values'].append([dt, series[dt]])
+      result.append(seriesData)
+    resultSets["_".join(rawKey)] = result
+  return resultSets
 
 
 # ------------------------------------------------------------------------------
@@ -81,18 +105,19 @@ def toPie(recordSet, key, val):
   """ Function dedicated to the Pie Chart and the Donut chart
 
   """
-  return json.dumps(to2DCharts(recordSet, None, key, val)[0]['values'])
+  data = dict([(key, result[0]['values']) for key, result in to2DCharts(recordSet, None, key, val).items()])
+  return json.dumps(data)
 
 def toBar(recordSet, seriesName, key, val, isXDt=None):
   """ Function dedicated to the Bar Chart
 
   """
-  return json.dumps(to2DCharts(recordSet, seriesName, key, val, isXDt=isXDt))
+  return json.dumps(to2DCharts(recordSet, seriesName, key, val))
 
-def toMultiSeries(recordSet, key, x, val, seriesNames=None, isXDt=None):
+def toMultiSeries(recordSet, key, x, val, seriesNames=None):
   """ Function dedicated to the StackedArea Chart
 
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
-  return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames, isXDt))
+  return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames))
 
