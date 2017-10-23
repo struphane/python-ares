@@ -36,7 +36,7 @@ class Radio(AresHtml.Html):
 
   def __str__(self):
     """ Return a basic HTML radio component """
-    items = AresItem.Item('<div class="btn-group" data-toggle="buttons">')
+    items = AresItem.Item('<div %s class="btn-group" data-toggle="buttons">' % self.strAttr(False))
     for val in self.vals:
       if self.selected == val:
         items.add(1, '<label class="btn btn-success active" name="%s">' % self.htmlId)
