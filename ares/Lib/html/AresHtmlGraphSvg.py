@@ -26,7 +26,7 @@ class Svg(AresHtml.Html):
     for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
       self.svgProp[key] = val
     if mockData:
-      self.dataFnc = self.dataMockFnc
+      self.processData = self.processDataMock
 
   def addChartAttr(self, attrs):
     """ Change the object chart properties """
@@ -150,6 +150,16 @@ class Svg(AresHtml.Html):
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())
 
+  def processDataMock(self, cat=None, val=None):
+    """ Return the json data """
+    self.chartKeys = [('MOCK', None)]
+    self.selectedChartKey = 'MOCK'
+    self.dynKeySelection = self.chartKeys[0]
+    self.chartVals = [('DATA', None)]
+    self.selectedChartVal = self.chartVals[0]
+    self.dynValSelection = 'DATA'
+    self.aresObj.jsGlobal.add("var %s_%s_%s = %s" % (self.htmlId, self.dynKeySelection, self.dynValSelection,
+                                                       open(r"ares\json\%sData.json" % self.alias).read().strip()))
 
 class MultiSvg(Svg):
   """
