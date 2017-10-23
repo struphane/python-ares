@@ -75,12 +75,21 @@ def report(aresObj):
     mod = val % size
     data.append({"CCY": ccys[mod], 'VAL': val, 'COB': '2017-10-20'})
 
+  data = [{"CCY": 'GBP', "PTF": '1', 'VAL': 100, 'VAL2': 100, 'COB': '2017-10-20'},
+          {"CCY": 'GBP', "PTF": '2', 'VAL': 40, 'VAL2': 3, 'COB': '2017-10-21'},
+          {"CCY": 'EUR', "PTF": '3', 'VAL': 23, 'VAL2': 36, 'COB': '2017-10-19'},
+          {"CCY": 'USD', "PTF": '4', 'VAL': 66, 'VAL2': -14, 'COB': '2017-10-21'}]
+
   header = [
     {'key': "CCY", 'colName': 'Currency'},
-    {'key': "VAL", 'colName': 'Value'}
+    {'key': "PTF", 'colName': 'Portfolio'},
+    {'key': "COB", 'colName': 'Close of Business'},
+    {'key': "VAL", 'colName': 'Value'},
+    {'key': "VAL2", 'colName': 'Value 2'}
   ]
 
-  pie = aresObj.pie(data, header, headerBox='Currencies')
-  pie.setKeys(['CCY'])
-  pie.setVals(['VAL'])
+  pie = aresObj.multiBar(data, header, headerBox='Currencies')
+  pie.setSeries(['CCY', "PTF"])
+  pie.setX('COB')
+  pie.setY(['VAL', 'VAL2'], selected=1)
 

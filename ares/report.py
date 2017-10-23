@@ -318,8 +318,12 @@ def pivotData(format):
     return json.dumps(AresChartsService.toPie(httpParams['RECORDSET'], httpParams['SERIESNAME'], httpParams['KEY'], httpParams['VAL']))
 
   if format.upper() in ['HORIZBAR', 'MULTIBAR', 'SCATTER', 'STACKEDAREA']:
-    return json.dumps(AresChartsService.toMultiSeries(httpParams['RECORDSET'], httpParams['SERIESNAME'],
-                                                      httpParams['KEY'], httpParams['VAL']))
+    return json.dumps(AresChartsService.toMultiSeries(httpParams['RECORDSET'],
+                                                      httpParams['KEY'],
+                                                      httpParams['X'],
+                                                      httpParams['VAL'],
+                                                      #httpParams['SERIESNAME'],
+                                                      ))
 
   return json.dumps('Format %s not recognised' % format)
 
@@ -413,7 +417,6 @@ def ajaxCreate(email_address):
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
     h = hashlib.new('md5')
-
     h.update(bytes(email_address.encode('utf-8')))
     hash_id = h.hexdigest()
     os.makedirs(dbPath)

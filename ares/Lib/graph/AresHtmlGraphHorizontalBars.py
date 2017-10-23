@@ -3,10 +3,12 @@
 
 """
 
-from ares.Lib.html import AresHtmlContainer
+import json
+from Libs import AresChartsService
+from ares.Lib.html import AresHtmlGraphSvg
 
 
-class NvD3HorizontalBars(AresHtmlContainer.Svg):
+class NvD3HorizontalBars(AresHtmlGraphSvg.MultiSvg):
   """
   """
   alias, chartObject = 'horizBar', 'multiBarHorizontalChart'
@@ -24,27 +26,20 @@ class NvD3HorizontalBars(AresHtmlContainer.Svg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['jquery', 'd3']
 
-  def graph(self):
-    """ Add the Graph definition in the Javascript method """
-    self.aresObj.jsGraphs.append(
-      '''
-        var %s = nv.models.%s()
-            .%s ;
+  def processData(self):
+    """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
+    recordSet = AresChartsService.toMultiSeries(self.vals, self.chartKeys, self.selectedX , self.chartVals)
+    print(recordSet)
+    for key, vals in recordSet.items():
+      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
-        %s
-
-        d3.select("#%s svg").datum(%s).call(%s);
-
-        nv.utils.windowResize(%s.update);
-      ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-             self.htmlId, self.dataFnc(), self.htmlId, self.htmlId)
-    )
-
-
-  def dataFnc(self):
-    """ """
+  def jsUpdate(self):
+    dispatchChart = []
+    for displathKey, jsFnc in self.dispatch.items():
+      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
     return '''
-            [{key: 'test 1', values: [['A', 2.3], ['B', -10]]},
-             {key: 'test 2', values: [['C', 12.3], ['D', -19]]}
-            ]
-           '''
+              var %s = nv.models.%s().%s ; %s
+              d3.select("#%s svg").datum(%s).call(%s);
+              nv.utils.windowResize(%s.update);
+           ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
+                  self.htmlId, self.jqData, self.htmlId, self.htmlId)

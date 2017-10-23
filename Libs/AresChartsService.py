@@ -106,18 +106,17 @@ def toPie(recordSet, key, val):
 
   """
   data = dict([(key, result[0]['values']) for key, result in to2DCharts(recordSet, None, key, val).items()])
-  return json.dumps(data)
+  return data
 
-def toBar(recordSet, seriesName, key, val, isXDt=None):
+def toBar(recordSet, seriesName, key, val):
   """ Function dedicated to the Bar Chart
 
   """
-  return json.dumps(to2DCharts(recordSet, seriesName, key, val))
+  return to2DCharts(recordSet, seriesName, key, val)
 
 def toMultiSeries(recordSet, key, x, val, seriesNames=None):
   """ Function dedicated to the StackedArea Chart
 
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
-  return json.dumps(toMultiSeriesChart(recordSet, key, x, val, seriesNames))
-
+  return toMultiSeriesChart(recordSet, key, x, val, seriesNames)
