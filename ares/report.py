@@ -328,11 +328,41 @@ def pivotData(format):
 
   return json.dumps('Format %s not recognised' % format)
 
-@report.route("/admin/<report_name>")
+
+
+
+@report.route("/admin/<report_name>", methods=['GET'])
 def adminEnv(report_name):
   """ Admin session for the environment """
+  #
+  #
+  #if not checkAuth(dbPath, report_name, user_id):
+  #  raise AresExceptions.AuthException('Not authorized to visualize this data')
+  script_name = '_AresAdmin' # run the report
+  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
+  onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
+  cssImport, jsImport = '', ''
+  systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', script_name)
+  if not systemDirectory in sys.path:
+    sys.path.append(systemDirectory)
+  ajaxPath = os.path.join(systemDirectory, 'ajax')
+  if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
+    sys.path.append(ajaxPath)
 
-  return render_template('ares_admin.html')
+  reportObj = Ares.Report()
+  reportObj.http = getHttpParams(request)
+  reportObj.reportName = report_name
+  mod = __import__(script_name) # run the report
+  envName = getattr(mod, 'NAME', '')
+  # Set some environments variables which can be used in the report
+  reportObj.http['FILE'] = script_name
+  reportObj.http['REPORT_NAME'] = report_name
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  mod.report(reportObj)
+  cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
+                         jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
+                         name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
 
 @report.route("/saved/<report_name>/<html_report>", methods = ['GET'])
 def savedHtmlReport(report_name, html_report):
@@ -365,6 +395,9 @@ def savedHtmlReport(report_name, html_report):
         jsImports.append(render_template_string('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\', filename=\'user/%s/css/%s\') }}"></script>' % (report_name, jsFile)))
 
   return render_template('ares_empty.html', cssImports="\n".join(cssImports), jsImports="\n".join(jsImports), html_report="".join(html_report))
+
+
+
 
 @report.route("/handlerequest/<module_name>/<function>", methods = ['GET', 'POST'])
 def handleRequest(module_name, function):
