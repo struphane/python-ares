@@ -134,3 +134,50 @@ def toComboChart(recordSet, key, x, val, seriesNames=None, barStyle=None, colors
       recordSet["color"] = colors.get(recordSet["key"], False)
       res[key].append(recordSet)
   return res
+
+def toPlotBox(recordSet, keys, valCols, withMean=True, seriesNames=None):
+  """ Transform a recordSet in a data Structure compatible with a Plot Box D3 item """
+  q1Col, q2Col, q3Col, whisker_lowCol, whisker_highCol, outliersCol = valCols
+  data = collections.defaultdict(lambda: collections.defaultdict(float))
+  outliers = collections.defaultdict(list)
+  keyAgg = keys[0][0]
+  for rec in recordSet:
+    data[rec[keyAgg]]['Q1'] += float(rec[q1Col])
+    data[rec[keyAgg]]['Q2'] += float(rec[q2Col])
+    data[rec[keyAgg]]['Q3'] += float(rec[q3Col])
+    data[rec[keyAgg]]['whisker_low'] += float(rec[whisker_lowCol])
+    data[rec[keyAgg]]['whisker_high'] += float(rec[whisker_highCol])
+    data[rec[keyAgg]]['count'] += 1
+    if outliersCol != '':
+      outliers[keyAgg].append(rec[outliersCol])
+
+  result = []
+  names = {} if seriesNames is None else seriesNames
+  if withMean:
+    for key, vals in data.items():
+      scaledVal = {}
+      for itemKey, val in vals.items():
+        if itemKey == 'count':
+          continue
+
+        scaledVal[itemKey] = val / vals['count']
+      scaledVal['outliers'] = outliers[itemKey]
+    result.append({'label': names.get(key, key), 'values': scaledVal})
+  else:
+    for key, vals in data.items():
+      scaledVal = {}
+      for itemKey, val in vals.items():
+        if itemKey == 'count':
+          continue
+        scaledVal[itemKey] = val
+      scaledVal['outliers'] = outliers[key]
+    result.append({'label': names.get(key, key), 'values': scaledVal})
+  return {'%s_FIXED' % keyAgg : result}
+
+def toCandleStick(recordSet, dateCol, openCol, highCol, lowCol, closeCol, volumeCol, adjustedCol, dtFormat='%Y-%m-%d'):
+  """  """
+  res = []
+  for rec in recordSet:
+    res.append({"date": rec[dateCol], "open": float(rec[openCol]), "high": float(rec[highCol]), "low": float(rec[lowCol]),
+                "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
+  return res

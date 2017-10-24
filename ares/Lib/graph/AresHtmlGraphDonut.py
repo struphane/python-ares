@@ -52,12 +52,11 @@ class NvD3Donut(AresHtmlGraphSvg.Svg):
     return '''
               var %s = nv.models.%s().%s ;
               %s
-              d3.select("#%s svg").datum(eval('%s_' + %s + '_' + %s))%s.call(%s);
+              d3.select("#%s svg").datum(%s)%s.call(%s);
               %s ;
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId,
-                   self.htmlId, self.dynKeySelection, self.dynValSelection, # recordSet key
+                   self.htmlId, self.jqData, # recordSet key
                    self.getSvg(), self.htmlId,
                    ";".join(dispatchChart), self.htmlId)
 
