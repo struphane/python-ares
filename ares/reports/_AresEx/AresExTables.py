@@ -60,4 +60,12 @@ def report(aresObj):
                         ],
                         'Test Table')
   table.callBackHideHeader()
+  table.callBackCreateRowThreshold('VAL3', 50, 'btn-success')
+  table.click('alert(rowData)') #, 2, 'CCY')
+  table.option('pageLength' , 10)
+  table.callBackRow('CCY', 'GBP', 'yellow')
+  table.columnDefs([{"targets": [2], "visible": False, "searchable": False}])
+  #table.click('alert(rowData)')
+  table.callBackFooterColumns([])
+  #table.callBackCreateRowHideFlag('CCY', 'GBP')
 
