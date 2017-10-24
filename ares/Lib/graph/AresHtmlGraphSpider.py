@@ -48,8 +48,8 @@ class D3SpiderChart(AresHtmlContainer.Svg):
           .attr("class", "legend")
           .attr("height", 100)
           .attr("width", 200)
-          .attr('transform', 'translate(90,20)')
-          ;
+          .attr('transform', 'translate(90,20)');
+
           //Create colour squares
           legend.selectAll('rect')
             .data(LegendOptions)
