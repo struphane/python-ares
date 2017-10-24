@@ -19,18 +19,12 @@ SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
                          ('Ajax Table', 'AresExTableAjax'),
                          ('Table with Chart', 'AresExTablePie')
                          ]),
-             ('Graphs', [('NvD3', 'AresExSimpleCharts'),
-                         ('Spider', 'AresExSpiderCharts'),
-                         ('Others', 'AresExOtherCharts'),
+             ('Charts', [('NvD3 - Part 1', 'AresExNvd3Charts1'),
+                         ('NvD3 - Part 2', 'AresExNvd3Charts2'),
+                         ('NvD3 - Part 3', 'AresExNvd3Charts3'),
+                         ('D2 - Spider', 'AresExSpiderCharts'),
+                         ('Others Charts', 'AresExOtherCharts'),
                          ]),
-
-             ('Templates', [
-               ('World Population', 'AresWorldPopulation'),
-               ('Data Extraction', 'AresDataExtract'),
-               ('Dashboard 1', 'AresDashboard1.py'),
-               ('Dashboard 2', 'AresDashboard2.py'),
-               ('Dashboard 3', 'AresDashboard3.py'),
-                      ]),
               ]
 
 def report(aresObj):

@@ -93,6 +93,7 @@ class Svg(AresHtml.Html):
 
   def __str__(self):
     """ Return the svg container """
+    self.processData()
     categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
     categories.select(self.selectedChartKey)
     self.dynKeySelection = categories.val # The javascript representation of the radio
@@ -105,7 +106,6 @@ class Svg(AresHtml.Html):
 
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
-    self.processData()
     self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
@@ -177,6 +177,7 @@ class MultiSvg(Svg):
 
   def __str__(self):
     """ Return the svg container """
+    self.processData()
     categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
     categories.select(self.selectedChartKey)
     self.dynKeySelection = categories.val # The javascript representation of the radio
@@ -188,7 +189,6 @@ class MultiSvg(Svg):
 
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
-    self.processData()
     self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
