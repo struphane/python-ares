@@ -15,14 +15,14 @@ class NvD3LineWithFocus(AresHtmlGraphSvg.MultiSvg):
   alias, chartObject = 'lineChartFocus', 'lineWithFocusChart'
   references = ['http://nvd3.org/examples/lineWithFocus.html']
   __chartStyle = {
-    'xAxis': {'tickFormat': "d3.format(',f')"},
-    'yAxis': {'tickFormat': "d3.format(',.2f')"},
-    'y2Axis': {'tickFormat': "d3.format(',.2f')"},
-    #'x': "function(d) { return d[0]; }",
-    #'y': "function(d) { return d[1]; }"
+      'x': "function(d) { return d[0]; }",
+      'y': "function(d) { return d[1]; }"
   }
 
   __chartProp = {
+    #'xAxis': {'tickFormat': "d3.format(',f')"},
+    #'yAxis': {'tickFormat': "d3.format(',.2f')"},
+    #'y2Axis': {'tickFormat': "d3.format(',.2f')"},
   }
 
   __svgProp = {

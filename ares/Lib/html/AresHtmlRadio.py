@@ -16,7 +16,7 @@ class Radio(AresHtml.Html):
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
-  def __init__(self, aresObj, recordSet, col=None, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, recordSet, col=None, cssCls=None, cssAttr=None, internalRef=None):
     """ Instantiate a Python Radio button """
     if col is not None:
       vals = set([])
@@ -28,6 +28,15 @@ class Radio(AresHtml.Html):
     super(Radio, self).__init__(aresObj, list(vals), cssCls, cssAttr)
     self.selected = None
     self.col = col
+    self.internalRef = internalRef
+
+  @property
+  def htmlId(self):
+    """ Property to get the HTML ID of a python HTML object """
+    if self.internalRef is not None:
+      return self.internalRef
+
+    return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
   def select(self, val):
     """ Change the selected value """

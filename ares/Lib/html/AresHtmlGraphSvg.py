@@ -127,16 +127,12 @@ class Svg(AresHtml.Html):
     """ Returns the selected category for the graph """
     return 'serie_%s' % self.htmlId
 
-  def dataMockFnc(self, cat=None, val=None):
-    """ Return the json data """
-    return open(r"ares\json\%sData.json" % self.alias).read().strip()
-
   def graph(self):
     """ Add the Graph definition in the Javascript method """
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
+    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
     categories.select(self.selectedChartKey)
     self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {})
+    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, internalRef='val_%s' % self.htmlId)
     values.select(self.selectedChartVal)
     self.dynValSelection = values.val # The javascript representation of the radio
 
@@ -154,12 +150,10 @@ class Svg(AresHtml.Html):
     """ Return the json data """
     self.chartKeys = [('MOCK', None)]
     self.selectedChartKey = 'MOCK'
-    self.dynKeySelection = self.chartKeys[0]
     self.chartVals = [('DATA', None)]
-    self.selectedChartVal = self.chartVals[0]
-    self.dynValSelection = 'DATA'
-    self.aresObj.jsGlobal.add("var %s_%s_%s = %s" % (self.htmlId, self.dynKeySelection, self.dynValSelection,
-                                                       open(r"ares\json\%sData.json" % self.alias).read().strip()))
+    self.selectedChartVal = self.chartVals[0][0]
+    self.aresObj.jsGlobal.add("%s_%s_%s = %s" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
+                                                 open(r"ares\json\%sData.json" % self.alias).read().strip()))
 
 class MultiSvg(Svg):
   """
@@ -190,7 +184,6 @@ class MultiSvg(Svg):
     values = AresHtmlRadio.Radio(self.aresObj, [val for val, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {})
     values.select(self.selectedChartVal)
     self.dynValSelection = values.val # The javascript representation of the radio
-
     categories.click([self])
     values.click([self])
 
