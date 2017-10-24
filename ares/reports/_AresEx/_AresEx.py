@@ -11,13 +11,9 @@ from ares.Lib import AresHtml
 
 NAME = 'Ares Example'
 # Just to set up the menu on the left hand side
-SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
-                         ]),
-
-              ('Tables', [('Basic Table', 'AresExTables'),
-                         ('Complex Table', 'AresExTablesComplex'),
-                         ('Ajax Table', 'AresExTableAjax'),
-                         ('Table with Chart', 'AresExTablePie')
+SHORTCUTS = [('Tables', [
+                          ('Tables - Tuto', 'AresExTables'),
+                          ('Complex Table', 'AresExTablesComplex'),
                          ]),
              ('Charts', [('Charts - Tuto', 'AresExChartPie'),
                          ('NvD3 - Part 1', 'AresExNvd3Charts1'),
