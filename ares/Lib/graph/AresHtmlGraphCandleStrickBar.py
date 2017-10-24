@@ -71,3 +71,11 @@ class NvD3CandlestickBarChart(AresHtmlGraphSvg.Svg):
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())
 
+  def processDataMock(self, cat=None, val=None):
+    """ Return the json data """
+    self.chartKeys = [('MOCK', None)]
+    self.selectedChartKey = 'MOCK'
+    self.chartVals = [('FIXED', None)]
+    self.selectedChartVal = self.chartVals[0][0]
+    self.aresObj.jsGlobal.add("%s_%s_%s = %s" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
+                                                 open(r"ares\json\%sData.json" % self.alias).read().strip()))

@@ -82,3 +82,12 @@ class NvD3PlotBox(AresHtmlGraphSvg.Svg):
     self.processData()
     self.htmlContent.append('<div %s class="gallery"><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+
+  def processDataMock(self, cat=None, val=None):
+    """ Return the json data """
+    self.chartKeys = [('MOCK', None)]
+    self.selectedChartKey = 'MOCK'
+    self.chartVals = [('DATA', None)]
+    self.selectedChartVal = self.chartVals[0][0]
+    self.aresObj.jsGlobal.add("%s_%s_%s = %s" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
+                                                 open(r"ares\json\%sData.json" % self.alias).read().strip()))
