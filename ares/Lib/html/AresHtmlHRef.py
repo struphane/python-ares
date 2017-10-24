@@ -32,12 +32,12 @@ class ExternalLink(AresHtml.Html):
     return '<a href="%s" %s target="_blank">%s</a>' % (self.url, self.strAttr(), self.vals)
 
 
-class A(AresHtml.Html):
+class Download(AresHtml.Html):
   """
-  Class to link a script to another sub script in a report
-  In this class no Javascript is used in the click event
+
   """
-  alias, cssCls = 'anchor', ['btn', 'btn-success']
+  alias, cssCls = 'anchor_download', ['fa fa-download']
+  flask = 'ares.downloadFiles'
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['jquery']
 
@@ -51,7 +51,7 @@ class A(AresHtml.Html):
 
   def resolve(self):
     """ Use Flak modules to translave the URL from the function name """
-    url = render_template_string('''{{ url_for(\'ares.run_report\', report_name=\'%(REPORT_NAME)s\', script_name=\'%(SCRIPT_NAME)s\') }}''' % self.getData)
+    url = render_template_string('''{{ url_for(\'ares.downloadFiles\', report_name=\'%(REPORT_NAME)s\', script_name=\'%(SCRIPT_NAME)s\') }}''' % self.getData)
     return url
 
   def __str__(self):
@@ -75,45 +75,7 @@ class A(AresHtml.Html):
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
 
 
-class ScriptPage(A):
-  """
-  Class to link a script to another sub script in a report
-  In this class no Javascript is used in the click event
-  """
-  alias, cssCls = 'main', ['']
-  reqCss = ['bootstrap']
-  reqJs = ['jquery']
-
-
-class Download(A):
-  """
-
-  """
-  alias, cssCls = 'anchor_download', ['fa fa-download']
-  flask = 'ares.downloadFiles'
-  reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['jquery']
-
-
-class CreateEnv(A):
-  """
-
-  """
-  alias, cssCls = 'anchor_set_env', ['btn', 'btn-primary']
-  flask = 'ares.ajaxCreate'
-  reqCss = ['bootstrap']
-  reqJs = ['jquery']
-
-
-class AddScript(A):
-  """ """
-  alias, cssCls = 'anchor_add_scripts', ['btn', 'btn-primary']
-  flask = 'ares.addScripts'
-  reqCss = ['bootstrap']
-  reqJs = ['jquery']
-
-
-class Href(AresHtml.Html):
+class InternalLink(AresHtml.Html):
   """
   Class to link a script to another sub script in a report
   In this class no Javascript is used in the click event
@@ -123,8 +85,8 @@ class Href(AresHtml.Html):
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['jquery']
 
-  def __init__(self, aresObj, vals, script, attrs, cssCls, cssAttr):
-    super(Href, self).__init__(aresObj, vals,  cssCls, cssAttr)
+  def __init__(self, aresObj, linkValue, script, attrs, cssCls, cssAttr):
+    super(InternalLink, self).__init__(aresObj, linkValue,  cssCls, cssAttr)
     self.getData = attrs if attrs is not None else {} # Special attributes to add to the URL
     if not 'REPORT_NAME' in self.getData:
       self.getData['REPORT_NAME'] = self.aresObj.http['REPORT_NAME']
