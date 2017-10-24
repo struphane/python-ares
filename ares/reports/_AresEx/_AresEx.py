@@ -19,7 +19,7 @@ SHORTCUTS = [('Tables', [
                          ('NvD3 - Part 1', 'AresExNvd3Charts1'),
                          ('NvD3 - Part 2', 'AresExNvd3Charts2'),
                          ('NvD3 - Part 3', 'AresExNvd3Charts3'),
-                         ('D2 - Spider', 'AresExSpiderCharts'),
+                         ('D3 - Spider', 'AresExSpiderCharts'),
                          ('Others Charts', 'AresExOtherCharts'),
                          ]),
               ]
