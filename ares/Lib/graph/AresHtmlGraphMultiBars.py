@@ -22,7 +22,7 @@ class NvD3MultiBars(AresHtmlGraphSvg.MultiSvg):
                   }
 
   __chartProp = {
-      'xAxis': {'tickFormat': "d3.format(',f')"},
+      #'xAxis': {'tickFormat': "d3.format(',f')"},
       'yAxis': {'tickFormat': "d3.format(',.1f')"}
   }
   reqCss = ['bootstrap', 'font-awesome', 'd3']
@@ -39,7 +39,7 @@ class NvD3MultiBars(AresHtmlGraphSvg.MultiSvg):
     """  """
     dispatchChart = []
     for displathKey, jsFnc in self.dispatch.items():
-      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
+      dispatchChart.append("%s.multibar.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
     return '''
             var %s = nv.models.%s().%s ;
             %s
@@ -47,3 +47,7 @@ class NvD3MultiBars(AresHtmlGraphSvg.MultiSvg):
             nv.utils.windowResize(%s.update);
           ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
                  self.htmlId, self.jqData, self.htmlId, self.htmlId)
+
+  def alertVal(self):
+    """ Add a click even on the chart  """
+    self.dispatch['elementClick'] = "alert('selected value = ')"
