@@ -4,7 +4,7 @@ def report(aresObj):
   """
 
   """
-  aresObj.title2("How to create a Pie Chart")
+  aresObj.title2("How to create a Donut Chart")
 
   aresObj.title4("Everything starts with the data")
   aresObj.preformat(
@@ -50,5 +50,23 @@ def report(aresObj):
 
   aresObj.title4("How to customize your chart")
   donut1 = aresObj.donut(recordSet, header)
+  donut1.addChartAttr({'startAngle': "function(d) { return d.startAngle/2 -Math.PI/2 }"})
+  donut1.addChartAttr({'endAngle': "function(d) { return d.endAngle/2 -Math.PI/2 }"})
   donut1.setKeys(["CCY", 'PTF'], selected=1)
   donut1.setVals(["VAL", 'VAL2'])
+  donut1.alertVal()
+
+  aresObj.row([
+      aresObj.col([
+      aresObj.paragraph(" With the below line of Python"),
+      aresObj.preformat('''
+      donut1 = aresObj.donut(recordSet, header)
+      donut1.addChartAttr({'startAngle': "function(d) { return d.startAngle/2 -Math.PI/2 }"})
+      donut1.addChartAttr({'endAngle': "function(d) { return d.endAngle/2 -Math.PI/2 }"})
+      donut1.setKeys(["CCY", 'PTF'], selected=1)
+      donut1.setVals(["VAL", 'VAL2'])
+      donut1.alertVal()''')])
+  , donut1])
+
+
+  aresObj.internalLink("Next training", 'AresExChartMultibar')
