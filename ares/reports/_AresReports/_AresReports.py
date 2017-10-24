@@ -55,6 +55,7 @@ def report(aresObj):
     iconComp = aresObj.icon('trash')
     iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
     content.append({'folderName': name, 'Date': folderInfo['LAST_MOD_DT'], 'Size': float(folderInfo['SIZE'].split(" ")[0]),
+                    'Day': folderInfo['LAST_MOD_DT'].split(" ")[0],
                     'folderLink': aresObj.internalLink(name, folder, attrs={'REPORT_NAME': folder}, cssCls=[]),
                     #'folderLink': aresObj.anchor(name, **{'report_name': folder, 'cssCls': ''}),
                     # TODO add this page in the bottom right section
@@ -75,16 +76,17 @@ def report(aresObj):
                                       {'key': 'Size', 'colName': 'Size in Ko'},
                                       {'key': 'delete', 'colName': '', 'type': 'object'}], 'Existing Reports')
   #tableComp.filters(['Folder Name'])
-  pie = aresObj.pie(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
-                              {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
+  bar = aresObj.bar(content, [{'key': 'folderName', 'colName': 'Folder Name'},
+                              {'key': 'Day', 'colName': 'Last Modification'},
+                              {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number'},
                               {'key': 'Date', 'colName': 'Last Modification'},
                               {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                               {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                               {'key': 'delete', 'colName': ''}], 'Scripts per folder')
 
   #
-  pie.setKeys(['Date'])
-  pie.setVals(['Size'])
+  bar.setKeys(['Day'])
+  bar.setVals(['Size'])
 
   inputModal = aresObj.input("Report Name", '')
   createReport = aresObj.ok('Create the Report')
@@ -102,4 +104,4 @@ def report(aresObj):
   donut.setKeys(['folderName'])
   donut.setVals(['activity'])
 
-  aresObj.row([pie, donut])
+  aresObj.row([bar, donut])
