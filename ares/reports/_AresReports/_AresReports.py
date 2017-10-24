@@ -13,7 +13,7 @@ def report(aresObj):
   """
 
   """
-  aresInput = aresObj.input("Report Name", '')
+
   reportsPath = aresObj.http.get('DIRECTORY')
   # Get the list of all the reports
   foldersReports, folderEvents = [], {}
@@ -34,13 +34,6 @@ def report(aresObj):
           folderEvents[folder]['count'] += 1
         log.close()
   # Add this list to the auto completion of the input item
-  aresInput.autocomplete(foldersReports)
-  aresButton = aresObj.internalLink('Open Report Section', aresInput, attrs={'REPORT_NAME': folder}, cssCls=['btn', 'btn-success'])
-  modal = aresObj.modal('click on the link to create a new report section')
-  modal.modal_header = "Set New Environment"
-  grid = aresObj.row([aresButton, modal])
-  grid.gridCss = None
-  aresObj.container('Create Environment', [aresInput, grid])
   content = []
   for folder, folderInfo in aresObj.getFoldersInfo().items():
     if not os.path.exists(os.path.join(aresObj.http['DIRECTORY'], folder, "%s.py" % folder)):
@@ -66,8 +59,6 @@ def report(aresObj):
                     }
                    )
 
-
-  aresObj.fixedModal('Open')
   # Create a new report # 'Existing Reports',
   tableComp = aresObj.table(content, [{'key': 'folderLink', 'colName': 'Folder Name', 'type': 'object'},
                                       {'key': 'FolderFiles', 'colName': 'Count Files'},
@@ -88,12 +79,6 @@ def report(aresObj):
   bar.setKeys(['Day'])
   bar.setVals(['Size'])
 
-  inputModal = aresObj.input("Report Name", '')
-  createReport = aresObj.ok('Create the Report')
-
-  #createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal, 'js': "%s.modal('toggle') ; display(data) ;" % modal.jqId})
-  aresObj.addTo(modal, inputModal)
-  aresObj.addTo(modal, createReport)
   donut = aresObj.donut(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
                                   {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
                                   {'key': 'Date', 'colName': 'Last Modification'},
