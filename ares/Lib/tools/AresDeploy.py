@@ -73,7 +73,7 @@ if __name__ == '__main__':
           ]
 
   #email address registered on the server
-  username = 'blabla@uk.bnpparibas.com'
+  username = 'nelson.allain@gmail.com'
   REPORT = 'deploy_test'
 
   # Function used to send files to the server

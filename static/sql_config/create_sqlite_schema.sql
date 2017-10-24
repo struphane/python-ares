@@ -29,6 +29,7 @@ CREATE TABLE file_auth (
 CREATE TABLE env_def (
  env_id integer PRIMARY KEY AUTOINCREMENT,
  env_name text NOT NULL UNIQUE,
+ cmm text,
  crea_dt timestamp DEFAULT CURRENT_TIMESTAMP
 );
 

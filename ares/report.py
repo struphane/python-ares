@@ -328,11 +328,8 @@ def pivotData(format):
 
   return json.dumps('Format %s not recognised' % format)
 
-
-
-
-@report.route("/admin/<report_name>", methods=['GET'])
-def adminEnv(report_name):
+@report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
+def adminEnv(report_name, token):
   """ Admin session for the environment """
   #
   #
