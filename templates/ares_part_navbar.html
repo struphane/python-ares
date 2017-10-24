@@ -11,12 +11,12 @@ https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/
     <div class="collapse navbar-collapse" style="left:0px;padding-left:150px;position:fixed;top:3px;display: inline-block;width:100%;z-index:-1">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-          <a href="#" class="btn btn-outline-success active" data-toggle="dropdown">{{ name|safe }}</a>
+          <a href="#" class="btn btn-outline-success active" data-toggle="dropdown"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
         </li>
       </ul>
 
       <li class="nav-item dropdown">
-           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">HTML Archives</a>
+           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:white"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;HTML Archives</a>
           <div class="dropdown-menu">
               {{ htmlArchives|safe }}
           </div>
