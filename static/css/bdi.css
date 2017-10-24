@@ -81,6 +81,13 @@ button[name="ares_prop"] {
     margin-right: 5px;
 }
 
+.dropdown a {
+    color: #000000;
+    padding: 1px 10px;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+}
 
 .dropdown-submenu {
     position: relative;
@@ -98,21 +105,6 @@ button[name="ares_prop"] {
     display: block;
 }
 
-.dropdown-submenu > a::after {
-    border-bottom: 0.3em solid transparent;
-    border-left-color: inherit;
-    border-left-style: solid;
-    border-left-width: 0.3em;
-    border-top: 0.3em solid transparent;
-    content: " ";
-    display: block;
-    float: right;
-    height: 0;
-    margin-right: -0.6em;
-    margin-top: -0.95em;
-    width: 0;
-}
-
 .dropdown-submenu.pull-left {
     float: none;
 }
@@ -121,13 +113,9 @@ button[name="ares_prop"] {
     left: -75%;
 }
 
-.dropdown-menu .divider {
-    background-color: #e5e5e5;
-    height: 1px;
-    margin: 9px 0;
-    overflow: hidden;
+.dropdown-submenu:hover > .dropdown-content {
+    display: block;
 }
-
 
 
 ul.tick {

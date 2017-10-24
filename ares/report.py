@@ -245,7 +245,7 @@ def run_report(report_name, script_name, user_id):
     savedHtmlLocation = os.path.join(userDirectory, 'saved')
     if os.path.exists(savedHtmlLocation):
       for htmlPage in os.listdir(savedHtmlLocation):
-        htmlArchives.append("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1])))
+        htmlArchives.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1]))))
     if isAuth:
       if not report_name.startswith("_"):
         sys.path.remove(userDirectory)

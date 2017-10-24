@@ -172,8 +172,9 @@ class ImportManager(object):
     for cssAlias in cssAliases:
       for urlModule in list(self.cssImports[cssAlias]['main']):
         cssList.append('<link rel="stylesheet" href="%s" type="text/css">' % urlModule)
-    for localCssFile in localCss:
-      cssList.append('<link rel="stylesheet" href="{{ url_for(\'static\',filename=\'users/%s\') }}" type="text/css">' % localCssFile)
+    if localCss is not None:
+      for localCssFile in localCss:
+        cssList.append('<link rel="stylesheet" href="{{ url_for(\'static\',filename=\'users/%s\') }}" type="text/css">' % localCssFile)
     return "\n".join([render_template_string(css) for css in cssList])
 
   def jsResolve(self, jsAliases, localJs=None):
@@ -183,8 +184,9 @@ class ImportManager(object):
     for jsAlias in jsAliases:
       for urlModule in list(self.jsImports[jsAlias]['main']):
         jsList.append('<script language="javascript" type="text/javascript" src="%s"></script>' % urlModule)
-    for localJsFile in localJs:
-      jsList.append('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\',filename=\'users/%s\') }}"></script>' % localJsFile)
+    if localJs is not None:
+      for localJsFile in localJs:
+        jsList.append('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\',filename=\'users/%s\') }}"></script>' % localJsFile)
     return "\n".join([render_template_string(js) for js in jsList])
 
   def cssGetAll(self):
