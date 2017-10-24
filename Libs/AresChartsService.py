@@ -174,10 +174,11 @@ def toPlotBox(recordSet, keys, valCols, withMean=True, seriesNames=None):
     result.append({'label': names.get(key, key), 'values': scaledVal})
   return {'%s_FIXED' % keyAgg : result}
 
-def toCandleStick(recordSet, dateCol, openCol, highCol, lowCol, closeCol, volumeCol, adjustedCol, dtFormat='%Y-%m-%d'):
+def toCandleStick(recordSet, dateInfo, openCol, highCol, lowCol, closeCol, volumeCol, adjustedCol):
   """  """
   res = []
+  dateCol, dtFormat = dateInfo[0]
   for rec in recordSet:
     res.append({"date": rec[dateCol], "open": float(rec[openCol]), "high": float(rec[highCol]), "low": float(rec[lowCol]),
                 "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
-  return res
+  return {"%s_FIXED" % dateCol: [{'values': res}]}
