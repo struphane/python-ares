@@ -107,11 +107,19 @@ class InternalLink(AresHtml.Html):
     jsDef = '''
               %s.on("click", function (event){
                 var baseUrl = "%s";
-                if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + %s ; }
-                else { var ullUrl = baseUrl + "?" + %s ; }
+                var data = %s;
+                var params = "";
+                for (key in data) {
+                  if (!key == 'REPORT_NAME' && !key == 'SCRIPT_NAME') {
+                    params = params + '&' + key + '=' + data[key];
+                  }
+                }
+                   
+                if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + params ; }
+                else { var ullUrl = baseUrl + "?" + params ; }
                 window.location.href = ullUrl ;
               }
             ) ;
-            ''' % (self.jqId, url, data, data)
+            ''' % (self.jqId, url, data)
     self.aresObj.jsOnLoadFnc.add(jsDef)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)

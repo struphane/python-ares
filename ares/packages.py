@@ -26,7 +26,8 @@ ARES = {
     'FILES': [
       ('Libs', 'AresSecurity.py'),
       ('Libs', 'AresUserAuthorization.py'),
-      ('ares', 'Lib', 'AresExceptions.py')],
+      ('ares', 'Lib', 'AresExceptions.py'),
+      ('ares', 'Lib', 'AresSql.py')],
   },
 
   'REMAP': {
