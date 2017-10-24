@@ -31,7 +31,7 @@ def report(aresObj):
   val = aresObj.paragraph("Different simple components already wrapped in python to step in very quickly."
                           " Framework compatible with both Python 2.7 and up. Modules documented and split to allow"
                           " you or your IT teams to fully customize it for your business needs")
-  moreDetails = aresObj.href("Get more details", "_AresDocPython")
+  moreDetails = aresObj.internalLink("Get more details", "_AresDocPython")
   aresObj.row([aresObj.col([val, moreDetails]), aresObj.img('tmpl_rpt.JPG')])
   aresObj.title3(" Be more productive and be an actor in your system ")
   val1 = aresObj.paragraph("Re use any D3 or bespoke charts to display your information in a dynamic manner"
@@ -41,7 +41,7 @@ def report(aresObj):
                            " managed by the python layer. All the components used are defined in the AresImports.py. "
                            " Each reports and modules can be downloaded from the web interface and can then be run locally")
   title = aresObj.title4(" Give an new dimension to your local simple scripts", cssAttr={'font-weight': 'bold', 'text-align': 'center'})
-  moreDetails = aresObj.href("Get more details", "_AresDocReport")
+  moreDetails = aresObj.internalLink("Get more details", "_AresDocReport")
   aresObj.row([aresObj.img('d3_components.JPG'), aresObj.col([val1, val2, title, moreDetails])])
 
   aresObj.title3(" Link all the components within your IT company ")

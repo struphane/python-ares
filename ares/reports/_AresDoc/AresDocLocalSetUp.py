@@ -26,7 +26,7 @@ def report(aresObj):
   aresObj.title2("Manual configuration")
   content1 = aresObj.paragraph("The Framework is very easy to set up and it will allow to perform all the tests fully locally based on your environment "
                               "but it will allow you also to deploy your scripts easily on the server. The only thing required is to click on the Download AReS link "
-                              "{0}, to unzip the archive in a folder and then to start writing your first Python codes in a folder.", htmlComp=[aresObj.href("AReS", '', cssCls=[])])
+                              "{0}, to unzip the archive in a folder and then to start writing your first Python codes in a folder.", htmlComp=[aresObj.internalLink("AReS", '', cssCls=[])])
   content2 = aresObj.paragraph("Using this way you will get the same environment except that the NewReport folder will not be generated."
                                "This folder is not very useful, it will just help you on understanding the structure of a project.")
   downloadPicture = aresObj.img('ares_download.JPG')

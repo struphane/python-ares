@@ -21,7 +21,7 @@ ARES = {
   'EXCLUDED': {
     'FOLDERS': [
       ('static', 'sql_config'),
-      ('system'),
+      ('system', ),
     ],
     'FILES': [
       ('Libs', 'AresSecurity.py'),
