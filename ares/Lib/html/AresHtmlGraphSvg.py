@@ -94,6 +94,18 @@ class Svg(AresHtml.Html):
   def __str__(self):
     """ Return the svg container """
     self.processData()
+    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
+    categories.select(self.selectedChartKey)
+    self.dynKeySelection = categories.val # The javascript representation of the radio
+    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, internalRef='val_%s' % self.htmlId)
+    values.select(self.selectedChartVal)
+    self.dynValSelection = values.val # The javascript representation of the radio
+
+    categories.click([self])
+    values.click([self])
+
+    self.htmlContent.append(str(categories))
+    self.htmlContent.append(str(values))
     self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
@@ -129,19 +141,6 @@ class Svg(AresHtml.Html):
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, internalRef='val_%s' % self.htmlId)
-    values.select(self.selectedChartVal)
-    self.dynValSelection = values.val # The javascript representation of the radio
-
-    categories.click([self])
-    values.click([self])
-
-    self.htmlContent.append(str(categories))
-    self.htmlContent.append(str(values))
-
     chartAttributes = []
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())
@@ -176,8 +175,9 @@ class MultiSvg(Svg):
     """ Returns the javascript SVG reference """
     return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
 
-  def graph(self):
-    """ Add the Graph definition in the Javascript method """
+  def __str__(self):
+    """ Return the svg container """
+    self.processData()
     categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
     categories.select(self.selectedChartKey)
     self.dynKeySelection = categories.val # The javascript representation of the radio
@@ -189,7 +189,12 @@ class MultiSvg(Svg):
 
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
+    self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
+    return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
+
+  def graph(self):
+    """ Add the Graph definition in the Javascript method """
     chartAttributes = []
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())

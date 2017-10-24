@@ -64,3 +64,6 @@ class NvD3Donut(AresHtmlGraphSvg.Svg):
     """ Add a click even on the chart  """
     self.dispatch['elementClick'] = jsFnc
 
+  def alertVal(self):
+    """ Add a click even on the chart  """
+    self.dispatch['elementClick'] = "alert('selected value = ' + e.data) ;"

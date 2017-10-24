@@ -13,7 +13,7 @@ def report(aresObj):
   """
 
   """
-  aresInput = aresObj.input("Report Name", '')
+
   reportsPath = aresObj.http.get('DIRECTORY')
   # Get the list of all the reports
   foldersReports, folderEvents = [], {}
@@ -34,13 +34,6 @@ def report(aresObj):
           folderEvents[folder]['count'] += 1
         log.close()
   # Add this list to the auto completion of the input item
-  aresInput.autocomplete(foldersReports)
-  aresButton = aresObj.internalLink('Open Report Section', aresInput, attrs={'REPORT_NAME': folder}, cssCls=['btn', 'btn-success'])
-  modal = aresObj.modal('click on the link to create a new report section')
-  modal.modal_header = "Set New Environment"
-  grid = aresObj.row([aresButton, modal])
-  grid.gridCss = None
-  aresObj.container('Create Environment', [aresInput, grid])
   content = []
   for folder, folderInfo in aresObj.getFoldersInfo().items():
     if not os.path.exists(os.path.join(aresObj.http['DIRECTORY'], folder, "%s.py" % folder)):
@@ -55,6 +48,7 @@ def report(aresObj):
     iconComp = aresObj.icon('trash')
     iconComp.post('click', "./delete_folder/%s" % folder, {}, 'location.reload();')
     content.append({'folderName': name, 'Date': folderInfo['LAST_MOD_DT'], 'Size': float(folderInfo['SIZE'].split(" ")[0]),
+                    'Day': folderInfo['LAST_MOD_DT'].split(" ")[0],
                     'folderLink': aresObj.internalLink(name, folder, attrs={'REPORT_NAME': folder}, cssCls=[]),
                     #'folderLink': aresObj.anchor(name, **{'report_name': folder, 'cssCls': ''}),
                     # TODO add this page in the bottom right section
@@ -65,8 +59,6 @@ def report(aresObj):
                     }
                    )
 
-
-  aresObj.fixedModal('Open')
   # Create a new report # 'Existing Reports',
   tableComp = aresObj.table(content, [{'key': 'folderLink', 'colName': 'Folder Name', 'type': 'object'},
                                       {'key': 'FolderFiles', 'colName': 'Count Files'},
@@ -75,31 +67,26 @@ def report(aresObj):
                                       {'key': 'Size', 'colName': 'Size in Ko'},
                                       {'key': 'delete', 'colName': '', 'type': 'object'}], 'Existing Reports')
   #tableComp.filters(['Folder Name'])
-  pie = aresObj.pie(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
-                              {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
+  bar = aresObj.bar(content, [{'key': 'folderName', 'colName': 'Folder Name'},
+                              {'key': 'Day', 'colName': 'Last Modification'},
+                              {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number'},
                               {'key': 'Date', 'colName': 'Last Modification'},
                               {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                               {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
                               {'key': 'delete', 'colName': ''}], 'Scripts per folder')
 
   #
-  pie.setKeys(['Date'])
-  pie.setVals(['Size'])
+  bar.setKeys(['Day'])
+  bar.setVals(['Size'])
 
-  inputModal = aresObj.input("Report Name", '')
-  createReport = aresObj.ok('Create the Report')
+  donut = aresObj.donut(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
+                                  {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
+                                  {'key': 'Date', 'colName': 'Last Modification'},
+                                  {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
+                                  {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
+                                  {'key': 'delete', 'colName': ''}], 'Folder')
 
-  #createReport.post('click', 'ares.ajaxCreate', **{'report_name': inputModal, 'js': "%s.modal('toggle') ; display(data) ;" % modal.jqId})
-  aresObj.addTo(modal, inputModal)
-  aresObj.addTo(modal, createReport)
-  #donut = aresObj.donut(content, [{'key': 'folderName', 'colName': 'Folder Name', 'selected': True},
-  #                                {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
-  #                                {'key': 'Date', 'colName': 'Last Modification'},
-  #                                {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
-  #                                {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
-  #                                {'key': 'delete', 'colName': ''}], 'Folder')
-  #
-  #donut.setKeys(['folderName'])
-  #donut.setVals(['activity'])
+  donut.setKeys(['folderName'])
+  donut.setVals(['activity'])
 
-  #aresObj.row([pie, donut])
+  aresObj.row([bar, donut])

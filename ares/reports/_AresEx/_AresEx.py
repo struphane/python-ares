@@ -11,26 +11,17 @@ from ares.Lib import AresHtml
 
 NAME = 'Ares Example'
 # Just to set up the menu on the left hand side
-SHORTCUTS = [('Text', [('Input Events', 'AresExText'),
+SHORTCUTS = [('Tables', [
+                          ('Tables - Tuto', 'AresExTables'),
+                          ('Complex Table', 'AresExTablesComplex'),
                          ]),
-
-              ('Tables', [('Basic Table', 'AresExTables'),
-                         ('Complex Table', 'AresExTablesComplex'),
-                         ('Ajax Table', 'AresExTableAjax'),
-                         ('Table with Chart', 'AresExTablePie')
+             ('Charts', [('Charts - Tuto', 'AresExChartPie'),
+                         ('NvD3 - Part 1', 'AresExNvd3Charts1'),
+                         ('NvD3 - Part 2', 'AresExNvd3Charts2'),
+                         ('NvD3 - Part 3', 'AresExNvd3Charts3'),
+                         ('D3 - Spider', 'AresExSpiderCharts'),
+                         ('Others Charts', 'AresExOtherCharts'),
                          ]),
-             ('Graphs', [('NvD3', 'AresExSimpleCharts'),
-                         ('Spider', 'AresExSpiderCharts'),
-                         ('Others', 'AresExOtherCharts'),
-                         ]),
-
-             ('Templates', [
-               ('World Population', 'AresWorldPopulation'),
-               ('Data Extraction', 'AresDataExtract'),
-               ('Dashboard 1', 'AresDashboard1.py'),
-               ('Dashboard 2', 'AresDashboard2.py'),
-               ('Dashboard 3', 'AresDashboard3.py'),
-                      ]),
               ]
 
 def report(aresObj):

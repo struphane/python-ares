@@ -32,7 +32,6 @@ class NvD3LineCumulative(AresHtmlGraphSvg.MultiSvg):
 
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
-
     recordSet = AresChartsService.toMultiSeries(self.vals, self.chartKeys, self.selectedX , self.chartVals)
     for key, vals in recordSet.items():
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
