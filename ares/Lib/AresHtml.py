@@ -268,8 +268,9 @@ class Html(object):
 
   def html(self):
     """ Return the onload, the HTML object and the javascript events """
+    strObj = str(self) # The string representation should be the first one to be triggered
     self.graph()
-    return self.onLoad(), str(self), self.jsEvents()
+    return self.onLoad(), strObj, self.jsEvents()
 
   @classmethod
   def aresExample(cls, aresObj):
