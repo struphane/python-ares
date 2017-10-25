@@ -178,20 +178,32 @@ a.top-slide:hover {
 	opacity: 1;
 }
 
-tr.details td:first-child {
+tr.details td:first-child:before {
     color: black;
-    background-image: url("/static/images/grey-plus.png");
-    background-repeat: no-repeat;
-    background-position: left;
+    content: "\f196";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
     cursor: pointer ;
+    top: 0px;
+    right: 0;
+    padding-right:5px;
 }
 
-tr.nodetails td:first-child {
+tr.details td.changed:first-child:before {
+    content: "\f147";
+}
+
+tr.nodetails td:first-child:before {
     color: black;
-    background-image: url("/static/images/grey-minus.png");
-    background-repeat: no-repeat;
-    background-position: left;
+    content: "\f147";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
     cursor: pointer ;
+    top: 0px;
+    right: 0;
+    padding-right:5px;
 }
 
 .ares-panel-success {

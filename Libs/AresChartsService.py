@@ -15,10 +15,13 @@ in the chart interface in the future your report will not be impacted as this in
 
 """
 
+import re
 import json
 import time
 import datetime
 import collections
+
+regex = re.compile('[^a-zA-Z0-9]')
 
 def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat):
   """ Function dedicated to return from a recordSet for the 2D charts with single series
@@ -182,3 +185,39 @@ def toCandleStick(recordSet, dateInfo, openCol, highCol, lowCol, closeCol, volum
     res.append({"date": rec[dateCol], "open": float(rec[openCol]), "high": float(rec[highCol]), "low": float(rec[lowCol]),
                 "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
   return {"%s_FIXED" % dateCol: [{'values': res}]}
+
+def toHyrTable(recordSet, keys, vals):
+  """
+  In order to produce a pivot table values should be float figures
+
+  This is an version using basic python functions to allow users without Pandas to use it
+  """
+  parents = collections.defaultdict(lambda: collections.defaultdict(float))
+  for rec in recordSet:
+    compositeKey = [''] * len(keys)
+    cssClass = set()
+    for i, key in enumerate(keys):
+      compositeKey[i] = rec[key]
+      for j, val in enumerate(vals):
+        parents[tuple(compositeKey)][val] += rec[val]
+      cssClass.add(regex.sub('', ''.join(compositeKey).strip()))
+      parents[tuple(compositeKey)]['level'] = i
+      parents[tuple(compositeKey)]['cssCls'] = list(cssClass)
+      parents[tuple(compositeKey)]['__count'] += 1
+  fullKeys = sorted(parents.keys())
+  result = []
+  for compKey in fullKeys:
+    row = dict(zip(keys, list(compKey)))
+    for val in vals:
+      row[val] = parents[compKey][val]
+    row['cssCls'] = parents[compKey]['cssCls'][:-1]
+    row['_id'] = parents[compKey]['cssCls'][-1]
+    if parents[compKey]['__count'] == 1:
+      row['_leaf'] = 1
+    else:
+      row['_hasChildren'] = 1
+    if parents[compKey]['level'] == 0:
+      row['_parent'] = 1
+    row['level'] = parents[compKey]['level']
+    result.append(row)
+  return result

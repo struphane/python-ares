@@ -9,7 +9,7 @@ from ares.Lib import AresItem
 from ares.Lib import AresJs
 from ares.Lib.html import AresHtmlContainer
 from flask import render_template_string
-
+from Libs import AresChartsService
 
 class Td(AresHtml.Html):
   """ Python class for the TD objects """
@@ -28,7 +28,6 @@ class Td(AresHtml.Html):
     if self.rowspan > 1:
       self.attr['rowspan'] = self.rowspan
     withId = 'title' in self.attr
-    print(self.attr)
     return '<%s %s>%s</%s>' % (self.tag, self.strAttr(withId=withId), self.vals, self.tag)
 
   def mouseOver(self, bgcolor, fontColor='#FFFFFF'):
@@ -306,17 +305,75 @@ class SimpleTable(AresHtml.Html):
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
+    self.tdCssCls = tdCssCls
+    self.tdCssAttr = tdCssAttr
     for val in vals:
       row = []
       for header in self.header[-1]:
         cellVal = val.get(self.recKey(header), self.dflt)
         if cellVal is not None:
-          row.append(Td(aresObj, cellVal, cssCls=tdCssCls, cssAttr=tdCssAttr))
+          row.append(Td(aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=self.tdCssAttr))
       self.__data.append(row)
 
   def recKey(self, col):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
+
+  def setIndentedTree(self, keys, vals):
+    """ """
+    header = self.__data[0]
+    vals = AresChartsService.toHyrTable(self.vals, keys, vals)
+    self.__data = [header]
+    self.__rows_hidden = {}
+    for i, val in enumerate(vals):
+      print(val)
+      row, indexCol = [], i+1
+      #
+      if not indexCol in self.__rows_attr['rows']:
+        self.__rows_attr['rows'][indexCol] = {'name': val['_id']}
+      else:
+        self.__rows_attr['rows'][indexCol]['name'] = val['_id']
+      self.__rows_attr['rows'][indexCol]['data-index'] = val['level']
+
+      if 'class' in self.__rows_attr['rows'][indexCol]:
+        self.__rows_attr['rows'][indexCol]['class'].extend(val['cssCls'])
+      else:
+        self.__rows_attr['rows'][indexCol]['class'] = val['cssCls']
+
+      if val.get('_parent', 0) == 0:
+        if 'css' in self.__rows_attr['rows'][indexCol]:
+          self.__rows_attr['rows'][indexCol]['css'].update({'display': 'None'})
+        else:
+          self.__rows_attr['rows'][indexCol]['css'] = {'display': 'None'}
+
+      #
+      if val.get('_hasChildren', 0) == 1:
+        self.__rows_attr['rows'][indexCol]['class'].append('details')
+      for j, header in enumerate(self.header[-1]):
+        cellVal = val.get(self.recKey(header), self.dflt)
+        attrCss = dict(self.tdCssAttr) if self.tdCssAttr is not None else {}
+        if cellVal is not None:
+          if j == 0:
+            attrCss['padding-left'] = '%spx' % (val['level'] * 15)
+          row.append(Td(self.aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=attrCss))
+      self.__data.append(row)
+
+    self.aresObj.jsOnLoadFnc.add(
+      '''
+      $( ".details > td:first-child" ).click(function() {
+        var trObj = $(this).closest('tr');
+        var children_data_id = trObj.data('index') + 1;
+        alert(children_data_id);
+        var isVisible = $( "." +  trObj.attr('name') + "[data-index=" + children_data_id + "]").is(':hidden');
+        if (isVisible) {
+          $( "." + trObj.attr('name')).hide() ;
+        } else {
+          $( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
+        }
+        $( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
+        $(this).toggleClass('changed');
+      });
+      ''')
 
   def getCell(self, row, col):
     """ Returns the underlying cell object """
@@ -356,6 +413,9 @@ class SimpleTable(AresHtml.Html):
         trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
       if 'class' in attr:
         trRes.append('class="%s"' % " ".join(attr['class']))
+      for attrCod in ['name', 'id', 'data-index']:
+        if attrCod in attr:
+          trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
       trSpecialAttr[row] = " ".join(trRes)
 
     html = ["<thead>"]
