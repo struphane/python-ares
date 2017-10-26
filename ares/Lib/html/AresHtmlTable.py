@@ -443,13 +443,19 @@ class SimpleTable(AresHtml.Html):
     for row in self.__rows_attr['rows']:
       attr = self.__rows_attr['rows'][row]
       trRes = []
+      if 'ALL' in self.__rows_attr['rows']:
+        for attrCod, val in self.__rows_attr['rows'].items():
+          if attrCod in attr:
+            attr[attrCod].append(self.__rows_attr['rows']['ALL'][val])
+          else:
+            attr[attrCod] = self.__rows_attr['rows'].get('ALL', {})[attrCod] = val
+      #
       if 'css' in attr:
         trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
-      if 'class' in attr:
-        trRes.append('class="%s"' % " ".join(attr['class']))
-      for attrCod in ['name', 'id', 'data-index', 'onmouseover', 'onMouseOut']:
+      for attrCod in ['name', 'id', 'data-index', 'onmouseover', 'onMouseOut', 'class']:
         if attrCod in attr:
           trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
+
       trSpecialAttr[row] = " ".join(trRes)
 
     html = ["<thead>"]
@@ -499,7 +505,10 @@ class SimpleTable(AresHtml.Html):
 
   def cssRowMouseHover(self, bgColor, fontCOlor, rowNum=None):
     if rowNum is None:
-      row = self.__rows_attr
+      if 'rows' in self.__rows_attr:
+        row = self.__rows_attr['rows'] = {'ALL': {}}
+      else:
+        row = self.__rows_attr['rows']['ALL'] = []
     else:
       if not rowNum in self.__rows_attr['rows']:
         self.__rows_attr['rows'][rowNum] = {}

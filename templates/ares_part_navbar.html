@@ -1,46 +1,74 @@
 <!--
-https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/
+https:// view-source:https://v4-alpha.getbootstrap.com/examples/navbars/
+https://www.bootply.com/60886#
 -->
 
-<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top" style="max-height:45px;position:fixed;top:0;">
-    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-            aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span></button>
-    <a name="side_change" href="#" style="color:white;width:20px;z-index:1"><i class="fa fa-bars fa-2x"></i></a>
-    <a class="navbar-brand" href="{{ url_for('ares.run_report') }}" style="margin-top:3px;left:50px;font-size: 20px;position:fixed;top:0"><strong>RiskLab</strong></strong></a>
-    <div class="collapse navbar-collapse" style="left:0px;padding-left:150px;position:fixed;top:3px;display: inline-block;width:100%;z-index:-1">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a href="#" class="btn btn-outline-success active" data-toggle="dropdown"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="navbar-brand">
+          <a name="side_change"  href="#"><i class="fa fa-bars fa-2x"></i></a>
+          <a  href="#"><strong>RiskLab</strong></a>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <a href="#"  class="btn btn-outline-success active"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
+          {% if downloadEnv %}
+            <a  href="{{ url_for('ares.downloadReport', report_name=downloadEnv ) }}" class="btn"><i class="fa fa-cloud-download" aria-hidden="true">&nbsp;&nbsp;Download</i></a>
+          {% endif %}
+      </div>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  HTML Archives
+                </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  {{ htmlArchives|safe }}
+              </div>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Packages
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='ARES') }}">AReS Package</a>
+              <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='CHART') }}">Chart Service</a>
+            </div>
+          </li>
+        </ul>
+
+         <li class="nav-item  dropdown " id="menuLogin">
+            <a class="dropdown-toggle" href="#" data-toggle="dropdown" id="navLogin">Login</a>
+            <div class="dropdown-menu" style="padding:17px;">
+                <form id="formLogin" class="form">
+                    <label>Login</label>
+                    <input name="_csrf" id="token" type="hidden" value="oO9MUEHl-g3xpNL_k_TMalST44AddDaBwn4U">
+                    <input name="username" id="username" type="text" placeholder="Username" pattern="^[a-z,A-Z,0-9,_]{6,15}$" data-valid-min="6" title="Enter your username" required="">
+                    <input name="password" id="password" type="password" placeholder="Password" title="Enter your password" required=""><br>
+                    <button type="button" id="btnLogin" class="btn">Login</button>
+                </form>
+                <form><a href="#" title="Fast and free sign up!" id="btnNewUser" data-toggle="collapse" data-target="#formRegister">New User? Sign-up..</a></form>
+                <form id="formRegister" class="form collapse">
+                    <input name="_csrf" id="token" type="hidden" value="oO9MUEHl-g3xpNL_k_TMalST44AddDaBwn4U">
+                    <input name="email" id="inputEmail" type="email" placeholder="Email" required="">
+                    <input name="username" id="inputUsername" type="text" placeholder="Username" pattern="^[a-z,A-Z,0-9,_]{6,15}$" data-valid-min="6" title="Choose a username" required=""><br>
+                    <input name="password" id="inputpassword" type="password" placeholder="Password" required="">
+                    <input name="verify" id="inputVerify" type="password" placeholder="Password (again)" required=""><br>
+                    <button type="button" id="btnRegister" class="btn">Sign Up</button>
+                </form>
+                <a data-toggle="modal" role="button" href="#forgotPasswordModal">Forgot username or password?</a>
+                <a data-toggle="modal" role="button" href="#contactModal"><small>Need help? Contact us</small></a>
+            </div>
         </li>
-      </ul>
 
-      <li class="nav-item dropdown">
-           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:white"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;HTML Archives</a>
-          <div class="dropdown-menu">
-              {{ htmlArchives|safe }}
-          </div>
-      </li>
 
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:white">Packages</a>
-        <div class="dropdown-menu">
-          <h6 class="dropdown-header">System</h6>
-          <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='ARES') }}">AReS Package</a>
-          <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='CHART') }}">Chart Service</a>
-          <div class="dropdown-divider"></div>
-          <h6 class="dropdown-header">Other Metrics</h6>
-          <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='DUMMY') }}">Test 1</a>
-          <a class="dropdown-item" href="#">Test 2</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="{{ url_for('ares.run_report', report_name='_AresPackages', script_name='_AresPackages') }}">Documentation</a>
-        </div>
-      </li>
 
-      <form class="form-inline" style="float:right;margin-right:5px;">
-        <input class="form-control mr-sm-2 " type="text" style="height: 30px" placeholder="Search" />
-        <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px" type="submit">Search</button>
-      </form>
-
-    </div>
-</nav>
+        <form class="form-inline my-2 my-md-0">
+          <input class="form-control mr-sm-2" type="text" placeholder="Search">
+          <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
