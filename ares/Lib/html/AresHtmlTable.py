@@ -326,7 +326,6 @@ class SimpleTable(AresHtml.Html):
     self.__data = [header]
     self.__rows_hidden = {}
     for i, val in enumerate(vals):
-      print(val)
       row, indexCol = [], i+1
       #
       if not indexCol in self.__rows_attr['rows']:
