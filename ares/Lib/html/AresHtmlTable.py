@@ -459,7 +459,11 @@ class SimpleTable(AresHtml.Html):
     for i, row in enumerate(self.__data[1:]):
       html.append("<tr %s>%s</tr>" % (trSpecialAttr[i+1] if i+1 in trSpecialAttr else strTrAttr, "".join([str(td) for td in row])))
     html.append("</tbody>")
-    return "<table %s>%s</table>" % (self.strAttr(), "".join(html))
+    item =  "<table %s>%s</table>" % (self.strAttr(), "".join(html))
+    if self.headerBox is not None:
+      item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
+
+    return item
 
   def cell_dblclick(self, jsFnc):
     """ Add an event on the cells, $(this).html() will return the selected value """
