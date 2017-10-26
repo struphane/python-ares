@@ -255,16 +255,17 @@ class DataTable(AresHtml.Html):
           item.add(3, "<td>%s</td>" % col.get("colName"))
       item.add(2, "</tr>")
       item.add(1, "</thead>")
-      if self.withFooter:
-        item.add(1, "<tfoot>")
-        item.add(2, "<tr>")
-        for col in self.header[-1]:
-          if col.get("visible", True):
-            item.add(3, "<th>%s</th>" % col.get("colName"))
-        item.add(2, "</tr>")
-        item.add(1, "</tfoot>")
-        item.add(1, "<tbody>")
-        item.add(1, "</tbody>")
+
+    if self.withFooter:
+      item.add(1, "<tfoot>")
+      item.add(2, "<tr>")
+      for col in self.header[-1]:
+        if col.get("visible", True):
+          item.add(3, "<th>%s</th>" % col.get("colName"))
+      item.add(2, "</tr>")
+      item.add(1, "</tfoot>")
+      item.add(1, "<tbody>")
+      item.add(1, "</tbody>")
     item.add(0, '</table>')
 
     if self.headerBox is not None:
