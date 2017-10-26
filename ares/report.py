@@ -167,6 +167,7 @@ def run_report(report_name, script_name, user_id):
   """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
+  viewScript, downloadEnv = False, False
   cssImport, jsImport = '', ''
   isAuth = True
   try:
@@ -215,11 +216,11 @@ def run_report(report_name, script_name, user_id):
     reportObj.http['DIRECTORY'] = userDirectory
     mod.report(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
-    if typeDownload in ['BOTH', 'SCRIPT']:
-      side_bar.append('<h5 style="color:white">&nbsp;<b><i class="fa fa-download" aria-hidden="true">&nbsp;</i>Download</b></h5>')
-      side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadFiles\', report_name=\'%s\', script=\'%s.py\') }}" >Python script</a></li>' % (report_name, script_name)))
+    #if typeDownload in ['BOTH', 'SCRIPT']:
+    #  side_bar.append('<h5 style="color:white">&nbsp;<b><i class="fa fa-download" aria-hidden="true">&nbsp;</i>Download</b></h5>')
+    #  side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadFiles\', report_name=\'%s\', script=\'%s.py\') }}" >Python script</a></li>' % (report_name, script_name)))
     if typeDownload == 'BOTH':
-      side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadReport\', report_name=\'%s\') }}" >environment</a></li>' % report_name))
+      downloadEnv = report_name
     report = __import__(report_name) # run the report
     envName = getattr(report, 'NAME', '')
     side_bar.append('<h5 style="color:white"><b>&nbsp;<i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Dashboard</b></h5>')
@@ -267,7 +268,8 @@ def run_report(report_name, script_name, user_id):
 
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
-                         name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives))
+                         name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
+                         viewScript=viewScript, downloadEnv=downloadEnv)
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):

@@ -348,6 +348,10 @@ class SimpleTable(AresHtml.Html):
       #
       if val.get('_hasChildren', 0) == 1:
         self.__rows_attr['rows'][indexCol]['class'].append('details')
+        if 'css' in self.__rows_attr['rows'][indexCol]:
+          self.__rows_attr['rows'][indexCol]['css']['font-weight'] = 'bold'
+        else:
+          self.__rows_attr['rows'][indexCol]['css'] = {'font-weight': 'bold'}
       for j, header in enumerate(self.header[-1]):
         cellVal = val.get(self.recKey(header), self.dflt)
         attrCss = dict(self.tdCssAttr) if self.tdCssAttr is not None else {}
