@@ -319,10 +319,10 @@ class SimpleTable(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
-  def setIndentedTree(self, keys, vals):
+  def pivot(self, keys, vals):
     """ """
     header = self.__data[0]
-    vals = AresChartsService.toHyrTable(self.vals, keys, vals)
+    vals = AresChartsService.toPivotTable(self.vals, keys, vals)
     self.__data = [header]
     self.__rows_hidden = {}
     for i, val in enumerate(vals):

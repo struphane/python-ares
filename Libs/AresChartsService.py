@@ -186,7 +186,7 @@ def toCandleStick(recordSet, dateInfo, openCol, highCol, lowCol, closeCol, volum
                 "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
   return {"%s_FIXED" % dateCol: [{'values': res}]}
 
-def toHyrTable(recordSet, keys, vals):
+def toPivotTable(recordSet, keys, vals):
   """
   In order to produce a pivot table values should be float figures
 
