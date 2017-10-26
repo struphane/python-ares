@@ -35,6 +35,7 @@ class Button(AresHtml.Html):
   reqJs = ['bootstrap', 'jquery']
   __css = {'margin-bottom': '20p', 'margin-top': '-10p'}
   disable = False
+  synchronous = False
 
   def __init__(self, aresObj, vals, cssCls, cssAttr, awsIcon):
     """  Instantiate the object and store the icon """
