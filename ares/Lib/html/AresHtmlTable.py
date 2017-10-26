@@ -354,7 +354,7 @@ class SimpleTable(AresHtml.Html):
         attrCss = dict(self.tdCssAttr) if self.tdCssAttr is not None else {}
         if cellVal is not None:
           if j == 0:
-            attrCss['padding-left'] = '%spx' % (val['level'] * 15)
+            attrCss['padding-left'] = '%spx' % (val['level'] * 20)
           row.append(Td(self.aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=attrCss))
       self.__data.append(row)
 
