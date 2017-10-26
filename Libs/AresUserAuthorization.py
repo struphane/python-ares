@@ -2,32 +2,34 @@ import datetime
 import hashlib
 import random
 import sqlite3
-from flask import current_app
-import config
 import os
 from Libs import AresSecurity
+from ares.Lib import AresSql
 
 
-class MainDB(object):
+class AuthenticationBase(object):
   """ """
 
-  __conn = sqlite3.connect(os.path.join(current_app.config['ROOT_PATH'], config.ARES_MAIN_DB_LOCATION))
-  __cursor = conn.cursor()
+  __db = AresSql.MainDB()
 
   @classmethod
   def addUser(cls, email):
     """ """
-    __cursor.execute("""SELECT random_nbr FROM main_usr_def WHERE email = '%s'""" % email)
-    res = __cursor.fetchall()
-    if res:
-      return True, AresSecurity.generate_key(email, res[0])
+    result = list(cls.__db.select("""SELECT random_nbr FROM main_usr_def WHERE email = '%s'""" % email))
+    if result:
+      return True, AresSecurity.generate_key(email, result[0]['random_nbr'])
 
     ADD_USER = """ INSERT INTO main_usr_def (email, random_nbr) VALUES ('%s', '%s');"""
     random.seed(datetime.datetime.now())
     random_number = int(random.random() * 1000)
-    c.execute(ADD_USER % (email, random_number))
-    __conn.commit()
-
+    cls.__db.modify(ADD_USER % (email, random_number))
     # now return the salt from the random number
     return True, AresSecurity.generate_key(email, random_number)
+
+  @classmethod
+  def get_user_base(cls):
+    """ """
+    USER_BASE = """SELECT email FROM main_usr_def;"""
+    return list(cls.__db.select(USER_BASE))
+
 
