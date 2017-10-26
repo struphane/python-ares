@@ -13,19 +13,32 @@ class SqliteDB(object):
   def __init__(self, report_name):
     """ """
     self.path = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
-    self.__conn = sqlite3.connect(self.path)
-    self.__cursor = self.__conn.cursor()
+    self.conn = sqlite3.connect(self.path)
+    self.cursor = self.conn.cursor()
 
   def modify(self, query):
     """ method used for update, insert, delete """
-    self.__cursor.execute(query)
-    self.__conn.commit()
+    self.cursor.execute(query)
+    self.conn.commit()
 
   def select(self, query):
-    print(query)
     """ query used for selects - return an iterator """
-    result = self.__cursor.execute(query)
-    header = [col[0] for col in self.__cursor.description]
+    result = self.cursor.execute(query)
+    header = [col[0] for col in self.cursor.description]
     for res in result:
       yield dict(zip(header, list(res)))
+
+  def close(self):
+    """ """
+    self.conn.close()
+
+class MainDB(SqliteDB):
+  """ """
+
+  def __init__(self):
+    self.path = os.path.join(current_app.config['ROOT_PATH'], config.ARES_MAIN_DB_LOCATION)
+    self.conn = sqlite3.connect(self.path)
+    self.cursor = self.conn.cursor()
+
+
 

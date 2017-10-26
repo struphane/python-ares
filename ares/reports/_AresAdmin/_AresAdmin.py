@@ -3,9 +3,10 @@
 """
 
 from ares.Lib import AresSql
+from Libs import mailer
+from Libs import AresUserAuthorization
+
 NAME = 'Administrator'
-
-
 
 def getUserData(aresObj, sqlCon):
   """ """
@@ -30,6 +31,55 @@ def getDeployData(aresObj, sqlCon):
                     GROUP by "date" """ % aresObj.http['REPORT_NAME']
 
   return sqlCon.select(deploy_logs)
+
+def getAuthorizedUsers(aresObj, sqlCon):
+  """ """
+  auth_users = """ SELECT 
+                  user_accnt.email_addr as "user" 
+                  ,user_accnt.hash_id as "token"
+                  ,role
+                  FROM user_accnt
+                  INNER JOIN env_auth ON env_auth.uid = user_accnt.uid
+                  INNER JOIN env_def ON env_def.env_id = env_auth.env_id
+                  WHERE env_def.env_name = '%s' """ % aresObj.http['REPORT_NAME']
+
+  return sqlCon.select(auth_users)
+
+def createUserAccnt(email_addr):
+  """ """
+  main_db = AresUserAuthorization.AuthenticationBase
+  return main_db.addUser(email_addr)
+
+
+def ajaxCall(aresObj, userLst):
+  """ Pass in the list of user from the input zone
+   REMOVE FOR LATER : ARES mail details
+   address: ares.pymailer@gmail.com
+   password: H3reCom3sAReS
+
+   """
+  mailer._DEBUG = True
+  mail_server = mailer.SMTPServer('smtp.gmail.com', 587)
+  mail_server.connect(user='ares.pymailer@gmail.com', password='H3reCom3sAReS')
+  ADD_USER = """ INSERT INTO user_accnt (email_addr, hash_id) VALUES ('%s', '%s');"""
+  ADD_AUTH = """ INSERT INTO env_auth (env_id, uid) VALUES (%s, %s);"""
+  sqlCon = AresSql.SqliteDB(aresObj.http['REPORT_NAME'])
+
+  env_id = list(sqlCon.select("SELECT env_id FROM env_def WHERE env_name = '%s'" % aresObj.http['REPORT_NAME']))[0]['env_id']
+
+  authRecSet = [rec['user'] for rec in list(getAuthorizedUsers(aresObj, sqlCon))]
+  mail_subject = 'You have been authorized to a new environment in AReS'
+  mail_content = """Hello,\nYou are now allowed to view the content of the report %s.\nSimply connect to the application using your personal token: %s\nSee you soon !\nAReS Team """
+  for user in userLst:
+    if user not in authRecSet:
+      _, add_token = createUserAccnt(user)
+      #add new user into user_accnt
+      sqlCon.modify(ADD_USER % (user, add_token))
+      uid = list(sqlCon.select('select last_insert_rowid() as "uid";'))[0]['uid']
+      #add entry into env_auth
+      sqlCon.modify(ADD_AUTH % (env_id, uid))
+      email = mailer.Email('ares.pymailer@gmail.com', [user], mail_subject, mail_content % (aresObj.http['REPORT_NAME'], add_token))
+      mail_server.sendmail(email)
 
 
 def report(aresObj):
@@ -84,13 +134,13 @@ def report(aresObj):
   for user, count in userDeployRec.items():
     userRecSet.append({'user': user, 'count': count})
 
-  print(userRecSet)
   pie = aresObj.pie(userRecSet, [{'key': 'user', 'colName': 'User'},
                                 {'key': 'count', 'colName': 'Deployments done', 'type': 'number'}], headerBox='Deployers' )
 
   pie.setKeys(['user'])
   pie.setVals(['count'])
   aresObj.row([bar, pie])
+  ajaxCall(aresObj, ['ares.pymailer@gmail.com'])
 
 
 
