@@ -363,17 +363,43 @@ class SimpleTable(AresHtml.Html):
       $( ".details > td:first-child" ).click(function() {
         var trObj = $(this).closest('tr');
         var children_data_id = trObj.data('index') + 1;
-        alert(children_data_id);
-        var isVisible = $( "." +  trObj.attr('name') + "[data-index=" + children_data_id + "]").is(':hidden');
-        if (isVisible) {
-          $( "." + trObj.attr('name')).hide() ;
-        } else {
-          $( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
-        }
-        $( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
+        var trName = trObj.attr('name');
+        var isVisible = $(this).hasClass('changed');
         $(this).toggleClass('changed');
+        $('#%s > tbody  > tr').each(function() {
+          var trId = $(this).data('index');
+          var trHasParent = $(this).hasClass(trName);
+          if (isVisible) {
+            if ((trId >= children_data_id) && trHasParent ) {
+              if ($(this).hasClass('details')){
+                var firstTd = $(this).find('td:first-child');
+                if  (firstTd.hasClass('changed')) {
+                  $(this).find('td:first-child').removeClass('changed');}
+              }
+              $(this).hide() ;
+            }
+         } else {
+            if ((trId == children_data_id) && trHasParent ) {
+              $(this).toggle() ;
+            }
+          }
+          //alert($(this).attr('name'));
+        } );
+
+
+        //var trObj = $(this).closest('tr');
+        //var children_data_id = trObj.data('index') + 1;
+        //alert(children_data_id);
+        //var isVisible = $( "." +  trObj.attr('name') + "[data-index=" + children_data_id + "]").is(':hidden');
+        //if (isVisible) {
+         // $( "." + trObj.attr('name')).hide() ;
+        //} else {
+        //  $( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
+       // }
+        //$( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
+        //$(this).toggleClass('changed');
       });
-      ''')
+      ''' % self.htmlId)
 
   def getCell(self, row, col):
     """ Returns the underlying cell object """

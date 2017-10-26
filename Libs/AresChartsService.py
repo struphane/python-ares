@@ -195,14 +195,14 @@ def toHyrTable(recordSet, keys, vals):
   parents = collections.defaultdict(lambda: collections.defaultdict(float))
   for rec in recordSet:
     compositeKey = [''] * len(keys)
-    cssClass = set()
+    #cssClass = []
     for i, key in enumerate(keys):
       compositeKey[i] = rec[key]
       for j, val in enumerate(vals):
         parents[tuple(compositeKey)][val] += rec[val]
-      cssClass.add(regex.sub('', ''.join(compositeKey).strip()))
+      #cssClass.append(regex.sub('', ''.join(compositeKey).strip()))
       parents[tuple(compositeKey)]['level'] = i
-      parents[tuple(compositeKey)]['cssCls'] = list(cssClass)
+      #parents[tuple(compositeKey)]['cssCls'] = list(cssClass)
       parents[tuple(compositeKey)]['__count'] += 1
   fullKeys = sorted(parents.keys())
   result = []
@@ -210,8 +210,13 @@ def toHyrTable(recordSet, keys, vals):
     row = dict(zip(keys, list(compKey)))
     for val in vals:
       row[val] = parents[compKey][val]
-    row['cssCls'] = parents[compKey]['cssCls'][:-1]
-    row['_id'] = parents[compKey]['cssCls'][-1]
+    comKeyClean = [regex.sub('', ''.join(comp).strip()) for comp in compKey]
+    classCleanKey, prevKey = [], ''
+    for i in range(0, len(comKeyClean)):
+      prevKey = "%s%s" % (prevKey, comKeyClean[i])
+      classCleanKey.append(prevKey)
+    row['cssCls'] = list(set(classCleanKey)) # parents[compKey]['cssCls'][:-1]
+    row['_id'] = "".join(comKeyClean[0:parents[compKey]['level']+1])
     if parents[compKey]['__count'] == 1:
       row['_leaf'] = 1
     else:
