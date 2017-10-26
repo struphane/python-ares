@@ -303,7 +303,7 @@ class SimpleTable(AresHtml.Html):
     self.headerBox = headerBox
     self.header = header
     self.cssPivotRows = {'font-weight': 'bold'}
-    self.__rows_attr = {'rows': {}}
+    self.__rows_attr = {'rows': {'ALL': {}}}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
@@ -331,15 +331,15 @@ class SimpleTable(AresHtml.Html):
       row, indexCol = [], i+1
       #
       if not indexCol in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][indexCol] = {'name': val['_id']}
+        self.__rows_attr['rows'][indexCol] = {'name': [val['_id']]}
       else:
-        self.__rows_attr['rows'][indexCol]['name'] = val['_id']
-      self.__rows_attr['rows'][indexCol]['data-index'] = val['level']
+        self.__rows_attr['rows'][indexCol]['name'] = [val['_id']]
+      self.__rows_attr['rows'][indexCol]['data-index'] = [val['level']]
 
       if 'class' in self.__rows_attr['rows'][indexCol]:
         self.__rows_attr['rows'][indexCol]['class'].extend(val['cssCls'])
       else:
-        self.__rows_attr['rows'][indexCol]['class'] = val['cssCls']
+        self.__rows_attr['rows'][indexCol]['class'] = [val['cssCls']]
 
       if val.get('_parent', 0) == 0:
         if 'css' in self.__rows_attr['rows'][indexCol]:
@@ -443,18 +443,20 @@ class SimpleTable(AresHtml.Html):
     for row in self.__rows_attr['rows']:
       attr = self.__rows_attr['rows'][row]
       trRes = []
+      # This will add the all attributes to the main attr object
+      # It will be then processed and added to the rest of the attributes
       if 'ALL' in self.__rows_attr['rows']:
         for attrCod, val in self.__rows_attr['rows'].items():
           if attrCod in attr:
-            attr[attrCod].append(self.__rows_attr['rows']['ALL'][val])
+            attr[attrCod].extend(val)
           else:
-            attr[attrCod] = self.__rows_attr['rows'].get('ALL', {})[attrCod] = val
+            attr[attrCod] = val
       #
       if 'css' in attr:
         trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
       for attrCod in ['name', 'id', 'data-index', 'onmouseover', 'onMouseOut', 'class']:
         if attrCod in attr:
-          trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
+          trRes.append('%s="%s"' % (attrCod, "".join(attr[attrCod])))
 
       trSpecialAttr[row] = " ".join(trRes)
 
@@ -467,7 +469,7 @@ class SimpleTable(AresHtml.Html):
     html.append("</tbody>")
     item =  "<table %s>%s</table>" % (self.strAttr(), "".join(html))
     if self.headerBox is not None:
-      item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
+      return str(AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references))
 
     return item
 
@@ -505,16 +507,13 @@ class SimpleTable(AresHtml.Html):
 
   def cssRowMouseHover(self, bgColor, fontCOlor, rowNum=None):
     if rowNum is None:
-      if 'rows' in self.__rows_attr:
-        row = self.__rows_attr['rows'] = {'ALL': {}}
-      else:
-        row = self.__rows_attr['rows']['ALL'] = []
+      row = self.__rows_attr['rows']['ALL']
     else:
       if not rowNum in self.__rows_attr['rows']:
         self.__rows_attr['rows'][rowNum] = {}
       row = self.__rows_attr['rows'][rowNum]
-    row['onmouseover'] = "this.style.background='%s';this.style.color='%s'" % (bgColor, fontCOlor)
-    row['onMouseOut'] = "this.style.background='#FFFFFF';this.style.color='#000000'"
+    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontCOlor)]
+    row['onMouseOut'] = ["this.style.background='#FFFFFF';this.style.color='#000000'"]
 
   def cssPivotAggRow(self, attr):
     """  """
