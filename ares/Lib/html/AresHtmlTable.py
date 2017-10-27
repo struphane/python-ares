@@ -145,7 +145,7 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if (data['%s'] == '%s') {$(row).hide(); }" % (colName, value))
 
-  def callBackFooterColumns(self, colNames):
+  def callBackFooterColumns(self):
     """  """
     self.withFooter = True
     self.callBacks('initComplete',
@@ -331,15 +331,15 @@ class SimpleTable(AresHtml.Html):
       row, indexCol = [], i+1
       #
       if not indexCol in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][indexCol] = {'name': [val['_id']]}
+        self.__rows_attr['rows'][indexCol] = {'name': val['_id']}
       else:
-        self.__rows_attr['rows'][indexCol]['name'] = [val['_id']]
-      self.__rows_attr['rows'][indexCol]['data-index'] = [val['level']]
+        self.__rows_attr['rows'][indexCol]['name'] = val['_id']
+      self.__rows_attr['rows'][indexCol]['data-index'] = val['level']
 
       if 'class' in self.__rows_attr['rows'][indexCol]:
         self.__rows_attr['rows'][indexCol]['class'].extend(val['cssCls'])
       else:
-        self.__rows_attr['rows'][indexCol]['class'] = [val['cssCls']]
+        self.__rows_attr['rows'][indexCol]['class'] = val['cssCls']
 
       if val.get('_parent', 0) == 0:
         if 'css' in self.__rows_attr['rows'][indexCol]:
@@ -390,19 +390,6 @@ class SimpleTable(AresHtml.Html):
           }
           //alert($(this).attr('name'));
         } );
-
-
-        //var trObj = $(this).closest('tr');
-        //var children_data_id = trObj.data('index') + 1;
-        //alert(children_data_id);
-        //var isVisible = $( "." +  trObj.attr('name') + "[data-index=" + children_data_id + "]").is(':hidden');
-        //if (isVisible) {
-         // $( "." + trObj.attr('name')).hide() ;
-        //} else {
-        //  $( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
-       // }
-        //$( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
-        //$(this).toggleClass('changed');
       });
       ''' % self.htmlId)
 
@@ -440,24 +427,29 @@ class SimpleTable(AresHtml.Html):
       if attrCod in self.__rows_attr:
         trAttr.append('%s="%s"' % (attrCod, self.__rows_attr[attrCod]))
     strTrAttr = " ".join(trAttr)
+    attrRow = self.__rows_attr['rows']['ALL']
     for row in self.__rows_attr['rows']:
       attr = self.__rows_attr['rows'][row]
       trRes = []
       # This will add the all attributes to the main attr object
       # It will be then processed and added to the rest of the attributes
-      if 'ALL' in self.__rows_attr['rows']:
-        for attrCod, val in self.__rows_attr['rows'].items():
-          if attrCod in attr:
-            attr[attrCod].extend(val)
-          else:
-            attr[attrCod] = val
+      for attrCod, val in attrRow.items():
+        if attrCod in attr:
+          attr[attrCod].extend(val)
+        else:
+          attr[attrCod] = val
       #
       if 'css' in attr:
         trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
-      for attrCod in ['name', 'id', 'data-index', 'onmouseover', 'onMouseOut', 'class']:
+      for attrCod in ['onmouseover', 'onMouseOut', 'class']:
         if attrCod in attr:
-          trRes.append('%s="%s"' % (attrCod, "".join(attr[attrCod])))
-
+          trRes.append('%s="%s"' % (attrCod, " ".join(set(attr[attrCod]))))
+      for attrCod in ['data-index', 'name', 'id']:
+        if attrCod in attr:
+          if attrCod == 'data-index':
+            trRes.append('%s=%s' % (attrCod, attr[attrCod]))
+          else:
+            trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
       trSpecialAttr[row] = " ".join(trRes)
 
     html = ["<thead>"]
