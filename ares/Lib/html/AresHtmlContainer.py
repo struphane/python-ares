@@ -576,7 +576,7 @@ class AresBox(AresHtml.Html):
     if self.prop is not None:
       item.add(3, '<button class="btn btn-xs" name="ares_prop" data-toggle="modal" data-target="#%s_prop"></button>' % self.htmlId)
     item.add(1, '</div>')
-    item.add(1, '<div class="panel-body" id="%s">' % self.htmlId)
+    item.add(1, '<div class="panel-body" id="%s" style="padding:8px">' % self.htmlId)
     item.add(2, self.vals)
     item.add(1, '</div>')
     item.add(0, '</div>')
