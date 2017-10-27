@@ -16,6 +16,7 @@ Ares documentation is available here:
 from __future__ import print_function
 import os
 import sys
+import traceback
 
 from ares.Lib import Ares
 
@@ -33,6 +34,7 @@ def getReport(results, reports, scriptPath):
           reportModule.report(results[reportModule.__name__])
         except Exception as e:
           print("Error with report %s" % report)
+          print(traceback.print_exc())
           print(e)
       else:
         print("Module ignore %s" % report)
