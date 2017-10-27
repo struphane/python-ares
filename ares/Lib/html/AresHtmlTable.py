@@ -497,4 +497,4 @@ class SimpleTable(AresHtml.Html):
 
   def cssPivotAggRow(self, attr):
     """  """
-self.cssPivotRows = attr
+    self.cssPivotRows = attr
