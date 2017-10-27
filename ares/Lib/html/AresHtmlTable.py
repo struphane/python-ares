@@ -1,5 +1,4 @@
 """ Python Module to define all the HTML component dedicated to display tables
-
 """
 
 import json
@@ -94,11 +93,9 @@ class DataTable(AresHtml.Html):
     """
     Add the function to call when a user will create a row.
     Please have a look at the documentation if you want to use some specific callback function in your table.
-
     The signature and the code should be in javascript
       https://datatables.net/reference/option/drawCallback
       https://datatables.net/reference/option/initComplete
-
     Example of callback functions
       $('#%s thead').find('tr:last').hide();
     """
@@ -121,7 +118,6 @@ class DataTable(AresHtml.Html):
                                 //alert(data['VAL']);
                                 $('td', row).eq(0).addClass('btn-info');
                             }
-
     """
     self.callBacks('createdRow', fnc)
 
@@ -145,7 +141,7 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if (data['%s'] == '%s') {$(row).hide(); }" % (colName, value))
 
-  def callBackFooterColumns(self, colNames):
+  def callBackFooterColumns(self):
     """  """
     self.withFooter = True
     self.callBacks('initComplete',
@@ -157,7 +153,6 @@ class DataTable(AresHtml.Html):
                                     var val = $.fn.dataTable.util.escapeRegex( $(this).val());
                                     column.search( val ? '^'+val+'$' : '', true, false ).draw();
                                 } );
-
                             column.data().unique().sort().each( function ( d, j ) {
                               select.append('<option value=' + d+ '>' + d +'</option>' )
                             } );
@@ -183,10 +178,8 @@ class DataTable(AresHtml.Html):
   def contextMenu(self, contextMenu, attrList=None):
     """
     Add a Click event feature
-
     The below example will display the column script from the row
     rowData[0] is a javascript dictionary with key and values
-
     $('#%s').on('click', 'tr', function () {
         var rowData = %s.rows($(this)[0]._DT_RowIndex).data();
         alert( 'You clicked on ' + rowData[0].script + ' row' );
@@ -218,10 +211,8 @@ class DataTable(AresHtml.Html):
 
   def click(self, jsFnc, colIndex=None, colVal=None):
     """ Add a Click event feature on the row or cell level
-
     The below example will display the column script from the row
     rowData[0] is a javascript dictionary with key and values
-
     For example, you can add the below to display the element from the first column of the selected row:
         alert( 'You clicked on ' + rowData[0].script + ' row' );
     """
@@ -303,7 +294,7 @@ class SimpleTable(AresHtml.Html):
     self.headerBox = headerBox
     self.header = header
     self.cssPivotRows = {'font-weight': 'bold'}
-    self.__rows_attr = {'rows': {}}
+    self.__rows_attr = {'rows': {'ALL': {}}}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
@@ -390,19 +381,6 @@ class SimpleTable(AresHtml.Html):
           }
           //alert($(this).attr('name'));
         } );
-
-
-        //var trObj = $(this).closest('tr');
-        //var children_data_id = trObj.data('index') + 1;
-        //alert(children_data_id);
-        //var isVisible = $( "." +  trObj.attr('name') + "[data-index=" + children_data_id + "]").is(':hidden');
-        //if (isVisible) {
-         // $( "." + trObj.attr('name')).hide() ;
-        //} else {
-        //  $( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
-       // }
-        //$( "." + trObj.attr('name') + "[data-index=" + children_data_id + "]").show() ;
-        //$(this).toggleClass('changed');
       });
       ''' % self.htmlId)
 
@@ -440,22 +418,29 @@ class SimpleTable(AresHtml.Html):
       if attrCod in self.__rows_attr:
         trAttr.append('%s="%s"' % (attrCod, self.__rows_attr[attrCod]))
     strTrAttr = " ".join(trAttr)
+    attrRow = self.__rows_attr['rows']['ALL']
     for row in self.__rows_attr['rows']:
       attr = self.__rows_attr['rows'][row]
       trRes = []
-      if 'ALL' in self.__rows_attr['rows']:
-        for attrCod, val in self.__rows_attr['rows'].items():
-          if attrCod in attr:
-            attr[attrCod].append(self.__rows_attr['rows']['ALL'][val])
-          else:
-            attr[attrCod] = self.__rows_attr['rows'].get('ALL', {})[attrCod] = val
+      # This will add the all attributes to the main attr object
+      # It will be then processed and added to the rest of the attributes
+      for attrCod, val in attrRow.items():
+        if attrCod in attr:
+          attr[attrCod].extend(val)
+        else:
+          attr[attrCod] = val
       #
       if 'css' in attr:
         trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
-      for attrCod in ['name', 'id', 'data-index', 'onmouseover', 'onMouseOut', 'class']:
+      for attrCod in ['onmouseover', 'onMouseOut', 'class']:
         if attrCod in attr:
-          trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
-
+          trRes.append('%s="%s"' % (attrCod, " ".join(set(attr[attrCod]))))
+      for attrCod in ['data-index', 'name', 'id']:
+        if attrCod in attr:
+          if attrCod == 'data-index':
+            trRes.append('%s=%s' % (attrCod, attr[attrCod]))
+          else:
+            trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
       trSpecialAttr[row] = " ".join(trRes)
 
     html = ["<thead>"]
@@ -467,7 +452,7 @@ class SimpleTable(AresHtml.Html):
     html.append("</tbody>")
     item =  "<table %s>%s</table>" % (self.strAttr(), "".join(html))
     if self.headerBox is not None:
-      item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
+      return str(AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references))
 
     return item
 
@@ -489,33 +474,27 @@ class SimpleTable(AresHtml.Html):
                 html = html + '</div>';
                 html = html + '<button type="submit" id="temp_submit" class="btn btn-primary">submit</button>' ;
                 html = html + '</div>';
-
                 $('body').append(html) ;
                 $('#temp_cell').val($(event.target).html());
                 $("#dialog").dialog();
-
                 // Update the data to the table
                 $( "#temp_submit" ).on( "click", { item: $(event.target) }, function (event){
                     event.data.item.html($('#temp_cell').val());
                     $( "#dialog" ).remove();
                 });
-
             '''
     self.aresObj.jsFnc.add(AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc))
 
   def cssRowMouseHover(self, bgColor, fontCOlor, rowNum=None):
     if rowNum is None:
-      if 'rows' in self.__rows_attr:
-        row = self.__rows_attr['rows'] = {'ALL': {}}
-      else:
-        row = self.__rows_attr['rows']['ALL'] = []
+      row = self.__rows_attr['rows']['ALL']
     else:
       if not rowNum in self.__rows_attr['rows']:
         self.__rows_attr['rows'][rowNum] = {}
       row = self.__rows_attr['rows'][rowNum]
-    row['onmouseover'] = "this.style.background='%s';this.style.color='%s'" % (bgColor, fontCOlor)
-    row['onMouseOut'] = "this.style.background='#FFFFFF';this.style.color='#000000'"
+    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontCOlor)]
+    row['onMouseOut'] = ["this.style.background='#FFFFFF';this.style.color='#000000'"]
 
   def cssPivotAggRow(self, attr):
     """  """
-    self.cssPivotRows = attr
+self.cssPivotRows = attr
