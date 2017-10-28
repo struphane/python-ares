@@ -8,6 +8,9 @@ from Libs import AresUserAuthorization
 
 NAME = 'Administrator'
 
+
+
+
 def getUserData(aresObj, sqlCon):
   """ """
   nbGlobalUsers = """ SELECT user_accnt.email_addr as "user", user_accnt.role as "role"
@@ -58,7 +61,7 @@ def ajaxCall(aresObj, userLst):
    password: H3reCom3sAReS
 
    """
-  mailer._DEBUG = True
+  mailer._DEBUG = False
   mail_server = mailer.SMTPServer('smtp.gmail.com', 587)
   mail_server.connect(user='ares.pymailer@gmail.com', password='H3reCom3sAReS')
   ADD_USER = """ INSERT INTO user_accnt (email_addr, hash_id) VALUES ('%s', '%s');"""
@@ -140,7 +143,6 @@ def report(aresObj):
   pie.setKeys(['user'])
   pie.setVals(['count'])
   aresObj.row([bar, pie])
-  ajaxCall(aresObj, ['ares.pymailer@gmail.com'])
 
 
 

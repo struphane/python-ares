@@ -480,9 +480,6 @@ def ajaxCreate(email_address):
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
-    fileFullPath = os.path.join(scriptPath, scriptName)
-    with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
-      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
 
     os.makedirs(os.path.join(scriptPath, 'outputs'))
     return json.dumps("New environment created: %s" % scriptName), 200
