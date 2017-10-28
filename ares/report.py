@@ -252,11 +252,20 @@ def run_report(report_name, script_name, user_id):
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
     # Try to unload the module
-    htmlArchives = []
+    htmlArchives, htmlConfigs, htmlStatics = [], [], []
     savedHtmlLocation = os.path.join(userDirectory, 'saved')
     if os.path.exists(savedHtmlLocation):
       for htmlPage in os.listdir(savedHtmlLocation):
         htmlArchives.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}' target='_blank'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1]))))
+    fileConfig = os.path.join(userDirectory, 'config')
+    if os.path.exists(fileConfig):
+      for configPage in os.listdir(fileConfig):
+        htmlConfigs.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='config', filename='%s') }}' target='_blank'>%s</a>" % (report_name, configPage, configPage)))
+    fileStatic = os.path.join(userDirectory, 'static')
+    if os.path.exists(fileStatic):
+      for staticPage in os.listdir(fileStatic):
+        htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='config', filename='%s') }}' target='_blank'>%s</a>" % (report_name, staticPage, staticPage)))
+
     if isAuth:
       if not report_name.startswith("_"):
         sys.path.remove(userDirectory)
@@ -279,7 +288,8 @@ def run_report(report_name, script_name, user_id):
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
-                         viewScript=viewScript, downloadEnv=downloadEnv)
+                         viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
+                         htmlConfigs="\n".join(htmlConfigs))
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
@@ -339,6 +349,23 @@ def pivotData(format):
                                                       ))
 
   return json.dumps('Format %s not recognised' % format)
+
+@report.route("/view/<report_name>/<folder>/<filename>", methods = ['GET'])
+def showStatics(report_name, folder, filename):
+  """
+
+  """
+  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  configFile = os.path.join(userDirectory, folder, filename)
+  reportObj = Ares.Report()
+  if os.path.exists(configFile):
+    inFile = open(configFile)
+    reportObj.preformat(inFile.read())
+    inFile.close()
+  cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
+                         jsOnload=onload, content=content, jsGraphs=jsCharts,
+                         name='Configuration - %s' % filename, jsGlobal=jsGlobal)
 
 @report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
 def adminEnv(report_name, token):
@@ -491,7 +518,7 @@ def uploadFiles(report_type, report_name, user_name):
   """ Add all the files that a users will drag and drop in the section """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   result = []
-  reportTypes = {'report': (['.PY'], None), 'configuration': (['.JSON'], 'config'),
+  reportTypes = {'report': (['.PY'], None), 'configuration': (['.DAT', '.TXT', '.CSV', '.JSON'], 'config'),
                  'ajax': (['.PY'], 'ajax'), 'javascript': (['.JS'], 'js'),
                  'views': (['.TXT', '.CSV'], 'statics'), 'outputs': (None, 'outputs'),
                  'styles': (['.CSS', '.JS'], 'styles'), 'saved': (['.HTML'], 'saved')

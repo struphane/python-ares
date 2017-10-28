@@ -186,24 +186,41 @@ def toCandleStick(recordSet, dateInfo, openCol, highCol, lowCol, closeCol, volum
                 "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
   return {"%s_FIXED" % dateCol: [{'values': res}]}
 
-def toPivotTable(recordSet, keys, vals):
+def toPivotTable(recordSet, keys, vals, filters=None):
   """
   In order to produce a pivot table values should be float figures
 
   This is an version using basic python functions to allow users without Pandas to use it
   """
   parents = collections.defaultdict(lambda: collections.defaultdict(float))
-  for rec in recordSet:
-    compositeKey = [''] * len(keys)
-    #cssClass = []
-    for i, key in enumerate(keys):
-      compositeKey[i] = rec[key]
-      for j, val in enumerate(vals):
-        parents[tuple(compositeKey)][val] += rec[val]
-      #cssClass.append(regex.sub('', ''.join(compositeKey).strip()))
-      parents[tuple(compositeKey)]['level'] = i
-      #parents[tuple(compositeKey)]['cssCls'] = list(cssClass)
-      parents[tuple(compositeKey)]['__count'] += 1
+  dimKeys = len(keys)
+  if filters is not None:
+    for rec in recordSet:
+      for col, val in filters.items():
+        if not rec[col] in val:
+          break
+
+      else:
+        compositeKey = [''] * len(keys)
+        for i, key in enumerate(keys):
+          compositeKey[i] = rec[key]
+          for j, val in enumerate(vals):
+            parents[tuple(compositeKey)][val] += rec[val]
+          parents[tuple(compositeKey)]['level'] = i
+          parents[tuple(compositeKey)]['__count'] += 1
+          if dimKeys == i+1:
+            parents[tuple(compositeKey)]['_leaf'] = 1
+  else:
+    for rec in recordSet:
+      compositeKey = [''] * len(keys)
+      for i, key in enumerate(keys):
+        compositeKey[i] = rec[key]
+        for j, val in enumerate(vals):
+          parents[tuple(compositeKey)][val] += rec[val]
+        parents[tuple(compositeKey)]['level'] = i
+        parents[tuple(compositeKey)]['__count'] += 1
+        if dimKeys == i+1:
+          parents[tuple(compositeKey)]['_leaf'] = 1
   fullKeys = sorted(parents.keys())
   result = []
   for compKey in fullKeys:
@@ -217,7 +234,7 @@ def toPivotTable(recordSet, keys, vals):
       classCleanKey.append(prevKey)
     row['cssCls'] = list(set(classCleanKey)) # parents[compKey]['cssCls'][:-1]
     row['_id'] = "".join(comKeyClean[0:parents[compKey]['level']+1])
-    if parents[compKey]['__count'] == 1:
+    if parents[compKey]['_leaf'] == 1:
       row['_leaf'] = 1
     else:
       row['_hasChildren'] = 1

@@ -1,4 +1,6 @@
 """ Python Module to define all the HTML component dedicated to display tables
+
+@Author: Olivier Nogues
 """
 
 import json
@@ -7,6 +9,8 @@ from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
 from ares.Lib.html import AresHtmlContainer
+from ares.Lib.html import AresHtmlText
+
 from flask import render_template_string
 from Libs import AresChartsService
 
@@ -287,6 +291,7 @@ class SimpleTable(AresHtml.Html):
   reqCss = ['bootstrap', 'jquery']
   reqJs = ['bootstrap', 'jquery']
   dflt = None
+  formatVals = True
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
     """ Create an Simple Table object """
@@ -312,13 +317,17 @@ class SimpleTable(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
-  def pivot(self, keys, vals):
+  def pivot(self, keys, vals, filters=None):
     """ """
-    header = self.__data[0]
-    vals = AresChartsService.toPivotTable(self.vals, keys, vals)
-    self.__data = [header]
+    mapHeader = dict([(self.recKey(hdr), hdr['colName']) for hdr in self.header[-1]])
+    self.__data = [[Td(self.aresObj, mapHeader[header], True, cssAttr={'background': '#225D32', 'text-align': 'center',
+                                                                       'color': 'white', 'font-weight': 'bold'}) for header in keys + vals]]
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__rows_hidden = {}
-    for i, val in enumerate(vals):
+    for i, val in enumerate(rows):
+      if self.formatVals:
+        for keyVal in vals:
+          val[keyVal] = AresHtmlText.UpDown(self.aresObj, val[keyVal], val[keyVal])
       row, indexCol = [], i+1
       #
       if not indexCol in self.__rows_attr['rows']:
@@ -412,27 +421,28 @@ class SimpleTable(AresHtml.Html):
     trAttr, trSpecialAttr = [], {}
     if 'css' in self.__rows_attr:
       trAttr.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.__rows_attr["css"].items()]))
-    if 'class' in self.__rows_attr:
-      trAttr.append('class="%s"' % " ".join(self.__rows_attr['class']))
-    for attrCod in ['name', 'id', 'data-index', 'onmouseover', 'onMouseOut']:
+    for attrCod in ['onmouseover', 'onMouseOut', 'class']:
+      if attrCod in self.__rows_attr:
+        trAttr.append('%s="%s"' %(attrCod, " ".join(self.__rows_attr[attrCod])))
+    for attrCod in ['name', 'id', 'data-index']:
       if attrCod in self.__rows_attr:
         trAttr.append('%s="%s"' % (attrCod, self.__rows_attr[attrCod]))
     strTrAttr = " ".join(trAttr)
-    attrRow = self.__rows_attr['rows']['ALL']
+
+    # Special extra part of some line in the table
     for row in self.__rows_attr['rows']:
       attr = self.__rows_attr['rows'][row]
       trRes = []
-      # This will add the all attributes to the main attr object
-      # It will be then processed and added to the rest of the attributes
-      for attrCod, val in attrRow.items():
-        if attrCod in attr:
-          attr[attrCod].extend(val)
-        else:
-          attr[attrCod] = val
-      #
       if 'css' in attr:
         trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
       for attrCod in ['onmouseover', 'onMouseOut', 'class']:
+        # Here we consider those properties as ones that could be propagated to the extra defintiion
+        # This will allow in the case of the pivot table to keep the onmouseover event for example
+        if attrCod in self.__rows_attr:
+          if attrCod in attr:
+            attr[attrCod].extend(self.__rows_attr[attrCod])
+          else:
+            attr[attrCod] = self.__rows_attr[attrCod]
         if attrCod in attr:
           trRes.append('%s="%s"' % (attrCod, " ".join(set(attr[attrCod]))))
       for attrCod in ['data-index', 'name', 'id']:
@@ -443,6 +453,7 @@ class SimpleTable(AresHtml.Html):
             trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
       trSpecialAttr[row] = " ".join(trRes)
 
+    # Build the table
     html = ["<thead>"]
     html.append("<tr %s>%s</tr>" % (trSpecialAttr[0] if 0 in trSpecialAttr else strTrAttr, "".join([str(td) for td in self.__data[0]])))
     html.append("</thead>")
@@ -485,14 +496,14 @@ class SimpleTable(AresHtml.Html):
             '''
     self.aresObj.jsFnc.add(AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc))
 
-  def cssRowMouseHover(self, bgColor, fontCOlor, rowNum=None):
+  def cssRowMouseHover(self, bgColor='#BDFFC2', fontColor='black', rowNum=None):
     if rowNum is None:
-      row = self.__rows_attr['rows']['ALL']
+      row = self.__rows_attr
     else:
       if not rowNum in self.__rows_attr['rows']:
         self.__rows_attr['rows'][rowNum] = {}
       row = self.__rows_attr['rows'][rowNum]
-    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontCOlor)]
+    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontColor)]
     row['onMouseOut'] = ["this.style.background='#FFFFFF';this.style.color='#000000'"]
 
   def cssPivotAggRow(self, attr):
