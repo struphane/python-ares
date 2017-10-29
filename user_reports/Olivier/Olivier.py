@@ -32,6 +32,7 @@ def report(aresObj):
   '''
   Write your function below
   '''
+  #aresObj.changeSiteColor('pink', 'yellow')
   aresObj.title("My report Title")
   # Example of DropDown selection
   #   - parameter 1: the title to be displayed in the object
