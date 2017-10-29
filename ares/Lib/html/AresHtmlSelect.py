@@ -4,6 +4,7 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
+from flask import render_template_string
 
 
 class SelectDropDown(AresHtml.Html):
@@ -74,3 +75,25 @@ class SelectDropDown(AresHtml.Html):
   def click(self, htmlObject):
     """ Change the component to use javascript functions """
     self.js('click', "console.log($(this).text()) ;") # % self.htmlId
+
+class SelectDropDownAjax(SelectDropDown):
+  """
+  This object will allow you to interact with the data and to request new set of data.
+  This will not work locally, in order to get something locally you need to change your object to be a
+  simple SelectDropDown
+
+
+  """
+  alias, cssCls = 'ajaxDropdown', ['btn', 'btn-success']
+  references = ['http://getbootstrap.com/docs/4.0/components/dropdowns/']
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap', 'jquery']
+
+  def targetScript(self, script):
+    self.script = script
+
+  def click(self, htmlObjects):
+    """ Call the ajax service and update the corresponding objects on the page """
+    url = render_template_string("{{ url_for( 'ares.ajaxCall', report_name='%s', script='%s' ) }}" % (self.aresObj.http["REPORT_NAME"], self.script))
+    self.js('click', '''$.ajax({url: '%s',
+          success: function(result){var resultObj = JSON.parse(result);$('#%s').html(resultObj['data']); }});''' % (url, htmlObjects[0].htmlId))
