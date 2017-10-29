@@ -324,10 +324,15 @@ def toPivotTable(recordSet, keys, vals, filters=None):
     row['_id'] = "".join(comKeyClean[0:parents[compKey]['level']+1])
     if parents[compKey]['_leaf'] == 1:
       row['_leaf'] = 1
+      row['_hasChildren'] = 0
     else:
+      row['_leaf'] = 0
       row['_hasChildren'] = 1
     if parents[compKey]['level'] == 0:
       row['_parent'] = 1
+      row['_leaf'] = 0
+    else:
+      row['_parent'] = 0
     row['level'] = parents[compKey]['level']
     result.append(row)
   return result

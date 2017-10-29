@@ -61,7 +61,7 @@ class DataTable(AresHtml.Html):
     self.aresObj.jsGlobal.add(self.htmlId) # table has to be registered as a global variable in js
     self.headerBox = headerBox
     self.recordSetId = id(vals)
-    self.recordSetHeader, self.jsMenu = [], []
+    self.recordSetHeader, self.jsMenu, self.recMap = [], [], {}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     else: # we have a header on several lines, nothing to do
@@ -69,10 +69,21 @@ class DataTable(AresHtml.Html):
     for col in self.header[-1]:
       if col.get("visible", True):
         self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
+        self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter = False
+
+  def pivot(self, keys, vals, filters=None):
+    """ Create the pivot table """
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
+    self.__options['data'] = json.dumps(rows)
+    self.recordSetHeader = []
+    for col in ['_leaf', 'level', '_hasChildren', '_id', '_parent'] + keys + vals:
+      self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (col, self.recMap.get(col, col)))
+    self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    self.hideColumns([0, 1, 2, 3, 4])
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
@@ -84,6 +95,9 @@ class DataTable(AresHtml.Html):
   def columnDefs(self, columnDefList):
     """ Set the column definition in the Datatable """
     self.__options['columnDefs'] = json.dumps(columnDefList)
+
+  def hideColumns(self, colIndices):
+    self.__options['columnDefs'] = "[{ 'visible': false, 'targets': [%s] }]" % ",".join([str(i) for i in colIndices])
 
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """

@@ -45,7 +45,7 @@ class NvD3ComboLineBar(AresHtmlGraphSvg.MultiSvg):
 
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
-    recordSet = AresChartsService.toComboChart(self.vals, self.chartKeys, self.selectedX , self.chartVals, barStyle=self.barStyle, colors=self.colors, extKeys=self.extKey)
+    recordSet = AresChartsService.toComboChart(self.vals, self.chartKeys, self.selectedX , self.chartVals, barStyle=self.barStyle, colors=self.colors, extKeys=self.extKeys)
     for key, vals in recordSet.items():
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
