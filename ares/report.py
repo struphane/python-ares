@@ -260,11 +260,11 @@ def run_report(report_name, script_name, user_id):
     fileConfig = os.path.join(userDirectory, 'config')
     if os.path.exists(fileConfig):
       for configPage in os.listdir(fileConfig):
-        htmlConfigs.append(configPage)
+        htmlConfigs.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='config', filename='%s') }}' target='_blank'>%s</a>" % (report_name, configPage, configPage)))
     fileStatic = os.path.join(userDirectory, 'static')
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
-        htmlStatics.append(staticPage)
+        htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='config', filename='%s') }}' target='_blank'>%s</a>" % (report_name, staticPage, staticPage)))
 
     if isAuth:
       if not report_name.startswith("_"):
@@ -288,8 +288,8 @@ def run_report(report_name, script_name, user_id):
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
-                         viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics=htmlStatics,
-                         htmlConfigs=htmlConfigs)
+                         viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
+                         htmlConfigs="\n".join(htmlConfigs))
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
@@ -349,6 +349,23 @@ def pivotData(format):
                                                       ))
 
   return json.dumps('Format %s not recognised' % format)
+
+@report.route("/view/<report_name>/<folder>/<filename>", methods = ['GET'])
+def showStatics(report_name, folder, filename):
+  """
+
+  """
+  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  configFile = os.path.join(userDirectory, folder, filename)
+  reportObj = Ares.Report()
+  if os.path.exists(configFile):
+    inFile = open(configFile)
+    reportObj.preformat(inFile.read())
+    inFile.close()
+  cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
+                         jsOnload=onload, content=content, jsGraphs=jsCharts,
+                         name='Configuration - %s' % filename, jsGlobal=jsGlobal)
 
 @report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
 def adminEnv(report_name, token):

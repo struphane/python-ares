@@ -22,37 +22,28 @@ https://www.bootply.com/60886#
 
           {% if htmlStatics %}
           <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Config Files
-                </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  {{ htmlStatics|safe }}
-              </div>
+              <a class="btn btn-outline-info active" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 40px;vertical-align: middle;display:inline-block;text-align:center; padding-top:8px;margin-right:5px">
+                  <i class="fa fa-asterisk" aria-hidden="true"></i>Statics</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlStatics|safe }}</div>
           </li>
           {% endif %}
 
           {% if htmlConfigs %}
           <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Config Files
-                </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  {{ htmlConfigs|safe }}
-              </div>
+              <a class="btn btn-outline-primary active" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 40px;vertical-align: middle;display:inline-block;text-align:center; padding-top:8px;margin-right:5px">
+                  <i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;Config Files</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlConfigs|safe }}</div>
           </li>
           {% endif %}
 
           {% if htmlArchives %}
           <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  HTML Archives
-                </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  {{ htmlArchives|safe }}
-              </div>
+              <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">HTML Archives</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlArchives|safe }}</div>
           </li>
           {% endif %}
-          <li class="nav-item dropdown">
+
+          <li class="nav-item dropdown" style="right:0px">
             <a class="nav-link dropdown-toggle"href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Packages
             </a>
