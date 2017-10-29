@@ -9,6 +9,8 @@ from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
 from ares.Lib.html import AresHtmlContainer
+from ares.Lib.html import AresHtmlText
+
 from flask import render_template_string
 from Libs import AresChartsService
 
@@ -289,6 +291,7 @@ class SimpleTable(AresHtml.Html):
   reqCss = ['bootstrap', 'jquery']
   reqJs = ['bootstrap', 'jquery']
   dflt = None
+  formatVals = True
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
     """ Create an Simple Table object """
@@ -317,10 +320,13 @@ class SimpleTable(AresHtml.Html):
   def pivot(self, keys, vals):
     """ """
     mapHeader = dict([(self.recKey(hdr), hdr['colName']) for hdr in self.header[-1]])
-    self.__data = [[Td(self.aresObj, mapHeader[header], True) for header in keys + vals]]
-    vals = AresChartsService.toPivotTable(self.vals, keys, vals)
+    self.__data = [[Td(self.aresObj, mapHeader[header], True, cssAttr={'background': '#225D32', 'text-align': 'center',
+                                                                       'color': 'white', 'font-weight': 'bold'}) for header in keys + vals]]
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals)
     self.__rows_hidden = {}
-    for i, val in enumerate(vals):
+    for i, val in enumerate(rows):
+      for keyVal in vals:
+        val[keyVal] = AresHtmlText.UpDown(self.aresObj, val[keyVal], val[keyVal])
       row, indexCol = [], i+1
       #
       if not indexCol in self.__rows_attr['rows']:
@@ -489,14 +495,14 @@ class SimpleTable(AresHtml.Html):
             '''
     self.aresObj.jsFnc.add(AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc))
 
-  def cssRowMouseHover(self, bgColor, fontCOlor, rowNum=None):
+  def cssRowMouseHover(self, bgColor='#BDFFC2', fontColor='black', rowNum=None):
     if rowNum is None:
       row = self.__rows_attr
     else:
       if not rowNum in self.__rows_attr['rows']:
         self.__rows_attr['rows'][rowNum] = {}
       row = self.__rows_attr['rows'][rowNum]
-    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontCOlor)]
+    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontColor)]
     row['onMouseOut'] = ["this.style.background='#FFFFFF';this.style.color='#000000'"]
 
   def cssPivotAggRow(self, attr):

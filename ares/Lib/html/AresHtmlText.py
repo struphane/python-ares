@@ -219,8 +219,7 @@ class Tick(AresHtml.Html):
 class UpDown(AresHtml.Html):
   """ Up and down Text component """
   alias = 'updown'
-  __css = {'color': 'green', 'cursor': 'pointer', 'font-style': 'normal', 'font-variant': 'normal',
-           'font-weight': 'normal', 'line-height': 'inherit', 'font-size': '45px'}
+  __css = {'color': 'green', 'line-height': 'inherit'}
   reqCss = ['font-awesome']
 
   def __init__(self, aresObj, vals, delta, cssCls=None, cssAttr=None, htmlComp=None):
