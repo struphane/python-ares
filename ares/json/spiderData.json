@@ -1,4 +1,6 @@
-[
+{
+keys: ['iPhone', 'Samsung', 'Nokia'],
+values: [
   [//iPhone
 	{axis:"Battery Life",value:0.22},
 	{axis:"Brand",value:0.28},
@@ -28,3 +30,4 @@
 	{axis:"To Be A Smartphone",value:0.30}
   ]
 ]
+}
