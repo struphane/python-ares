@@ -90,9 +90,10 @@ def report(aresObj):
   dropdownPrd = aresObj.select(data, 'PRD')
   dropdownPrd.setDefault("Cds")
 
-  pie = aresObj.donut(data, header, headerBox='Currencies')
-  pie.setKeys(['CCY', 'COB'])
-  pie.setVals(['VAL', 'VAL2'])
+  pie = aresObj.stackedArea(data, header, headerBox='Currencies')
+  pie.setSeries(['CCY', 'COB'])
+  pie.setY(['VAL2'])
+  pie.setX('VAL')
   pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
 
   bar = aresObj.bar(data, header, headerBox='Currencies')

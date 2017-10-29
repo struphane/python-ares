@@ -183,9 +183,18 @@ class MultiSvg(Svg):
     """ """
     self.selectedX = (x, self.header[x])
 
+  def setExtVals(self, keys, components):
+    """ Link the result to the different components on the page """
+    self.extKeys = keys
+    self.components = components
+
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
+    if self.components is not None:
+      dataComp = "+ '_' + ".join([comp.val for comp in self.components])
+      return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection, self.dynValSelection)
+
     return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
 
   def __str__(self):
@@ -211,3 +220,5 @@ class MultiSvg(Svg):
     chartAttributes = []
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())
+    for comp in self.components:
+      comp.link(self.jsUpdate())
