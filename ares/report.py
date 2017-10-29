@@ -29,6 +29,7 @@ from ares import packages
 from ares.Lib import Ares
 from ares.Lib import AresImports
 from ares.Lib import AresExceptions
+from ares.Lib import AresSql
 
 try:
   from Libs import AresUserAuthorization
@@ -127,21 +128,30 @@ def executeSelectQuery(dbPath, query, params=None):
 
 def checkAuth(dbpath, report_name, user_id):
   """ Check whether user has authorization to see data within the environment """
-  #TODO add login information to have proper security with Salt
-  # cipherId = AresSecurity.encrypt()
+
   if not os.path.exists(dbpath):
     raise IOError("Path to DB does not exist - the SQLite Database may have been deleted")
 
+
+  db = AresSql.SqliteDB(report_name)
   query = """SELECT 1 FROM env_auth 
-               INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%(report_name)s'
-               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%(user_id)s'"""
-  res = executeSelectQuery(dbpath, query, params={'report_name': report_name, 'user_id': user_id})
-  if not res:
+               INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
+               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%(user_id)s'""" % (report_name, user_id)
+
+  if not list(db.select(query)):
     return False
 
   else:
     return True
 
+def getEnvAdmin(dbPath, report_name):
+  """ """
+  db = AresSql.SqliteDB(report_name)
+  query = """SELECT email_addr 
+             FROM user_accnt
+             WHERE role = 'admin'"""
+
+  return list(db.select(dbPath, query))
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
@@ -177,7 +187,7 @@ def run_report(report_name, script_name, user_id):
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-      if  script_name != report_name and config.upper() != 'LOCAL':
+      if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
         if not checkAuth(dbPath, report_name, user_id):
           raise AresExceptions.AuthException('Not authorized to visualize this data')
@@ -366,6 +376,13 @@ def adminEnv(report_name, token):
 @report.route("/saved/<report_name>/<html_report>", methods = ['GET'])
 def savedHtmlReport(report_name, html_report):
   """  """
+  if config.ARES_MODE.upper() != 'LOCAL':
+    dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
+    if not checkAuth(dbPath, report_name, None):
+      raise AresExceptions.AuthException("""Sorry, you are not authorised to view this report - please contact this environment administrator to request access.
+                                         Administrator: %s """ ", ".join([rec['email_addr'] for rec in getEnvAdmin()]))
+
+
   reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'saved', html_report)
   html_report = []
   if os.path.exists(reportPath):
@@ -463,9 +480,6 @@ def ajaxCreate(email_address):
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
-    fileFullPath = os.path.join(scriptPath, scriptName)
-    with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
-      zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), scriptName))
 
     os.makedirs(os.path.join(scriptPath, 'outputs'))
     return json.dumps("New environment created: %s" % scriptName), 200
@@ -527,13 +541,6 @@ def uploadFiles(report_type, report_name, user_name):
       queryParams = {'report_name': report_name, 'file': file.filename, 'type': report_type, 'usr_id': user_name}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
-      if not os.path.exists("%s.zip" % fileFullPath):
-        with zipfile.ZipFile("%s.zip" % fileFullPath, 'w') as zf:
-          zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
-      else:
-        zf = zipfile.ZipFile("%s.zip" % fileFullPath, 'a')
-        zf.write(fileFullPath, "%s_%s" % (time.strftime("%Y%m%d-%H%M%S"), file.filename))
-        zf.close()
       result.append(filename)
   return json.dumps(result)
 
@@ -796,3 +803,15 @@ def getAresFilesVersions():
       stat = os.stat(os.path.join(libPath, pyFile))
       files[pyFile] = [stat.st_mtime, stat.st_size]
   return json.dumps(files)
+
+@report.route("/ares/registration/", methods = ['POST'])
+def aresRegistration():
+  """ """
+  data = request.data
+  userDict = json.loads(data)
+  if AresUserAuthorization.AuthenticationBase.user_exists(userDict['email_addr']):
+    return "User Already exists"
+
+  _, token = AresUserAuthorization.AuthenticationBase.addUser(userDict['email_addr'])
+  return token
+
