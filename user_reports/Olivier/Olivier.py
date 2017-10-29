@@ -113,10 +113,15 @@ def report(aresObj):
   header = [
     {'key': "CCY", 'colName': 'Currency', 'color': 'pink', 'barStyle': True},
     {'key': "PTF", 'colName': 'Portfolio'},
-    {'key': "COB", 'colName': 'Close of Business', 'type': '%Y-%m-%d'},
+    {'key': "COB", 'colName': 'Close of Business'},
     {'key': "VAL", 'colName': 'Value'},
     {'key': "VAL2", 'colName': 'Value 2'}
   ]
+
+  bar = aresObj.bar(data, header, headerBox='Currencies')
+  bar.setKeys(['CCY', 'COB'])
+  bar.setVals(['VAL'])
+  bar.setExtVals(['PTF'], [dropdown])
 
   #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
   #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})

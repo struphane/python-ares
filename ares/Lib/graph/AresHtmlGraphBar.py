@@ -26,7 +26,7 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
 
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
-    recordSet = AresChartsService.toBar(self.vals,self.seriesName, self.chartKeys, self.chartVals)
+    recordSet = AresChartsService.toBar(self.vals,self.seriesName, self.chartKeys, self.chartVals, extKeys=self.extKeys)
     for key, vals in recordSet.items():
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
