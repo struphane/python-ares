@@ -37,8 +37,11 @@ def report(aresObj):
   # Example of DropDown selection
   #   - parameter 1: the title to be displayed in the object
   #   - parameter 2: the content of the dropdown (the items should be tuple (Name, hyperlink)
-  dropdown = aresObj.dropdown('Test', [('4', None), ('2', None), ('3', None)])
+  dropdown = aresObj.dropdown('Portfolio', [('4', None), ('2', None), ('3', None)])
   dropdown.setDefault("2")
+
+  dropdownPrd = aresObj.dropdown('Product', [('Bond', None), ('Cds', None)])
+  dropdownPrd.setDefault("Cds")
   # dropdown.targetScript('testService')
   # To disable some links
   dropdown.disable('link 1', None)
@@ -74,21 +77,22 @@ def report(aresObj):
     mod = val % size
     data.append({"CCY": ccys[mod], 'VAL': val, 'COB': '2017-10-20'})
 
-  data = [{"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
-        {"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
-        {"CCY": 'GBP', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
-        {"CCY": 'GBP', "PTF": '1', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
-        {"CCY": 'GBP', "PTF": '2', 'VAL': 43, 'VAL2': 3, 'COB': '2017-10-21'},
-        {"CCY": 'GBP', "PTF": '3', 'VAL': 26, 'VAL2': 36, 'COB': '2017-10-19'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 67, 'VAL2': -34, 'COB': '2017-10-21'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 66, 'VAL2': -1344, 'COB': '2017-10-22'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 60, 'VAL2': -144, 'COB': '2017-10-23'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 20, 'VAL2': -1e4, 'COB': '2017-10-18'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 36, 'VAL2': -164, 'COB': '2017-10-17'}]
+  data = [{"CCY": 'EUR', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
+        {"CCY": 'EUR', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
+        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
+        {"CCY": 'GBP', 'PRD': 'Cds', "PTF": '1', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
+        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 43, 'VAL2': 3, 'COB': '2017-10-21'},
+        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '3', 'VAL': 26, 'VAL2': 36, 'COB': '2017-10-19'},
+        {"CCY": 'GBP', 'PRD': 'Cds', "PTF": '4', 'VAL': 67, 'VAL2': -34, 'COB': '2017-10-21'},
+        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -1344, 'COB': '2017-10-22'},
+        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '4', 'VAL': 60, 'VAL2': -144, 'COB': '2017-10-23'},
+        {"CCY": 'GBP', 'PRD': 'Cds', "PTF": '4', 'VAL': 20, 'VAL2': -1e4, 'COB': '2017-10-18'},
+        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '4', 'VAL': 36, 'VAL2': -164, 'COB': '2017-10-17'}]
 
   header = [
     {'key': "CCY", 'colName': 'Currency'},
     {'key': "COB", 'colName': 'Close of business'},
+    {'key': "PRD", 'colName': 'Product'},
     {'key': "PTF", 'colName': 'Portfolio'},
     {'key': "VAL", 'colName': 'Value'}
   ]
@@ -96,32 +100,12 @@ def report(aresObj):
   pie = aresObj.pie(data, header, headerBox='Currencies')
   pie.setKeys(['CCY', 'COB'])
   pie.setVals(['VAL'])
-  pie.setExtVals(['PTF'], [dropdown])
-
-  data = [{"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
-        {"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
-        {"CCY": 'GBP', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
-        {"CCY": 'GBP', "PTF": '1', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
-        {"CCY": 'GBP', "PTF": '2', 'VAL': 43, 'VAL2': 3, 'COB': '2017-10-21'},
-        {"CCY": 'GBP', "PTF": '3', 'VAL': 26, 'VAL2': 36, 'COB': '2017-10-19'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 67, 'VAL2': -34, 'COB': '2017-10-21'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 66, 'VAL2': -1344, 'COB': '2017-10-22'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 60, 'VAL2': -144, 'COB': '2017-10-23'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 20, 'VAL2': -1e4, 'COB': '2017-10-18'},
-        {"CCY": 'GBP', "PTF": '4', 'VAL': 36, 'VAL2': -164, 'COB': '2017-10-17'}]
-
-  header = [
-    {'key': "CCY", 'colName': 'Currency', 'color': 'pink', 'barStyle': True},
-    {'key': "PTF", 'colName': 'Portfolio'},
-    {'key': "COB", 'colName': 'Close of Business'},
-    {'key': "VAL", 'colName': 'Value'},
-    {'key': "VAL2", 'colName': 'Value 2'}
-  ]
+  pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
 
   bar = aresObj.bar(data, header, headerBox='Currencies')
   bar.setKeys(['CCY', 'COB'])
   bar.setVals(['VAL'])
-  bar.setExtVals(['PTF'], [dropdown])
+  bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
 
   #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
   #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})
