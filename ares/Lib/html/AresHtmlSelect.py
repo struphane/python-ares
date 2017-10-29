@@ -21,6 +21,16 @@ class SelectDropDown(AresHtml.Html):
     super(SelectDropDown, self).__init__(aresObj, list(vals), cssCls, cssAttr)
     self.title = title
     self.disableItems = {}
+    self.jsFrg = ['%s = $(this).text().trim();' % self.htmlId]
+
+  def setDefault(self, value):
+    """ Set a selected default value """
+    self.aresObj.jsGlobal.add("%s = '%s';" % (self.htmlId, value))
+
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML objec in a python HTML object """
+    return self.htmlId
 
   def addCategory(self, items, level, vals):
     """ Add recursively the sub categories """
@@ -72,9 +82,11 @@ class SelectDropDown(AresHtml.Html):
     items.add(0, "</div>")
     return str(items)
 
-  def click(self, htmlObject):
+  def link(self, jsEvent):
     """ Change the component to use javascript functions """
-    self.js('click', "console.log($(this).text()) ;") # % self.htmlId
+    self.jsFrg.append(jsEvent)
+    self.js('click', ";".join(self.jsFrg))
+
 
 class SelectDropDownAjax(SelectDropDown):
   """

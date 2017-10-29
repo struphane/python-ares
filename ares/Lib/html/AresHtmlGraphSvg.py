@@ -19,6 +19,7 @@ class Svg(AresHtml.Html):
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
     super(Svg, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
+    self.extKeys, self.components = None, []
     self.dispatch, self.htmlContent = {}, []
     self.recordSetId = id(vals)
     self.header = dict([(col['key'], col.get('type')) for col in recordSetDef])
@@ -119,6 +120,11 @@ class Svg(AresHtml.Html):
     self.chartVals = [(val, self.header[val]) for val in vals]
     self.selectedChartVal = vals[selected] if selected is not None else vals[0]
 
+  def setExtVals(self, keys, components):
+    """ Link the result to the different components on the page """
+    self.extKeys = keys
+    self.components = components
+
   @property
   def jqId(self):
     """ Returns the javascript SVG reference """
@@ -132,7 +138,7 @@ class Svg(AresHtml.Html):
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
-    return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
+    return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, self.components[0].val, self.dynKeySelection, self.dynValSelection)
 
   @property
   def jqSeriesKey(self):
@@ -144,6 +150,8 @@ class Svg(AresHtml.Html):
     chartAttributes = []
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())
+    for comp in self.components:
+      comp.link(self.jsUpdate())
 
   def processDataMock(self, cat=None, val=None):
     """ Return the json data """

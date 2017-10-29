@@ -37,11 +37,9 @@ def report(aresObj):
   # Example of DropDown selection
   #   - parameter 1: the title to be displayed in the object
   #   - parameter 2: the content of the dropdown (the items should be tuple (Name, hyperlink)
-  dropdown = aresObj.ajaxDropdown('Test', [('link 1', None),
-                                       ('Other', [('link 2', None),
-                                                 ('link 3', [('link 4', None)] )])
-                                                 ])
-  dropdown.targetScript('testService')
+  dropdown = aresObj.dropdown('Test', [('4', None), ('2', None), ('3', None)])
+  dropdown.setDefault("2")
+  # dropdown.targetScript('testService')
   # To disable some links
   dropdown.disable('link 1', None)
   # Because the hyperlink are not defined a click has to be defined to define the action
@@ -76,16 +74,29 @@ def report(aresObj):
     mod = val % size
     data.append({"CCY": ccys[mod], 'VAL': val, 'COB': '2017-10-20'})
 
+  data = [{"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
+        {"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
+        {"CCY": 'GBP', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
+        {"CCY": 'GBP', "PTF": '1', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
+        {"CCY": 'GBP', "PTF": '2', 'VAL': 43, 'VAL2': 3, 'COB': '2017-10-21'},
+        {"CCY": 'GBP', "PTF": '3', 'VAL': 26, 'VAL2': 36, 'COB': '2017-10-19'},
+        {"CCY": 'GBP', "PTF": '4', 'VAL': 67, 'VAL2': -34, 'COB': '2017-10-21'},
+        {"CCY": 'GBP', "PTF": '4', 'VAL': 66, 'VAL2': -1344, 'COB': '2017-10-22'},
+        {"CCY": 'GBP', "PTF": '4', 'VAL': 60, 'VAL2': -144, 'COB': '2017-10-23'},
+        {"CCY": 'GBP', "PTF": '4', 'VAL': 20, 'VAL2': -1e4, 'COB': '2017-10-18'},
+        {"CCY": 'GBP', "PTF": '4', 'VAL': 36, 'VAL2': -164, 'COB': '2017-10-17'}]
+
   header = [
     {'key': "CCY", 'colName': 'Currency'},
+    {'key': "COB", 'colName': 'Close of business'},
+    {'key': "PTF", 'colName': 'Portfolio'},
     {'key': "VAL", 'colName': 'Value'}
   ]
 
   pie = aresObj.pie(data, header, headerBox='Currencies')
-  pie.setKeys(['CCY'])
+  pie.setKeys(['CCY', 'COB'])
   pie.setVals(['VAL'])
-
-  dropdown.click([pie])
+  pie.setExtVals(['PTF'], [dropdown])
 
   data = [{"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
         {"CCY": 'EUR', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
@@ -107,6 +118,6 @@ def report(aresObj):
     {'key': "VAL2", 'colName': 'Value 2'}
   ]
 
-  table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
-  table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})
-  table.cssRowMouseHover()
+  #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
+  #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})
+  #table.cssRowMouseHover()

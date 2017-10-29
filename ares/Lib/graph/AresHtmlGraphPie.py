@@ -37,7 +37,7 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
 
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
-    recordSet = AresChartsService.toPie(self.vals, self.chartKeys, self.chartVals)
+    recordSet = AresChartsService.toPie(self.vals, self.chartKeys, self.chartVals, extKeys=self.extKeys)
     for key, vals in recordSet.items():
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
@@ -48,11 +48,11 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
     return '''
               var %s = nv.models.%s().%s ;
               %s
-              d3.select("#%s svg").datum(eval('%s_' + %s + '_' + %s))%s.call(%s);
+              d3.select("#%s svg").datum(eval(%s))%s.call(%s);
               %s ;
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
-                   self.htmlId, self.dynKeySelection, self.dynValSelection, # recordSet key
+                   self.jqData, # recordSet key
                    self.getSvg(), self.htmlId,
                    ";".join(dispatchChart), self.htmlId)
 

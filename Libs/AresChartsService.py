@@ -23,7 +23,7 @@ import collections
 
 regex = re.compile('[^a-zA-Z0-9]')
 
-def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat):
+def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=None):
   """ Function dedicated to return from a recordSet for the 2D charts with single series
 
   The key and val should be some keys defined in the recordSet.
@@ -36,22 +36,44 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat):
       trsnsfValFormat.append((val, float))
     else:
       trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat]))
-  for key, format in keysWithFormat:
-    if format is not None: # If there is a timestamp format defined
-      mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
-    else:
-      mapFnc = lambda dt, dtFmt: str(dt)
-    for rec in recordSet:
-      for val, valFormat in trsnsfValFormat:
-        data[(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
 
-  resultSets = {}
-  for key, aggVals in data.items():
-    result = [{'key': seriesName, 'values': []}]
-    sortedDt = sorted(aggVals.keys())
-    for dataKey in sortedDt:
-      result[0]['values'].append([dataKey, aggVals[dataKey]])
-    resultSets["_".join(key)] = result
+  if extKeys is None:
+    data = collections.defaultdict(lambda: collections.defaultdict(float))
+    for key, format in keysWithFormat:
+      if format is not None: # If there is a timestamp format defined
+        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+      else:
+        mapFnc = lambda dt, dtFmt: str(dt)
+      for rec in recordSet:
+        for val, valFormat in trsnsfValFormat:
+          data[(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
+
+    resultSets = {}
+    for key, aggVals in data.items():
+      result = [{'key': seriesName, 'values': []}]
+      sortedDt = sorted(aggVals.keys())
+      for dataKey in sortedDt:
+        result[0]['values'].append([dataKey, aggVals[dataKey]])
+      resultSets["_".join(key)] = result
+  else:
+    data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(float)))
+    for key, format in keysWithFormat:
+      if format is not None: # If there is a timestamp format defined
+        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+      else:
+        mapFnc = lambda dt, dtFmt: str(dt)
+      for rec in recordSet:
+        for val, valFormat in trsnsfValFormat:
+          extkeyResolve = "_".join([rec[extKey] for extKey in extKeys])
+          data[extkeyResolve][(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
+    resultSets = {}
+    for extKeys, recordSet in data.items():
+      for key, aggVals in recordSet.items():
+        result = [{'key': seriesName, 'values': []}]
+        sortedDt = sorted(aggVals.keys())
+        for dataKey in sortedDt:
+          result[0]['values'].append([dataKey, aggVals[dataKey]])
+        resultSets["%s_%s" %(extKeys, "_".join(key))] = result
   return resultSets
 
 def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, seriesNames=None):
@@ -104,18 +126,18 @@ def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, s
 # ------------------------------------------------------------------------------
 # Interface for the different charts
 # ------------------------------------------------------------------------------
-def toPie(recordSet, key, val):
+def toPie(recordSet, key, val, extKeys=None):
   """ Function dedicated to the Pie Chart and the Donut chart
 
   """
-  data = dict([(key, result[0]['values']) for key, result in to2DCharts(recordSet, None, key, val).items()])
+  data = dict([(key, result[0]['values']) for key, result in to2DCharts(recordSet, None, key, val, extKeys=extKeys).items()])
   return data
 
-def toBar(recordSet, seriesName, key, val):
+def toBar(recordSet, seriesName, key, val, extKeys=None):
   """ Function dedicated to the Bar Chart
 
   """
-  return to2DCharts(recordSet, seriesName, key, val)
+  return to2DCharts(recordSet, seriesName, key, val, extKeys=extKeys)
 
 def toMultiSeries(recordSet, key, x, val, seriesNames=None):
   """ Function dedicated to the StackedArea Chart
