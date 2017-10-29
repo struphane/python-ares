@@ -26,7 +26,7 @@ class NvD3SparkLinePlus(AresHtmlGraphSvg.MultiSvg):
   reqJs = ['jquery', 'd3']
 
   def filterSerie(self, key):
-    """  """
+    """ Filter on 1 specific series """
     self.filterAKey = key
 
   def processData(self):
@@ -34,7 +34,6 @@ class NvD3SparkLinePlus(AresHtmlGraphSvg.MultiSvg):
     recordSet = AresChartsService.toMultiSeries(self.vals, self.chartKeys, self.selectedX , self.chartVals, extKeys=self.extKeys)
     for key, recordSets in recordSet.items():
       for recrordSet in recordSets:
-        print recrordSet['key']
         if recrordSet['key'] ==  self.filterAKey:
           self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(recrordSet['values'])))
 

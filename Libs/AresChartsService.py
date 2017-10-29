@@ -244,6 +244,32 @@ def toCandleStick(recordSet, dateInfo, openCol, highCol, lowCol, closeCol, volum
                 "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
   return {"%s_FIXED" % dateCol: [{'values': res}]}
 
+def toSplider(recordSet, key, x, val, seriesNames=None, extKeys=None):
+  """ """
+  data = toMultiSeries(recordSet, key, x, val, seriesNames, extKeys)
+  result = {}
+  for key, vals in data.items():
+    recordSet = {'keys': [], 'values': []}
+    allCategories, sumPerKey, sumPerKeyPerCategory = set(), collections.defaultdict(float), collections.defaultdict(lambda: collections.defaultdict(float))
+    for row in vals:
+      recordSet['keys'].append(row['key'])
+      #values = []
+      for val in row['values']:
+        #values.append({'axis': val[0], 'value': val[1]})
+        allCategories.add(val[0])
+        sumPerKey[row['key']] += abs(val[1])
+        sumPerKeyPerCategory[row['key']][val[0]] += abs(val[1])
+
+    recordSet = {'keys': sumPerKeyPerCategory.keys(), 'values': []}
+    for subKeys in recordSet['keys']:
+      values = []
+      for category in allCategories:
+        values.append({'axis': category, 'value': sumPerKeyPerCategory[subKeys][category] / sumPerKey[subKeys]})
+      recordSet['values'].append(values)
+      result[key] = recordSet
+
+  print(result)
+  return result
 
 # ------------------------------------------------------------------------------
 # Interface for the tables
@@ -305,4 +331,3 @@ def toPivotTable(recordSet, keys, vals, filters=None):
     row['level'] = parents[compKey]['level']
     result.append(row)
   return result
-
