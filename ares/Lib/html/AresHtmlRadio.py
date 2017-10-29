@@ -29,6 +29,7 @@ class Radio(AresHtml.Html):
     self.selected = None
     self.col = col
     self.internalRef = internalRef
+    self.jsFrg = ['radio_val_%s = $(this).text().trim();' %  self.htmlId]
 
   @property
   def htmlId(self):
@@ -37,6 +38,11 @@ class Radio(AresHtml.Html):
       return self.internalRef
 
     return "%s_%s" % (self.__class__.__name__.lower(), id(self))
+
+  def setDefault(self, value):
+    """ Set a selected default value """
+    self.selected = value
+    self.aresObj.jsGlobal.add("radio_val_%s = '%s';" % (self.htmlId, value))
 
   def select(self, val):
     """ Change the selected value """
@@ -83,3 +89,9 @@ class Radio(AresHtml.Html):
     for htmlObject in htmlObjects:
       jsDef.append(htmlObject.jsUpdate())
     self.js(evenType, "\n".join(jsDef))
+
+  def link(self, jsEvent):
+    """ Change the component to use javascript functions """
+    jsFrg = list(self.jsFrg)
+    jsFrg.append(jsEvent)
+    self.js('mouseup', ";".join(jsFrg))

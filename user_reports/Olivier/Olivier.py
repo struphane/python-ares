@@ -40,8 +40,7 @@ def report(aresObj):
   dropdown = aresObj.dropdown('Portfolio', [('4', None), ('2', None), ('3', None), ('1', None)])
   dropdown.setDefault("2")
 
-  dropdownPrd = aresObj.dropdown('Product', [('Bond', None), ('Cds', None)])
-  dropdownPrd.setDefault("Cds")
+
   # dropdown.targetScript('testService')
   # To disable some links
   dropdown.disable('link 1', None)
@@ -96,6 +95,9 @@ def report(aresObj):
     {'key': "PTF", 'colName': 'Portfolio'},
     {'key': "VAL", 'colName': 'Value'}
   ]
+
+  dropdownPrd = aresObj.radio(data, 'PRD')
+  dropdownPrd.setDefault("Cds")
 
   pie = aresObj.pie(data, header, headerBox='Currencies')
   pie.setKeys(['CCY', 'COB'])
