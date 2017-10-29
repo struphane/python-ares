@@ -14,7 +14,7 @@ import sqlite3
 import datetime
 import hashlib
 
-from flask import current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
+from flask import session, current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
 
 import config
@@ -33,8 +33,13 @@ from ares.Lib import AresSql
 
 try:
   from Libs import AresUserAuthorization
+
+  if config.ARES_MODE.upper() != 'LOCAL':
+      from system.sqlite.db_config import setup_db_env
+      setup_db_env.launch_db()
 except:
   pass
+
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
@@ -92,16 +97,6 @@ def getFileName(script, exts):
     return "%s%s" % (scriptName, exts[0])
 
   return None
-
-def noCache(f):
-  def respFunc(*args, **kwargs):
-    resp = make_response(f(*args, **kwargs))
-    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    resp.headers['Pragma'] = 'no-cache'
-    return resp
-
-  return respFunc
-
 
 def executeScriptQuery(dbPath, query, params=None):
   """ simple function to execute queries"""
@@ -626,7 +621,7 @@ def configFile(report_name):
     userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, "config", requestParams['source'])
     if not os.path.exists(userDirectory):
       os.makedirs(userDirectory)
-    # 
+    #
     commentFile = open(os.path.join(userDirectory, "%s.cfg" % requestParams['key']), "w")
     commentFile.write(requestParams['val'])
     commentFile.close()
@@ -651,7 +646,7 @@ def designerComponent(component, compId):
 #   - To get the full report updated package
 #   - To get the last version of a specific script
 # ---------------------------------------------------------------------------------------------------------
-@noCache
+
 @report.route("/download/<report_name>/<script>", methods = ['GET', 'POST'])
 def downloadFiles(report_name, script):
   """ Download a specific file in a report project """
@@ -672,8 +667,6 @@ def downloadFiles(report_name, script):
     userDirectory = os.path.join(pathDirectory, report_name)
   return send_from_directory(userDirectory, splitScriptPath[-1], as_attachment=True)
 
-#TO BE REMOVED
-@noCache
 @report.route("/download/dsc/json/<jsonFile>", methods = ['GET', 'POST'])
 def downloadJsonFiles(jsonFile):
   if not jsonFile.endswith(".json"):
@@ -682,7 +675,6 @@ def downloadJsonFiles(jsonFile):
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'json')
   return send_from_directory(mokfilePath, jsonFile, as_attachment=True)
 
-@noCache
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
   """ Return in a Zip archive the full python package """
@@ -709,7 +701,6 @@ def downloadReport(report_name):
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
-@noCache
 @report.route("/download/package")
 def download():
   """ Return the package in order to test the scripts """
@@ -746,7 +737,6 @@ def download():
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
-@noCache
 @report.route("/download/package/<name>")
 def downloadPackage(name):
   modules = getattr(packages, name, None)
@@ -801,7 +791,6 @@ def downloadPackage(name):
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % name, as_attachment=True)
 
-@noCache
 @report.route("/download/<report_name>/outputs/<file_name>", methods = ['GET'])
 def downloadOutputs(report_name, file_name):
   """ Download the up to date Ares package """
@@ -831,14 +820,29 @@ def getAresFilesVersions():
       files[pyFile] = [stat.st_mtime, stat.st_size]
   return json.dumps(files)
 
-@report.route("/ares/registration/", methods = ['POST'])
+@report.route("/ares/registration", methods = ['POST'])
 def aresRegistration():
   """ """
-  data = request.data
-  userDict = json.loads(data)
-  if AresUserAuthorization.AuthenticationBase.user_exists(userDict['email_addr']):
+  data = request.form
+  if AresUserAuthorization.AuthenticationBase.user_exists(data['email_addr']):
     return "User Already exists"
 
-  _, token = AresUserAuthorization.AuthenticationBase.addUser(userDict['email_addr'])
-  return token
+  _, token = AresUserAuthorization.AuthenticationBase.addUser(data['email_addr'])
+  return 'OK'
 
+@report.route("/ares/login", methods= ['POST'])
+def aresLogin():
+  """ """
+  import pprint
+  pprint.pprint(current_app.config)
+  data = request.form
+  if not AresUserAuthorization.AuthenticationBase.user_exists(data['email_addr']):
+    return "Email Addresss is not registered"
+
+  _, token = AresUserAuthorization.AuthenticationBase.addUser(data['email_addr'])
+  if token == data['token']:
+    session['USERNAME'] = data['email_addr']
+    session['TOKEN'] = token
+    return "OK"
+
+  return "Wrong password"

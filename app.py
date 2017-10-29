@@ -18,11 +18,7 @@ POSTGRES = {
     'port': '5432',
 }
 
-if config.ARES_MODE == 'LIVE':
-    from system.sqlite.db_config import setup_db_env
-    setup_db_env.launch_db(app.config['ROOT_PATH'])
-
-
+app.config['SECRET_KEY'] = None#Change this if you want the app to work
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -39,9 +35,9 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-
-from ares.report import report
-app.register_blueprint(report)
+with app.app_context():
+    from ares.report import report
+    app.register_blueprint(report)
 
 from saturn.saturn import saturn
 app.register_blueprint(saturn)
