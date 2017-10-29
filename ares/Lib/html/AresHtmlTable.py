@@ -80,10 +80,33 @@ class DataTable(AresHtml.Html):
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
-    for col in ['_leaf', 'level', '_hasChildren', '_id', '_parent'] + keys + vals:
+    for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys + vals:
       self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (col, self.recMap.get(col, col)))
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.hideColumns([0, 1, 2, 3, 4])
+    self.callBackCreateRowHideFlag('_leaf', '1')
+    self.callBackCreateRowHideFlag('_parent', '0')
+    self.callBackCreateRowFlag('_hasChildren', 0, 'details')
+    self.click('''
+               $(this).toggleClass('changed');
+               var trObj = $(this).closest('tr');
+               //var children_data_id = $(this).data('index') + 1;
+               var trName = $('td:eq(0)', trObj).html();
+
+               var trId = %s.row(trObj).data()._id;
+               var trLevel = %s.row(trObj).data().level + 1;
+
+
+               %s.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                 var d = this.data();
+                 if (( trLevel == d.level ) && (d._id.startsWith(trId)) ) {
+                    //alert('');
+                    $(this).toggle() ;
+                 }
+               }) ;
+
+               %s.draw();
+               ''' % (self.htmlId, self.htmlId, self.htmlId, self.htmlId), colIndex=5)
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
@@ -144,6 +167,11 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
 
+  def callBackCreateCellFlag(self, colName, val, dstColIndex, cssCls):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( data['%s'] == '%s' ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, val, dstColIndex, cssCls))
+
   def callBackCreateRowThreshold(self, colName, threshold, cssCls):
     """  Change the row according to a float threshold """
     self.callBacks('createdRow',
@@ -181,6 +209,11 @@ class DataTable(AresHtml.Html):
     """ Row Call back wrapper to change the background color """
     self.callBacks('rowCallback',
                    "if (data['%s'] == '%s') {$(row).css('background-color', '%s'); }" % (colName, value, bgColor))
+
+  def callBackCreateRowFlag(self, colName, val, cssCls):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
 
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
