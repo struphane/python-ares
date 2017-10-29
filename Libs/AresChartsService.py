@@ -157,10 +157,15 @@ def toPie(recordSet, key, val, extKeys=None):
   return data
 
 def toBar(recordSet, seriesName, key, val, extKeys=None):
-  """ Function dedicated to the Bar Chart
-
-  """
+  """ Function dedicated to the Bar Chart """
   return to2DCharts(recordSet, seriesName, key, val, extKeys=extKeys)
+
+def toWordCloud(recordSet, key, val, extKeys=None):
+  """ Function dedicated to the World Cloud Chart """
+  data = {}
+  for key, result in to2DCharts(recordSet, None, key, val, extKeys=extKeys).items():
+    data[key] = [{'text': text, 'size': int(size)} for text, size  in result[0]['values']]
+  return data
 
 
 # ------------------------------------------------------------------------------
@@ -300,3 +305,4 @@ def toPivotTable(recordSet, keys, vals, filters=None):
     row['level'] = parents[compKey]['level']
     result.append(row)
   return result
+
