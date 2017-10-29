@@ -1,6 +1,6 @@
-"""
-Definition of all the different HTML Text wrappers.
+"""  Definition of all the different HTML Text wrappers.
 
+@author: Olivier Nogues
 """
 
 import os
