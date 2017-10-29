@@ -139,7 +139,7 @@ class Svg(AresHtml.Html):
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
-    if self.components is not None:
+    if self.components:
       dataComp = "+ '_' + ".join([comp.val for comp in self.components])
       return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection, self.dynValSelection)
 
