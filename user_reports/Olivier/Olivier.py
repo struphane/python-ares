@@ -46,16 +46,6 @@ def report(aresObj):
   dropdown.disable('link 1', None)
   # Because the hyperlink are not defined a click has to be defined to define the action
 
-  # Example of a Radio select HTML object
-  #   - parameter 1: the key in the recordSet to be used to define the range of values
-  #   - parameter 2: the recordset (a list of dictionaries)
-  #   - parameter 3: the header definition of the recordset
-  radio = aresObj.radio([{'CCY': 'EUR'}, {'CCY': 'HUF'}, {'CCY': 'USD'}], 'CCY',
-                        [{'key': 'CCY', 'colName': 'Currency'}])
-
-  radio.select('EUR')
-  radio.jsFnc('alert(%s)' % radio.val)
-
   # Example of a pie chart
   ccys = ['AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD', 'AWG', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN', 'BHD', 'BIF']
          #'BMD', 'BND', 'BOB', 'BRL', 'BSD', 'BTN', 'BWP', 'BYN', 'BZD', 'CAD', 'CDF', 'CHF', 'CLP', 'CNY', 'COP', 'CRC',
@@ -77,7 +67,7 @@ def report(aresObj):
     data.append({"CCY": ccys[mod], 'VAL': val, 'COB': '2017-10-20'})
 
   data = [{"CCY": 'EUR', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
-        {"CCY": 'EUR', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
+        {"CCY": 'EUR', 'PRD': 'Bond Option', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
         {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
         {"CCY": 'GBP', 'PRD': 'Cds', "PTF": '1', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
         {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 43, 'VAL2': 3, 'COB': '2017-10-21'},
@@ -93,15 +83,16 @@ def report(aresObj):
     {'key': "COB", 'colName': 'Close of business'},
     {'key': "PRD", 'colName': 'Product'},
     {'key': "PTF", 'colName': 'Portfolio'},
-    {'key': "VAL", 'colName': 'Value'}
+    {'key': "VAL", 'colName': 'Notional'},
+    {'key': "VAL2", 'colName': 'Pv'}
   ]
 
-  dropdownPrd = aresObj.radio(data, 'PRD')
+  dropdownPrd = aresObj.select(data, 'PRD')
   dropdownPrd.setDefault("Cds")
 
-  pie = aresObj.pie(data, header, headerBox='Currencies')
+  pie = aresObj.donut(data, header, headerBox='Currencies')
   pie.setKeys(['CCY', 'COB'])
-  pie.setVals(['VAL'])
+  pie.setVals(['VAL', 'VAL2'])
   pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
 
   bar = aresObj.bar(data, header, headerBox='Currencies')
@@ -109,6 +100,7 @@ def report(aresObj):
   bar.setVals(['VAL'])
   bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
 
+  aresObj.row([pie, bar])
   #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
   #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})
   #table.cssRowMouseHover()

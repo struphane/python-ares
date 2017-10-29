@@ -311,6 +311,7 @@ class Report(object):
 
   # Radio Section
   def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet if header is None else self.register(self.suppRec(recordSet), header), col, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def select(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
   # Title section
@@ -348,7 +349,6 @@ class Report(object):
   def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def select(self, values, selected=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.supp(values), selected, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select_group(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Container'](self, header, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def row(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Row'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)

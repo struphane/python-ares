@@ -1,4 +1,5 @@
-"""
+""" Python Wrapper for the Radio items
+@author: Olivier Nogues
 
 """
 
@@ -29,7 +30,8 @@ class Radio(AresHtml.Html):
     self.selected = None
     self.col = col
     self.internalRef = internalRef
-    self.jsFrg = ['radio_val_%s = $(this).text().trim();' %  self.htmlId]
+    # To replace non alphanumeric characters https://stackoverflow.com/questions/20864893/javascript-replace-all-non-alpha-numeric-characters-new-lines-and-multiple-whi
+    self.jsFrg = ["radio_val_%s = $(this).text().trim().replace(/\W+/g, '');" % self.htmlId]
 
   @property
   def htmlId(self):

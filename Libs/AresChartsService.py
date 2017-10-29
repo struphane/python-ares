@@ -21,7 +21,7 @@ import time
 import datetime
 import collections
 
-regex = re.compile('[^a-zA-Z0-9]')
+regex = re.compile('[^a-zA-Z0-9_]')
 
 def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=None):
   """ Function dedicated to return from a recordSet for the 2D charts with single series
@@ -64,7 +64,7 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
         mapFnc = lambda dt, dtFmt: str(dt)
       for rec in recordSet:
         for val, valFormat in trsnsfValFormat:
-          extkeyResolve = "_".join([rec[extKey] for extKey in extKeys])
+          extkeyResolve = regex.sub('', "_".join([rec[extKey] for extKey in extKeys]))
           data[extkeyResolve][(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
     resultSets = {}
     for extKeys, recordSet in data.items():

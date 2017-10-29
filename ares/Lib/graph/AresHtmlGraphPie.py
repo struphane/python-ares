@@ -1,4 +1,5 @@
-"""
+""" Chart module in charge of generating a Pie Chart
+@author: Olivier Nogues
 
 """
 
@@ -46,13 +47,15 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
     for displathKey, jsFnc in self.dispatch.items():
       dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
     return '''
+              d3.select("#%s svg").remove();
+              d3.select("#%s").append("svg");
               var %s = nv.models.%s().%s ;
               %s
-              d3.select("#%s svg").datum(eval(%s))%s.call(%s);
+              d3.select("#%s svg").style("height", '%spx').datum(eval(%s))%s.call(%s);
               %s ;
               nv.utils.windowResize(%s.update);
-            ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
-                   self.jqData, # recordSet key
+            ''' % (self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
+                   self.height, self.jqData, # recordSet key
                    self.getSvg(), self.htmlId,
                    ";".join(dispatchChart), self.htmlId)
 

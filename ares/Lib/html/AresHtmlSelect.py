@@ -1,11 +1,16 @@
-"""
+""" Python wrapper for the HTML Select object
+@author: Olivier Nogues
 
 """
+
+import re
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from flask import render_template_string
 
+
+regex = re.compile('[^a-zA-Z0-9_]')
 
 class SelectDropDown(AresHtml.Html):
   """
@@ -21,7 +26,8 @@ class SelectDropDown(AresHtml.Html):
     super(SelectDropDown, self).__init__(aresObj, list(vals), cssCls, cssAttr)
     self.title = title
     self.disableItems = {}
-    self.jsFrg = ['%s = $(this).text().trim();' % self.htmlId]
+    # To replace non alphanumeric characters https://stackoverflow.com/questions/20864893/javascript-replace-all-non-alpha-numeric-characters-new-lines-and-multiple-whi
+    self.jsFrg = ["%s = $(this).text().trim().replace(/\W+/g, '');" % self.htmlId]
 
   def setDefault(self, value):
     """ Set a selected default value """
@@ -84,8 +90,9 @@ class SelectDropDown(AresHtml.Html):
 
   def link(self, jsEvent):
     """ Change the component to use javascript functions """
-    self.jsFrg.append(jsEvent)
-    self.js('click', ";".join(self.jsFrg))
+    jsFrg = list(self.jsFrg)
+    jsFrg.append(jsEvent)
+    self.js('click', ";".join(jsFrg))
 
 
 class SelectDropDownAjax(SelectDropDown):
@@ -109,3 +116,94 @@ class SelectDropDownAjax(SelectDropDown):
     url = render_template_string("{{ url_for( 'ares.ajaxCall', report_name='%s', script='%s' ) }}" % (self.aresObj.http["REPORT_NAME"], self.script))
     self.js('click', '''$.ajax({url: '%s',
           success: function(result){var resultObj = JSON.parse(result);$('#%s').html(resultObj['data']); }});''' % (url, htmlObjects[0].htmlId))
+
+
+class Select(AresHtml.Html):
+  """
+  Basic wrapper to the Select HTML Tag
+    https://silviomoreto.github.io/bootstrap-select/examples/
+
+  For example to get a change on the Select Box Item in the
+  Javascript call back method
+    - alert($(this).val()) ;
+
+  For example
+    [('Fruit', ['Apple', 'Banana'])]
+
+  Default class parameters
+  cssCls = selectpicker
+  """
+  # TODO: Extend the python object to handle multi select and all the cool features
+  alias, cssCls = 'select', ['form-control']
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap', 'jquery']
+
+  def __init__(self, aresObj, recordSet, col=None, cssCls=None, cssAttr=None):
+    """ Instanciate the object and store the selected item """
+    if col is not None:
+      vals = set([])
+      for rec in recordSet:
+        if col in rec:
+          vals.add(rec[col])
+    else:
+      vals = set(recordSet)
+    super(Select, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.jsFrg = ["%s = $(this).val().trim(); " % self.htmlId]
+
+  def setDefault(self, value):
+    """ Set a selected default value """
+    self.selected = value
+    self.aresObj.jsGlobal.add("%s = '%s';" % (self.htmlId, regex.sub('', value.strip())))
+
+  def __str__(self):
+    """ Return the HTML string for a select """
+    item = AresItem.Item('<div class="form-group">', self.incIndent)
+    item.add(1, '<label for="sel1">Select list:</label>')
+    item.add(1, '<select %s style="height:32px">' % self.strAttr())
+    for val in self.vals:
+      if val == self.selected:
+        item.add(3, '<option value="%s" selected>%s</option>' % (regex.sub('', val.strip()), val))
+      else:
+        item.add(3, '<option value="%s">%s</option>' % (regex.sub('', val.strip()), val))
+    item.add(1, '</select>')
+    item.add(0, '</div>')
+    return str(item)
+
+  def link(self, jsEvent):
+    """ Change the component to use javascript functions """
+    jsFrg = list(self.jsFrg)
+    jsFrg.append(jsEvent)
+    self.js('change', ";".join(jsFrg))
+
+
+class SelectWithGroup(AresHtml.Html):
+  """
+  Basic wrapper to the Select HTML Tag
+    https://silviomoreto.github.io/bootstrap-select/examples/
+
+  For example to get a change on the Select Box Item in the
+  Javascript call back method
+    - alert($(this).val()) ;
+
+  For example
+    [('Fruit', ['Apple', 'Banana'])]
+
+  Default class parameters
+  cssCls = selectpicker
+  """
+  # TODO: Extend the python object to handle multi select and all the cool features
+  alias, cssCls = 'select_group', ['selectpicker']
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap']
+
+  def __str__(self):
+    """ Return the HTML string for a select """
+    item = AresItem.Item('<select %s>' % self.strAttr(), self.incIndent)
+    for group, vals in self.vals:
+      item.add(1, '<optgroup label="%s">' % group)
+      for v in vals:
+        item.add(2, '<option>%s</option>' % v)
+      item.add(1, '</optgroup>')
+    item.add(0, '</select>')
+    return str(item)
+

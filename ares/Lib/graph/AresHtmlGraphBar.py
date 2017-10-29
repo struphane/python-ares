@@ -1,4 +1,5 @@
-"""
+""" Chart module in charge of generating a Bar Chart
+@author: Olivier Nogues
 
 """
 
@@ -36,10 +37,12 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
     for displathKey, jsFnc in self.dispatch.items():
       dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
     return '''
+              d3.select("#%s svg").remove();
+              d3.select("#%s").append("svg");
               var %s = nv.models.%s().%s ;
-              d3.select("#%s svg").datum(%s).call(%s);
+              d3.select("#%s svg").style("height", '%spx').datum(%s).call(%s);
               nv.utils.windowResize(%s.update);
-            ''' % (self.htmlId, self.chartObject, self.attrToStr(),
-                   self.htmlId, self.jqData, self.htmlId, self.htmlId)
+            ''' % (self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(),
+                   self.htmlId, self.height, self.jqData, self.htmlId, self.htmlId)
 
 

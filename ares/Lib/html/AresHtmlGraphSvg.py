@@ -12,6 +12,7 @@ class Svg(AresHtml.Html):
   __css = {'width': '95%', 'height': '100%'}
   references = []
   __prop = {} #'transition': '',
+  height = 400
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """
@@ -107,7 +108,7 @@ class Svg(AresHtml.Html):
 
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
-    self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
+    self.htmlContent.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
   def setKeys(self, keys, selected=None):
@@ -201,7 +202,7 @@ class MultiSvg(Svg):
 
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
-    self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
+    self.htmlContent.append('<div %s style="height:400px;"><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
 
