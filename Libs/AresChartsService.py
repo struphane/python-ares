@@ -193,9 +193,9 @@ def toPivotTable(recordSet, keys, vals):
   This is an version using basic python functions to allow users without Pandas to use it
   """
   parents = collections.defaultdict(lambda: collections.defaultdict(float))
+  dimKeys = len(keys)
   for rec in recordSet:
     compositeKey = [''] * len(keys)
-    #cssClass = []
     for i, key in enumerate(keys):
       compositeKey[i] = rec[key]
       for j, val in enumerate(vals):
@@ -204,6 +204,8 @@ def toPivotTable(recordSet, keys, vals):
       parents[tuple(compositeKey)]['level'] = i
       #parents[tuple(compositeKey)]['cssCls'] = list(cssClass)
       parents[tuple(compositeKey)]['__count'] += 1
+      if dimKeys == i+1:
+        parents[tuple(compositeKey)]['_leaf'] = 1
   fullKeys = sorted(parents.keys())
   result = []
   for compKey in fullKeys:
@@ -217,7 +219,7 @@ def toPivotTable(recordSet, keys, vals):
       classCleanKey.append(prevKey)
     row['cssCls'] = list(set(classCleanKey)) # parents[compKey]['cssCls'][:-1]
     row['_id'] = "".join(comKeyClean[0:parents[compKey]['level']+1])
-    if parents[compKey]['__count'] == 1:
+    if parents[compKey]['_leaf'] == 1:
       row['_leaf'] = 1
     else:
       row['_hasChildren'] = 1
