@@ -325,8 +325,9 @@ class SimpleTable(AresHtml.Html):
     rows = AresChartsService.toPivotTable(self.vals, keys, vals)
     self.__rows_hidden = {}
     for i, val in enumerate(rows):
-      for keyVal in vals:
-        val[keyVal] = AresHtmlText.UpDown(self.aresObj, val[keyVal], val[keyVal])
+      if self.formatVals:
+        for keyVal in vals:
+          val[keyVal] = AresHtmlText.UpDown(self.aresObj, val[keyVal], val[keyVal])
       row, indexCol = [], i+1
       #
       if not indexCol in self.__rows_attr['rows']:
