@@ -107,5 +107,5 @@ def report(aresObj):
   ]
 
   table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
-  table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['4']})
+  table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})
   table.cssRowMouseHover()

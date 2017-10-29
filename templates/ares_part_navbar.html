@@ -20,6 +20,29 @@ https://www.bootply.com/60886#
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
 
+          {% if htmlStatics %}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Config Files
+                </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  {{ htmlStatics|safe }}
+              </div>
+          </li>
+          {% endif %}
+
+          {% if htmlConfigs %}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Config Files
+                </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  {{ htmlConfigs|safe }}
+              </div>
+          </li>
+          {% endif %}
+
+          {% if htmlArchives %}
           <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   HTML Archives
@@ -28,7 +51,7 @@ https://www.bootply.com/60886#
                   {{ htmlArchives|safe }}
               </div>
           </li>
-
+          {% endif %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle"href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Packages
