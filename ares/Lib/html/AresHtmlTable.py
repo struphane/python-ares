@@ -317,12 +317,12 @@ class SimpleTable(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
-  def pivot(self, keys, vals):
+  def pivot(self, keys, vals, filters=None):
     """ """
     mapHeader = dict([(self.recKey(hdr), hdr['colName']) for hdr in self.header[-1]])
     self.__data = [[Td(self.aresObj, mapHeader[header], True, cssAttr={'background': '#225D32', 'text-align': 'center',
                                                                        'color': 'white', 'font-weight': 'bold'}) for header in keys + vals]]
-    rows = AresChartsService.toPivotTable(self.vals, keys, vals)
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__rows_hidden = {}
     for i, val in enumerate(rows):
       if self.formatVals:
