@@ -37,7 +37,7 @@ def report(aresObj):
   # Example of DropDown selection
   #   - parameter 1: the title to be displayed in the object
   #   - parameter 2: the content of the dropdown (the items should be tuple (Name, hyperlink)
-  dropdown = aresObj.dropdown('Portfolio', [('4', None), ('2', None), ('3', None)])
+  dropdown = aresObj.dropdown('Portfolio', [('4', None), ('2', None), ('3', None), ('1', None)])
   dropdown.setDefault("2")
 
   dropdownPrd = aresObj.dropdown('Product', [('Bond', None), ('Cds', None)])

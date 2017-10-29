@@ -84,45 +84,6 @@ class TextArea(AresHtml.Html):
     return '$("#%s").html(%s)' % (self.htmlId, val)
 
 
-class DropDown(AresHtml.Html):
-  """
-  Wrapper for a Dropdowm HTML object
-
-  This component is built with
-    - BUTTON
-    - UL
-    - LI
-
-  Input value should be a List of String or of HTML components
-  The javascript reference will point to the li component
-
-  Default class parameters
-    - title = Title
-    - jQueryEvent = click
-    - CSS Default Class = dropdown (Bootstrap default style)
-  """
-  title, cssCls = 'Title', ['dropdown']
-  alias = 'dropdown'
-  reqCss = ['bootstrap', 'font-awesome']
-  reqJs = ['bootstrap']
-
-  def __str__(self):
-    """ Return the HTML String of a Drop Down list """
-    item = AresItem.Item('<div %s>' % self.strAttr())
-    item.add(1, '<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">%s<span class="caret"></span></button>' % self.title)
-    item.add(1, '<ul class="dropdown-menu">')
-    for val in self.vals:
-      item.add(2, '<li><a href="#%s">%s</a></li>' % (val[0], val[1]))
-    item.add(1, '</ul>')
-    item.add(0, '</div>')
-    return str(item)
-
-  @property
-  def jqId(self):
-    """ Return the javascript reference to the dropdown li item """
-    return '$("#%s .dropdown-menu li")' % self.htmlId
-
-
 class Select(AresHtml.Html):
   """
   Basic wrapper to the Select HTML Tag
