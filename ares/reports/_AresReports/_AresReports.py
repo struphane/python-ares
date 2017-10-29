@@ -13,7 +13,6 @@ def report(aresObj):
   """
 
   """
-
   reportsPath = aresObj.http.get('DIRECTORY')
   # Get the list of all the reports
   foldersReports, folderEvents = [], {}

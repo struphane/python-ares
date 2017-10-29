@@ -415,6 +415,20 @@ class Report(object):
           comp.append(cls.alias)
     return comp
 
+  def changeSiteColor(self, bgColor, fontColor):
+    """ To change from Ares the color of the nav bar and side bar """
+    self.jsOnLoadFnc.add('''$('nav').css('background-color', '%s');
+                            $('nav').css('color', '%s');
+                            $('.navbar-brand').css('background-color', '%s');
+                            $('.navbar-brand').css('color', '%s');
+                            $('.dropdown-menu').css('background-color', '%s');
+                            $('.dropdown-menu').css('color', '%s');
+                            $('#sidebar-wrapper').css('background-color', '%s') ;
+                            $('#sidebar-wrapper a').css('color', '%s') ;''' % (bgColor, fontColor,
+                                                                               bgColor, fontColor,
+                                                                               bgColor, fontColor,
+                                                                               bgColor, fontColor))
+
 
   def getFoldersInfo(self, subfolders=None):
     """  """
