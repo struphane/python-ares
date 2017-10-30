@@ -90,9 +90,15 @@ class DataTable(AresHtml.Html):
           self.recordSetHeader.append('''{ data: "%s", title: "%s",
               render: function (data, type, full, meta) {
                   var url = "%s";
-                  if (url.indexOf("?") !== -1) {url = url + '&%s=' + data ;}
-                  else {url = url + '?%s=' + data ;}
-                  return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, col, col))
+                  var cols = JSON.parse('%s');
+                  rowParams = '' ;
+                  for (var i in cols) {
+                      rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];
+                  }
+
+                  if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
+                  else {url = url + '?' + rowParams.substring(1) ;}
+                  return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(colRenders[col]['cols'])))
 
       else:
         self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
