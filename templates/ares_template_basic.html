@@ -65,6 +65,17 @@
             console.log($("head").html());
             //console.log($('#page-content-wrapper').html());
         });
+
+        $.ajaxSetup({
+            beforeSend:function(){
+                // show image here
+                $("#loading").show();
+            },
+            complete:function(){
+                // hide image here
+                $("#loading").hide();
+            }
+        });
     }) ;
     </script>
 
