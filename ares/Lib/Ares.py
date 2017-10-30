@@ -388,7 +388,10 @@ class Report(object):
   #def tree(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Tree'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # File HTML Section
-  def upload(self, values='', cssCls=None, cssAttr=None): return self.add(aresFactory['UploadFile'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  # def upload(self, values='', cssCls=None, cssAttr=None): return self.add(aresFactory['UploadFile'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def upload(self, cssCls=None, cssAttr=None): return self.add(aresFactory['FileUploader'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def deployFiles(self, cssCls=None, cssAttr=None): return self.add(aresFactory['FileDeployer'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
+
 
 
   # Anchor section): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
