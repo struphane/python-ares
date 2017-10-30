@@ -70,6 +70,7 @@ def report(aresObj):
         {"CCY": 'EUR', 'PRD': 'Bond Option', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
         {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
         {"CCY": 'USD', 'PRD': 'Cds', "PTF": '4', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
+        {"CCY": 'USD', 'PRD': 'Cds', "PTF": '4', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-19'},
         {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 43, 'VAL2': 3, 'COB': '2017-10-21'},
         {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '3', 'VAL': 26, 'VAL2': 36, 'COB': '2017-10-19'},
         {"CCY": 'AUD', 'PRD': 'Cds', "PTF": '4', 'VAL': 67, 'VAL2': -34, 'COB': '2017-10-21'},
@@ -87,21 +88,29 @@ def report(aresObj):
     {'key': "VAL2", 'colName': 'Pv'}
   ]
 
-  dropdownPrd = aresObj.select(data, 'PRD')
-  dropdownPrd.setDefault("Cds")
+  # dropdownPrd = aresObj.select(data, 'PRD')
+  # dropdownPrd.setDefault("Cds")
+  #
+  # pie = aresObj.spider(data, header, headerBox='Currencies')
+  # pie.setSeries(['CCY'])
+  # pie.setY(['VAL2'])
+  # pie.setX('PRD')
+  #pie.filterSerie('USD')
+  #pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
 
-  pie = aresObj.stackedArea(data, header, headerBox='Currencies')
-  pie.setSeries(['CCY', 'COB'])
-  pie.setY(['VAL2'])
-  pie.setX('VAL')
-  pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+  # bar = aresObj.wordcloud(data, header, headerBox='Currencies')
+  # bar.setKeys(['CCY', 'COB'])
+  # bar.setVals(['VAL'])
+  # bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+  #
+  # aresObj.row([pie, bar])
 
-  bar = aresObj.wordcloud(data, header, headerBox='Currencies')
-  bar.setKeys(['CCY', 'COB'])
-  bar.setVals(['VAL'])
-  bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+  table = aresObj.table(data, header)
+  #table.hideColumns([0, 1])
+  table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'])
+  table.callBackFooterColumns()
+        #{ 'visible': False, 'targets': [1,3] }
 
-  aresObj.row([pie, bar])
   #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
   #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})
   #table.cssRowMouseHover()

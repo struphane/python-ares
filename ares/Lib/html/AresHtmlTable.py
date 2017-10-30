@@ -1,6 +1,6 @@
 """ Python Module to define all the HTML component dedicated to display tables
-
 @Author: Olivier Nogues
+
 """
 
 import json
@@ -84,29 +84,47 @@ class DataTable(AresHtml.Html):
       self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (col, self.recMap.get(col, col)))
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.hideColumns([0, 1, 2, 3, 4])
+    self.option('scrollCollapse', 'false')
+    self.option('paging', 'false')
+    self.option('scrollY', "'50vh'")
+    self.mouveHover('#BFFCA6', 'black')
+    #self.option('order', "[[0, 'asc']]") # default behaviour anyway
     self.callBackCreateRowHideFlag('_leaf', '1')
     self.callBackCreateRowHideFlag('_parent', '0')
     self.callBackCreateRowFlag('_hasChildren', 0, 'details')
+    self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
+                                     if ( data.level > 0) {
+                                         $('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}
+                                 ''' )
     self.click('''
-               $(this).toggleClass('changed');
-               var trObj = $(this).closest('tr');
-               //var children_data_id = $(this).data('index') + 1;
-               var trName = $('td:eq(0)', trObj).html();
+                var currentTable = %s;
+                var trObj = $(this).closest('tr');
+                var trName = $('td:eq(0)', trObj).html();
+                var trId = currentTable.row(trObj).data()._id;
+                var trLevel = currentTable.row(trObj).data().level + 1;
+                if (!$(this).hasClass('changed')) {
+                  $(this).toggleClass('changed');
+                  var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    if ( trLevel == currentTable.row(nextTr.index()).data().level ) {
+                      nextTr.show();
+                    }
+                    nextTr = $(nextTr).next();
+                  }
+               }
+               else
+               {
+                  $(this).toggleClass('changed');
+                  var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    nextTr.hide();
+                    $('td:eq(0)', nextTr).removeClass('changed');
+                    nextTr = $(nextTr).next();
+                  }
 
-               var trId = %s.row(trObj).data()._id;
-               var trLevel = %s.row(trObj).data().level + 1;
-
-
-               %s.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
-                 var d = this.data();
-                 if (( trLevel == d.level ) && (d._id.startsWith(trId)) ) {
-                    //alert('');
-                    $(this).toggle() ;
-                 }
-               }) ;
-
-               %s.draw();
-               ''' % (self.htmlId, self.htmlId, self.htmlId, self.htmlId), colIndex=5)
+               }
+               currentTable.draw();
+               ''' % self.htmlId, colIndex=5)
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
@@ -120,7 +138,7 @@ class DataTable(AresHtml.Html):
     self.__options['columnDefs'] = json.dumps(columnDefList)
 
   def hideColumns(self, colIndices):
-    self.__options['columnDefs'] = "[{ 'visible': false, 'targets': [%s] }]" % ",".join([str(i) for i in colIndices])
+    self.__options['columnDefs'] = "[{ 'visible': false, 'targets': [%s], 'searchable': false, 'className': 'dt_right'}]" % ",".join([str(i) for i in colIndices])
 
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """
@@ -273,6 +291,22 @@ class DataTable(AresHtml.Html):
     else:
       filterCol = 'var rowData = %s.row(this).data()%s;%s' % (self.htmlId, colTag, jsFnc)
     self.aresObj.jsFnc.add("%s.on('click', '%s', function () {%s ;});" % (self.jqId, eventLevel, filterCol))
+
+  def mouveHover(self, backgroundColor, fontColor):
+    self.aresObj.jsFnc.add('''
+        %s.on( 'mouseover', 'tr', function () {
+            $(this).css('background-color', '%s');
+            $(this).css('color', '%s');
+        });
+       ''' % (self.jqId, backgroundColor, fontColor) )
+
+    self.aresObj.jsFnc.add('''
+        %s.on( 'mouseout', 'tr', function () {
+            $(this).css('background-color', 'white');
+            $(this).css('color', 'black');
+        });
+       ''' % self.jqId)
+
 
   def __str__(self):
     """ Return the string representation of a HTML table """
