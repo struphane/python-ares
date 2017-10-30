@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+    function preloader() {
+        $('#loading').show();
+    }
+
+    function display(data){
+        $('#temp-message').html(data);
+        $('#temp-message').show();
+        $('#temp-message').fadeOut( 4000 );
+    }
+
+    $(window).scroll(function() {
+        $('#context-menu').hide() ;
+    }) ;
+
+    $(window).click(function() {
+        // Function to close the context menu
+        $("#context-menu").hide();
+    });
+
+    {{ jsGlobal|safe }}
+    $(document).ready(function() {
+        {{ jsOnload|safe }}
+    }) ;
+
+
+</script>
+<title>RiskLab</title>
+
+{{ cssImport|safe }}
+
+{{ jsImport|safe }}
+
+</head>
+<body>
+
+
+<!--method="POST" action="{{ url_for('ares.aresRegistration') }}"-->
+<!--method="POST" action="{{ url_for('ares.aresLogin') }}"-->
+
+<div class="login-page">
+    <div class="form" >
+        <form class="register-form" method="POST" action="{{ url_for('ares.aresRegistration') }}">
+          <input type="text" name="email_addr" placeholder="email address" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$"/>
+          <input type="password" name="password" placeholder="password"/>
+          <input type="password" name="password_confirm" placeholder="confirm password"/>
+          <button type="submit">create</button>
+          <p class="message">Already registered? <a href="#">Sign In</a></p>
+        </form>
+        <form class="login-form" method="POST" action="{{ url_for('ares.aresLogin') }}">
+          <input type="text" name="email_addr" placeholder="username"/>
+          <input type="password" name="password" placeholder="password"/>
+          <button type="submit">login</button>
+          <p class="message">Not registered? <a href="#">Create an account</a></p>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    $('.message a').click(function(){
+       $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
+        });
+</script>
+
+</body>
+<footer role="contentinfo" style="text-align: center"><p>
+  Open Framework 2017 - <a href="{{ url_for('ares.run_report', report_name='_AresDoc', script_name='_AresDoc') }}">The Lab</a> -
+  <span class="credit">Powered by <a href="#">BDI Team</a></span>
+</p>
+
+</footer>
+</html>

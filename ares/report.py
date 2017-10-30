@@ -14,9 +14,12 @@ import sqlite3
 import datetime
 import hashlib
 
+from app import User, db
+
+from flask_login import LoginManager, login_user, login_required, logout_user
 from flask import session, current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
-
+from app import login_manager
 import config
 
 # TODO add a check on the variable DIRECTORY to ensure that it cannot be changed
@@ -53,6 +56,9 @@ LIB_PACKAGE = {
   'JSON': ['horizBars.json', 'linePlusBarData.json', 'lineWithFocus.json', 'multiBar.json', 'stackedAreaData.json']
 }
 
+@login_manager.user_loader
+def load_user(email_addr):
+  return User.query.filter_by(email=email_addr).first()
 
 def appendToLog(reportName, event, comment):
   """ Append an event to the dedicated log file """
@@ -98,6 +104,9 @@ def getFileName(script, exts):
 
   return None
 
+# @app.route('/')
+# def register()
+
 def executeScriptQuery(dbPath, query, params=None):
   """ simple function to execute queries"""
 
@@ -121,7 +130,7 @@ def executeSelectQuery(dbPath, query, params=None):
   conn.close()
   return res
 
-def checkAuth(dbpath, report_name, user_id):
+def checkAuth(dbpath, report_name):
   """ Check whether user has authorization to see data within the environment """
 
   if not os.path.exists(dbpath):
@@ -131,7 +140,7 @@ def checkAuth(dbpath, report_name, user_id):
   db = AresSql.SqliteDB(report_name)
   query = """SELECT 1 FROM env_auth 
                INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
-               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%(user_id)s'""" % (report_name, user_id)
+               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%(user_id)s'""" % (report_name, session['user_id'])
 
   if not list(db.select(query)):
     return False
@@ -184,10 +193,10 @@ def run_report(report_name, script_name, user_id):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
-        if not checkAuth(dbPath, report_name, user_id):
+        if not checkAuth(dbPath, report_name):
           raise AresExceptions.AuthException('Not authorized to visualize this data')
 
-        queryParams = {'script_name': script_name, 'env_name': report_name, 'usr_id': user_id}
+        queryParams = {'script_name': script_name, 'env_name': report_name, 'usr_id': session['user_id']}
         executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_request.sql')).read(), params=queryParams)
       side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
       if not userDirectory in sys.path:
@@ -395,12 +404,13 @@ def adminEnv(report_name, token):
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
 
+@login_required
 @report.route("/saved/<report_name>/<html_report>", methods = ['GET'])
 def savedHtmlReport(report_name, html_report):
   """  """
   if config.ARES_MODE.upper() != 'LOCAL':
     dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
-    if not checkAuth(dbPath, report_name, None):
+    if not checkAuth(dbPath, report_name):
       raise AresExceptions.AuthException("""Sorry, you are not authorised to view this report - please contact this environment administrator to request access.
                                          Administrator: %s """ ", ".join([rec['email_addr'] for rec in getEnvAdmin()]))
 
@@ -508,7 +518,21 @@ def ajaxCreate(email_address):
 
   return json.dumps("Existing Environment"), 200
 
-@report.route("/upload/<report_type>/<report_name>/<user_name>", methods = ['POST'])
+@report.route("/test_deploy/", methods = ['POST'])
+def testDeploy():
+  print(request.files)
+  print('\n\n\n')
+  print(request.form)
+  print('\n\n\n')
+  import pprint
+  pprint.pprint(dir(request))
+  print('\n\n\n')
+  print(request.args)
+  return json.dumps('')
+
+
+@login_required
+@report.route("/upload/<report_type>/<report_name>", methods = ['POST'])
 def uploadFiles(report_type, report_name, user_name):
   """ Add all the files that a users will drag and drop in the section """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
@@ -565,9 +589,6 @@ def uploadFiles(report_type, report_name, user_name):
 
       result.append(filename)
   return json.dumps(result)
-
-
-
 
 
 @report.route("/delete_file/<report_name>", methods = ['POST'])
@@ -675,6 +696,7 @@ def downloadJsonFiles(jsonFile):
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'json')
   return send_from_directory(mokfilePath, jsonFile, as_attachment=True)
 
+@login_required
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
   """ Return in a Zip archive the full python package """
@@ -820,29 +842,49 @@ def getAresFilesVersions():
       files[pyFile] = [stat.st_mtime, stat.st_size]
   return json.dumps(files)
 
-@report.route("/ares/registration", methods = ['POST'])
+@report.route("/ares/registration", methods = ['GET', 'POST'])
 def aresRegistration():
   """ """
-  data = request.form
-  if AresUserAuthorization.AuthenticationBase.user_exists(data['email_addr']):
-    return "User Already exists"
+  if request.method == 'GET':
+    jsImport = render_template_string('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\', filename=\'js/jquery-3.2.1.min.js\') }}"></script>')
+    special_css = render_template_string('<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/aresLogin.css\')  }}" >')
+    return render_template('ares_login_page.html', cssImport=special_css, jsImport=jsImport)
 
-  _, token = AresUserAuthorization.AuthenticationBase.addUser(data['email_addr'])
-  return 'OK'
+  if request.method == 'POST':
+    data = request.form
+    if User.query.filter_by(email=data['email_addr']).first():
+      return "User Already exists"
 
-@report.route("/ares/login", methods= ['POST'])
+
+    user = User(data['email_addr'], data['password'])
+    db.session.add(user)
+    db.session.commit()
+    return "User Created"
+
+@report.route("/ares/login", methods= ['GET', 'POST'])
 def aresLogin():
   """ """
-  import pprint
-  pprint.pprint(current_app.config)
-  data = request.form
-  if not AresUserAuthorization.AuthenticationBase.user_exists(data['email_addr']):
-    return "Email Addresss is not registered"
 
-  _, token = AresUserAuthorization.AuthenticationBase.addUser(data['email_addr'])
-  if token == data['token']:
-    session['USERNAME'] = data['email_addr']
-    session['TOKEN'] = token
-    return "OK"
+  if request.method == 'GET':
+    jsImport = render_template_string('<script language="javascript" type="text/javascript" src="{{ url_for(\'static\', filename=\'js/jquery-3.2.1.min.js\') }}"></script>')
+    special_css = render_template_string('<link rel="stylesheet" href="{{ url_for(\'static\', filename=\'css/aresLogin.css\')  }}" >')
+    return render_template('ares_login_page.html', cssImport=special_css, jsImport=jsImport)
 
-  return "Wrong password"
+  if request.method == 'POST':
+    data = request.form
+    user = User.query.filter_by(email=data['email_addr']).first()
+    if user:
+      if user.password == data['password']:
+        login_user(user)
+        print(session['user_id'])
+        return "User Logged in"
+
+      return "Wrong Password"
+
+    return "Email Address not registered"
+
+@report.route('/ares/logout')
+def aresLogout():
+  """ """
+  logout_user()
+  return "Logged out"

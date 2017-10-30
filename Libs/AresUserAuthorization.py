@@ -6,6 +6,7 @@ import os
 from Libs import AresSecurity
 from ares.Lib import AresSql
 import mailer
+from flask_wtf import Form
 
 mailer._DEBUG = False
 mail_server = mailer.SMTPServer('smtp.gmail.com', 587)
@@ -17,6 +18,11 @@ Your account has been created and you can now logon to AReS using simply your em
 Enjoy !
 AReS Team"""
 
+
+class SignupForm(Form):
+  email = StringField('email')
+  password = PasswordField('password')
+  submit = SubmitField("Register")
 
 class AuthenticationBase(object):
   """ """
