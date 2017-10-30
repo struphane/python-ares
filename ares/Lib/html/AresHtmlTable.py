@@ -82,7 +82,18 @@ class DataTable(AresHtml.Html):
     self.recordSetHeader = []
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
-      #self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="#">' + data + '</a>';} }''' % (col, self.recMap.get(col, col)))
+      if col in colRenders:
+        if 'url' in colRenders[col]:
+          # This will only work for static urls (not javascript tranalation for the time being)
+          colRenders[col]['url']['report_name'] = self.aresObj.http['REPORT_NAME']
+          getParams = ",".join(["%s='%s'"% (key, val) for key, val in colRenders[col]['url'].items()])
+          url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % getParams)
+          self.recordSetHeader.append('''{ data: "%s", title: "%s",
+              render: function (data, type, full, meta) {
+                  var url = "%s";
+                  if (url.indexOf("?") !== -1) {url = url + '&%s=' + data ;}
+                  else {url = url + '?%s=' + data ;}
+                  return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, col, col))
     for col in vals:
       if withUpDown:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",

@@ -107,7 +107,7 @@ def report(aresObj):
 
   table = aresObj.table(data, header)
   #table.hideColumns([0, 1])
-  table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'])
+  table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], colRenders={'CCY': {'url': {'script_name': "youpi"} }})
   table.callBackFooterColumns()
         #{ 'visible': False, 'targets': [1,3] }
 
