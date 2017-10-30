@@ -81,7 +81,6 @@ class DataTable(AresHtml.Html):
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
-      self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
       if col in colRenders:
         if 'url' in colRenders[col]:
           # This will only work for static urls (not javascript tranalation for the time being)
@@ -94,6 +93,9 @@ class DataTable(AresHtml.Html):
                   if (url.indexOf("?") !== -1) {url = url + '&%s=' + data ;}
                   else {url = url + '?%s=' + data ;}
                   return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, col, col))
+
+      else:
+        self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
     for col in vals:
       if withUpDown:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",
