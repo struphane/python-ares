@@ -10,6 +10,7 @@ import zipfile
 import contextlib
 import os
 import io
+import AresCreateLocalEnv
 
 SERVER_PATH = 'http://127.0.0.1:5000'
 
@@ -41,20 +42,5 @@ if __name__ == '__main__':
     strPath = os.path.join(*path)
     open(os.path.join(strPath, '__init__.py'), 'w').close()
 
-  dummyReportName = 'NewReport'
   # Then creation of the dummy report environment
-  if os.path.exists(dummyReportName):
-    shutil.rmtree(dummyReportName)
-
-  os.makedirs(dummyReportName)
-
-  # Create the folders
-  os.makedirs(os.path.join(dummyReportName, 'js')) # for the javascript fragments
-  os.makedirs(os.path.join(dummyReportName, 'json')) # for the static configurations
-  os.makedirs(os.path.join(dummyReportName, 'ajax')) # for the python dynamic data extraction
-  os.makedirs(os.path.join(dummyReportName, 'statics')) # for the MRX Static views (1 view per MRX screen)
-  os.makedirs(os.path.join(dummyReportName, 'outputs')) # To push output files
-  os.makedirs(os.path.join(dummyReportName, 'styles')) # for the special CSS and JS files to be used on the server
-  os.makedirs(os.path.join(dummyReportName, 'saved')) # To push the already ready HTML reports
-
-  shutil.copy2(os.path.join('ares', 'tmpl', 'tmpl_report.py'), os.path.join(dummyReportName, "%s.py" % dummyReportName))
+  AresCreateLocalEnv.createEnv('NewReport', True)

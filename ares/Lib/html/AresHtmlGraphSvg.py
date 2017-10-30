@@ -12,6 +12,7 @@ class Svg(AresHtml.Html):
   __css = {'width': '95%', 'height': '100%'}
   references = []
   __prop = {} #'transition': '',
+  height = 400
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """
@@ -19,6 +20,7 @@ class Svg(AresHtml.Html):
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
     super(Svg, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
+    self.extKeys, self.components = None, []
     self.dispatch, self.htmlContent = {}, []
     self.recordSetId = id(vals)
     self.header = dict([(col['key'], col.get('type')) for col in recordSetDef])
@@ -106,7 +108,7 @@ class Svg(AresHtml.Html):
 
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
-    self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
+    self.htmlContent.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
   def setKeys(self, keys, selected=None):
@@ -118,6 +120,11 @@ class Svg(AresHtml.Html):
     """ Set a default value for the graph """
     self.chartVals = [(val, self.header[val]) for val in vals]
     self.selectedChartVal = vals[selected] if selected is not None else vals[0]
+
+  def setExtVals(self, keys, components):
+    """ Link the result to the different components on the page """
+    self.extKeys = keys
+    self.components = components
 
   @property
   def jqId(self):
@@ -132,6 +139,10 @@ class Svg(AresHtml.Html):
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
+    if self.components:
+      dataComp = "+ '_' + ".join([comp.val for comp in self.components])
+      return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection, self.dynValSelection)
+
     return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
 
   @property
@@ -144,6 +155,8 @@ class Svg(AresHtml.Html):
     chartAttributes = []
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())
+    for comp in self.components:
+      comp.link(self.jsUpdate())
 
   def processDataMock(self, cat=None, val=None):
     """ Return the json data """
@@ -170,9 +183,18 @@ class MultiSvg(Svg):
     """ """
     self.selectedX = (x, self.header[x])
 
+  def setExtVals(self, keys, components):
+    """ Link the result to the different components on the page """
+    self.extKeys = keys
+    self.components = components
+
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
+    if self.components:
+      dataComp = "+ '_' + ".join([comp.val for comp in self.components])
+      return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection, self.dynValSelection)
+
     return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
 
   def __str__(self):
@@ -189,7 +211,7 @@ class MultiSvg(Svg):
 
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
-    self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
+    self.htmlContent.append('<div %s style="height:400px;"><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
     return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
 
@@ -198,3 +220,5 @@ class MultiSvg(Svg):
     chartAttributes = []
     self.resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate())
+    for comp in self.components:
+      comp.link(self.jsUpdate())

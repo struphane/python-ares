@@ -11,17 +11,48 @@ from ares.Lib import AresHtml
 
 NAME = 'Ares Example'
 # Just to set up the menu on the left hand side
-SHORTCUTS = [('Tables', [
-                          ('Tables - Tuto', 'AresExTables'),
-                          ('Complex Table', 'AresExTablesComplex'),
-                         ]),
-             ('Charts', [('Charts - Tuto', 'AresExChartPie'),
-                         ('NvD3 - Part 1', 'AresExNvd3Charts1'),
-                         ('NvD3 - Part 2', 'AresExNvd3Charts2'),
-                         ('NvD3 - Part 3', 'AresExNvd3Charts3'),
-                         ('D3 - Spider', 'AresExSpiderCharts'),
-                         ('Others Charts', 'AresExOtherCharts'),
-                         ]),
+SHORTCUTS = [('Html Types', [
+                  ('slider', 'AresExTables'),
+                  ('date', 'AresExTablesComplex'),
+                  ('textArea', 'AresExTablesComplex'),
+                  ('code', 'AresExTablesComplex'),
+                  ('preformat', 'AresExTablesComplex'),
+                  ('input', 'AresExTablesComplex'),
+                  ('inputInt', 'AresExTablesComplex'),
+                  ('inputRange', 'AresExTablesComplex'),
+                  ('button', 'AresExTablesComplex'),
+                  ('internalLink', 'AresExTablesComplex'),
+                  ('externalLink', 'AresExTablesComplex'),
+                  ('row and col', 'AresExTablesComplex'),
+                  ('radio', 'AresExTablesComplex'),
+                  ('select', 'AresExTablesComplex'),
+                  ('dropdown', 'AresExTablesComplex'),
+                  ('tick', 'AresExTablesComplex'),
+                  ('updown', 'AresExTablesComplex'),
+
+
+                  ]),
+             ('Chart Types',
+                  [('lineCumulative', 'AresExChartLineCumulative'),
+                   ('Pie and donut', 'AresExChartPie'), # Done
+                   ('bar', 'AresExChartBar'), # Done
+                   ('line', 'AresExChartLine'),
+                   #('forceDirected', 'AresExChartLine'),
+                   ('stackedArea', 'AresExChartStackedArea'),
+                   ('stackedAreaWithFocus', 'AresExChartLine'),
+                   ('multiBar', 'AresExChartMultiBar'), # Done
+                   ('lineChartFocus', 'AresExChartLine'),
+                   ('horizBar', 'AresExChartHorizBar'), # Done
+                   ('comboLineBar', 'AresExChartComboLineBar'), # Done
+                   ('scatter', 'AresExChartScatter'), # Done
+                   ('scatterline', 'AresExChartScatterline'), # Done
+                   ('wordcloud', 'AresExChartWordCloud'), # Done
+                   #('sunburst', 'AresExChartLine'),
+                   ('sparklineplus', 'AresExChartChartLine'),
+                   #('boxplot', 'AresExChartLine'),
+                   #('candlestickbar', 'AresExChartLine'),
+                   ('spider', 'AresExChartSpider'), # Done
+                  ]),
               ]
 
 def report(aresObj):
@@ -32,7 +63,9 @@ def report(aresObj):
   stackedArea = aresObj.stackedArea(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                                       {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                                     headerBox='Stacked Bar Chart Example', mockData=True)
-  meter = aresObj.meter(1, headerBox='Meter Chart Example', cssAttr={'height': '400px'})
+  forcedDirected = aresObj.forceDirected(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                                      {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+                                    headerBox='Stacked Bar Chart Example', mockData=True)
 
   # Graph documentation
   graphRefs = []
@@ -57,5 +90,5 @@ def report(aresObj):
   titleGraph = aresObj.title2("Reference for the charts")
   colLeft = aresObj.col([stackedArea, titleGraph, aresObj.list(graphRefs)])
   titlehtml = aresObj.title2("Reference for the HTLM")
-  colRight = aresObj.col([meter, titlehtml, aresObj.list(htmlRefs)])
+  colRight = aresObj.col([forcedDirected, titlehtml, aresObj.list(htmlRefs)])
   aresObj.row([colLeft, colRight])

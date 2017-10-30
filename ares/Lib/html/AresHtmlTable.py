@@ -1,6 +1,6 @@
 """ Python Module to define all the HTML component dedicated to display tables
-
 @Author: Olivier Nogues
+
 """
 
 import json
@@ -61,7 +61,7 @@ class DataTable(AresHtml.Html):
     self.aresObj.jsGlobal.add(self.htmlId) # table has to be registered as a global variable in js
     self.headerBox = headerBox
     self.recordSetId = id(vals)
-    self.recordSetHeader, self.jsMenu = [], []
+    self.recordSetHeader, self.jsMenu, self.recMap = [], [], {}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     else: # we have a header on several lines, nothing to do
@@ -69,10 +69,103 @@ class DataTable(AresHtml.Html):
     for col in self.header[-1]:
       if col.get("visible", True):
         self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
+        self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter = False
+
+  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False):
+    """ Create the pivot table """
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
+    self.__options['data'] = json.dumps(rows)
+    self.recordSetHeader = []
+    for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
+      if col in colRenders:
+        if 'url' in colRenders[col]:
+          # This will only work for static urls (not javascript tranalation for the time being)
+          colRenders[col]['url']['report_name'] = self.aresObj.http['REPORT_NAME']
+          getParams = ",".join(["%s='%s'"% (key, val) for key, val in colRenders[col]['url'].items()])
+          url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % getParams)
+          self.recordSetHeader.append('''{ data: "%s", title: "%s",
+              render: function (data, type, full, meta) {
+                  var url = "%s";
+                  var cols = JSON.parse('%s');
+                  rowParams = '' ;
+                  for (var i in cols) {
+                      rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];
+                  }
+
+                  if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
+                  else {url = url + '?' + rowParams.substring(1) ;}
+                  return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(colRenders[col]['cols'])))
+
+      else:
+        self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
+    for col in vals:
+      if withUpDown:
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",
+          render: function (data, type, full, meta) {
+            val = parseFloat(data);
+            if (val < 0) {
+              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ;
+            }
+            return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ; } }
+
+        ''' % (col, self.recMap.get(col, col)))
+      else:
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",
+          render: function (data, type, full, meta) {
+            val = parseFloat(data);
+            if (val < 0) {
+              return "<font style='color:red'>" + parseFloat(data).formatMoney(0, ',', '.') + "</font>" ;
+            }
+            return "<font style='color:green'>" + parseFloat(data).formatMoney(0, ',', '.') + "</font>" ; } }
+        ''' % (col, self.recMap.get(col, col)))
+
+    self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    self.hideColumns([0, 1, 2, 3, 4])
+    self.option('scrollCollapse', 'false')
+    self.option('paging', 'false')
+    self.option('scrollY', "'50vh'")
+    self.mouveHover('#BFFCA6', 'black')
+    #self.option('order', "[[0, 'asc']]") # default behaviour anyway
+    self.callBackCreateRowHideFlag('_leaf', '1')
+    self.callBackCreateRowHideFlag('_parent', '0')
+    self.callBackCreateRowFlag('_hasChildren', 0, 'details')
+    self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
+                                     if ( data.level > 0) {
+                                         $('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}
+                                 ''')
+    self.click('''
+                var currentTable = %s;
+                var trObj = $(this).closest('tr');
+                var trName = $('td:eq(0)', trObj).html();
+                var trId = currentTable.row(trObj).data()._id;
+                var trLevel = currentTable.row(trObj).data().level + 1;
+                if (!$(this).hasClass('changed')) {
+                  $(this).toggleClass('changed');
+                  var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    if ( trLevel == currentTable.row(nextTr.index()).data().level ) {
+                      nextTr.show();
+                    }
+                    nextTr = $(nextTr).next();
+                  }
+               }
+               else
+               {
+                  $(this).toggleClass('changed');
+                  var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    nextTr.hide();
+                    $('td:eq(0)', nextTr).removeClass('changed');
+                    nextTr = $(nextTr).next();
+                  }
+
+               }
+               currentTable.draw();
+               ''' % self.htmlId, colIndex=5)
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
@@ -84,6 +177,9 @@ class DataTable(AresHtml.Html):
   def columnDefs(self, columnDefList):
     """ Set the column definition in the Datatable """
     self.__options['columnDefs'] = json.dumps(columnDefList)
+
+  def hideColumns(self, colIndices):
+    self.__options['columnDefs'] = "[{ 'visible': false, 'targets': [%s], 'searchable': false, 'className': 'dt_right'}]" % ",".join([str(i) for i in colIndices])
 
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """
@@ -130,6 +226,11 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
 
+  def callBackCreateCellFlag(self, colName, val, dstColIndex, cssCls):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( data['%s'] == '%s' ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, val, dstColIndex, cssCls))
+
   def callBackCreateRowThreshold(self, colName, threshold, cssCls):
     """  Change the row according to a float threshold """
     self.callBacks('createdRow',
@@ -167,6 +268,11 @@ class DataTable(AresHtml.Html):
     """ Row Call back wrapper to change the background color """
     self.callBacks('rowCallback',
                    "if (data['%s'] == '%s') {$(row).css('background-color', '%s'); }" % (colName, value, bgColor))
+
+  def callBackCreateRowFlag(self, colName, val, cssCls):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
 
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
@@ -226,6 +332,22 @@ class DataTable(AresHtml.Html):
     else:
       filterCol = 'var rowData = %s.row(this).data()%s;%s' % (self.htmlId, colTag, jsFnc)
     self.aresObj.jsFnc.add("%s.on('click', '%s', function () {%s ;});" % (self.jqId, eventLevel, filterCol))
+
+  def mouveHover(self, backgroundColor, fontColor):
+    self.aresObj.jsFnc.add('''
+        %s.on( 'mouseover', 'tr', function () {
+            $(this).css('background-color', '%s');
+            $(this).css('color', '%s');
+        });
+       ''' % (self.jqId, backgroundColor, fontColor) )
+
+    self.aresObj.jsFnc.add('''
+        %s.on( 'mouseout', 'tr', function () {
+            $(this).css('background-color', 'white');
+            $(this).css('color', 'black');
+        });
+       ''' % self.jqId)
+
 
   def __str__(self):
     """ Return the string representation of a HTML table """

@@ -55,13 +55,6 @@ def report(aresObj):
   ajaxRecordSet = AresRefreshScripts.getRecordSet(aresObj, os.path.join(directory, 'ajax'))
 
   folderEvents, activity = collections.defaultdict(int), collections.defaultdict(int)
-  log = aresObj.logs(aresObj.http['USER_SCRIPT'])
-  if log is not None:
-    for line in log:
-      row = line.strip().split("#")
-      folderEvents[row[1]] += 1
-      activity[row[1]] += 1
-
   aresObj.div('Last update of your environment %s' % scriptUpdate, cssCls='alert alert-success')
 
   modal = aresObj.modal('Add a script')

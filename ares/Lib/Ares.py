@@ -311,6 +311,7 @@ class Report(object):
 
   # Radio Section
   def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet if header is None else self.register(self.suppRec(recordSet), header), col, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def select(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
   # Title section
@@ -348,7 +349,6 @@ class Report(object):
   def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def select(self, values, selected=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.supp(values), selected, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select_group(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Container'](self, header, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def row(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Row'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -377,7 +377,7 @@ class Report(object):
   def comboLineBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3ComboLineBar'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def scatter(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3ScatterChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def scatterline(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3ScatterPlusLineChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
-  def cloud(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['WordCloud'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def wordcloud(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['WordCloud'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def sunburst(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Sunburst'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def sparklineplus(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3SparkLinePlus'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def boxplot(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3PlotBox'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
@@ -467,14 +467,7 @@ class Report(object):
   #   2. Add and write a output file in the output section
   #   3. Read a file in the output file section
   # --------------------------------------------------
-  def configFile(self, fileName):
-    """ Return the object in the configuration file from the json file """
-    confFilg = open(os.path.join(self.http['DIRECTORY'], 'config', fileName))
-    data = json.load(confFilg)
-    confFilg.close()
-    return data
-
-  def getViews(self, fileName):
+  def getStaticFile(self, fileName):
     """ Return the object in the Statics area with the views parameters """
     confFilg = open(os.path.join(self.http['DIRECTORY'], 'statics', fileName))
     data = confFilg.read()
@@ -504,15 +497,6 @@ class Report(object):
     fileFullPath = os.path.join(outPath, fileName)
     self.fileManager[fileFullPath] = open(fileFullPath, typeFile)
     return self.fileManager[fileFullPath]
-
-  def logs(self, reportName):
-    """ Return the log file """
-    fileFullPath = os.path.join(self.http['DIRECTORY'], reportName, 'log_ares.dat')
-    if os.path.exists(fileFullPath):
-      self.fileManager[fileFullPath] = open(fileFullPath, 'r')
-      return self.fileManager[fileFullPath]
-
-    return None
 
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """

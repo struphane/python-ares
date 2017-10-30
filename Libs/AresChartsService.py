@@ -21,9 +21,9 @@ import time
 import datetime
 import collections
 
-regex = re.compile('[^a-zA-Z0-9]')
+regex = re.compile('[^a-zA-Z0-9_]')
 
-def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat):
+def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=None):
   """ Function dedicated to return from a recordSet for the 2D charts with single series
 
   The key and val should be some keys defined in the recordSet.
@@ -36,25 +36,47 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat):
       trsnsfValFormat.append((val, float))
     else:
       trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat]))
-  for key, format in keysWithFormat:
-    if format is not None: # If there is a timestamp format defined
-      mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
-    else:
-      mapFnc = lambda dt, dtFmt: str(dt)
-    for rec in recordSet:
-      for val, valFormat in trsnsfValFormat:
-        data[(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
 
-  resultSets = {}
-  for key, aggVals in data.items():
-    result = [{'key': seriesName, 'values': []}]
-    sortedDt = sorted(aggVals.keys())
-    for dataKey in sortedDt:
-      result[0]['values'].append([dataKey, aggVals[dataKey]])
-    resultSets["_".join(key)] = result
+  if extKeys is None:
+    data = collections.defaultdict(lambda: collections.defaultdict(float))
+    for key, format in keysWithFormat:
+      if format is not None: # If there is a timestamp format defined
+        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+      else:
+        mapFnc = lambda dt, dtFmt: str(dt)
+      for rec in recordSet:
+        for val, valFormat in trsnsfValFormat:
+          data[(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
+
+    resultSets = {}
+    for key, aggVals in data.items():
+      result = [{'key': seriesName, 'values': []}]
+      sortedDt = sorted(aggVals.keys())
+      for dataKey in sortedDt:
+        result[0]['values'].append([dataKey, aggVals[dataKey]])
+      resultSets["_".join(key)] = result
+  else:
+    data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(float)))
+    for key, format in keysWithFormat:
+      if format is not None: # If there is a timestamp format defined
+        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
+      else:
+        mapFnc = lambda dt, dtFmt: str(dt)
+      for rec in recordSet:
+        for val, valFormat in trsnsfValFormat:
+          extkeyResolve = regex.sub('', "_".join([rec[extKey] for extKey in extKeys]))
+          data[extkeyResolve][(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
+    resultSets = {}
+    for extKeys, recordSet in data.items():
+      for key, aggVals in recordSet.items():
+        result = [{'key': seriesName, 'values': []}]
+        sortedDt = sorted(aggVals.keys())
+        for dataKey in sortedDt:
+          result[0]['values'].append([dataKey, aggVals[dataKey]])
+        resultSets["%s_%s" %(extKeys, "_".join(key))] = result
   return resultSets
 
-def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, seriesNames=None):
+def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, seriesNames=None, extKeys=None):
   """ Function dedicated to handle charts with multiple series
 
   In those chart each series will have a certain numboer of points and the series name might be defined.
@@ -79,58 +101,90 @@ def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, s
     else:
       trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat]))
 
-  # Define the temporary dataSet used to aggregate the data in the recordSet
-  data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
-  # Aggregate the data in the recordSet
-  for key, keyFormat in keysWithFormat:
-    for rec in recordSet:
-      dt = mapFnc(rec[xWithFormat[0]], xWithFormat[1]) # Use the map function
-      for val, valFormat in trsnsfValFormat:
-        data[(key, val)][rec[key]][dt] += valFormat(rec[val])
-  # Produce the final data structure required by the multi series charts
-  resultSets = {}
-  for rawKey, aggVals in data.items():
-    result = []
-    for key, series in aggVals.items():
-      seriesData = {'key': seriesNames.get(key, key) if seriesNames is not None else key, 'values': []}
-      sortedDt = sorted(series.keys())
-      for dt in sortedDt:
-        seriesData['values'].append([dt, series[dt]])
-      result.append(seriesData)
-    resultSets["_".join(rawKey)] = result
+  if extKeys is None:
+    # Define the temporary dataSet used to aggregate the data in the recordSet
+    data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
+    # Aggregate the data in the recordSet
+    for key, keyFormat in keysWithFormat:
+      for rec in recordSet:
+        dt = mapFnc(rec[xWithFormat[0]], xWithFormat[1]) # Use the map function
+        for val, valFormat in trsnsfValFormat:
+          data[(key, val)][rec[key]][dt] += valFormat(rec[val])
+    # Produce the final data structure required by the multi series charts
+    resultSets = {}
+    for rawKey, aggVals in data.items():
+      result = []
+      for key, series in aggVals.items():
+        seriesData = {'key': seriesNames.get(key, key) if seriesNames is not None else key, 'values': []}
+        sortedDt = sorted(series.keys())
+        for dt in sortedDt:
+          seriesData['values'].append([dt, series[dt]])
+        result.append(seriesData)
+      resultSets["_".join(rawKey)] = result
+  else:
+    # Define the temporary dataSet used to aggregate the data in the recordSet
+    data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int))))
+    # Aggregate the data in the recordSet
+    for key, keyFormat in keysWithFormat:
+      for rec in recordSet:
+        dt = mapFnc(rec[xWithFormat[0]], xWithFormat[1]) # Use the map function
+        for val, valFormat in trsnsfValFormat:
+          extkeyResolve = regex.sub('', "_".join([rec[extKey] for extKey in extKeys]))
+          data[extkeyResolve][(key, val)][rec[key]][dt] += valFormat(rec[val])
+    # Produce the final data structure required by the multi series charts
+    resultSets = {}
+    for extKeys, recordSet in data.items():
+      for rawKey, aggVals in recordSet.items():
+        result = []
+        for key, series in aggVals.items():
+          seriesData = {'key': seriesNames.get(key, key) if seriesNames is not None else key, 'values': []}
+          sortedDt = sorted(series.keys())
+          for dt in sortedDt:
+            seriesData['values'].append([dt, series[dt]])
+          result.append(seriesData)
+        resultSets["%s_%s" % (extKeys, "_".join(rawKey))] = result
   return resultSets
 
 
 # ------------------------------------------------------------------------------
-# Interface for the different charts
+# Interface for the different Simple SVG charts
 # ------------------------------------------------------------------------------
-def toPie(recordSet, key, val):
+def toPie(recordSet, key, val, extKeys=None):
   """ Function dedicated to the Pie Chart and the Donut chart
 
   """
-  data = dict([(key, result[0]['values']) for key, result in to2DCharts(recordSet, None, key, val).items()])
+  data = dict([(key, result[0]['values']) for key, result in to2DCharts(recordSet, None, key, val, extKeys=extKeys).items()])
   return data
 
-def toBar(recordSet, seriesName, key, val):
-  """ Function dedicated to the Bar Chart
+def toBar(recordSet, seriesName, key, val, extKeys=None):
+  """ Function dedicated to the Bar Chart """
+  return to2DCharts(recordSet, seriesName, key, val, extKeys=extKeys)
 
-  """
-  return to2DCharts(recordSet, seriesName, key, val)
+def toWordCloud(recordSet, key, val, extKeys=None):
+  """ Function dedicated to the World Cloud Chart """
+  data = {}
+  for key, result in to2DCharts(recordSet, None, key, val, extKeys=extKeys).items():
+    data[key] = [{'text': text, 'size': int(size)} for text, size  in result[0]['values']]
+  return data
 
-def toMultiSeries(recordSet, key, x, val, seriesNames=None):
+
+# ------------------------------------------------------------------------------
+# Interface for the different Multi charts
+# ------------------------------------------------------------------------------
+def toMultiSeries(recordSet, key, x, val, seriesNames=None, extKeys=None):
   """ Function dedicated to the StackedArea Chart
 
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
-  return toMultiSeriesChart(recordSet, key, x, val, seriesNames)
+  return toMultiSeriesChart(recordSet, key, x, val, seriesNames, extKeys)
 
-def toComboChart(recordSet, key, x, val, seriesNames=None, barStyle=None, colors=None):
+def toComboChart(recordSet, key, x, val, seriesNames=None, barStyle=None, colors=None, extKeys=None):
   """ Function dedicated to the StackedArea Chart
 
   https://www.tutorialspoint.com/python/time_strptime.htm
   """
   res = {}
-  for key, vals in toMultiSeriesChart(recordSet, key, x, val, seriesNames).items():
+  for key, vals in toMultiSeriesChart(recordSet, key, x, val, seriesNames, extKeys).items():
     res[key] = []
     for recordSet in vals:
       recordSet["bar"] = barStyle.get(recordSet["key"], False)
@@ -138,6 +192,10 @@ def toComboChart(recordSet, key, x, val, seriesNames=None, barStyle=None, colors
       res[key].append(recordSet)
   return res
 
+
+# ------------------------------------------------------------------------------
+# Bespoke Interface for the different charts
+# ------------------------------------------------------------------------------
 def toPlotBox(recordSet, keys, valCols, withMean=True, seriesNames=None):
   """ Transform a recordSet in a data Structure compatible with a Plot Box D3 item """
   q1Col, q2Col, q3Col, whisker_lowCol, whisker_highCol, outliersCol = valCols
@@ -186,6 +244,36 @@ def toCandleStick(recordSet, dateInfo, openCol, highCol, lowCol, closeCol, volum
                 "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
   return {"%s_FIXED" % dateCol: [{'values': res}]}
 
+def toSplider(recordSet, key, x, val, seriesNames=None, extKeys=None):
+  """ """
+  data = toMultiSeries(recordSet, key, x, val, seriesNames, extKeys)
+  result = {}
+  for key, vals in data.items():
+    recordSet = {'keys': [], 'values': []}
+    allCategories, sumPerKey, sumPerKeyPerCategory = set(), collections.defaultdict(float), collections.defaultdict(lambda: collections.defaultdict(float))
+    for row in vals:
+      recordSet['keys'].append(row['key'])
+      #values = []
+      for val in row['values']:
+        #values.append({'axis': val[0], 'value': val[1]})
+        allCategories.add(val[0])
+        sumPerKey[row['key']] += abs(val[1])
+        sumPerKeyPerCategory[row['key']][val[0]] += abs(val[1])
+
+    recordSet = {'keys': sumPerKeyPerCategory.keys(), 'values': []}
+    for subKeys in recordSet['keys']:
+      values = []
+      for category in allCategories:
+        values.append({'axis': category, 'value': sumPerKeyPerCategory[subKeys][category] / sumPerKey[subKeys]})
+      recordSet['values'].append(values)
+      result[key] = recordSet
+
+  print(result)
+  return result
+
+# ------------------------------------------------------------------------------
+# Interface for the tables
+# ------------------------------------------------------------------------------
 def toPivotTable(recordSet, keys, vals, filters=None):
   """
   In order to produce a pivot table values should be float figures
@@ -236,10 +324,15 @@ def toPivotTable(recordSet, keys, vals, filters=None):
     row['_id'] = "".join(comKeyClean[0:parents[compKey]['level']+1])
     if parents[compKey]['_leaf'] == 1:
       row['_leaf'] = 1
+      row['_hasChildren'] = 0
     else:
+      row['_leaf'] = 0
       row['_hasChildren'] = 1
     if parents[compKey]['level'] == 0:
       row['_parent'] = 1
+      row['_leaf'] = 0
+    else:
+      row['_parent'] = 0
     row['level'] = parents[compKey]['level']
     result.append(row)
   return result

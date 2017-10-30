@@ -1,6 +1,8 @@
-"""
+""" Chart module in charge of generating a PlotBox Chart
+@author: Olivier Nogues
 
 """
+#TODO Migrate to the new Chart framework
 
 import json
 from ares.Lib.html import AresHtmlRadio
@@ -8,15 +10,9 @@ from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 from ares.Lib.html import AresHtmlContainer
 
+
 class NvD3PlotBox(AresHtmlGraphSvg.Svg):
-  """
-  NVD3 Wrapper for a Pie Chart object.
-
-  This will expect as input data a list of tuple (label, value)
-
-  data format expected in the Graph:
-    [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
-  """
+  """ NVD3 Plot Box python interface """
   alias, chartObject = 'boxplot', 'boxPlotChart'
   references = ['http://nvd3.org/examples/pie.html']
   __chartStyle = {'x': "function(d) { return d.label }",
@@ -24,23 +20,19 @@ class NvD3PlotBox(AresHtmlGraphSvg.Svg):
                   'yDomain': '[0, 500]',
                   'staggerLabels': "true"}
 
-  __svgProp = {
-  }
+  __svgProp = { } # Do not update those variables directly, please use the functions in the base class !
 
-  __chartProp = {
-  }
+  __chartProp = { } # Do not update those variables directly, please use the functions in the base class !
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
-  seriesNames = None
-  withMean = True
+  seriesNames, withMean = None, True
 
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
     return "eval('%s_' + %s + '_FIXED')" % (self.htmlId, self.dynKeySelection)
-
 
   def setVals(self, q1, q2, q3, whisker_low, whisker_high):
     """ Set a default value for the graph """
@@ -55,9 +47,9 @@ class NvD3PlotBox(AresHtmlGraphSvg.Svg):
         self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
   def jsUpdate(self):
-    dispatchChart = []
-    for displathKey, jsFnc in self.dispatch.items():
-      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
+    """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    # Dispatch method to add events on the chart (in progress)
+    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               var %s = nv.models.%s().%s ;
               d3.select("#%s svg").datum(%s)%s.call(%s);
