@@ -9,14 +9,7 @@ from ares.Lib.html import AresHtmlGraphSvg
 
 
 class NvD3ComboLineBar(AresHtmlGraphSvg.MultiSvg):
-  """
-  This object will combine a line and a bar chart.
-  The first item should be the line chart
-
-  The second will the bar chart
-
-  Reference website: http://nvd3.org/examples/linePlusBar.html
-  """
+  """ NVD3 Combo Line Bar Chart python interface """
   alias, chartObject = 'comboLineBar', 'linePlusBarChart'
   references = ['http://nvd3.org/examples/linePlusBar.html']
   __chartStyle = {
@@ -50,9 +43,9 @@ class NvD3ComboLineBar(AresHtmlGraphSvg.MultiSvg):
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
   def jsUpdate(self):
-    dispatchChart = []
-    for displathKey, jsFnc in self.dispatch.items():
-      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
+    """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    # Dispatch method to add events on the chart (in progress)
+    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
             d3.select("#%s svg").remove();
             d3.select("#%s").append("svg");

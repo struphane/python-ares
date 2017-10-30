@@ -1,17 +1,15 @@
-"""
+""" Chart module in charge of generating a Forced directed Chart (network chart)
+@author: Olivier Nogues
 
 """
-
-#TODO test the new version of NVD3 sur github
+#TODO Migrate to the new Chart framework
 
 from ares.Lib.html import AresHtmlContainer
 
 class NvD3ForceDirected(AresHtmlContainer.Svg):
-  """
-
-  """
+  """ """
   alias, chartObject = 'forceDirected', 'forceDirectedGraph'
-  references = []
+  references = ['http://krispo.github.io/angular-nvd3/#/forceDirectedGraph']
   __chartStyle = {
     'width ': '500',
     'height': '400',
@@ -29,11 +27,8 @@ class NvD3ForceDirected(AresHtmlContainer.Svg):
     self.aresObj.jsGraphs.append(
       '''
         var %s = nv.models.%s().%s ;
-
         %s
-
         d3.select("#%s svg").datum(%s).call(%s);
-
       ''' % (self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
              self.htmlId, self.dataFnc(), self.htmlId)
     )

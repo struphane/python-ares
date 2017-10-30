@@ -1,7 +1,6 @@
 """ Chart module in charge of generating a Line Cumulative Chart
 @author: Olivier Nogues
 
-
 """
 
 import json

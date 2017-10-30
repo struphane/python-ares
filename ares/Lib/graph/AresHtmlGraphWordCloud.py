@@ -7,16 +7,11 @@ import json
 from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 
+
 class WordCloud(AresHtmlGraphSvg.Svg):
-  """
-
-  This module will require the javascript module: d3.layout.cloud.js
-
-  TODO finalise the update method and make it generic with all the graph
-  the update method should appear once and only once in the javascript section of the page
-  """
+  """ NVD3 Word Cloud Chart python interface """
   alias, reqJs = 'wordcloud', ['cloud']
-  references = []
+  references = ['https://www.jasondavies.com/wordcloud/']
   width = 600
 
   def processData(self):
@@ -26,6 +21,7 @@ class WordCloud(AresHtmlGraphSvg.Svg):
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
   def jsUpdate(self):
+    """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     return '''
               d3.select("#%s svg g").remove();
 

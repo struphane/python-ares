@@ -9,9 +9,7 @@ from ares.Lib.html import AresHtmlGraphSvg
 
 
 class NvD3StackedArea(AresHtmlGraphSvg.MultiSvg):
-  """ This object will output a simple stacked area chart
-
-  """
+  """ NVD3 Stacked Area Chart python interface """
   alias, chartObject = 'stackedArea', 'stackedAreaChart'
   references = ['http://nvd3.org/examples/stackedArea.html']
   __chartStyle = {'margin': '{right: 100}',
@@ -41,9 +39,9 @@ class NvD3StackedArea(AresHtmlGraphSvg.MultiSvg):
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
   def jsUpdate(self):
-    dispatchChart = []
-    for displathKey, jsFnc in self.dispatch.items():
-      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
+    """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    # Dispatch method to add events on the chart (in progress)
+    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               d3.select("#%s svg").remove();
               d3.select("#%s").append("svg");

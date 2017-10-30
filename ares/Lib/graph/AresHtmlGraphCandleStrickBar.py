@@ -1,6 +1,8 @@
-"""
+""" Chart module in charge of generating a Candle Stick Bar Chart
+@author: Olivier Nogues
 
 """
+#TODO Migrate to the new Chart framework
 
 import json
 from ares.Lib.html import AresHtmlRadio
@@ -10,20 +12,12 @@ from ares.Lib.html import AresHtmlContainer
 
 
 class NvD3CandlestickBarChart(AresHtmlGraphSvg.Svg):
-  """
-  NVD3 Wrapper for a Pie Chart object.
-
-  This will expect as input data a list of tuple (label, value)
-
-  data format expected in the Graph:
-    [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
-  """
+  """ NVD3 Candle Chart Stick bar Chart python interface """
   alias, chartObject = 'candlestickbar', 'candlestickBarChart'
-  references = []
+  references = ['http://krispo.github.io/angular-nvd3/#/candlestickBarChart']
   __chartStyle = {'x': "function(d) { return d['date'] }",
                   'y': "function(d) { return d['close'] }",
-                  'margin': '{left: 75, bottom: 50}'
-                  }
+                  'margin': '{left: 75, bottom: 50}'}
 
   __chartProp = {
       'xAxis': {'axisLabel': '"Dates"', 'tickFormat': "function(d) {return d3.time.format('%x')(new Date(new Date() - (20000 * 86400000) + (d * 86400000)));}"},
@@ -50,9 +44,9 @@ class NvD3CandlestickBarChart(AresHtmlGraphSvg.Svg):
         self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
   def jsUpdate(self):
-    dispatchChart = []
-    for displathKey, jsFnc in self.dispatch.items():
-      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
+    """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    # Dispatch method to add events on the chart (in progress)
+    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               var %s = nv.models.%s().%s ;
               d3.select("#%s svg").datum(%s)%s.call(%s);

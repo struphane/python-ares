@@ -9,14 +9,7 @@ from ares.Lib.html import AresHtmlGraphSvg
 
 
 class NvD3Pie(AresHtmlGraphSvg.Svg):
-  """
-  NVD3 Wrapper for a Pie Chart object.
-
-  This will expect as input data a list of tuple (label, value)
-
-  data format expected in the Graph:
-    [{ "label": "One","value" : 29.765957771107} , {"label": "Three", "value" : 32.807804682612}]
-  """
+  """ NVD3 Pie Chart python interface """
   alias, chartObject = 'pie', 'pieChart'
   references = ['http://nvd3.org/examples/pie.html']
   __chartStyle = {'showLabels': 'true',
@@ -43,9 +36,9 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
 
   def jsUpdate(self):
-    dispatchChart = []
-    for displathKey, jsFnc in self.dispatch.items():
-      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
+    """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    # Dispatch method to add events on the chart (in progress)
+    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               d3.select("#%s svg").remove();
               d3.select("#%s").append("svg");

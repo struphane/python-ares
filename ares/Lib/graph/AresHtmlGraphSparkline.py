@@ -9,9 +9,7 @@ from ares.Lib.html import AresHtmlGraphSvg
 
 
 class NvD3SparkLinePlus(AresHtmlGraphSvg.MultiSvg):
-  """
-
-  """
+  """ NVD3 Spark Plus Line Chart python interface """
   alias, chartObject = 'sparklineplus', 'sparklinePlus'
   references = ['http://nvd3.org/examples/line.html']
   __chartStyle = {
@@ -38,9 +36,9 @@ class NvD3SparkLinePlus(AresHtmlGraphSvg.MultiSvg):
           self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(recrordSet['values'])))
 
   def jsUpdate(self):
-    dispatchChart = []
-    for displathKey, jsFnc in self.dispatch.items():
-      dispatchChart.append("%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc))
+    """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    # Dispatch method to add events on the chart (in progress)
+    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               d3.select("#%s svg").remove();
               d3.select("#%s").append("svg");
