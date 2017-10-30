@@ -228,7 +228,7 @@ def run_report(report_name, script_name, user_id):
       downloadEnv = report_name
     report = __import__(report_name) # run the report
     envName = getattr(report, 'NAME', '')
-    side_bar.append('<h5 style="color:white"><b>&nbsp;<i class="fa fa-area-chart" aria-hidden="true"></i>&nbsp;Dashboard</b></h5>')
+    side_bar.append('<br /><h5 style="color:white"><b>&nbsp;Dashboard</b></h5>')
     for categories, links in getattr(report, 'SHORTCUTS', []):
       side_bar.append('<h6 style="color:white"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></h6>' % categories)
       for name, scriptName in links:
