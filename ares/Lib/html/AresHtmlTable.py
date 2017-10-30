@@ -75,13 +75,35 @@ class DataTable(AresHtml.Html):
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter = False
 
-  def pivot(self, keys, vals, filters=None):
+  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False):
     """ Create the pivot table """
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
-    for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys + vals:
-      self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (col, self.recMap.get(col, col)))
+    for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
+      self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
+      #self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="#">' + data + '</a>';} }''' % (col, self.recMap.get(col, col)))
+    for col in vals:
+      if withUpDown:
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",
+          render: function (data, type, full, meta) {
+            val = parseFloat(data);
+            if (val < 0) {
+              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ;
+            }
+            return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ; } }
+
+        ''' % (col, self.recMap.get(col, col)))
+      else:
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",
+          render: function (data, type, full, meta) {
+            val = parseFloat(data);
+            if (val < 0) {
+              return "<font style='color:red'>" + parseFloat(data).formatMoney(0, ',', '.') + "</font>" ;
+            }
+            return "<font style='color:green'>" + parseFloat(data).formatMoney(0, ',', '.') + "</font>" ; } }
+        ''' % (col, self.recMap.get(col, col)))
+
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.hideColumns([0, 1, 2, 3, 4])
     self.option('scrollCollapse', 'false')
@@ -95,7 +117,7 @@ class DataTable(AresHtml.Html):
     self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
                                      if ( data.level > 0) {
                                          $('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}
-                                 ''' )
+                                 ''')
     self.click('''
                 var currentTable = %s;
                 var trObj = $(this).closest('tr');
