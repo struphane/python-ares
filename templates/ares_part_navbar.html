@@ -3,34 +3,52 @@ https:// view-source:https://v4-alpha.getbootstrap.com/examples/navbars/
 https://www.bootply.com/60886#
 -->
 
-<nav id='ares_nav_bar' style="background-color:#1B5E20" class="navbar navbar-toggleable-md navbar-inverse fixed-top">
+<nav id='ares_nav_bar' class="navbar navbar-toggleable-md navbar-inverse fixed-top" style="height:45px">
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="navbar-brand">
+      <div class="navbar-brand" style="height:45px;">
           <a name="side_change"  href="#"><i class="fa fa-bars fa-2x"></i></a>
           <a  href="#"><strong>RiskLab</strong></a>
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <a href="#"  class="btn btn-outline-success active"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
+          <a href="#"  class="btn btn-outline-success active" style="top:0px"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
           {% if downloadEnv %}
-            <a  href="{{ url_for('ares.downloadReport', report_name=downloadEnv ) }}" class="btn"><i class="fa fa-cloud-download" aria-hidden="true">&nbsp;&nbsp;Download</i></a>
+            <a  href="{{ url_for('ares.downloadReport', report_name=downloadEnv ) }}" style="top:0px" class="btn"><i class="fa fa-cloud-download" aria-hidden="true">&nbsp;&nbsp;Download</i></a>
           {% endif %}
       </div>
+
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
 
+          {% if htmlStatics %}
           <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  HTML Archives
-                </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  {{ htmlArchives|safe }}
-              </div>
+              <a class="btn active" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;height:40px;vertical-align: middle;display:inline-block;text-align:center; padding-top:8px;margin-right:5px">
+                  <i class="fa fa-asterisk" aria-hidden="true"></i>&nbsp;Statics</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlStatics|safe }}</div>
           </li>
+          {% endif %}
 
+          {% if htmlConfigs %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <a class="btn active" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;height:40px;vertical-align: middle;display:inline-block;text-align:center; padding-top:8px;margin-right:5px">
+                  <i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp;Config Files</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlConfigs|safe }}</div>
+          </li>
+          {% endif %}
+
+          {% if htmlArchives %}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">HTML Archives</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlArchives|safe }}</div>
+          </li>
+          {% endif %}
+
+        </ul>
+
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown" >
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;padding-top:8px">
               Packages
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -38,63 +56,61 @@ https://www.bootply.com/60886#
               <a class="dropdown-item" href="{{ url_for('ares.downloadPackage', name='CHART') }}">Chart Service</a>
             </div>
           </li>
-
-
-
-        </ul>
-
-        <form class="form-inline my-2 my-md-0">
-          <input class="form-control mr-sm-2" type="text" placeholder="Search">
-          <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px" type="submit">Search</button>
-        </form>
-
-        <ul class="nav-item  dropdown " id="menuLogin">
-                <a class="nav-link dropdown fa fa-user-circle fa-2x" style="color:grey" href="#" data-toggle="dropdown" id="navLogin" aria-haspopup="true" aria-expanded="false"></a>
+         </ul>
+         <ul class="nav pull-right">
+             <li class="nav-item  dropdown " id="menuLogin">
+                <a class=" nav-link dropdown-toggle fa fa-user-circle fa-2x" href="#" data-toggle="dropdown" id="navLogin" style="color:white;padding-top:2px"></a>
                 <div class="dropdown-menu" style="padding:17px;">
-                    <form id="formLogin" class="form" href="#">
+                    <form id="formLogin" class="form" href="#">>
                         <label>Login</label>
                         <input name="username" id="username" type="text" placeholder="Username" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" data-valid-min="6" title="Enter your username" required="">
-                        <input name="password" id="password" type="password" placeholder="Token" title="Enter your token" required=""><br>
+                        <input name="password" id="password" type="password" placeholder="password" title="Enter your password" required=""><br>
                         <button id="btnLogin" class="btn">Login</button>
                     </form>
                     <form><a href="#" title="Fast and free sign up!" id="btnNewUser" data-toggle="collapse" data-target="#formRegister">New User? Sign-up..</a></form>
-                    <form id="formRegister" class="form collapse", href="#">
+                    <form id="formRegister" class="form collapse" href="#">
                         <input name="email" id="inputEmail" type="email" placeholder="Email" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" required="">
+                        <input name="password" id="regPassword" type="password" placeholder="password" title="Enter your password" required=""><br>
+                        <input name="password_confirm" id="password_confirm" type="password" placeholder="password" title="Confirm password" required=""><br>
                         <button id="btnRegister" class="btn">Sign Up</button>
                     </form>
                     <a data-toggle="modal" role="button" href="#forgotPasswordModal">Forgot username or password?</a>
                     <a data-toggle="modal" role="button" href="#contactModal"><small>Need help? Contact us</small></a>
                 </div>
+            </li>
         </ul>
 
+
+        <script>
+            $(document).ready(function () {
+                $('#formLogin').submit(function(event) {
+                    event.preventDefault();
+                    var userDict = {'email_addr': $('#username').val(), 'password': $('#password').val()};
+                    $.post("{{ url_for('ares.aresLogin') }}", userDict, function(result) {
+                        if (result != 'OK') {
+                            alert("Wrong email or password entered !");
+                        }
+                    });
+                });
+
+                $('#formRegister').submit(function(event) {
+                    event.preventDefault();
+                    $.post("{{ url_for('ares.aresRegistration') }}", {'email_addr': $('#inputEmail').val(), 'password': $('#regPassword').val()}, function(result) {
+                        if (result != 'User Created') {
+                            alert("This email is already registered with us, try connecting using the token we've sent you via email");
+                        }
+                        else {
+                            alert(result);
+                        }
+                    });
+                });
+
+            });
+        </script>
+
+        <form class="form-inline my-2 my-md-0">
+          <input class="form-control mr-sm-2" type="text" placeholder="Search">
+          <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px" type="submit">Search</button>
+        </form>
       </div>
     </nav>
-
-<script>
-        $(document).ready(function () {
-            $('#formLogin').submit(function(event) {
-                event.preventDefault();
-                var userDict = {'email_addr': $('#username').val(), 'token': $('#password').val()};
-                $.post("{{ url_for('ares.aresLogin') }}", userDict, function(result) {
-                    if (result != 'OK') {
-                        alert("Wrong email or password entered !");
-                    }
-                });
-            });
-
-            $('#formRegister').submit(function(event) {
-                event.preventDefault();
-                $.post("{{ url_for('ares.aresRegistration') }}", {'email_addr': $('#inputEmail').val()}, function(result) {
-                    if (result != 'OK') {
-                        alert("This email is already registered with us, try connecting using the token we've sent you via email");
-                    }
-                    else {
-                        alert("An email with your token has been sent to your address");
-                    }
-                });
-            });
-
-        });
-
-
-</script>
