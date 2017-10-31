@@ -16,5 +16,5 @@ def report(aresObj):
     recordSet.append(rec)
   print recordSet[0]
   pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader())
-  pivotTable.pivot(['TYPE', 'ISSUER'], ['EXERCISE'])
+  pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'])
 

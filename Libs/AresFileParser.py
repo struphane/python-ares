@@ -30,15 +30,20 @@ class FileParser(object):
       self.__inputFile.next()
     self.header, self.colCnvFnc, keyMapCol = [], {}, {}
     for i, col in enumerate(self.cols):
-      self.header.append(regex.sub('', col['colName']))
+      colKey = self.recKey(col)
+      self.header.append(colKey)
       keyMapCol[col['colName']] = i
       if 'convertFnc' in col:
         self.colCnvFnc[i] = col['convertFnc']
     vCols = getattr(self, 'vCols', [])
     self.vHeader, self.vColCnvFnc = [], {}
     for i, vCol in enumerate(vCols):
-      self.vHeader.append((i, regex.sub('', vCol['colName'])))
-      self.vColCnvFnc[i] = ([regex.sub('', col)  for col in vCol['mapCols']], vCol['convertFnc'])
+      self.vHeader.append((i, self.recKey(vCol)))
+      self.vColCnvFnc[i] = ([col for col in vCol['mapCols']], vCol['convertFnc'])
+
+  def recKey(self, col):
+    """ Return the keys of the file configuration """
+    return col['key'] if 'key' in col else regex.sub('', col['colName'])
 
   def __iter__(self):
     """ Iterator to return a line """
@@ -57,5 +62,8 @@ class FileParser(object):
     """ Return the header definition """
     fileHeader = []
     for col in cls.cols:
-      fileHeader.append({'colName': col['colName'], 'key': regex.sub('', col['colName'])})
+      if 'key' not in col:
+        fileHeader.append({'colName': col['colName'], 'key': regex.sub('', col['colName'])})
+      else:
+        fileHeader.append({'colName': col['colName'], 'key': col['key']})
     return fileHeader

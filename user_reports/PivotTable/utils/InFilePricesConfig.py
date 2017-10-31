@@ -19,9 +19,9 @@ class InFilePices(AresFileParser.FileParser):
   cols = [
       {'colName': 'CODE'},
       {'colName': 'TYPE'},
-      {'colName': 'EXERCISE', 'convertFnc': TryFloat},
+      {'colName': 'EXERCISE', 'convertFnc': TryFloat, 'key': 'TTTT'},
       {'colName': 'EXPIRY'},
-      {'colName': 'RATIO'},
+      {'colName': 'RATIO', 'key': 'MMM'},
       {'colName': 'EX STYLE'},
       {'colName': 'ISSUER'},
       {'colName': 'REGISTRY'},
@@ -29,5 +29,5 @@ class InFilePices(AresFileParser.FileParser):
       {'colName': 'ISSUED (M)'},
       {'colName': 'NOTES'}]
 
-  vCols = [{'colName': 'Test Youpi', 'mapCols': ['EXERCISE'], 'convertFnc': lambda x: x * 2},
-           {'colName': 'Super', 'mapCols': ['TestYoupi'], 'convertFnc': lambda x: x * 2}]
+  vCols = [{'colName': 'Test Youpi', 'mapCols': ['TTTT'], 'convertFnc': lambda x: x * 2},
+           {'colName': 'Super', 'key': 'RRR', 'mapCols': ['TestYoupi'], 'convertFnc': lambda x: x * 2}]
