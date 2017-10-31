@@ -104,3 +104,5 @@ ENV/
 
 ### Python template
 # Byte-compiled / optimized / DLL files
+run.py
+run.py
