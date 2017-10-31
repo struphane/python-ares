@@ -464,14 +464,7 @@ class Report(object):
   #   2. Add and write a output file in the output section
   #   3. Read a file in the output file section
   # --------------------------------------------------
-  def configFile(self, fileName):
-    """ Return the object in the configuration file from the json file """
-    confFilg = open(os.path.join(self.http['DIRECTORY'], 'config', fileName))
-    data = json.load(confFilg)
-    confFilg.close()
-    return data
-
-  def getViews(self, fileName):
+  def getStaticFile(self, fileName):
     """ Return the object in the Statics area with the views parameters """
     confFilg = open(os.path.join(self.http['DIRECTORY'], 'statics', fileName))
     data = confFilg.read()
@@ -501,15 +494,6 @@ class Report(object):
     fileFullPath = os.path.join(outPath, fileName)
     self.fileManager[fileFullPath] = open(fileFullPath, typeFile)
     return self.fileManager[fileFullPath]
-
-  def logs(self, reportName):
-    """ Return the log file """
-    fileFullPath = os.path.join(self.http['DIRECTORY'], reportName, 'log_ares.dat')
-    if os.path.exists(fileFullPath):
-      self.fileManager[fileFullPath] = open(fileFullPath, 'r')
-      return self.fileManager[fileFullPath]
-
-    return None
 
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """
