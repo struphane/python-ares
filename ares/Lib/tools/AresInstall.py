@@ -41,6 +41,6 @@ if __name__ == '__main__':
   for path in (['ares'], ['ares', 'Lib'], ['ares', 'Lib', 'html'], ['ares', 'Lib', 'graph']):
     strPath = os.path.join(*path)
     open(os.path.join(strPath, '__init__.py'), 'w').close()
-    
+
   # Then creation of the dummy report environment
   AresCreateLocalEnv.createEnv('NewReport', True)
