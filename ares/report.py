@@ -313,6 +313,7 @@ def ajaxCall(report_name, script):
   finally:
     if script in sys.modules:
       del sys.modules[script]
+
     for f in reportObj.files.values():
       f.close()
 

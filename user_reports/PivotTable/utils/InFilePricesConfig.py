@@ -31,3 +31,13 @@ class InFilePices(AresFileParser.FileParser):
 
   vCols = [{'colName': 'Test Youpi', 'mapCols': ['TTTT'], 'convertFnc': lambda x: x * 2},
            {'colName': 'Super', 'key': 'RRR', 'mapCols': ['TestYoupi'], 'convertFnc': lambda x: x * 2}]
+
+
+class InFileCountry(AresFileParser.FileParser):
+  """  """
+  delimiter = '\n'
+  hdrLines = 1
+
+  cols = [
+      {'colName': 'Code'},
+      {'colName': 'Country'}]

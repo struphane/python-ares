@@ -6,6 +6,7 @@ from utils import InFilePricesConfig
 NAME = 'Pivot Table'
 FILE_CONFIGS = [
     {'filename': 'data.txt', 'folder': 'outputs', 'parser': InFilePricesConfig.InFilePices},
+    {'filename': 'country.txt', 'folder': 'static', 'parser': InFilePricesConfig.InFileCountry},
     ]
 
 def report(aresObj):
