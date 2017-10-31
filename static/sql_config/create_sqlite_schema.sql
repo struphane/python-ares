@@ -10,7 +10,8 @@ CREATE TABLE user_accnt (
 CREATE TABLE file_map (
  file_id integer PRIMARY KEY AUTOINCREMENT,
  alias text NOT NULL,
- disk_name text NOT NULL,
+ file_type text NOT NULL,
+ disk_name text NOT NULL UNIQUE,
  crea_dt text timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
