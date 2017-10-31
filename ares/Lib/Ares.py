@@ -250,36 +250,6 @@ class Report(object):
     self.supp(htmlObj)
     container.addVal(htmlObj)
 
-  def register(self, recordSet, header):
-    """
-    This function will register the recordSet when it is shared with other components
-    """
-    strFct, newRecordSet = [], []
-    for headerLine in header:
-      if isinstance(headerLine, list):
-        for headerRow in headerLine:
-          if headerRow.get("type") == 'object':
-            strFct.append(headerRow.get('key', headerRow['colName']) )
-      else:
-        if headerLine.get("type") == 'object':
-          strFct.append(headerLine.get('key', headerLine['colName']) )
-    if id(recordSet) not in self.jsRegistered:
-      if strFct:
-        newRecordSet = []
-        for rec in recordSet:
-          fullRec = dict(rec)
-          for col in strFct:
-            fullRec["__%s" % col] = rec[col]
-            fullRec[col] = str(rec[col])
-            rec[col] = str(rec[col])
-          newRecordSet.append(fullRec)
-        self.jsRegistered[id(recordSet)] = recordSet
-        self.jsRegistered[id(newRecordSet)] = recordSet
-        return newRecordSet
-
-      self.jsRegistered[id(recordSet)] = recordSet
-    return recordSet
-
   # ---------------------------------------------------------------------------------------------------------
   # Section dedicated to map the functions call to the HTML Component
   # This part is done in python 3 in order to ensure users will put the right type of objects
@@ -310,7 +280,7 @@ class Report(object):
   def ajaxDropdown(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectDropDownAjax'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Radio Section
-  def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet if header is None else self.register(self.suppRec(recordSet), header), col, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
@@ -346,8 +316,8 @@ class Report(object):
   def div(self, value, cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
+  def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, values, header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select_group(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Container'](self, header, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -384,9 +354,6 @@ class Report(object):
   def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def spider(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['D3SpiderChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
 
-
-  #def tree(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['NvD3Tree'](self, headerBox, self.register(self.suppRec(values), header), header, cssCls, cssAttr), sys._getframe().f_code.co_name)
-
   # File HTML Section
   # def upload(self, values='', cssCls=None, cssAttr=None): return self.add(aresFactory['UploadFile'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def upload(self, cssCls=None, cssAttr=None): return self.add(aresFactory['FileUploader'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -409,15 +376,6 @@ class Report(object):
   def aresInput(self, cssCls=None, cssAttr=None): return self.add(aresFactory['TextInput'](self, 'Put your text here', cssCls, cssAttr), sys._getframe().f_code.co_name)
   def aresDataSource(self, cssCls=None, cssAttr=None): return self.add(aresFactory['DataSource'](self, 'Drop here', cssCls, cssAttr), sys._getframe().f_code.co_name)
   def aresDragItems(self, vals, cssCls=None, cssAttr=None): return self.add(aresFactory['DragItems'](self, vals, cssCls, cssAttr), sys._getframe().f_code.co_name)
-
-  def components(self):
-    """ Get the list of component available in the framework """
-    comp = []
-    for aresModule in [AresHtmlText]:
-      for name, cls in inspect.getmembers(aresModule):
-        if inspect.isclass(cls) and cls.alias is not None:
-          comp.append(cls.alias)
-    return comp
 
   def changeSiteColor(self, bgColor, fontColor):
     """ To change from Ares the color of the nav bar and side bar """
@@ -469,7 +427,7 @@ class Report(object):
   # --------------------------------------------------
   def getStaticFile(self, fileName):
     """ Return the object in the Statics area with the views parameters """
-    confFilg = open(os.path.join(self.http['DIRECTORY'], 'statics', fileName))
+    confFilg = open(os.path.join(self.http['DIRECTORY'], 'static', fileName))
     data = confFilg.read()
     confFilg.close()
     return data

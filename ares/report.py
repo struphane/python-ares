@@ -261,14 +261,10 @@ def run_report(report_name, script_name, user_id):
     if os.path.exists(savedHtmlLocation):
       for htmlPage in os.listdir(savedHtmlLocation):
         htmlArchives.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}' target='_blank'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1]))))
-    fileConfig = os.path.join(userDirectory, 'config')
-    if os.path.exists(fileConfig):
-      for configPage in os.listdir(fileConfig):
-        htmlConfigs.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='config', filename='%s') }}' target='_blank'>%s</a>" % (report_name, configPage, configPage)))
     fileStatic = os.path.join(userDirectory, 'static')
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
-        htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='config', filename='%s') }}' target='_blank'>%s</a>" % (report_name, staticPage, staticPage)))
+        htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='static', filename='%s') }}' target='_blank'>%s</a>" % (report_name, staticPage, staticPage)))
 
     if isAuth:
       if not report_name.startswith("_"):
@@ -444,18 +440,6 @@ def savedHtmlReport(report_name, html_report):
 
   return render_template('ares_empty.html', cssImports="\n".join(cssImports), jsImports="\n".join(jsImports), html_report="".join(html_report))
 
-
-
-
-@report.route("/handlerequest/<module_name>/<function>", methods = ['GET', 'POST'])
-def handleRequest(module_name, function):
-  onload, js, error = '', '', False
-  try:
-    mod = __import__(module_name)
-    results = {"status": "success", "data": getattr(mod, function)(getHttpParams(request))}
-  except Exception as e:
-    results = {"status": "Error", "message": str(e), "data": []}
-  return json.dumps(results)
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to upload files to a shared environment on the server
@@ -646,17 +630,6 @@ def configFile(report_name):
     commentFile = open(os.path.join(userDirectory, "%s.cfg" % requestParams['key']), "w")
     commentFile.write(requestParams['val'])
     commentFile.close()
-  return json.dumps('')
-
-@report.route("/components/<component>:<compId>")
-def designerComponent(component, compId):
-  """
-
-  """
-  echo(compId)
-  echo(component)
-  #echo(Ares.moduleFromAlias(component))
-  #echo(Ares.moduleFromAlias(component).aresDesigner(compId))
   return json.dumps('')
 
 # ---------------------------------------------------------------------------------------------------------
