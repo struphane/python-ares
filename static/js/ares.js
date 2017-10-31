@@ -19,6 +19,28 @@ Number.prototype.formatMoney = function(decPlaces, thouSeparator, decSeparator) 
     return sign + (j ? i.substr(0, j) + thouSeparator : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSeparator) + (decPlaces ? decSeparator + Math.abs(n - i).toFixed(decPlaces).slice(2) : "");
 };
 
+function addInputforDeploy(divId){
+            var newDiv = document.createElement('div');
+            newDiv.innerHTML = "<br><input type='file' name='file' />";
+            document.getElementById(divId).appendChild(newDiv);
+}
+
+function addInputForUpload(divId){
+            var newDiv = document.createElement('div');
+            newDiv.innerHTML = "<br><input type='file' name='file' />" +
+             "<select name='File Type' required>" +
+             "<option value='report'>report</option>" +
+             "<option value='configuration'>configuration</option>" +
+             "<option value='ajax'>ajax</option>" +
+             "<option value='javascript'>javascript</option>" +
+             "<option value='views'>views</option>" +
+             "<option value='outputs'>outputs</option>" +
+             "<option value='styles'>styles</option>" +
+             "<option value='saved'>saved</option>" +
+             "</select>";
+             document.getElementById(divId).appendChild(newDiv);
+}
+
 function getDict(dict, key, dflt){
     // Return a default value in a dictionary
     if (key in dict) return dict[key];
