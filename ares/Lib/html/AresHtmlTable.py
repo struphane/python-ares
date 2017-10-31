@@ -82,7 +82,7 @@ class DataTable(AresHtml.Html):
     self.recordSetHeader = []
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
       if col in colRenders:
-        if 'url' in colRenders[col]:
+        if colRenders is not None and 'url' in colRenders[col]:
           # This will only work for static urls (not javascript tranalation for the time being)
           colRenders[col]['url']['report_name'] = self.aresObj.http['REPORT_NAME']
           getParams = ",".join(["%s='%s'"% (key, val) for key, val in colRenders[col]['url'].items()])
