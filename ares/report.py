@@ -248,7 +248,7 @@ def run_report(report_name, script_name, user_id):
 
         queryParams = {'script_name': script_name, 'env_name': report_name, 'usr_id': session['user_id']}
         executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_request.sql')).read(), params=queryParams)
-      side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
+      side_bar = []
       if not userDirectory in sys.path:
         sys.path.append(userDirectory)
     else:
