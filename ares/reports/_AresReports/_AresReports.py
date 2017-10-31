@@ -50,7 +50,7 @@ def report(aresObj):
                     'creationDate': folderEvents[folder]['data'].get('FOLDER CREATION', '')})
 
   # Create a new report # 'Existing Reports',
-  tableComp = aresObj.table(content, [{'key': 'folderName', 'colName': 'Folder Name'},
+  tableComp = aresObj.table(content, [{'key': 'folderName', 'colName': 'Folder Name', 'url': {'report_name': folder}},
                                       {'key': 'FolderFiles', 'colName': 'Count Files'},
                                       {'key': 'creationDate', 'colName': 'Creation'},
                                       {'key': 'Date', 'colName': 'Last Modification'},

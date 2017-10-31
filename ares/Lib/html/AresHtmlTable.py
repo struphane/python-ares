@@ -78,9 +78,26 @@ class DataTable(AresHtml.Html):
     else: # we have a header on several lines, nothing to do
       self.header = header
     for col in self.header[-1]:
-      if col.get("visible", True):
+      if 'url' in col:
+        # This will only work for static urls (not javascript tranalation for the time being)
+        if not 'report_name' in col['url']:
+          col['url']['report_name'] = self.aresObj.http['REPORT_NAME']
+        colKey = self.recKey(col)
+        url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % ",".join(["%s='%s'"% (key, val) for key, val in col['url'].items()]))
+        if 'cols' in col['url']:
+          self.recordSetHeader.append('''{ data: "%s", title: "%s",
+              render: function (data, type, full, meta) {
+                  var url = "%s"; ar cols = JSON.parse('%s');
+                  rowParams = '' ;
+                  for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]]; }
+                  if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
+                  else {url = url + '?' + rowParams.substring(1) ;}
+                  return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(col['url']['cols'])))
+        else:
+          self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="%s">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url))
+      else:
         self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
-        self.recMap[self.recKey(col)] = col.get("colName")
+      self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
