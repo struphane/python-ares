@@ -54,6 +54,7 @@ class DataTable(AresHtml.Html):
       'initComplete': "function(settings, json) { %s }",
       'createdRow': "function ( row, data, index ) { %s }",
       'rowCallback': "function ( row, data, index ) { %s }",
+      'footerCallback': "function ( row, data, start, end, display ) { %s }",
   }
 
   def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
@@ -371,6 +372,26 @@ class DataTable(AresHtml.Html):
         });
        ''' % self.jqId)
 
+  def callBackFooterSum(self, colNumber):
+    self.callBacks('footerCallback',
+                   '''
+                    var api = this.api(), data;
+                    var colNumber = %s;
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {return typeof i === 'string' ?i.replace(/[\$,]/g, '')*1 :typeof i === 'number' ?i : 0;};
+
+                    for (i in colNumber) {
+                      // Total over all pages
+                      total = api.column( colNumber[i] ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+
+                      // Total over this page
+                      pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+
+                      // Update footer
+                      $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
+                    }
+                    ''' % json.dumps(colNumber))
+
   def __str__(self):
     """ Return the string representation of a HTML table """
     if self.noPivot:
@@ -397,16 +418,15 @@ class DataTable(AresHtml.Html):
       item.add(2, "</tr>")
       item.add(1, "</thead>")
 
-    if self.withFooter:
-      item.add(1, "<tfoot>")
-      item.add(2, "<tr>")
-      for col in self.header[-1]:
-        if col.get("visible", True):
-          item.add(3, "<th>%s</th>" % col.get("colName"))
-      item.add(2, "</tr>")
-      item.add(1, "</tfoot>")
-      item.add(1, "<tbody>")
-      item.add(1, "</tbody>")
+    item.add(1, "<tfoot>")
+    item.add(2, "<tr>")
+    for col in self.header[-1]:
+      if col.get("visible", True):
+        item.add(3, "<th>%s</th>" % col.get("colName"))
+    item.add(2, "</tr>")
+    item.add(1, "</tfoot>")
+    item.add(1, "<tbody>")
+    item.add(1, "</tbody>")
     item.add(0, '</table>')
 
     if self.headerBox is not None:

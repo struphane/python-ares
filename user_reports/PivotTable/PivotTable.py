@@ -17,5 +17,6 @@ def report(aresObj):
     recordSet.append(rec)
 
   pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), dataFilters={'TYPE': ['Barrier Call']})
+  pivotTable.callBackFooterSum([2, 4])
   #pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'])
 
