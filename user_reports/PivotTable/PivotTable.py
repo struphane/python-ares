@@ -13,10 +13,11 @@ HTTP_PARAMS = [{'code': 'PERIMETER', 'dflt': ''},
                {'code': 'MULTIPLIER'}]
 
 def params(aresObj):
-  popup = aresObj.modal('Youpi')
+  popup = aresObj.modal('Report Parameters')
+  popup.modal_header = "Report parameters"
   aresObj.jsOnLoadFnc.add("%s.modal('show'); " % popup.jqId)
-  perimeter = aresObj.input()
-  multiplier = aresObj.input()
+  perimeter = aresObj.input('Perimeter')
+  multiplier = aresObj.input('Multiplier')
   button = aresObj.internalLink('Run', aresObj.reportName, attrs={'perimeter': perimeter, 'multiplier': multiplier})
   aresObj.addTo(popup, perimeter)
   aresObj.addTo(popup, multiplier)
