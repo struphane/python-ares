@@ -271,11 +271,20 @@ def run_report(report_name, script_name, user_id):
     if script_name in sys.modules:
       del sys.modules[script_name]
     mod = __import__(script_name) # run the report
+    fnct = 'report'
+    for param in getattr(mod, 'HTTP_PARAMS', []):
+      if not param['code'] in reportObj.http:
+        if not 'dflt' in param:
+          fnct = 'params'
+          break
+          
+        else:
+          reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
     for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
-    mod.report(reportObj)
+    getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
     #  side_bar.append('<h5 style="color:white">&nbsp;<b><i class="fa fa-download" aria-hidden="true">&nbsp;</i>Download</b></h5>')
@@ -332,7 +341,7 @@ def run_report(report_name, script_name, user_id):
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
                          viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
-                         htmlConfigs="\n".join(htmlConfigs))
+                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name)
 
 
 # def generateFiles(report_name):
@@ -462,7 +471,7 @@ def showStatics(report_name, folder, filename):
     return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, jsGlobal=jsGlobal)
 
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts,
-                         name='Configuration - %s' % filename, jsGlobal=jsGlobal)
+                         name='Configuration - %s' % filename, jsGlobal=jsGlobal, report_name=report_name, script_name=report_name)
 
 @report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
 def adminEnv(report_name, token):
