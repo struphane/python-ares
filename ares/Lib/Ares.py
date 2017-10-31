@@ -174,9 +174,7 @@ class Report(object):
     self.interruptReport = (False, None)
     #
     self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, set(), set()
-    self.jsGraphs, self.jsFnc = [], set()
-
-    self.fileManager = {}
+    self.jsGraphs, self.jsFnc, self.files = [], set(), {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
 
@@ -316,7 +314,7 @@ class Report(object):
   def div(self, value, cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def table(self, values, header, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, values, header, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def table(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, values, header, dataFilters, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select_group(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -441,20 +439,6 @@ class Report(object):
         fileData.update({'folderPath': folder, 'file': file})
         folders.append(fileData)
     return folders
-
-  def open(self, fileName, typeFile='r', folder=None):
-    """ Return a python file object is the selected type """
-    if folder is None:
-      outPath = os.path.join(self.http['DIRECTORY'], 'outputs')
-    else:
-      outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
-      if not os.path.exists(outPath):
-        os.makedirs(outPath)
-    # Open the file and register it in the Ares File Manager
-    # This will be monitored by the framework to close the files
-    fileFullPath = os.path.join(outPath, fileName)
-    self.fileManager[fileFullPath] = open(fileFullPath, typeFile)
-    return self.fileManager[fileFullPath]
 
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """

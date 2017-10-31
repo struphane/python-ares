@@ -54,35 +54,75 @@ class DataTable(AresHtml.Html):
       'initComplete': "function(settings, json) { %s }",
       'createdRow': "function ( row, data, index ) { %s }",
       'rowCallback': "function ( row, data, index ) { %s }",
+      'footerCallback': "function ( row, data, start, end, display ) { %s }",
   }
 
-  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
-    super(DataTable, self).__init__(aresObj, vals, cssCls, cssAttr)
+  def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
+    if dataFilters is not None:
+      recordSet = []
+      for rec in vals:
+        for col, val in dataFilters.items():
+          if not rec[col] in val:
+            break
+
+        else:
+          recordSet.append(rec)
+    else:
+      recordSet = vals
+    super(DataTable, self).__init__(aresObj, recordSet, cssCls, cssAttr)
     self.aresObj.jsGlobal.add(self.htmlId) # table has to be registered as a global variable in js
     self.headerBox = headerBox
-    self.recordSetId = id(vals)
+    self.dataFilters = dataFilters
     self.recordSetHeader, self.jsMenu, self.recMap = [], [], {}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     else: # we have a header on several lines, nothing to do
       self.header = header
     for col in self.header[-1]:
-      if col.get("visible", True):
+      if 'url' in col:
+        # This will only work for static urls (not javascript tranalation for the time being)
+        colKey = self.recKey(col)
+        if 'report_name' in col['url'].get('cols', {}):
+          self.recordSetHeader.append('''{ data: "%s", title: "%s",
+                render: function (data, type, full, meta) {
+                    var url = "run"; var cols = JSON.parse('%s');
+                    rowParams = '' ;
+                    for (var i in cols) {
+                      rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];
+                      if (cols[i] == 'FolderName') {url = url + '/' + full[cols[i]] ; }
+                    }
+                    return '<a href="' + url + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), json.dumps(col['url']['cols'])))
+        else:
+          if not 'report_name' in col['url']:
+            col['url']['report_name'] = self.aresObj.http['REPORT_NAME']
+          url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % ",".join(["%s='%s'"% (key, val) for key, val in col['url'].items()]))
+          if 'cols' in col['url']:
+            self.recordSetHeader.append('''{ data: "%s", title: "%s",
+                render: function (data, type, full, meta) {
+                    var url = "%s"; var cols = JSON.parse('%s');
+                    rowParams = '' ;
+                    for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]]; }
+                    if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
+                    else {url = url + '?' + rowParams.substring(1) ;}
+                    return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(colKey, colKey), url, json.dumps(col['url']['cols'])))
+          else:
+            self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="%s">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url))
+      else:
         self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
-        self.recMap[self.recKey(col)] = col.get("colName")
+      self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
-    self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
-    self.withFooter = False
+    self.withFooter, self.noPivot = False, True
 
   def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False):
     """ Create the pivot table """
+    self.noPivot = False
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
-      if col in colRenders:
-        if colRenders is not None and 'url' in colRenders[col]:
+      if colRenders is not None and col in colRenders:
+        if 'url' in colRenders[col]:
           # This will only work for static urls (not javascript tranalation for the time being)
           colRenders[col]['url']['report_name'] = self.aresObj.http['REPORT_NAME']
           getParams = ",".join(["%s='%s'"% (key, val) for key, val in colRenders[col]['url'].items()])
@@ -164,7 +204,6 @@ class DataTable(AresHtml.Html):
                   }
 
                }
-               currentTable.draw();
                ''' % self.htmlId, colIndex=5)
 
   def option(self, keyOption, value):
@@ -184,10 +223,6 @@ class DataTable(AresHtml.Html):
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """
     self.__options['ajax'] = jsDic
-
-  def data(self, jsFnc):
-    """ Add the data or ajax.data fields to the options """
-    self.__options['data'] = jsFnc
 
   def callBacks(self, callBackName, jsFnc):
     """
@@ -348,9 +383,32 @@ class DataTable(AresHtml.Html):
         });
        ''' % self.jqId)
 
+  def callBackFooterSum(self, colNumber):
+    """ Add a footer with a sum on the datatable """
+    self.withFooter = True
+    self.callBacks('footerCallback',
+                   '''
+                    var api = this.api(), data;
+                    var colNumber = %s;
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {return typeof i === 'string' ?i.replace(/[\$,]/g, '')*1 :typeof i === 'number' ?i : 0;};
+
+                    for (i in colNumber) {
+                      // Total over all pages
+                      total = api.column( colNumber[i] ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+
+                      // Total over this page
+                      pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+
+                      // Update footer
+                      $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
+                    }
+                    ''' % json.dumps(colNumber))
 
   def __str__(self):
     """ Return the string representation of a HTML table """
+    if self.noPivot:
+      self.__options['data'] = json.dumps(self.vals)
     item = AresItem.Item(None, self.incIndent)
     #if self.filt is not None:
     #  item.join(self.filt)
@@ -381,8 +439,8 @@ class DataTable(AresHtml.Html):
           item.add(3, "<th>%s</th>" % col.get("colName"))
       item.add(2, "</tr>")
       item.add(1, "</tfoot>")
-      item.add(1, "<tbody>")
-      item.add(1, "</tbody>")
+    item.add(1, "<tbody>")
+    item.add(1, "</tbody>")
     item.add(0, '</table>')
 
     if self.headerBox is not None:

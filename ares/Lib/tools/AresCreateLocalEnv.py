@@ -26,7 +26,7 @@ The structure of your environment should be as follow
     __init__.py
     libReport.py
 
-  \statics # All the static files required to run your report
+  \static # All the static files required to run your report
 
 """
 

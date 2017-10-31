@@ -221,9 +221,6 @@ def run_report(report_name, script_name, user_id):
       side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
       if not userDirectory in sys.path:
         sys.path.append(userDirectory)
-      ajaxPath = os.path.join(userDirectory, 'ajax')
-      if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
-        sys.path.append(ajaxPath)
     else:
       side_bar = []
       systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
@@ -245,9 +242,9 @@ def run_report(report_name, script_name, user_id):
       del sys.modules[script_name]
     mod = __import__(script_name) # run the report
     # Set some environments variables which can be used in the report
-    reportObj.http['FILE'] = script_name
-    reportObj.http['REPORT_NAME'] = report_name
-    reportObj.http['DIRECTORY'] = userDirectory
+    reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
+    for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
+      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
     mod.report(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
@@ -289,15 +286,11 @@ def run_report(report_name, script_name, user_id):
     if isAuth:
       if not report_name.startswith("_"):
         sys.path.remove(userDirectory)
-        if os.path.exists(os.path.join(userDirectory, 'ajax')):
-          sys.path.remove(os.path.join(userDirectory, 'ajax'))
-
         for module, ss in sys.modules.items():
           if userDirectory in str(ss):
             del sys.modules[module]
-      for f in reportObj.fileManager.values():
-        if not f.closed:
-          f.close()
+      for f in reportObj.files.values():
+        f.close()
 
   if not isAuth:
     return render_template('ares_error.html', content=content)
@@ -321,18 +314,17 @@ def ajaxCall(report_name, script):
     if report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
-      # TODO Improve the __import__ to not have to append the ajax path to the sys.path
-      sys.path.append(os.path.join(userDirectory, 'ajax'))
-      # , reportObj.http['USER_SCRIPT']
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
     else:
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       sys.path.append(userDirectory)
-      sys.path.append(os.path.join(userDirectory, 'ajax'))
     reportObj.http['FILE'] = None
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
+    report = __import__(report_name)
+    for fileConfig in getattr(report, 'FILE_CONFIGS', []):
+      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
     mod = __import__(script.replace(".py", ""))
     result = {'status': 'Success', "data": mod.call(reportObj)}
   except Exception as e:
@@ -341,9 +333,9 @@ def ajaxCall(report_name, script):
   finally:
     if script in sys.modules:
       del sys.modules[script]
-    for f in reportObj.fileManager.values():
-      if not f.closed:
-        f.close()
+
+    for f in reportObj.files.values():
+      f.close()
 
   if error:
     return json.dumps({'status': 'Error', "data": [], 'message': str(content)})
@@ -372,19 +364,50 @@ def pivotData(format):
 
 @report.route("/view/<report_name>/<folder>/<filename>", methods = ['GET'])
 def showStatics(report_name, folder, filename):
-  """
-
-  """
+  """ Display the static data used in the report environment """
+  error, isAuth = False, True
   userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-  configFile = os.path.join(userDirectory, folder, filename)
-  reportObj = Ares.Report()
-  if os.path.exists(configFile):
-    inFile = open(configFile)
-    reportObj.preformat(inFile.read())
-    inFile.close()
-  cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
-  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
-                         jsOnload=onload, content=content, jsGraphs=jsCharts,
+  sys.path.append(userDirectory)
+  try:
+    reportObj = Ares.Report()
+    report = __import__(report_name) # run the report
+    for fileConfig in getattr(report, 'FILE_CONFIGS', []):
+      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+    recordSet = []
+    for rec in reportObj.files[filename]:
+      recordSet.append(rec)
+
+    table = reportObj.table(recordSet, fileConfig['parser'].getHeader())
+    table.callBackFooterColumns()
+    cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
+
+  except Exception as e:
+    error = True
+    content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
+    content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
+
+  finally:
+    htmlArchives, htmlConfigs, htmlStatics = [], [], []
+    savedHtmlLocation = os.path.join(userDirectory, 'saved')
+    if os.path.exists(savedHtmlLocation):
+      for htmlPage in os.listdir(savedHtmlLocation):
+        htmlArchives.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}' target='_blank'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1]))))
+    fileStatic = os.path.join(userDirectory, 'static')
+    if os.path.exists(fileStatic):
+      for staticPage in os.listdir(fileStatic):
+        htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='static', filename='%s') }}' target='_blank'>%s</a>" % (report_name, staticPage, staticPage)))
+
+    sys.path.remove(userDirectory)
+    for module, ss in sys.modules.items():
+      if userDirectory in str(ss):
+        del sys.modules[module]
+    for f in reportObj.files.values():
+      f.close()
+
+  if error:
+    return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, jsGlobal=jsGlobal)
+
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts,
                          name='Configuration - %s' % filename, jsGlobal=jsGlobal)
 
 @report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])

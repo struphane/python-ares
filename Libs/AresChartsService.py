@@ -268,7 +268,6 @@ def toSplider(recordSet, key, x, val, seriesNames=None, extKeys=None):
       recordSet['values'].append(values)
       result[key] = recordSet
 
-  print(result)
   return result
 
 # ------------------------------------------------------------------------------
