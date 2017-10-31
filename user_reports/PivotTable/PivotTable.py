@@ -9,9 +9,17 @@ FILE_CONFIGS = [
     {'filename': 'country.txt', 'folder': 'static', 'parser': InFilePricesConfig.InFileCountry},
     ]
 
+HTTP_PARAMS = [{'code': 'PERIMETER', 'dflt': ''},
+               {'code': 'MULTIPLIER'}]
+
+def params(aresObj):
+  perimeter = aresObj.input()
+  multiplier = aresObj.input()
+  aresObj.internalLink('Run', aresObj.reportName, attrs={'perimeter': perimeter, 'multiplier': multiplier})
+
 def report(aresObj):
   """  """
-
+  print aresObj.http
   recordSet = []
   for rec in aresObj.files['data.txt']:
     recordSet.append(rec)
