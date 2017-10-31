@@ -384,6 +384,8 @@ class DataTable(AresHtml.Html):
        ''' % self.jqId)
 
   def callBackFooterSum(self, colNumber):
+    """ Add a footer with a sum on the datatable """
+    self.withFooter = True
     self.callBacks('footerCallback',
                    '''
                     var api = this.api(), data;
@@ -429,13 +431,14 @@ class DataTable(AresHtml.Html):
       item.add(2, "</tr>")
       item.add(1, "</thead>")
 
-    item.add(1, "<tfoot>")
-    item.add(2, "<tr>")
-    for col in self.header[-1]:
-      if col.get("visible", True):
-        item.add(3, "<th>%s</th>" % col.get("colName"))
-    item.add(2, "</tr>")
-    item.add(1, "</tfoot>")
+    if self.withFooter:
+      item.add(1, "<tfoot>")
+      item.add(2, "<tr>")
+      for col in self.header[-1]:
+        if col.get("visible", True):
+          item.add(3, "<th>%s</th>" % col.get("colName"))
+      item.add(2, "</tr>")
+      item.add(1, "</tfoot>")
     item.add(1, "<tbody>")
     item.add(1, "</tbody>")
     item.add(0, '</table>')
