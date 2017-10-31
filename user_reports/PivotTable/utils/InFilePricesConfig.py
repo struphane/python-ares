@@ -35,7 +35,7 @@ class InFilePices(AresFileParser.FileParser):
 
 class InFileCountry(AresFileParser.FileParser):
   """  """
-  delimiter = '\n'
+  delimiter = '\t'
   hdrLines = 1
 
   cols = [
