@@ -311,7 +311,7 @@ def run_report(report_name, script_name, user_id):
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
                          viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
-                         htmlConfigs="\n".join(htmlConfigs))
+                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name)
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
@@ -417,7 +417,7 @@ def showStatics(report_name, folder, filename):
     return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, jsGlobal=jsGlobal)
 
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts,
-                         name='Configuration - %s' % filename, jsGlobal=jsGlobal)
+                         name='Configuration - %s' % filename, jsGlobal=jsGlobal, report_name=report_name, script_name=report_name)
 
 @report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
 def adminEnv(report_name, token):
