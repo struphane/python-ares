@@ -71,18 +71,19 @@ class DataTable(AresHtml.Html):
         self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
         self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
-    self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
+    #self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
-    self.withFooter = False
+    self.withFooter, self.noPivot = False, True
 
   def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False):
     """ Create the pivot table """
+    self.noPivot = False
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
-      if col in colRenders:
-        if colRenders is not None and 'url' in colRenders[col]:
+      if colRenders is not None and col in colRenders:
+        if 'url' in colRenders[col]:
           # This will only work for static urls (not javascript tranalation for the time being)
           colRenders[col]['url']['report_name'] = self.aresObj.http['REPORT_NAME']
           getParams = ",".join(["%s='%s'"% (key, val) for key, val in colRenders[col]['url'].items()])
@@ -164,7 +165,6 @@ class DataTable(AresHtml.Html):
                   }
 
                }
-               currentTable.draw();
                ''' % self.htmlId, colIndex=5)
 
   def option(self, keyOption, value):
@@ -184,10 +184,6 @@ class DataTable(AresHtml.Html):
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """
     self.__options['ajax'] = jsDic
-
-  def data(self, jsFnc):
-    """ Add the data or ajax.data fields to the options """
-    self.__options['data'] = jsFnc
 
   def callBacks(self, callBackName, jsFnc):
     """
@@ -351,6 +347,8 @@ class DataTable(AresHtml.Html):
 
   def __str__(self):
     """ Return the string representation of a HTML table """
+    if self.noPivot:
+      self.__options['data'] = json.dumps(self.vals)
     item = AresItem.Item(None, self.incIndent)
     #if self.filt is not None:
     #  item.join(self.filt)

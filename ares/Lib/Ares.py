@@ -176,7 +176,7 @@ class Report(object):
     self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, set(), set()
     self.jsGraphs, self.jsFnc = [], set()
 
-    self.fileManager = {}
+    self.fileManager, self.files = {}, {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
 

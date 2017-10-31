@@ -13,7 +13,10 @@ Please do not use this module directly in your production code.
 
 """
 
+import re
 import csv
+
+regex = re.compile('[^a-zA-Z0-9_]')
 
 class FileParser(object):
   """
@@ -27,16 +30,16 @@ class FileParser(object):
       self.__inputFile.next()
     self.header, self.colCnvFnc, keyMapCol = [], {}, {}
     for i, col in enumerate(self.cols):
-      self.header.append(col['colName'])
+      self.header.append(regex.sub('', col['colName']))
       keyMapCol[col['colName']] = i
       if 'convertFnc' in col:
         self.colCnvFnc[i] = col['convertFnc']
     vCols = getattr(self, 'vCols', [])
     self.vHeader, self.vColCnvFnc = {}, {}
     for i, vCol in enumerate(vCols):
-      self.vHeader[i] = vCol['colName']
+      self.vHeader[i] = regex.sub('', vCol['colName'])
       map(lambda x: keyMapCol[x], vCol['mapCols'])
-      self.vColCnvFnc[i] = (vCol['mapCols'], vCol['convertFnc'])
+      self.vColCnvFnc[i] = ([regex.sub('', col)  for col in vCol['mapCols']], vCol['convertFnc'])
 
   def __iter__(self):
     """ Iterator to return a line """
@@ -49,3 +52,11 @@ class FileParser(object):
         for i, name in self.vHeader.items():
           rec[name] = self.vColCnvFnc[i][1](*[rec[col] for col in self.vColCnvFnc[i][0]])
         yield rec
+
+  @classmethod
+  def getHeader(cls):
+    """ Return the header definition """
+    fileHeader = []
+    for col in cls.cols:
+      fileHeader.append({'colName': col['colName'], 'key': regex.sub('', col['colName'])})
+    return fileHeader
