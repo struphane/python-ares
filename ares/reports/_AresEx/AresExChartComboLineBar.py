@@ -3,22 +3,22 @@
 
 """
 
-from ares.Lib.graph import AresHtmlGraphMultiBars
+from ares.Lib.graph import AresHtmlGraphComboLineBar
 from ares.Lib import AresImports
 
 def report(aresObj):
   aresObj.title("NvD3MultiBars objects")
   aresObj.paragraph("aresObj function signature")
   aresObj.preformat('''
-  def multiBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False)
+  def comboLineBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False)
   ''')
 
   aresObj.paragraph("Reference, Javascript and CSS needs")
   impManager = AresImports.ImportManager()
-  cssImports = impManager.cssResolve(AresHtmlGraphMultiBars.NvD3MultiBars.reqCss)
-  jsImports = impManager.jsResolve(AresHtmlGraphMultiBars.NvD3MultiBars.reqJs)
+  cssImports = impManager.cssResolve(AresHtmlGraphComboLineBar.NvD3ComboLineBar.reqCss)
+  jsImports = impManager.jsResolve(AresHtmlGraphComboLineBar.NvD3ComboLineBar.reqJs)
   aresObj.row([aresObj.paragraph(jsImports),
-               aresObj.list(AresHtmlGraphMultiBars.NvD3MultiBars.references),
+               aresObj.list(AresHtmlGraphComboLineBar.NvD3ComboLineBar.references),
                aresObj.paragraph(cssImports)])
 
   data = [{"CCY": 'EUR', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
@@ -70,18 +70,20 @@ def report(aresObj):
 
   aresObj.paragraph("Display the chart")
   p = aresObj.preformat('''
-    chart = aresObj.multiBar(data, header, headerBox='Currencies')
-    chart.setSeries(['CCY'])
+    chart = aresObj.comboLineBar(data, header, headerBox='Currencies')
+    chart.setSeries(['PRD'])
     chart.setY(['VAL'])
-    chart.setX('PRD')
+    chart.setX('COB')
+    chart.formatSeries({'PRD': False}, {'CCY': 'yellow'})
   ''')
-  chart = aresObj.multiBar(data, header, headerBox='Currencies')
-  chart.setSeries(['CCY'])
+  chart = aresObj.comboLineBar(data, header, headerBox='Currencies')
+  chart.setSeries(['PRD'])
   chart.setY(['VAL'])
-  chart.setX('PRD')
+  chart.setX('COB')
+  chart.formatSeries({'PRD': False}, {'CCY': 'yellow'})
   aresObj.row([p, chart])
 
   aresObj.paragraph("See the HTML source code of this page, to see the underlying javascript.")
-  next = aresObj.internalLink("Next", 'AresExChartComboLineBar')
-  prev = aresObj.internalLink("Previous", 'AresExChartHorizBar')
+  next = aresObj.internalLink("Next", 'AresExChartScatter')
+  prev = aresObj.internalLink("Previous", 'AresExChartMultiBar')
   aresObj.row([prev, next])

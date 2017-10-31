@@ -3,22 +3,22 @@
 
 """
 
-from ares.Lib.graph import AresHtmlGraphMultiBars
+from ares.Lib.graph import AresHtmlGraphHorizontalBars
 from ares.Lib import AresImports
 
 def report(aresObj):
-  aresObj.title("NvD3MultiBars objects")
+  aresObj.title("NvD3HorizontalBars objects")
   aresObj.paragraph("aresObj function signature")
   aresObj.preformat('''
-  def multiBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False)
+  def horizBar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False)
   ''')
 
   aresObj.paragraph("Reference, Javascript and CSS needs")
   impManager = AresImports.ImportManager()
-  cssImports = impManager.cssResolve(AresHtmlGraphMultiBars.NvD3MultiBars.reqCss)
-  jsImports = impManager.jsResolve(AresHtmlGraphMultiBars.NvD3MultiBars.reqJs)
+  cssImports = impManager.cssResolve(AresHtmlGraphHorizontalBars.NvD3HorizontalBars.reqCss)
+  jsImports = impManager.jsResolve(AresHtmlGraphHorizontalBars.NvD3HorizontalBars.reqJs)
   aresObj.row([aresObj.paragraph(jsImports),
-               aresObj.list(AresHtmlGraphMultiBars.NvD3MultiBars.references),
+               aresObj.list(AresHtmlGraphHorizontalBars.NvD3HorizontalBars.references),
                aresObj.paragraph(cssImports)])
 
   data = [{"CCY": 'EUR', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
@@ -70,18 +70,18 @@ def report(aresObj):
 
   aresObj.paragraph("Display the chart")
   p = aresObj.preformat('''
-    chart = aresObj.multiBar(data, header, headerBox='Currencies')
+    chart = aresObj.horizBar(data, header, headerBox='Currencies')
     chart.setSeries(['CCY'])
     chart.setY(['VAL'])
     chart.setX('PRD')
   ''')
-  chart = aresObj.multiBar(data, header, headerBox='Currencies')
+  chart = aresObj.horizBar(data, header, headerBox='Currencies')
   chart.setSeries(['CCY'])
   chart.setY(['VAL'])
   chart.setX('PRD')
   aresObj.row([p, chart])
 
   aresObj.paragraph("See the HTML source code of this page, to see the underlying javascript.")
-  next = aresObj.internalLink("Next", 'AresExChartComboLineBar')
-  prev = aresObj.internalLink("Previous", 'AresExChartHorizBar')
+  next = aresObj.internalLink("Next", 'AresExChartMultiBar')
+  prev = aresObj.internalLink("Previous", 'AresExChartWordCloud')
   aresObj.row([prev, next])

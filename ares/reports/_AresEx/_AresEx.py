@@ -11,17 +11,48 @@ from ares.Lib import AresHtml
 
 NAME = 'Ares Example'
 # Just to set up the menu on the left hand side
-SHORTCUTS = [('Tables', [
-                          ('Tables - Tuto', 'AresExTables'),
-                          ('Complex Table', 'AresExTablesComplex'),
-                         ]),
-             ('Charts', [('Charts - Tuto', 'AresExChartPie'),
-                         ('NvD3 - Part 1', 'AresExNvd3Charts1'),
-                         ('NvD3 - Part 2', 'AresExNvd3Charts2'),
-                         ('NvD3 - Part 3', 'AresExNvd3Charts3'),
-                         ('D3 - Spider', 'AresExSpiderCharts'),
-                         ('Others Charts', 'AresExOtherCharts'),
-                         ]),
+SHORTCUTS = [('Html Types', [
+                  ('slider', 'AresExTables'),
+                  ('date', 'AresExTablesComplex'),
+                  ('textArea', 'AresExTablesComplex'),
+                  ('code', 'AresExTablesComplex'),
+                  ('preformat', 'AresExTablesComplex'),
+                  ('input', 'AresExTablesComplex'),
+                  ('inputInt', 'AresExTablesComplex'),
+                  ('inputRange', 'AresExTablesComplex'),
+                  ('button', 'AresExTablesComplex'),
+                  ('internalLink', 'AresExTablesComplex'),
+                  ('externalLink', 'AresExTablesComplex'),
+                  ('row and col', 'AresExTablesComplex'),
+                  ('radio', 'AresExTablesComplex'),
+                  ('select', 'AresExTablesComplex'),
+                  ('dropdown', 'AresExTablesComplex'),
+                  ('tick', 'AresExTablesComplex'),
+                  ('updown', 'AresExTablesComplex'),
+
+
+                  ]),
+             ('Chart Types',
+                  [('lineCumulative', 'AresExChartLineCumulative'),
+                   ('Pie and donut', 'AresExChartPie'), # Done
+                   ('bar', 'AresExChartBar'), # Done
+                   ('line', 'AresExChartLine'),
+                   #('forceDirected', 'AresExChartLine'),
+                   ('stackedArea', 'AresExChartStackedArea'),
+                   ('stackedAreaWithFocus', 'AresExChartLine'),
+                   ('multiBar', 'AresExChartMultiBar'), # Done
+                   ('lineChartFocus', 'AresExChartLine'),
+                   ('horizBar', 'AresExChartHorizBar'), # Done
+                   ('comboLineBar', 'AresExChartComboLineBar'), # Done
+                   ('scatter', 'AresExChartScatter'), # Done
+                   ('scatterline', 'AresExChartScatterline'), # Done
+                   ('wordcloud', 'AresExChartWordCloud'), # Done
+                   #('sunburst', 'AresExChartLine'),
+                   ('sparklineplus', 'AresExChartChartLine'),
+                   #('boxplot', 'AresExChartLine'),
+                   #('candlestickbar', 'AresExChartLine'),
+                   ('spider', 'AresExChartSpider'), # Done
+                  ]),
               ]
 
 def report(aresObj):
