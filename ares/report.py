@@ -73,6 +73,8 @@ def appendToLog(reportName, event, comment):
   logFile.write("%s#%s#%s#%s\n" % (event, showtime[0], showtime[1], comment))
   logFile.close()
 
+
+
 def getHttpParams(request):
   """
   Get the HTTP parameters of a request
@@ -163,6 +165,32 @@ def getEnvAdmin(dbPath, report_name):
 
   return list(db.select(dbPath, query))
 
+def getUserRole(dbPath, report_name, user_id):
+  """ """
+  db = AresSql.SqliteDB(report_name)
+  query = """SELECT role 
+             FROM user_accnt
+             WHERE user_id = '%s' """ % user_id
+  return list(db.select(dbPath, query))
+
+def getFileAuth(dbPath, report_name, file_name, user_id):
+  """ """
+  db = AresSql.SqliteDB(report_name)
+  query = """SELECT file_auth.alias as "alias", file_map.disk_name as "raw_name" 
+              FROM file_auth
+              INNER JOIN file_map on file_map.file_id = file_auth.file_id
+              INNER JOIN user_accnt on user_accnt.uid = file_map.uid
+              WHERE user_accnt.user_id = '%s' and file_map.raw_name = '%s' """ % (user_id, file_name)
+  return list(db.select(dbPath, query))
+
+def checkFileExist(dbPath, report_name, file_name):
+  """ """
+  db = AresSql.SqliteDB(report_name)
+  query = """SELECT file_id 
+                FROM file_map
+                WHERE disk_name = '%s' """ % file_name
+  return list(db.select(dbPath, query))
+
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
 #
@@ -174,6 +202,8 @@ def getEnvAdmin(dbPath, report_name):
 # Please make sure that this script is never shared and also that no user env start with a _
 # _ is dedicated to internal environments (for BDI only)
 # ------------------------------------------------------------------------------------------------------------
+
+
 
 @login_required
 @report.route("/deploy", methods=['GET'])
@@ -303,6 +333,30 @@ def run_report(report_name, script_name, user_id):
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
                          viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
                          htmlConfigs="\n".join(htmlConfigs))
+
+
+# def generateFiles(report_name):
+#   """ """
+#   user_id = session['user_id']
+#   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
+#   isAdmin = True if getUserRole(dbPath, report_name, user_id)[0] in ['admin', 'super_user'] else False
+#   report = __import__(report_name)
+#   data = request.form
+#   filesKey = ''
+#   fileCfg = getattr(report, 'FILE_CONFIGS', None)
+#   if fileCfg:
+#     filesKey = '#'.join(data.values())
+#     for file in fileCfg:
+#       diskName = '%s#%s' % (filesKey, file['filename'])
+#       if isAdmin:
+#         if checkFileExist(dbPath, report_name, diskName):
+#           pass
+#         else:
+#           g
+#
+#       if not getFileAuth(dbPath, report_name, diskName):
+#         return json.dumps(
+#           "You don't have the authorization to run this report with those params %s" % filesKey.replace('#', ' - ')), 500
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
@@ -643,6 +697,9 @@ def deployFiles(env, DATA):
         os.makedirs(filePath)
       fileFullPath = os.path.join(filePath, filename)
     fileObj.save(fileFullPath)
+    if fileType in ['outputs', 'static', 'saved']:
+      fileParams = {'filename': filename, 'file_type': fileType, 'usr_id': user_name}
+      executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
     queryParams = {'report_name': report_name, 'file': filename, 'type': fileType, 'usr_id': user_name}
     executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
     result.append(filename)
