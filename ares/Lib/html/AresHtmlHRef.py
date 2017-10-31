@@ -105,12 +105,11 @@ class InternalLink(AresHtml.Html):
 
     data = json.dumps(self.getData, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()')
     jsDef = '''
-              %s.on("click", function (event){
                 var baseUrl = "%s";
                 var data = %s;
                 var params = "";
                 for (key in data) {
-                  if (!key == 'REPORT_NAME' && !key == 'SCRIPT_NAME') {
+                  if (!(key == 'REPORT_NAME') && !(key == 'SCRIPT_NAME')) {
                     params = params + '&' + key + '=' + data[key];
                   }
                 }
@@ -118,8 +117,6 @@ class InternalLink(AresHtml.Html):
                 if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + params ; }
                 else { var ullUrl = baseUrl + "?" + params ; }
                 window.location.href = ullUrl ;
-              }
-            ) ;
-            ''' % (self.jqId, url, data)
-    self.aresObj.jsOnLoadFnc.add(jsDef)
+            ''' % (url, data)
+    self.js('click', jsDef)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
