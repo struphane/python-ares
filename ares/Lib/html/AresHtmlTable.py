@@ -56,11 +56,22 @@ class DataTable(AresHtml.Html):
       'rowCallback': "function ( row, data, index ) { %s }",
   }
 
-  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None):
-    super(DataTable, self).__init__(aresObj, vals, cssCls, cssAttr)
+  def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
+    if dataFilters is not None:
+      recordSet = []
+      for rec in vals:
+        for col, val in dataFilters.items():
+          if not rec[col] in val:
+            break
+
+        else:
+          recordSet.append(rec)
+    else:
+      recordSet = vals
+    super(DataTable, self).__init__(aresObj, recordSet, cssCls, cssAttr)
     self.aresObj.jsGlobal.add(self.htmlId) # table has to be registered as a global variable in js
     self.headerBox = headerBox
-    self.recordSetId = id(vals)
+    self.dataFilters = dataFilters
     self.recordSetHeader, self.jsMenu, self.recMap = [], [], {}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
@@ -71,7 +82,6 @@ class DataTable(AresHtml.Html):
         self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
         self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
-    #self.data("recordSet_%s" % self.recordSetId) # Add the Javascript data to the recordSet
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
 
@@ -343,7 +353,6 @@ class DataTable(AresHtml.Html):
             $(this).css('color', 'black');
         });
        ''' % self.jqId)
-
 
   def __str__(self):
     """ Return the string representation of a HTML table """

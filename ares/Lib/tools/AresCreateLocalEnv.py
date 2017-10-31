@@ -26,7 +26,7 @@ The structure of your environment should be as follow
     __init__.py
     libReport.py
 
-  \statics # All the static files required to run your report
+  \static # All the static files required to run your report
 
 """
 
@@ -42,7 +42,7 @@ def createEnv(reportName, deleteIfExist):
   if not os.path.exists(reportName):
     os.makedirs(reportName)
   # Create the sub folders
-  for subFolder in ['ajax', 'statics', 'outputs', 'styles', 'saved', 'utils']:
+  for subFolder in ['ajax', 'static', 'outputs', 'styles', 'saved', 'utils']:
     if not os.path.exists(os.path.join(reportName, subFolder)):
       os.makedirs(os.path.join(reportName, subFolder)) # for the javascript fragments
       if subFolder in ['ajax', 'utils']:

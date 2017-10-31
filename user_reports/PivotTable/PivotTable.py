@@ -15,7 +15,7 @@ def report(aresObj):
   recordSet = []
   for rec in aresObj.files['data.txt']:
     recordSet.append(rec)
-  print recordSet[0]
-  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader())
-  pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'])
+
+  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), dataFilters={'TYPE': ['Barrier Call']})
+  #pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'])
 
