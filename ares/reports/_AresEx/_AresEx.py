@@ -63,7 +63,9 @@ def report(aresObj):
   stackedArea = aresObj.stackedArea(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
                                                       {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
                                     headerBox='Stacked Bar Chart Example', mockData=True)
-  meter = aresObj.meter(1, headerBox='Meter Chart Example', cssAttr={'height': '400px'})
+  forcedDirected = aresObj.forceDirected(recordSet, [{'key': 'PTF', 'colName': 'Portfolio', 'colspan': 1, 'rowspan': 2},
+                                                      {'key': 'VAL', 'colName': 'Portfolio 2', 'colspan': 1, 'type': 'number'}],
+                                    headerBox='Stacked Bar Chart Example', mockData=True)
 
   # Graph documentation
   graphRefs = []
@@ -88,5 +90,5 @@ def report(aresObj):
   titleGraph = aresObj.title2("Reference for the charts")
   colLeft = aresObj.col([stackedArea, titleGraph, aresObj.list(graphRefs)])
   titlehtml = aresObj.title2("Reference for the HTLM")
-  colRight = aresObj.col([meter, titlehtml, aresObj.list(htmlRefs)])
+  colRight = aresObj.col([forcedDirected, titlehtml, aresObj.list(htmlRefs)])
   aresObj.row([colLeft, colRight])
