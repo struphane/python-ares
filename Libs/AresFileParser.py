@@ -35,10 +35,9 @@ class FileParser(object):
       if 'convertFnc' in col:
         self.colCnvFnc[i] = col['convertFnc']
     vCols = getattr(self, 'vCols', [])
-    self.vHeader, self.vColCnvFnc = {}, {}
+    self.vHeader, self.vColCnvFnc = [], {}
     for i, vCol in enumerate(vCols):
-      self.vHeader[i] = regex.sub('', vCol['colName'])
-      map(lambda x: keyMapCol[x], vCol['mapCols'])
+      self.vHeader.append((i, regex.sub('', vCol['colName'])))
       self.vColCnvFnc[i] = ([regex.sub('', col)  for col in vCol['mapCols']], vCol['convertFnc'])
 
   def __iter__(self):
@@ -49,7 +48,7 @@ class FileParser(object):
         rec = dict(zip(self.header, row))
         for i, transFnc in self.colCnvFnc.items():
           rec[self.header[i]] = transFnc(row[i])
-        for i, name in self.vHeader.items():
+        for i, name in self.vHeader:
           rec[name] = self.vColCnvFnc[i][1](*[rec[col] for col in self.vColCnvFnc[i][0]])
         yield rec
 

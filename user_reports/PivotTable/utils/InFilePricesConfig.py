@@ -29,3 +29,5 @@ class InFilePices(AresFileParser.FileParser):
       {'colName': 'ISSUED (M)'},
       {'colName': 'NOTES'}]
 
+  vCols = [{'colName': 'Test Youpi', 'mapCols': ['EXERCISE'], 'convertFnc': lambda x: x * 2},
+           {'colName': 'Super', 'mapCols': ['TestYoupi'], 'convertFnc': lambda x: x * 2}]
