@@ -67,3 +67,8 @@ class FileParser(object):
       else:
         fileHeader.append({'colName': col['colName'], 'key': col['key']})
     return fileHeader
+
+  def close(self):
+    """ Close the underlying file """
+    if not self.__inputFile.closed:
+      self.__inputFile.close()

@@ -269,9 +269,8 @@ def run_report(report_name, script_name, user_id):
         for module, ss in sys.modules.items():
           if userDirectory in str(ss):
             del sys.modules[module]
-      for f in reportObj.fileManager.values():
-        if not f.closed:
-          f.close()
+      for f in reportObj.files.values():
+        f.close()
 
   if not isAuth:
     return render_template('ares_error.html', content=content)
@@ -295,18 +294,17 @@ def ajaxCall(report_name, script):
     if report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
-      # TODO Improve the __import__ to not have to append the ajax path to the sys.path
-      sys.path.append(os.path.join(userDirectory, 'ajax'))
-      # , reportObj.http['USER_SCRIPT']
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
     else:
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       sys.path.append(userDirectory)
-      sys.path.append(os.path.join(userDirectory, 'ajax'))
     reportObj.http['FILE'] = None
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
+    report = __import__(report_name)
+    for fileConfig in getattr(report, 'FILE_CONFIGS', []):
+      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
     mod = __import__(script.replace(".py", ""))
     result = {'status': 'Success', "data": mod.call(reportObj)}
   except Exception as e:
@@ -315,9 +313,8 @@ def ajaxCall(report_name, script):
   finally:
     if script in sys.modules:
       del sys.modules[script]
-    for f in reportObj.fileManager.values():
-      if not f.closed:
-        f.close()
+    for f in reportObj.files.values():
+      f.close()
 
   if error:
     return json.dumps({'status': 'Error', "data": [], 'message': str(content)})

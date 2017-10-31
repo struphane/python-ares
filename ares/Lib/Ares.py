@@ -174,9 +174,7 @@ class Report(object):
     self.interruptReport = (False, None)
     #
     self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, set(), set()
-    self.jsGraphs, self.jsFnc = [], set()
-
-    self.fileManager, self.files = {}, {}
+    self.jsGraphs, self.jsFnc, self.files = [], set(), {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
 
@@ -441,20 +439,6 @@ class Report(object):
         fileData.update({'folderPath': folder, 'file': file})
         folders.append(fileData)
     return folders
-
-  def open(self, fileName, typeFile='r', folder=None):
-    """ Return a python file object is the selected type """
-    if folder is None:
-      outPath = os.path.join(self.http['DIRECTORY'], 'outputs')
-    else:
-      outPath = os.path.join(self.http['DIRECTORY'], 'outputs', folder)
-      if not os.path.exists(outPath):
-        os.makedirs(outPath)
-    # Open the file and register it in the Ares File Manager
-    # This will be monitored by the framework to close the files
-    fileFullPath = os.path.join(outPath, fileName)
-    self.fileManager[fileFullPath] = open(fileFullPath, typeFile)
-    return self.fileManager[fileFullPath]
 
   def getFileInfo(self, fileName, subfolders=None):
     """ Return the size and the last modification date of a given file on the server """
