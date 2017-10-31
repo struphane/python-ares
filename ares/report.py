@@ -56,6 +56,12 @@ LIB_PACKAGE = {
   'JSON': ['horizBars.json', 'linePlusBarData.json', 'lineWithFocus.json', 'multiBar.json', 'stackedAreaData.json']
 }
 
+BUILT_IN_PAGES_REQ = {
+  'CSS': ['https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', 'bootstrap.min.css', 'bdi.css',
+          'bootstrap-simple-sidebar.css', 'jquery-ui.css'],
+  'JS': ['jquery-3.2.1.min.js', 'jquery-ui.min.js', 'tether.min.js', 'bootstrap.min.js', 'ares.js']
+}
+
 @login_manager.user_loader
 def load_user(email_addr):
   return User.query.filter_by(email=email_addr).first()
@@ -140,7 +146,7 @@ def checkAuth(dbpath, report_name):
   db = AresSql.SqliteDB(report_name)
   query = """SELECT 1 FROM env_auth 
                INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
-               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%(user_id)s'""" % (report_name, session['user_id'])
+               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%s'""" % (report_name, session['user_id'])
 
   if not list(db.select(query)):
     return False
@@ -168,6 +174,20 @@ def getEnvAdmin(dbPath, report_name):
 # Please make sure that this script is never shared and also that no user env start with a _
 # _ is dedicated to internal environments (for BDI only)
 # ------------------------------------------------------------------------------------------------------------
+
+@login_required
+@report.route("/deploy", methods=['GET'])
+def aresDeploy():
+  """ """
+  jsImports, cssImports = [], []
+  for jsImport in BUILT_IN_PAGES_REQ['JS']:
+    jsImports.append(render_template_string("<script language='javascript' type='text/javascript' src='{{ url_for('static', filename='js/%s') }}'></script>" % jsImport))
+  for cssImport in BUILT_IN_PAGES_REQ['CSS']:
+    if not cssImport.startswith('http'):
+      cssImports.append(render_template_string("<link rel='stylesheet' href='{{ url_for('static', filename='css/%s') }}'>" % cssImport))
+    else:
+      cssImports.append(render_template_string("<link rel='stylesheet' href='%s' }}'>" % cssImport))
+  return render_template('ares_deployment.html', cssImport='\n'.join(cssImports), jsImport='\n'.join(jsImports))
 
 @report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports', 'user_id': None})
 @report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports', 'user_id': None})
@@ -502,18 +522,108 @@ def ajaxCreate(email_address):
 
   return json.dumps("Existing Environment"), 200
 
-@report.route("/test_deploy/", methods = ['POST'])
-def testDeploy():
-  print(request.files)
-  print('\n\n\n')
-  print(request.form)
-  print('\n\n\n')
-  import pprint
-  pprint.pprint(dir(request))
-  print('\n\n\n')
-  print(request.args)
-  return json.dumps('')
+@report.route("/deployment/", methods = ['POST'])
+def deployment():
+  """
+  """
+  hasFiles = False
+  if request.files.getlist('file')[0]:
+    hasFiles = True
 
+  DATA = {'files': zip(request.files.getlist('file'), request.values.getlist('File Type'))}
+  env = request.values['env']
+  isNew = True if request.values['isNew'] == 'true' else False
+  if isNew:
+    createEnv(env)
+  if hasFiles:
+    return deployFiles(env, DATA)
+
+  return json.dumps("Environment created"), 200
+
+def createEnv(environment):
+  """ Special Ajax call to set up the environment
+
+  This service will create the environment and also add an emtpy report.
+  The log file will be produce and the zip archive with the history will be defined
+  """
+  DIR_LIST = ['outputs', 'static', 'styles', 'saved', 'utils']
+  email_addr = session['user_id']
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
+  reportObj = Ares.Report()
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+  reportObj.http['ARES_TMPL'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'tmpl')
+  scriptName = "%s.py" % environment
+  scriptPath = os.path.join(reportObj.http['DIRECTORY'],environment)
+  if scriptName.startswith("_"):
+    return json.dumps("Environment Name cannot start with _"), 500
+
+  if not os.path.exists(scriptPath):
+    os.makedirs(scriptPath)
+    # envKey = os.urandom(24).encode('hex')
+    # Create a dedicated database in the user environment
+    # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
+    dbPath = os.path.join(scriptPath, 'db')
+    os.makedirs(dbPath)
+    executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
+    #fisrt user insert to appoint an admin on the environment
+
+    queryParams = {'usr_id': email_addr, 'env_name': environment}
+    firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
+    executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
+    queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'usr_id': email_addr}
+    executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+
+    shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
+
+    for dir in DIR_LIST:
+      os.makedirs(os.path.join(scriptPath, dir))
+    return "New environment created: %s" % scriptName
+
+  return "Existing Environment"
+
+def deployFiles(env, DATA):
+  """ """
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
+  result = []
+  user_name = session['user_id']
+  report_name = env
+  reportTypes = {'report': (['.PY'], None), 'static': (['.DAT', '.TXT', '.CSV', '.JSON'], 'static'),
+                 'outputs': (None, 'outputs'), 'styles': (['.CSS', '.JS'], 'styles'),
+                 'saved': (['.HTML'], 'saved'), 'utils': (['.PY'], 'utils') }
+  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
+
+  if not checkAuth(dbPath, report_name):
+    return json.dumps('Not authorized to deploy on environment: %s' % report_name), 500
+
+  if report_name.startswith("_"):
+    return json.dumps("Environment Name cannot start with _"), 500
+
+  for fileObj, fileType in DATA['files']:
+    if fileType not in reportTypes:
+      return json.dumps('Error %s category not recognized !' % report_type), 500
+
+    ext, path = reportTypes[fileType]
+    filename = fileObj.filename
+    if fileType != 'outputs':
+      # No checks for the outputs folder
+      # User can deploy whatever they want in this folder
+      fileWithoutExt = getFileName(filename, ext)
+      if fileWithoutExt is None:
+        return json.dumps('File extension %s not recognized for this category %s  !' % (ext, fileType)), 500
+
+    if path is None:
+      fileFullPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name,
+                                  filename)
+    else:
+      filePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, path)
+      if not os.path.exists(filePath):
+        os.makedirs(filePath)
+      fileFullPath = os.path.join(filePath, filename)
+    fileObj.save(fileFullPath)
+    queryParams = {'report_name': report_name, 'file': filename, 'type': fileType, 'usr_id': user_name}
+    executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+    result.append(filename)
+  return json.dumps(result), 200
 
 @login_required
 @report.route("/upload/<report_type>/<report_name>", methods = ['POST'])
@@ -849,7 +959,6 @@ def aresLogin():
     if user:
       if user.password == data['password']:
         login_user(user)
-        print(session['user_id'])
         return "User Logged in"
 
       return "Wrong Password"

@@ -2,7 +2,6 @@
 CREATE TABLE user_accnt (
  uid integer PRIMARY KEY AUTOINCREMENT,
  email_addr text NOT NULL UNIQUE,
- hash_id text NOT NULL,
  role text DEFAULT 'Normal',
  crea_dt timestamp DEFAULT CURRENT_TIMESTAMP
 );

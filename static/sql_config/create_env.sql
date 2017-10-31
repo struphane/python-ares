@@ -1,4 +1,4 @@
-INSERT INTO user_accnt (email_addr, role, hash_id) VALUES ('%(usr_id)s', 'admin', '%(hash_id)s');
+INSERT INTO user_accnt (email_addr, role) VALUES ('%(usr_id)s', 'admin');
 INSERT INTO env_def (env_name) VALUES ('%(env_name)s');
 INSERT INTO env_auth (env_id, uid)
 SELECT env_def.env_id, user_accnt.uid

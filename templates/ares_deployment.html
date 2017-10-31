@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+<title>RiskLab</title>
+
+{{ cssImport|safe }}
+
+{{ jsImport|safe }}
+
+<script>
+    function preloader() {
+        $('#loading').show();
+    }
+
+    function display(data){
+        $('#temp-message').html(data);
+        $('#temp-message').show();
+        $('#temp-message').fadeOut( 4000 );
+    }
+
+    $(window).scroll(function() {
+        $('#context-menu').hide() ;
+    }) ;
+
+    $(window).click(function() {
+        // Function to close the context menu
+        $("#context-menu").hide();
+    });
+
+    {{ jsGlobal|safe }}
+    $(document).ready(function() {
+        {{ jsOnload|safe }}
+    }) ;
+
+</script>
+</head>
+<body oncontextmenu="return false;">
+    {% include 'ares_part_navbar.html' %}
+    <!--
+    Internal javascript functions not related to the HTML content
+    Those are specific to the template on the server and they should not be shared
+    -->
+    <script>
+    $(document).ready(function() {
+        $('a[name="side_change"]').click(function () {
+             $("#wrapper").toggleClass("toggled");
+        });
+
+        $('button[name="ares_min"]').click(function () {
+             var idEvent = $(this).attr('id').replace("_min", "") ;
+             $('#' + idEvent).toggle() ;
+        });
+
+        $('button[name="ares_close"]').click(function () {
+              var idEvent = $(this).attr('id').replace("_close", "") ;
+              $('#' + idEvent + '_main').remove() ;
+        });
+
+        $('#save_html').click(function () {
+            // document.documentElement.outerHTML
+            console.log($("head").html());
+            //console.log($('#page-content-wrapper').html());
+        });
+
+        $.ajaxSetup({
+            beforeSend:function(){
+                // show image here
+                $("#loading").show();
+            },
+            complete:function(){
+                // hide image here
+                $("#loading").hide();
+            }
+        });
+    }) ;
+    </script>
+
+<div id="wrapper" class="toggled" style="background-color: #fff">
+	{% include 'ares_part_side_bar.html' %}
+	<!--
+	<a href="#menu-toggle" id="menu-toggle"><i id='menu-icon' class="fa fa-chevron-circle-left fa-2x" aria-hidden="true"></i></a>
+	 Page Content
+
+	-->
+
+    <div id="page-content-wrapper">
+        <H1>
+            <a class="anchorjs-link" id="title_deploy" style="color:#398438;font-weight:normal" style="color:inherit">Deployment Tool</a>
+        </H1>
+        <form  id="form_post" enctype="multipart/form-data">
+            <div    class="btn-group" data-toggle="buttons">
+              <label class="btn btn-info" name="radio_button_existing">
+                EXISTING<input id="radio_button_existing" type="radio" value="EXISTING"/>
+                <span class="awesomeicon fa fa-check">&nbsp;</span>
+              </label>
+              <label class="btn btn-info" name="radio_button_new">
+                NEW<input id="radio_button_new" type="radio" value="NEW"/>
+                <span class="awesomeicon fa fa-check">&nbsp;</span>
+              </label>
+            </div><br>
+            <label>Please indicate the environment on which you would like to deploy:</label>
+                <input id="input_text_env" type="text" style="height:32px;width:100%" class="form-control">
+
+            <div style="padding-top:3px" id="div_deployer">
+                <br><input id="input_file" type="file" name="file" />
+                <select id="select_file_type" name="File Type" required>
+                   <option value="report">report</option>
+                   <option value="static">static</option>
+                   <option value="outputs">outputs</option>
+                   <option value="styles">styles</option>
+                   <option value="saved">saved</option>
+                   <option value="utils">utils</option>
+                </select>
+            </div>
+            <button type="button" class="btn-xs fa fa-plus" onClick="addInputForDeploy('div_deployer');"></button><br>
+            <br><button id="submitBtn">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    var counter = 1;
+
+    function addInputForDeploy(divId){
+            var newDiv = document.createElement('div');
+            newDiv.innerHTML = "<br><input id='input_file_" + counter + "' type='file' name='file' />" +
+             "<select id='select_file_type" + counter + "' name='File Type' required>" +
+             "<option value='report'>report</option>" +
+             "<option value='static'>static</option>" +
+             "<option value='outputs'>outputs</option>" +
+             "<option value='styles'>styles</option>" +
+             "<option value='saved'>saved</option>" +
+             "<option value='utils'>utils</option>" +
+             "</select>";
+             document.getElementById(divId).appendChild(newDiv);
+    }
+     $(document).ready(function() {
+        $('#form_post').submit(function(event) {
+            event.preventDefault();
+            var form_data = new FormData($('#form_post')[0]);
+            var isNew =  $('#radio_button_new').is(':checked');
+            var env = $('#input_text_env').val();
+            form_data.append('isNew', isNew);
+            form_data.append('env', env);
+            $.ajax({
+                type: 'POST',
+                url: "/reports/deployment/",
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                async: false,
+                success: function(data) {
+                    return 'Success!';
+                },
+            });
+        });
+     });
+
+</script>
+
+</body>
+<footer role="contentinfo" style="text-align: center"><p>
+  Open Framework 2017 - <a href="{{ url_for('ares.run_report', report_name='_AresDoc', script_name='_AresDoc') }}">The Lab</a> -
+  <span class="credit">Powered by <a href="#">BDI Team</a></span>
+</p>
+
+</footer>
+</html>
