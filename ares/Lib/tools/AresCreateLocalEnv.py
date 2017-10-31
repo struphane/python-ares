@@ -33,14 +33,10 @@ The structure of your environment should be as follow
 import os
 import shutil
 
-if __name__ == '__main__': # To be run directly
-  # This script should be placed at the root
-  reportName = 'NewReport' # THis will be the name of your environment (your folder)
-  removeExistingFilder = True
+def createEnv(reportName, deleteIfExist):
   # In your environment you can have multiple folders and services
-
   # Then creation of the dummy report environment
-  if os.path.exists(reportName) and removeExistingFilder:
+  if os.path.exists(reportName) and deleteIfExist:
     shutil.rmtree(reportName)
 
   if not os.path.exists(reportName):
@@ -53,4 +49,11 @@ if __name__ == '__main__': # To be run directly
         # Create the init file neeeded to import the modules
         open(os.path.join(reportName, subFolder, '__init__.py'), 'w').close()
   if not os.path.exists(os.path.join(reportName, '%s.py' % reportName)):
-    open(os.path.join(reportName, '%s.py' % reportName), 'w').close()
+    shutil.copy2(os.path.join('ares', 'tmpl', 'tmpl_report.py'), os.path.join(reportName, "%s.py" % reportName))
+
+if __name__ == '__main__': # To be run directly
+  # This script should be placed at the root
+  reportName = 'NewReport' # THis will be the name of your environment (your folder)
+  removeExistingFilder = True
+
+  createEnv(reportName, removeExistingFilder)
