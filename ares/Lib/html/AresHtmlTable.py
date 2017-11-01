@@ -41,7 +41,7 @@ class Td(AresHtml.Html):
 
 class DataTable(AresHtml.Html):
   """ Python wrapper for the Javascript Datatable object """
-  cssCls, alias = ['table', 'table-striped'], 'table'
+  cssCls, alias = ['table', 'table-striped', 'table-sm'], 'table'
   references = ['https://datatables.net/reference/index',
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
@@ -58,6 +58,7 @@ class DataTable(AresHtml.Html):
   }
 
   def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
+    self.theadCssCls = ['thead-inverse']
     if dataFilters is not None:
       recordSet = []
       for rec in vals:
@@ -293,6 +294,25 @@ class DataTable(AresHtml.Html):
                       } );
                    ''')
 
+  def callBackHeaderColumns(self):
+    """  """
+    self.withFooter = True
+    self.__options["ordering"] = 'false'
+    self.callBacks('initComplete',
+                   '''
+                      this.api().columns().every( function () {
+                            var column = this;
+                            var select = $('<br/><select><option value=""></option></select>').appendTo( $(column.header()) )
+                                .on( 'change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex( $(this).val());
+                                    column.search( val ? '^'+val+'$' : '', true, false ).draw();
+                                } );
+                            column.data().unique().sort().each( function ( d, j ) {
+                              select.append('<option value=' + d+ '>' + d +'</option>' )
+                            } );
+                      } );
+                   ''')
+
   def callBackRow(self, colName, value, bgColor):
     """ Row Call back wrapper to change the background color """
     self.callBacks('rowCallback',
@@ -408,7 +428,7 @@ class DataTable(AresHtml.Html):
     #  item.join(self.filt)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
-      item.add(1, "<thead>")
+      item.add(1, "<thead class='%s'>" % " ".join(self.theadCssCls))
       for headerLine in self.header[:-1]:
         item.add(2, "<tr>")
         for col in headerLine:
@@ -424,7 +444,8 @@ class DataTable(AresHtml.Html):
           item.add(3, "<td>%s</td>" % col.get("colName"))
       item.add(2, "</tr>")
       item.add(1, "</thead>")
-
+    else:
+      item.add(1, "<thead class='%s'></thead>" % " ".join(self.theadCssCls))
     if self.withFooter:
       item.add(1, "<tfoot>")
       item.add(2, "<tr>")
