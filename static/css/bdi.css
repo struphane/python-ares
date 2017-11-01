@@ -8,8 +8,17 @@ nav {
     text-decoration: none;
 }
 
+table {
+    padding : 0;
+    margin: 0;
+    border-collapse:collapse;
+    border-spacing: 0;
+}
 
-
+tr {
+    margin: 0;
+    padding: 0;
+}
 
 table th, table td {
     text-align: center;
@@ -17,7 +26,8 @@ table th, table td {
     margin: 0;
     padding: 0;
     border: 0;
-    ertical-align: baseline;
+    vertical-align: baseline;
+    line-height:10px;
 }
 
 
