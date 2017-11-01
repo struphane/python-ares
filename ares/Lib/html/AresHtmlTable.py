@@ -483,6 +483,24 @@ class DataTable(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
+  def setExtVals(self, cols, htmlObj):
+    """  """
+    self.aresObj.jsOnLoadFnc.add(
+       '''
+       $.fn.dataTable.ext.search.push(
+                       function( settings, data, dataIndex ) {
+                           if ( $.inArray( settings.nTable.getAttribute('id'), %s_allow_tables ) == -1 ){return true;}
+
+                           var isValid = true ;
+                           isValid = ((data[6] == %s) && (isValid == true))? true: false ;
+                           return isValid;
+                       }
+
+       );
+       ''' % (htmlObj[0].htmlId, htmlObj[0].htmlId))
+    htmlObj[0].link("var oTable = $('#%s').dataTable(); oTable.fnDraw(); " % self.htmlId)
+    htmlObj[0].allowTableFilter.append(self.htmlId)
+
 
 class SimpleTable(AresHtml.Html):
   """ Python wrapper for the table HTML object """

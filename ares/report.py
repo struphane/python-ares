@@ -438,10 +438,10 @@ def showStatics(report_name, folder, filename):
     reportObj = Ares.Report()
     report = __import__(report_name) # run the report
     fileConfig = None
-    for fileConfig in getattr(report, 'FILE_CONFIGS', []):
-      if filename == fileConfig['filename']:
-        fileConfig = fileConfig['parser']
-        reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+    for fileDef in getattr(report, 'FILE_CONFIGS', []):
+      if filename == fileDef['filename']:
+        fileConfig = fileDef['parser']
+        reportObj.files[fileDef['filename']] = fileConfig(open(os.path.join(userDirectory, fileDef['folder'], fileDef['filename'])))
     recordSet = []
     for rec in reportObj.files[filename]:
       recordSet.append(rec)

@@ -70,14 +70,7 @@ def report(aresObj):
         {"CCY": 'EUR', 'PRD': 'Bond Option', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
         {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
         {"CCY": 'USD', 'PRD': 'Cds', "PTF": '4', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
-        {"CCY": 'USD', 'PRD': 'Cds', "PTF": '4', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-19'},
-        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 43, 'VAL2': 3, 'COB': '2017-10-21'},
-        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '3', 'VAL': 26, 'VAL2': 36, 'COB': '2017-10-19'},
-        {"CCY": 'AUD', 'PRD': 'Cds', "PTF": '4', 'VAL': 67, 'VAL2': -34, 'COB': '2017-10-21'},
-        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -1344, 'COB': '2017-10-22'},
-        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '4', 'VAL': 60, 'VAL2': -144, 'COB': '2017-10-23'},
-        {"CCY": 'GBP', 'PRD': 'Cds', "PTF": '4', 'VAL': 20, 'VAL2': -1e4, 'COB': '2017-10-18'},
-        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '4', 'VAL': 36, 'VAL2': -164, 'COB': '2017-10-17'}]
+        ]
 
   header = [
     {'key': "CCY", 'colName': 'Currency'},
@@ -92,24 +85,24 @@ def report(aresObj):
   dropdownPrd.setDefault("Cds")
 
   #
-  pie = aresObj.spider(data, header, headerBox='Currencies')
-  pie.setSeries(['CCY'])
-  pie.setY(['VAL2'])
-  pie.setX('PRD')
-  pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+  #pie = aresObj.spider(data, header, headerBox='Currencies')
+  #pie.setSeries(['CCY'])
+  #pie.setY(['VAL2'])
+  #pie.setX('PRD')
+  #pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
 
-  bar = aresObj.wordcloud(data, header, headerBox='Currencies')
-  bar.setKeys(['CCY', 'COB'])
-  bar.setVals(['VAL'])
-  bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+  #bar = aresObj.wordcloud(data, header, headerBox='Currencies')
+  #bar.setKeys(['CCY', 'COB'])
+  #bar.setVals(['VAL'])
+  #bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
   #
-  aresObj.row([pie, bar])
+  #aresObj.row([pie, bar])
 
   table = aresObj.table(data, header)
   #table.hideColumns([0, 1])
   table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], colRenders={'CCY': {'url': {'script_name': "youpi"}, 'cols': ['CCY', 'COB'] }}, extendTable=True)
   table.callBackFooterColumns()
-
+  table.setExtVals(['PTF'], [dropdown])
         #{ 'visible': False, 'targets': [1,3] }
 
   #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
