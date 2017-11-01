@@ -434,13 +434,16 @@ def showStatics(report_name, folder, filename):
   try:
     reportObj = Ares.Report()
     report = __import__(report_name) # run the report
+    fileConfig = None
     for fileConfig in getattr(report, 'FILE_CONFIGS', []):
-      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+      if filename == fileConfig['filename']:
+        fileConfig = fileConfig['parser']
+        reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
     recordSet = []
     for rec in reportObj.files[filename]:
       recordSet.append(rec)
 
-    table = reportObj.table(recordSet, fileConfig['parser'].getHeader())
+    table = reportObj.table(recordSet, fileConfig.getHeader())
     table.callBackFooterColumns()
     cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
 
