@@ -88,22 +88,22 @@ def report(aresObj):
     {'key': "VAL2", 'colName': 'Pv'}
   ]
 
-  # dropdownPrd = aresObj.select(data, 'PRD')
-  # dropdownPrd.setDefault("Cds")
-  #
-  # pie = aresObj.spider(data, header, headerBox='Currencies')
-  # pie.setSeries(['CCY'])
-  # pie.setY(['VAL2'])
-  # pie.setX('PRD')
-  #pie.filterSerie('USD')
-  #pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+  dropdownPrd = aresObj.select(data, 'PRD')
+  dropdownPrd.setDefault("Cds")
 
-  # bar = aresObj.wordcloud(data, header, headerBox='Currencies')
-  # bar.setKeys(['CCY', 'COB'])
-  # bar.setVals(['VAL'])
-  # bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
   #
-  # aresObj.row([pie, bar])
+  pie = aresObj.spider(data, header, headerBox='Currencies')
+  pie.setSeries(['CCY'])
+  pie.setY(['VAL2'])
+  pie.setX('PRD')
+  pie.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+
+  bar = aresObj.wordcloud(data, header, headerBox='Currencies')
+  bar.setKeys(['CCY', 'COB'])
+  bar.setVals(['VAL'])
+  bar.setExtVals(['PTF', 'PRD'], [dropdown, dropdownPrd])
+  #
+  aresObj.row([pie, bar])
 
   table = aresObj.table(data, header)
   #table.hideColumns([0, 1])
