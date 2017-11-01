@@ -273,7 +273,7 @@ def toSplider(recordSet, key, x, val, seriesNames=None, extKeys=None):
 # ------------------------------------------------------------------------------
 # Interface for the tables
 # ------------------------------------------------------------------------------
-def toPivotTable(recordSet, keys, vals, filters=None):
+def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
   """
   In order to produce a pivot table values should be float figures
 
@@ -291,23 +291,35 @@ def toPivotTable(recordSet, keys, vals, filters=None):
         compositeKey = [''] * len(keys)
         for i, key in enumerate(keys):
           compositeKey[i] = rec[key]
+          countVals = 0
           for j, val in enumerate(vals):
+            if rec[val] == 0:
+              continue
+
+            countVals += 1
             parents[tuple(compositeKey)][val] += rec[val]
-          parents[tuple(compositeKey)]['level'] = i
-          parents[tuple(compositeKey)]['__count'] += 1
-          if dimKeys == i+1:
-            parents[tuple(compositeKey)]['_leaf'] = 1
+          if countVals > 0:
+            parents[tuple(compositeKey)]['level'] = i
+            parents[tuple(compositeKey)]['__count'] += 1
+            if dimKeys == i+1:
+              parents[tuple(compositeKey)]['_leaf'] = 1
   else:
     for rec in recordSet:
       compositeKey = [''] * len(keys)
       for i, key in enumerate(keys):
         compositeKey[i] = rec[key]
+        countVals = 0
         for j, val in enumerate(vals):
+          if rec[val] == 0:
+            continue
+
+          countVals += 1
           parents[tuple(compositeKey)][val] += rec[val]
-        parents[tuple(compositeKey)]['level'] = i
-        parents[tuple(compositeKey)]['__count'] += 1
-        if dimKeys == i+1:
-          parents[tuple(compositeKey)]['_leaf'] = 1
+        if countVals > 0:
+          parents[tuple(compositeKey)]['level'] = i
+          parents[tuple(compositeKey)]['__count'] += 1
+          if dimKeys == i+1:
+            parents[tuple(compositeKey)]['_leaf'] = 1
   fullKeys = sorted(parents.keys())
   result = []
   for compKey in fullKeys:
