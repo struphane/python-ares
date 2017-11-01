@@ -90,6 +90,13 @@ https://www.bootply.com/60886#
                     "</form>" ;
 
             $(document).ready(function () {
+
+                var sessionState = localStorage.getItem("isLoggedIn")
+                if (sessionState == "True")
+                {
+                    $('#authDiv').html(logoutHtml);
+                }
+
                 $('#formLogin').submit(function(event) {
                     event.preventDefault();
                     var userDict = {'email_addr': $('#username').val(), 'password': $('#password').val()};
@@ -98,6 +105,7 @@ https://www.bootply.com/60886#
                             alert("Wrong email or password entered !");
                         }
                         else {
+                            localStorage.setItem("isLoggedIn", "True");
                             $('#authDiv').html(logoutHtml);
                         }
 
