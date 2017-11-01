@@ -118,6 +118,7 @@ class DataTable(AresHtml.Html):
   def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False, extendTable=False):
     """ Create the pivot table """
     self.noPivot = False
+    self.__options["ordering"] = 'false'
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
