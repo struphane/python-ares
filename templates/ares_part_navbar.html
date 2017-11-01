@@ -61,7 +61,7 @@ https://www.bootply.com/60886#
          <ul class="nav pull-right">
              <li class="nav-item  dropdown " id="menuLogin">
                 <a class=" nav-link dropdown-toggle fa fa-user-circle" href="#" data-toggle="dropdown" id="navLogin" style="color:white;padding-top:2px;font-size:24px;padding-top:7px;"></a>
-                <div class="dropdown-menu" style="padding:17px;">
+                <div id="authDiv" class="dropdown-menu" style="padding:17px;">
                     <form id="formLogin" class="form" href="#">>
                         <label>Login</label>
                         <input name="username" id="username" type="text" placeholder="Username" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" data-valid-min="6" title="Enter your username" required="">
@@ -83,14 +83,24 @@ https://www.bootply.com/60886#
 
 
         <script>
+
+            var logoutHtml = "<form id='UserAccount' class='form' href='#'>" +
+                        "<button id='buttonLogout' class='btn'>Log Out</button><br>" +
+                        "<form><a href='#' title='Manage your account' id='userAccount' data-target=\"\{\{ url_for('ares.userAccount') \}\}\">User Account</a></form>"
+                    "</form>" ;
+
             $(document).ready(function () {
                 $('#formLogin').submit(function(event) {
                     event.preventDefault();
                     var userDict = {'email_addr': $('#username').val(), 'password': $('#password').val()};
                     $.post("{{ url_for('ares.aresLogin') }}", userDict, function(result) {
-                        if (result != 'OK') {
+                        if (result != 'User Logged in') {
                             alert("Wrong email or password entered !");
                         }
+                        else {
+                            $('#authDiv').html(logoutHtml);
+                        }
+
                     });
                 });
 
