@@ -568,7 +568,7 @@ class AresBox(AresHtml.Html):
 
   def __str__(self):
     """  Return the HTML representation of the Box objects """
-    item = AresItem.Item('<div class="%s" id="%s_main">' % (" ".join(self.cssCls), self.htmlId))
+    item = AresItem.Item('<div class="%s" id="%s_main" style="margin-top:5px">' % (" ".join(self.cssCls), self.htmlId))
     item.add(1, '<div class="ares-panel-heading">')
     item.add(2, '<strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
     item.add(3, '<button class="btn btn-xs " id="%s_close" name="ares_close"></button>' % self.htmlId)
