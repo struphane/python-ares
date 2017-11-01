@@ -61,41 +61,53 @@ https://www.bootply.com/60886#
          <ul class="nav pull-right">
              <li class="nav-item  dropdown " id="menuLogin">
                 <a class=" nav-link dropdown-toggle fa fa-user-circle" href="#" data-toggle="dropdown" id="navLogin" style="color:white;padding-top:2px;font-size:24px;padding-top:7px;"></a>
-                <div id="authDiv" class="dropdown-menu" style="padding:17px;">
-                    <form id="formLogin" class="form" href="#">>
+                <div id="currentDiv" class="dropdown-menu" style="padding:17px;">
+
+                </div>
+                <div id="authDiv" class="dropdown-menu" style="padding:17px;" hidden>
+                    <form id="formLogin" class="form" href="#">
                         <label>Login</label>
                         <input name="username" id="username" type="text" placeholder="Username" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" data-valid-min="6" title="Enter your username" required="">
                         <input name="password" id="password" type="password" placeholder="password" title="Enter your password" required=""><br>
                         <button id="btnLogin" class="btn">Login</button>
                     </form>
-                    <form><a href="#" title="Fast and free sign up!" id="btnNewUser" data-toggle="collapse" data-target="#formRegister">New User? Sign-up..</a></form>
+                    <form id="enableRegister" style="display:block"><a href="#" title="Fast and free sign up!" id="btnNewUser" data-toggle="collapse" data-target="#formRegister">New User? Sign-up..</a></form>
                     <form id="formRegister" class="form collapse" href="#">
                         <input name="email" id="inputEmail" type="email" placeholder="Email" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" required="">
                         <input name="password" id="regPassword" type="password" placeholder="password" title="Enter your password" required=""><br>
                         <input name="password_confirm" id="password_confirm" type="password" placeholder="password" title="Confirm password" required=""><br>
                         <button id="btnRegister" class="btn">Sign Up</button>
                     </form>
-                    <a data-toggle="modal" role="button" href="#forgotPasswordModal">Forgot username or password?</a>
-                    <a data-toggle="modal" role="button" href="#contactModal"><small>Need help? Contact us</small></a>
+                    <a data-toggle="modal" role="button" href="#forgotPasswordModal" style="display:block">Forgot username or password?</a>
+                    <a data-toggle="modal" role="button" href="#contactModal" style="display:block"><small>Need help? Contact us</small></a>
+                </div>
+                <div id="logoutDiv" class="dropdown-menu" style="padding:17px;" hidden>
+                    <form id="formLogout" class='form' href='#'>
+                        <button id='buttonLogout' class='btn'>Log Out</button><br>
+                        <form><a href='#' title='Manage your account' id='userAccount' data-target="{{ url_for('ares.aresUserAccount') }}">User Account</a>
+                    </form>
                 </div>
             </li>
         </ul>
 
 
+
         <script>
 
-            var logoutHtml = "<form id='UserAccount' class='form' href='#'>" +
-                        "<button id='buttonLogout' class='btn'>Log Out</button><br>" +
-                        "<form><a href='#' title='Manage your account' id='userAccount' data-target=\"\{\{ url_for('ares.userAccount') \}\}\">User Account</a></form>"
-                    "</form>" ;
 
             $(document).ready(function () {
 
-                var sessionState = localStorage.getItem("isLoggedIn")
-                if (sessionState == "True")
-                {
-                    $('#authDiv').html(logoutHtml);
-                }
+               var sessionState = localStorage.getItem("isLoggedIn")
+               if (sessionState == "True")
+               {
+                  var newHtml = $('#logoutDiv').html();
+                  $('#currentDiv').html(newHtml);
+               }
+               else
+               {
+                  var newHtml = $('#authDiv').html();
+                  $('#currentDiv').html(newHtml);
+               }
 
                 $('#formLogin').submit(function(event) {
                     event.preventDefault();
@@ -106,7 +118,8 @@ https://www.bootply.com/60886#
                         }
                         else {
                             localStorage.setItem("isLoggedIn", "True");
-                            $('#authDiv').html(logoutHtml);
+                            var newHtml = $('#logoutDiv').html();
+                            $('#currentDiv').html(newHtml);
                         }
 
                     });
@@ -124,6 +137,14 @@ https://www.bootply.com/60886#
                     });
                 });
 
+
+                $('#formLogout').submit(function(event) {
+                    event.preventDefault();
+                    $.post("{{ url_for('ares.aresLogout') }}");
+                    localStorage.setItem("isLoggedIn", "False");
+                    var newHtml = $('#authDiv').html();
+                    $('#currentDiv').html(newHtml);
+                });
             });
         </script>
 

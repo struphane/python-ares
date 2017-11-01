@@ -1074,5 +1074,6 @@ def aresUserAccount(user_id):
 @report.route('/ares/logout')
 def aresLogout():
   """ """
+  print('toto')
   logout_user()
   return "Logged out"
