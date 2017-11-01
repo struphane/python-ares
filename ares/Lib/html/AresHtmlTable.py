@@ -41,13 +41,14 @@ class Td(AresHtml.Html):
 
 class DataTable(AresHtml.Html):
   """ Python wrapper for the Javascript Datatable object """
-  cssCls, alias = ['table'], 'table'
+  cssCls, alias = ['table', 'table-striped', 'table-sm'], 'table'
   references = ['https://datatables.net/reference/index',
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
                 'https://datatables.net/reference/option/drawCallback',
                 'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
-                'https://datatables.net/examples/api/multi_filter_select.html']
+                'https://datatables.net/examples/api/multi_filter_select.html',
+                'https://datatables.net/extensions/fixedcolumns/examples/initialisation/size_fluid.html']
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
   __callBackWrapper = {
@@ -58,6 +59,7 @@ class DataTable(AresHtml.Html):
   }
 
   def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
+    self.theadCssCls = ['thead-inverse']
     if dataFilters is not None:
       recordSet = []
       for rec in vals:
@@ -104,7 +106,7 @@ class DataTable(AresHtml.Html):
                     for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]]; }
                     if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
                     else {url = url + '?' + rowParams.substring(1) ;}
-                    return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(colKey, colKey), url, json.dumps(col['url']['cols'])))
+                    return '<a href="' + url + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url, json.dumps(col['url']['cols'])))
           else:
             self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="%s">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url))
       else:
@@ -114,9 +116,10 @@ class DataTable(AresHtml.Html):
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
 
-  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False):
+  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False, extendTable=False):
     """ Create the pivot table """
     self.noPivot = False
+    self.__options["ordering"] = 'false'
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
@@ -129,17 +132,11 @@ class DataTable(AresHtml.Html):
           url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % getParams)
           self.recordSetHeader.append('''{ data: "%s", title: "%s",
               render: function (data, type, full, meta) {
-                  var url = "%s";
-                  var cols = JSON.parse('%s');
-                  rowParams = '' ;
-                  for (var i in cols) {
-                      rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];
-                  }
-
+                  var url = "%s"; var cols = JSON.parse('%s'); rowParams = '' ;
+                  for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];}
                   if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
                   else {url = url + '?' + rowParams.substring(1) ;}
                   return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(colRenders[col]['cols'])))
-
       else:
         self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
     for col in vals:
@@ -148,10 +145,8 @@ class DataTable(AresHtml.Html):
           render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
-              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ;
-            }
+              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ;}
             return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ; } }
-
         ''' % (col, self.recMap.get(col, col)))
       else:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",
@@ -170,13 +165,15 @@ class DataTable(AresHtml.Html):
     self.option('scrollY', "'50vh'")
     self.mouveHover('#BFFCA6', 'black')
     #self.option('order', "[[0, 'asc']]") # default behaviour anyway
-    self.callBackCreateRowHideFlag('_leaf', '1')
-    self.callBackCreateRowHideFlag('_parent', '0')
-    self.callBackCreateRowFlag('_hasChildren', 0, 'details')
-    self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
-                                     if ( data.level > 0) {
-                                         $('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}
-                                 ''')
+    if not extendTable:
+      self.callBackCreateRowHideFlag('_leaf', '1')
+      self.callBackCreateRowHideFlag('_parent', '0')
+      self.callBackCreateRowFlag('_hasChildren', 0, 'details')
+      self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
+                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+    else:
+      self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); $('td:eq(0)', row).toggleClass('changed');} ;
+                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
     self.click('''
                 var currentTable = %s;
                 var trObj = $(this).closest('tr');
@@ -261,6 +258,11 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
 
+  def callBackNumHeatMap(self, colName, dstColIndex):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > 0 ) {$('td', row).eq(%s).addClass('green_cell'); } else {$('td', row).eq(%s).addClass('red_cell');}" % (colName, dstColIndex, dstColIndex))
+
   def callBackCreateCellFlag(self, colName, val, dstColIndex, cssCls):
     """  Change the cell according to a float threshold """
     self.callBacks('createdRow',
@@ -289,6 +291,25 @@ class DataTable(AresHtml.Html):
                       this.api().columns().every( function () {
                             var column = this;
                             var select = $('<select><option value=""></option></select>').appendTo( $(column.footer()).empty() )
+                                .on( 'change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex( $(this).val());
+                                    column.search( val ? '^'+val+'$' : '', true, false ).draw();
+                                } );
+                            column.data().unique().sort().each( function ( d, j ) {
+                              select.append('<option value=' + d+ '>' + d +'</option>' )
+                            } );
+                      } );
+                   ''')
+
+  def callBackHeaderColumns(self):
+    """  """
+    self.withFooter = True
+    self.__options["ordering"] = 'false'
+    self.callBacks('initComplete',
+                   '''
+                      this.api().columns().every( function () {
+                            var column = this;
+                            var select = $('<br/><select><option value=""></option></select>').appendTo( $(column.header()) )
                                 .on( 'change', function () {
                                     var val = $.fn.dataTable.util.escapeRegex( $(this).val());
                                     column.search( val ? '^'+val+'$' : '', true, false ).draw();
@@ -414,7 +435,7 @@ class DataTable(AresHtml.Html):
     #  item.join(self.filt)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
-      item.add(1, "<thead>")
+      item.add(1, "<thead class='%s' style='white-space: nowrap;'>" % " ".join(self.theadCssCls))
       for headerLine in self.header[:-1]:
         item.add(2, "<tr>")
         for col in headerLine:
@@ -430,7 +451,8 @@ class DataTable(AresHtml.Html):
           item.add(3, "<td>%s</td>" % col.get("colName"))
       item.add(2, "</tr>")
       item.add(1, "</thead>")
-
+    else:
+      item.add(1, "<thead class='%s' style='white-space: nowrap;'></thead>" % " ".join(self.theadCssCls))
     if self.withFooter:
       item.add(1, "<tfoot>")
       item.add(2, "<tr>")

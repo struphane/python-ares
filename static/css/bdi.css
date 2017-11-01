@@ -3,9 +3,55 @@ nav {
     color: white;
 }
 
+H1 {
+    font-size: 22px;
+}
+
 .navbar-brand a {
     color:#ffffff;
     text-decoration: none;
+}
+
+table {
+    padding : 0;
+    margin: 0;
+    border-collapse:collapse;
+    border-spacing: 0;
+}
+
+tr {
+    margin: 0;
+    padding: 0;
+}
+
+table th, table td {
+    text-align: center;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    line-height:10px;
+    width:auto;
+}
+
+
+tr:nth-child(even) td.green_cell {
+    background-color: #d1ffca;
+    text-align: center;
+    color: #17a036;
+}
+
+tr:nth-child(odd) td.green_cell {
+    background-color: #bae8b3;
+    text-align: center;
+    color: #17a036;
+}
+
+td.red_cell {
+    background-color: #ffd8d5;
+    text-align: center;
+    color: red;
 }
 
 a[name="side_change"] {
@@ -102,10 +148,11 @@ button[name="ares_prop"] {
 
 .dropdown a {
     color: #000000;
-    padding: 1px 10px;
+    padding: 1px 4px;
     text-decoration: none;
     display: block;
     white-space: nowrap;
+    font-size: 12px;
 }
 
 .dropdown-submenu {
@@ -162,7 +209,6 @@ ul.tick li:before {
     font-family: 'Lato', sans-serif;
     font-size: 14px;
     background-color: white;
-    top: 35px;
     color: #000;
     margin: 0;
     padding: 0;
@@ -189,6 +235,15 @@ a.top-slide:hover {
     top: 0;
     left: 100%;
     margin-top: -1px;
+}
+
+.btn {
+    padding: 4px 6px 4px 6px;
+    font-size: 14px;
+}
+
+.btn:hover {
+    cursor: pointer;
 }
 
 .btn span.awesomeicon {
@@ -431,4 +486,5 @@ tr.nodetails td:first-child:before {
 body {
     background-color: #f4f4f4;
     top:0;
+    font-size: 12px;
 }

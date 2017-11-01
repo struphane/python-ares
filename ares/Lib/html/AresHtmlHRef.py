@@ -113,7 +113,7 @@ class InternalLink(AresHtml.Html):
                     params = params + '&' + key + '=' + data[key];
                   }
                 }
-                   
+                params = params.substr(1); // remove the first &
                 if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + params ; }
                 else { var ullUrl = baseUrl + "?" + params ; }
                 window.location.href = ullUrl ;

@@ -12,7 +12,7 @@ class Svg(AresHtml.Html):
   __css = {'width': '95%', 'height': '100%'}
   references = []
   __prop = {} #'transition': '',
-  height = 400
+  height = 250
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """

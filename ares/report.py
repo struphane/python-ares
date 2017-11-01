@@ -85,9 +85,9 @@ def getHttpParams(request):
   httpParams = {}
   for postValues in request.args.items():
     #TODO Find a way to not have this stupid hack
-    httpParams[postValues[0].replace("amp;", "").upper()] = postValues[1]
+    httpParams[postValues[0].replace("amp;", "")] = postValues[1]
   for postValues in request.form.items():
-    httpParams[postValues[0].upper()] = postValues[1]
+    httpParams[postValues[0]] = postValues[1]
   httpParams['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   # Special environment configuration
   httpParams['CONFIG'] = {}
@@ -248,7 +248,7 @@ def run_report(report_name, script_name, user_id):
 
         queryParams = {'script_name': script_name, 'env_name': report_name, 'usr_id': session['user_id']}
         executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_request.sql')).read(), params=queryParams)
-      side_bar = [render_template_string('<li><a href="{{ url_for(\'ares.run_report\', report_name=\'_AresReports\', script_name=\'AresIndexPage\', user_script=\'%s\') }}" target="_blank" style="color:white;text-decoration: none">Env <span class="badge-pill badge-danger">New</span></a></li>' % report_name)]
+      side_bar = []
       if not userDirectory in sys.path:
         sys.path.append(userDirectory)
     else:
@@ -256,9 +256,6 @@ def run_report(report_name, script_name, user_id):
       systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       if not systemDirectory in sys.path:
         sys.path.append(systemDirectory)
-      ajaxPath = os.path.join(systemDirectory, 'ajax')
-      if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
-        sys.path.append(ajaxPath)
 
       # In this context we need the generic user directory as we are in a system report
       # Users should not be allowed to create env starting with _
@@ -270,6 +267,7 @@ def run_report(report_name, script_name, user_id):
     reportObj.reportName = report_name
     if script_name in sys.modules:
       del sys.modules[script_name]
+
     mod = __import__(script_name) # run the report
     fnct = 'report'
     for param in getattr(mod, 'HTTP_PARAMS', []):
@@ -327,6 +325,11 @@ def run_report(report_name, script_name, user_id):
         sys.path.remove(userDirectory)
         for module, ss in sys.modules.items():
           if userDirectory in str(ss):
+            del sys.modules[module]
+      else:
+        sys.path.remove(systemDirectory)
+        for module, ss in sys.modules.items():
+          if systemDirectory in str(ss):
             del sys.modules[module]
       for f in reportObj.files.values():
         f.close()
@@ -434,13 +437,16 @@ def showStatics(report_name, folder, filename):
   try:
     reportObj = Ares.Report()
     report = __import__(report_name) # run the report
+    fileConfig = None
     for fileConfig in getattr(report, 'FILE_CONFIGS', []):
-      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+      if filename == fileConfig['filename']:
+        fileConfig = fileConfig['parser']
+        reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
     recordSet = []
     for rec in reportObj.files[filename]:
       recordSet.append(rec)
 
-    table = reportObj.table(recordSet, fileConfig['parser'].getHeader())
+    table = reportObj.table(recordSet, fileConfig.getHeader())
     table.callBackFooterColumns()
     cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
 
