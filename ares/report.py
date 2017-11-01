@@ -615,8 +615,7 @@ def deployment():
   hasFiles = False
   if request.files.getlist('file')[0]:
     hasFiles = True
-
-  DATA = {'files': zip(request.files.getlist('file'), request.values.getlist('File Type'))}
+  DATA = {'files': zip(request.files.getlist('file'), request.values.getlist('File Type'), request.values.getlist('file_code'))}
   env = request.values['env']
   isNew = True if request.values['isNew'] == 'true' else False
   if isNew:
@@ -684,12 +683,15 @@ def deployFiles(env, DATA):
   if report_name.startswith("_"):
     return json.dumps("Environment Name cannot start with _"), 500
 
-  for fileObj, fileType in DATA['files']:
+  for fileObj, fileType, fileCod in DATA['files']:
     if fileType not in reportTypes:
       return json.dumps('Error %s category not recognized !' % report_type), 500
 
     ext, path = reportTypes[fileType]
     filename = fileObj.filename
+    if filename == '':
+      continue
+
     if fileType != 'outputs':
       # No checks for the outputs folder
       # User can deploy whatever they want in this folder
@@ -707,7 +709,10 @@ def deployFiles(env, DATA):
       fileFullPath = os.path.join(filePath, filename)
     fileObj.save(fileFullPath)
     if fileType in ['outputs', 'static', 'saved']:
-      fileParams = {'filename': filename, 'file_type': fileType, 'usr_id': user_name}
+      if not fileCod and fileType == 'outputs':
+        return json.dumps('You have to provide a file code for the outputs type'), 500
+      fileCod = filename if not fileCod else fileCod
+      fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'usr_id': user_name}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
     queryParams = {'report_name': report_name, 'file': filename, 'type': fileType, 'usr_id': user_name}
     executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)

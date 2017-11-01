@@ -115,6 +115,7 @@
                    <option value="saved">saved</option>
                    <option value="utils">utils</option>
                 </select>
+                <input id="file_code" name="file_code" type="text" style="height:32px;width:15%;margin-left:10px"><label style="padding-left:5px">Mandatory for outputs</label>
             </div>
             <button type="button" class="btn-xs fa fa-plus" onClick="addInputForDeploy('div_deployer');"></button><br>
             <br><button id="submitBtn">Submit</button>
@@ -135,7 +136,8 @@
              "<option value='styles'>styles</option>" +
              "<option value='saved'>saved</option>" +
              "<option value='utils'>utils</option>" +
-             "</select>";
+             "</select>" +
+             "<input id='file_code' name='file_code'" + counter + " type='text' style='height:32px;width:15%;margin-left:10px'><label style='padding-left:5px'>Mandatory for outputs</label>";
              document.getElementById(divId).appendChild(newDiv);
     }
      $(document).ready(function() {
