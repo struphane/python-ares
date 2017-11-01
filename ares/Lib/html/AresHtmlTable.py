@@ -114,7 +114,7 @@ class DataTable(AresHtml.Html):
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
 
-  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False):
+  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False, extendTable=False):
     """ Create the pivot table """
     self.noPivot = False
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
@@ -129,17 +129,11 @@ class DataTable(AresHtml.Html):
           url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % getParams)
           self.recordSetHeader.append('''{ data: "%s", title: "%s",
               render: function (data, type, full, meta) {
-                  var url = "%s";
-                  var cols = JSON.parse('%s');
-                  rowParams = '' ;
-                  for (var i in cols) {
-                      rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];
-                  }
-
+                  var url = "%s"; var cols = JSON.parse('%s'); rowParams = '' ;
+                  for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];}
                   if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
                   else {url = url + '?' + rowParams.substring(1) ;}
                   return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(colRenders[col]['cols'])))
-
       else:
         self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
     for col in vals:
@@ -148,10 +142,8 @@ class DataTable(AresHtml.Html):
           render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
-              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ;
-            }
+              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ;}
             return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ; } }
-
         ''' % (col, self.recMap.get(col, col)))
       else:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",
@@ -170,13 +162,15 @@ class DataTable(AresHtml.Html):
     self.option('scrollY', "'50vh'")
     self.mouveHover('#BFFCA6', 'black')
     #self.option('order', "[[0, 'asc']]") # default behaviour anyway
-    self.callBackCreateRowHideFlag('_leaf', '1')
-    self.callBackCreateRowHideFlag('_parent', '0')
-    self.callBackCreateRowFlag('_hasChildren', 0, 'details')
-    self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
-                                     if ( data.level > 0) {
-                                         $('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}
-                                 ''')
+    if not extendTable:
+      self.callBackCreateRowHideFlag('_leaf', '1')
+      self.callBackCreateRowHideFlag('_parent', '0')
+      self.callBackCreateRowFlag('_hasChildren', 0, 'details')
+      self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
+                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+    else:
+      self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); $('td:eq(0)', row).toggleClass('changed');} ;
+                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
     self.click('''
                 var currentTable = %s;
                 var trObj = $(this).closest('tr');
