@@ -85,9 +85,9 @@ def getHttpParams(request):
   httpParams = {}
   for postValues in request.args.items():
     #TODO Find a way to not have this stupid hack
-    httpParams[postValues[0].replace("amp;", "").upper()] = postValues[1]
+    httpParams[postValues[0].replace("amp;", "")] = postValues[1]
   for postValues in request.form.items():
-    httpParams[postValues[0].upper()] = postValues[1]
+    httpParams[postValues[0]] = postValues[1]
   httpParams['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
   # Special environment configuration
   httpParams['CONFIG'] = {}
@@ -256,10 +256,6 @@ def run_report(report_name, script_name, user_id):
       systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       if not systemDirectory in sys.path:
         sys.path.append(systemDirectory)
-      ajaxPath = os.path.join(systemDirectory, 'ajax')
-      if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
-        sys.path.append(ajaxPath)
-
       # In this context we need the generic user directory as we are in a system report
       # Users should not be allowed to create env starting with _
       #TODO put in place a control
@@ -270,6 +266,7 @@ def run_report(report_name, script_name, user_id):
     reportObj.reportName = report_name
     if script_name in sys.modules:
       del sys.modules[script_name]
+
     mod = __import__(script_name) # run the report
     fnct = 'report'
     for param in getattr(mod, 'HTTP_PARAMS', []):

@@ -9,8 +9,8 @@ FILE_CONFIGS = [
     {'filename': 'country.txt', 'folder': 'static', 'parser': InFilePricesConfig.InFileCountry},
     ]
 
-HTTP_PARAMS = [{'code': 'PERIMETER', 'dflt': ''},
-               {'code': 'MULTIPLIER'}]
+HTTP_PARAMS = [{'code': 'perimeter', 'dflt': ''},
+               {'code': 'multiplier'}]
 
 def params(aresObj):
   popup = aresObj.modal('Report Parameters')
