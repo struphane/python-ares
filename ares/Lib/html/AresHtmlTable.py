@@ -104,7 +104,7 @@ class DataTable(AresHtml.Html):
                     for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]]; }
                     if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
                     else {url = url + '?' + rowParams.substring(1) ;}
-                    return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(colKey, colKey), url, json.dumps(col['url']['cols'])))
+                    return '<a href="' + url + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url, json.dumps(col['url']['cols'])))
           else:
             self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="%s">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url))
       else:
