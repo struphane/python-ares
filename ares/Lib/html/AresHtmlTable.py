@@ -41,7 +41,7 @@ class Td(AresHtml.Html):
 
 class DataTable(AresHtml.Html):
   """ Python wrapper for the Javascript Datatable object """
-  cssCls, alias = ['table'], 'table'
+  cssCls, alias = ['table', 'table-striped'], 'table'
   references = ['https://datatables.net/reference/index',
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
