@@ -474,7 +474,7 @@ def showStatics(report_name, folder, filename):
       f.close()
 
   if error:
-    return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, jsGlobal=jsGlobal)
+    return render_template('ares_error.html', cssImport='', jsImport='', jsOnload='', content=content, jsGraphs='', jsGlobal='')
 
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts,
                          name='Configuration - %s' % filename, jsGlobal=jsGlobal, report_name=report_name, script_name=report_name)

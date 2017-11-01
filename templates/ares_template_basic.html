@@ -46,8 +46,10 @@
     -->
     <script>
     $(document).ready(function() {
+
         $('a[name="side_change"]').click(function () {
-             $("#wrapper").toggleClass("toggled");
+            $("#wrapper").toggleClass("toggled");
+            localStorage.setItem("wrapper", $("#wrapper").hasClass("toggled"));
         });
 
         $('button[name="ares_min"]').click(function () {
@@ -97,6 +99,9 @@
 </div>	
 
 <script>
+    if (localStorage.getItem("wrapper") == 'false'){
+        $("#wrapper").toggleClass("toggled");
+    }
 {{ jsGraphs|safe }}
 </script>
 
