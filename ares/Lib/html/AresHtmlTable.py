@@ -47,7 +47,8 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/reference/option/ajax.data',
                 'https://datatables.net/reference/option/drawCallback',
                 'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
-                'https://datatables.net/examples/api/multi_filter_select.html']
+                'https://datatables.net/examples/api/multi_filter_select.html',
+                'https://datatables.net/extensions/fixedcolumns/examples/initialisation/size_fluid.html']
   reqCss = ['dataTables']
   reqJs = ['bootstrap', 'dataTables']
   __callBackWrapper = {
