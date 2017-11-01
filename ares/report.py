@@ -256,6 +256,7 @@ def run_report(report_name, script_name, user_id):
       systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       if not systemDirectory in sys.path:
         sys.path.append(systemDirectory)
+
       # In this context we need the generic user directory as we are in a system report
       # Users should not be allowed to create env starting with _
       #TODO put in place a control
@@ -324,6 +325,11 @@ def run_report(report_name, script_name, user_id):
         sys.path.remove(userDirectory)
         for module, ss in sys.modules.items():
           if userDirectory in str(ss):
+            del sys.modules[module]
+      else:
+        sys.path.remove(systemDirectory)
+        for module, ss in sys.modules.items():
+          if systemDirectory in str(ss):
             del sys.modules[module]
       for f in reportObj.files.values():
         f.close()
