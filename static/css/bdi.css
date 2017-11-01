@@ -8,6 +8,37 @@ nav {
     text-decoration: none;
 }
 
+
+
+
+table th, table td {
+    text-align: center;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    ertical-align: baseline;
+}
+
+
+tr:nth-child(even) td.green_cell {
+    background-color: #d1ffca;
+    text-align: center;
+    color: #17a036;
+}
+
+tr:nth-child(odd) td.green_cell {
+    background-color: #bae8b3;
+    text-align: center;
+    color: #17a036;
+}
+
+td.red_cell {
+    background-color: #ffd8d5;
+    text-align: center;
+    color: red;
+}
+
 a[name="side_change"] {
     color:white;
     width:20px;

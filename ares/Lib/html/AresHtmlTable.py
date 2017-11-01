@@ -256,6 +256,11 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
 
+  def callBackNumHeatMap(self, colName, dstColIndex):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > 0 ) {$('td', row).eq(%s).addClass('green_cell'); } else {$('td', row).eq(%s).addClass('red_cell');}" % (colName, dstColIndex, dstColIndex))
+
   def callBackCreateCellFlag(self, colName, val, dstColIndex, cssCls):
     """  Change the cell according to a float threshold """
     self.callBacks('createdRow',
@@ -428,7 +433,7 @@ class DataTable(AresHtml.Html):
     #  item.join(self.filt)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
-      item.add(1, "<thead class='%s'>" % " ".join(self.theadCssCls))
+      item.add(1, "<thead class='%s' style='white-space: nowrap;'>" % " ".join(self.theadCssCls))
       for headerLine in self.header[:-1]:
         item.add(2, "<tr>")
         for col in headerLine:
@@ -445,7 +450,7 @@ class DataTable(AresHtml.Html):
       item.add(2, "</tr>")
       item.add(1, "</thead>")
     else:
-      item.add(1, "<thead class='%s'></thead>" % " ".join(self.theadCssCls))
+      item.add(1, "<thead class='%s' style='white-space: nowrap;'></thead>" % " ".join(self.theadCssCls))
     if self.withFooter:
       item.add(1, "<tfoot>")
       item.add(2, "<tr>")

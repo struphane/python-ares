@@ -33,5 +33,5 @@ def report(aresObj):
   #pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'], extendTable=True)
   #pivotTable.callBackFooterSum([2, 4])
   pivotTable.callBackHeaderColumns()
-
+  pivotTable.callBackNumHeatMap('TTTT', 2)
 

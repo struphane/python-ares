@@ -5,8 +5,8 @@
 import os
 import importlib
 import inspect
-import ExAjaxRec
 
+from ajax import ExAjaxRec
 from ares.Lib import AresHtml
 
 NAME = 'Ares Example'
