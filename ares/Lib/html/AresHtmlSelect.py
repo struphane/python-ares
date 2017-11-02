@@ -3,6 +3,7 @@
 
 """
 
+import json
 import re
 
 from ares.Lib import AresHtml
@@ -28,6 +29,7 @@ class SelectDropDown(AresHtml.Html):
     self.disableItems = {}
     # To replace non alphanumeric characters https://stackoverflow.com/questions/20864893/javascript-replace-all-non-alpha-numeric-characters-new-lines-and-multiple-whi
     self.jsFrg = ["%s = $(this).text().trim().replace(/\W+/g, '');" % self.htmlId]
+    self.allowTableFilter = []
 
   def setDefault(self, value):
     """ Set a selected default value """
@@ -86,6 +88,7 @@ class SelectDropDown(AresHtml.Html):
     self.addCategory(items, 2, self.vals)
     items.add(1, "</ul>")
     items.add(0, "</div>")
+    self.aresObj.jsGlobal.add("%s_allow_tables = %s" % (self.htmlId, json.dumps(self.allowTableFilter)) )
     return str(items)
 
   def link(self, jsEvent):
@@ -159,7 +162,7 @@ class Select(AresHtml.Html):
     """ Return the HTML string for a select """
     item = AresItem.Item('<div class="form-group">', self.incIndent)
     item.add(1, '<label for="sel1">Select list:</label>')
-    item.add(1, '<select %s style="height:32px">' % self.strAttr())
+    item.add(1, '<select %s>' % self.strAttr())
     for val in self.vals:
       if val == self.selected:
         item.add(3, '<option value="%s" selected>%s</option>' % (regex.sub('', val.strip()), val))
