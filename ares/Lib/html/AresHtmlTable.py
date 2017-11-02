@@ -164,6 +164,7 @@ class DataTable(AresHtml.Html):
     self.option('paging', 'false')
     self.option('scrollY', "'50vh'")
     self.mouveHover('#BFFCA6', 'black')
+    self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
     #self.option('order', "[[0, 'asc']]") # default behaviour anyway
     if not extendTable:
       self.callBackCreateRowHideFlag('_leaf', '1')

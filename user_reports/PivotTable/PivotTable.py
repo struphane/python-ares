@@ -29,8 +29,8 @@ def report(aresObj):
   for rec in aresObj.files['data.txt']:
     recordSet.append(rec)
 
-  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), dataFilters={'TYPE': ['Barrier Call']}, headerBox="Youpi")
-  #pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'], extendTable=True)
+  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi")
+  pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'], extendTable=True)
   #pivotTable.callBackFooterSum([2, 4])
   #pivotTable.callBackHeaderColumns()
   pivotTable.callBackNumHeatMap('TTTT', 2)

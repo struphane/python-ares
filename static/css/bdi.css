@@ -259,12 +259,15 @@ tr.details td:first-child:before {
     content: "\f196";
     font-family: FontAwesome;
     font-style: normal;
-    text-align: left;
     font-weight: normal;
     cursor: pointer ;
     top: 0px;
     right: 0;
     padding-right:5px;
+}
+
+td.left_align {
+    text-align: left !important;
 }
 
 tr.details td.changed:first-child:before {
