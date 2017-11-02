@@ -34,6 +34,10 @@ class Svg(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
+  def changeColor(self, rangeColors):
+    """ Change the default colors in the chart """
+    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
+
   def addChartAttr(self, attrs):
     """ Change the object chart properties """
     self.chartAttrs.update(attrs)

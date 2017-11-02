@@ -49,6 +49,10 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
     else:
       self.addChartProp('labelsOutside', 'false')
 
+  def changeColor(self, rangeColors):
+    """ Change the default colors in the chart """
+    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
+
   def jsUpdate(self):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     # Dispatch method to add events on the chart (in progress)
