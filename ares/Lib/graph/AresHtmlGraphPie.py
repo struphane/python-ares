@@ -55,7 +55,7 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
       self.addChartProp('labelsOutside', 'false')
 
   def changeColor(self, rangeColors):
-    """ Change the defailt colors in the chart """
+    """ Change the default colors in the chart """
     self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
 
   def jsUpdate(self):

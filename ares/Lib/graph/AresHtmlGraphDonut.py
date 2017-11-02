@@ -52,6 +52,10 @@ class NvD3Donut(AresHtmlGraphSvg.Svg):
     else:
       self.addChartProp('labelsOutside', 'false')
 
+  def changeColor(self, rangeColors):
+    """ Change the default colors in the chart """
+    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
+
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toPie(self.vals, self.chartKeys, self.chartVals, extKeys=self.extKeys)
