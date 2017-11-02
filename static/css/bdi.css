@@ -259,6 +259,7 @@ tr.details td:first-child:before {
     content: "\f196";
     font-family: FontAwesome;
     font-style: normal;
+    text-align: left;
     font-weight: normal;
     cursor: pointer ;
     top: 0px;

@@ -35,7 +35,7 @@ class JQueryEvents(object):
       # Also because some of them might require specific display
       raise Exception('%s not defined for this %s!' % (eventType, self.__class__))
 
-    if isinstance(jsFnc, str): # to be compatible with unicode in python 2
+    if not isinstance(jsFnc, (list, AresItem.Item)):
       splitFnc = jsFnc.strip().split("\n")
       items = AresItem.Item(splitFnc[0].strip())
       for line in splitFnc[1:]:
@@ -53,7 +53,7 @@ class JQueryEvents(object):
 
   def extendJsFnc(self, jsFnc):
     """ Add the extr actions to the even function """
-    if isinstance(jsFnc, str): # to be compatible with unicode in python 2
+    if not isinstance(jsFnc, (list, AresItem.Item)):
       splitFnc = jsFnc.strip().split("\n")
       items = AresItem.Item(splitFnc[0].strip())
       for line in splitFnc[1:]:
@@ -78,46 +78,6 @@ class JQueryEvents(object):
       items.add(len(eventDefinition) - i - 1, strEvent)
     return str(items)
 
-
-class JD3Graph(object):
-  """
-
-  jGraphAttr = {'src': self.jsRef(), 'fnc': jsDef, 'htmlId': self.htmlId}
-  """
-  clickFnc = None
-
-  def __init__(self, jGraphAttr, chart, data):
-    """ """
-    self.jGraphAttr = jGraphAttr
-
-    if isinstance(chart, str):
-      splitFnc = chart.strip().split("\n")
-      items = AresItem.Item(splitFnc[0].strip())
-      items.incIndent = 2
-      for line in splitFnc[1:]:
-        items.add(0, line.strip())
-      jsChart = items
-    else:
-      jsChart = chart
-
-    self.jGraphAttr.update({'chart': str(jsChart)[1:].strip(), 'data': data})
-
-  def __str__(self):
-    """ """
-    res = AresItem.Item()
-    res.add(1, 'var chart_%(htmlId)s = %(chart)s' % self.jGraphAttr)
-    res.add(1, "var data_%(htmlId)s = %(data)s ;" % self.jGraphAttr)
-    res.add(1, "d3.%(src)s.datum(data_%(htmlId)s).transition().call(chart_%(htmlId)s) ; " % self.jGraphAttr)
-    if self.clickFnc is not None:
-      res.add(1, self.clickFnc)
-    return str(res)
-
-  def click(self, jsFnc):
-    """ Store the click function """
-    self.clickFnc = jsFnc
-
-  def jsSelectedValRef(self):
-    return "e.data.label"
 
 class XsCallFile(object):
   """
