@@ -12,7 +12,10 @@ regex = re.compile('[^a-zA-Z0-9_]')
 class NvD3Pie(AresHtmlGraphSvg.Svg):
   """ NVD3 Pie Chart python interface """
   alias, chartObject = 'pie', 'pieChart'
-  references = ['http://nvd3.org/examples/pie.html']
+  references = ['http://nvd3.org/examples/pie.html',
+                'https://bl.ocks.org/mbostock/3887235',
+                'http://bl.ocks.org/enjalot/1203641',
+                'https://stackoverflow.com/questions/16191542/how-to-customize-color-in-pie-chart-of-nvd3']
   __chartStyle = {'showLabels': 'true',
                   'x': "function(d) { return d[0]; }",
                   'y': "function(d) { return d[1]; }"}
@@ -51,11 +54,19 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
     else:
       self.addChartProp('labelsOutside', 'false')
 
+  def changeColor(self, rangeColors):
+    """ Change the defailt colors in the chart """
+    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
+
   def jsUpdate(self):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     # Dispatch method to add events on the chart (in progress)
     dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
+              d3.scale.myColors = function() {
+                  return d3.scale.ordinal().range(myColors);
+              };
+
               d3.select("#%s svg").remove();
               d3.select("#%s").append("svg");
               var %s = nv.models.%s().%s ;
