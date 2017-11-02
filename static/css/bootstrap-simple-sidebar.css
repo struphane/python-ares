@@ -27,10 +27,8 @@ body {
 
 #wrapper {
     padding-left: 150px;
-    margin-top: 30px ;
     font-family: Arial, sans-serif ;
     Font-Size: 10px ;
-    padding-left: 0;
     /*
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
@@ -51,8 +49,9 @@ body {
     height: 100%;
     margin-left: -150px;
     overflow-y: auto;
-    background-color: #333333;
+    background-color: #68a26f;
     /*
+    background-color: #626262;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
@@ -67,7 +66,7 @@ body {
 #page-content-wrapper {
     width: 100%;
     position: absolute;
-    padding: 15px;
+    padding: 10px;
 }
 
 #wrapper.toggled #page-content-wrapper {
@@ -94,7 +93,8 @@ body {
 .sidebar-nav li a {
     display: block;
     text-decoration: none;
-    color: #999999;
+    color: white;
+    font-size: 12px;
     padding-top: 5px;
     padding-bottom: 5px;
 }
@@ -128,9 +128,9 @@ body {
 @media(min-width:768px) {
     #wrapper {
         padding-left: 0;
-        margin-top: 30px ;
         font-family: Arial, sans-serif ;
         Font-Size: 10px ;
+        margin-top: 5px ;
     }
     #wrapper.toggled {
         padding-left: 150px;
