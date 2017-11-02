@@ -1065,6 +1065,12 @@ def aresLogin():
 
     return "Email Address not registered"
 
+@login_required
+@report.route('/ares/user_account')
+def aresUserAccount(user_id):
+  """ """
+  return json_dumps('youhou'), 200
+
 @report.route('/ares/logout')
 def aresLogout():
   """ """
