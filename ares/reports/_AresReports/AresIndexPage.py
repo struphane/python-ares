@@ -12,11 +12,8 @@ The target would be to try to avoid generic features that users will ask for goi
 import os
 import time
 import collections
-import six
 
 import AresRefreshScripts
-
-from ares.Lib import Ares
 
 NAME = 'Report Environment'
 DOWNLOAD = None

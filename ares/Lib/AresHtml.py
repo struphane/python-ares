@@ -13,10 +13,8 @@ import json
 import collections
 import warnings
 import functools
-import six
 
 from ares.Lib import AresJs
-from ares.Lib import AresItem
 
 
 def deprecated(func):
@@ -207,7 +205,7 @@ class Html(object):
       Get method to get data directly by interacting with the page
       https://api.jquery.com/jquery.get/
     """
-    data = 'eval(%s)' % data if isinstance(data, six.text_type) else json.dumps(data)
+    data = 'eval(%s)' % json.dumps(data)
     jsDef = '%s $.get("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
@@ -216,7 +214,7 @@ class Html(object):
       Post method to get data directly by interacting with the page
       https://api.jquery.com/jquery.post/
     """
-    data = '%s' % data if isinstance(data, (six.text_type, str)) else json.dumps(data)
+    data = '%s' % json.dumps(data)
     jsDef = '%s $.post("%s", %s, function(data) { %s } );' % (preAjaxJs, url, data, jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
@@ -225,7 +223,7 @@ class Html(object):
       Special function to input Json data
       http://api.jquery.com/jquery.getjson/
     """
-    data = 'eval(%s)' % data if isinstance(data, six.text_type) else json.dumps(data)
+    data = 'eval(%s)' % json.dumps(data)
     jsDef = '$.getJSON("%s", %s, function(data) { %s });' % (url, data, jsDef)
     self.jsEvent[evenType] = AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, data=data, url=url)
 
