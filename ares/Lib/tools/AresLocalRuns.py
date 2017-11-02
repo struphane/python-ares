@@ -20,17 +20,27 @@ import traceback
 
 from ares.Lib import Ares
 
-def getReport(results, reports, scriptPath):
+def getReport(results, directory, folder, reports, scriptPath):
   """ Recursively runs all the reports """
+  mainreport = __import__(folder)
+  extFiles = {}
+  for extFile in getattr(mainreport, 'FILE_CONFIG', {}):
+    extFiles[extFile['filename']] = extFile
   for report in reports:
+    reportName = report.replace(".py", "")
     if report.endswith(".py"):
-      reportModule = __import__(report.replace(".py", ""))
+      reportModule = __import__(reportName)
       if hasattr(reportModule, 'report'):
         print("  > Loading report %s" % report)
         results[reportModule.__name__] = Ares.Report()
-        results[reportModule.__name__].http['DIRECTORY'] = scriptPath
-        results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
-        try:
+        try :
+          for f in ['static', 'outputs']:
+            for file in os.listdir(os.path.join(directory, reportName, {})):
+              if file in extFile:
+                inFile = open(os.path.join(directory, reportName, f, file))
+                results[reportModule.__name__].files[file] = extFile[file]['parser'](inFile)
+          results[reportModule.__name__].http['DIRECTORY'] = scriptPath
+          results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
           reportModule.report(results[reportModule.__name__])
         except Exception as e:
           print("Error with report %s" % report)
@@ -83,7 +93,7 @@ if __name__ == '__main__':
   ajaxPath = os.path.join(directory, folder, 'ajax')
   if os.path.exists(ajaxPath):
     sys.path.append(ajaxPath)
-  getReport(res, scripts, directoryPath)
+  getReport(res, directory, folder, scripts, directoryPath)
 
   for report, htmlReport in res.items():
     htmlFile = open(r"%s\%s.html" % (path, report), "w")

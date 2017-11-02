@@ -6,7 +6,8 @@
 import json
 from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
-
+import re
+regex = re.compile('[^a-zA-Z0-9_]')
 
 class NvD3SparkLinePlus(AresHtmlGraphSvg.MultiSvg):
   """ NVD3 Spark Plus Line Chart python interface """
@@ -33,7 +34,7 @@ class NvD3SparkLinePlus(AresHtmlGraphSvg.MultiSvg):
     for key, recordSets in recordSet.items():
       for recrordSet in recordSets:
         if recrordSet['key'] ==  self.filterAKey:
-          self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(recrordSet['values'])))
+          self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(recrordSet['values'])))
 
   def jsUpdate(self):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """

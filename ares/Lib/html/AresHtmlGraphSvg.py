@@ -23,12 +23,16 @@ class Svg(AresHtml.Html):
     self.extKeys, self.components = None, []
     self.dispatch, self.htmlContent = {}, []
     self.recordSetId = id(vals)
-    self.header = dict([(col['key'], col.get('type')) for col in recordSetDef])
+    self.header = dict([(self.recKey(col), col.get('type')) for col in recordSetDef])
     self.svgProp = dict(self._Svg__prop)
     for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
       self.svgProp[key] = val
     if mockData:
       self.processData = self.processDataMock
+
+  def recKey(self, col):
+    """ Return the record Key taken into accounr th possible user options """
+    return col.get("key", col.get("colName"))
 
   def addChartAttr(self, attrs):
     """ Change the object chart properties """

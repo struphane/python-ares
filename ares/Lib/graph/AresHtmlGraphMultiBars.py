@@ -6,7 +6,8 @@
 import json
 from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
-
+import re
+regex = re.compile('[^a-zA-Z0-9_]')
 
 class NvD3MultiBars(AresHtmlGraphSvg.MultiSvg):
   """ NVD3 Multi Bar Chart python interface """
@@ -32,7 +33,7 @@ class NvD3MultiBars(AresHtmlGraphSvg.MultiSvg):
     recordSet = AresChartsService.toMultiSeries(self.vals, self.chartKeys, self.selectedX , self.chartVals, extKeys=self.extKeys)
     print(recordSet)
     for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
+      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
 
   def jsUpdate(self):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """

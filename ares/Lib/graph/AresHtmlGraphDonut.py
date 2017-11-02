@@ -8,6 +8,10 @@ from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 
 
+import re
+regex = re.compile('[^a-zA-Z0-9_]')
+
+
 class NvD3Donut(AresHtmlGraphSvg.Svg):
   """ NVD3 Donut Chart python interface """
   alias, chartObject = 'donut', 'pieChart'
@@ -33,11 +37,26 @@ class NvD3Donut(AresHtmlGraphSvg.Svg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
 
+  def showLeged(self, boolFlag):
+    """ Change the D3 flag to display the legend in the chart """
+    if boolFlag:
+      self.addChartProp('showLegend', 'true')
+    else:
+      self.addChartProp('showLegend', 'false')
+
+  def outSideLabels(self, boolFlag):
+    """ Change the flag to display the labels of teh chart outside """
+    if boolFlag:
+      self.addChartProp('showLabels', 'true')
+      self.addChartProp('labelsOutside', 'true')
+    else:
+      self.addChartProp('labelsOutside', 'false')
+
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toPie(self.vals, self.chartKeys, self.chartVals, extKeys=self.extKeys)
     for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
+      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
 
   def jsUpdate(self):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """

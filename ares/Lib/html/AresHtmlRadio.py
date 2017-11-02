@@ -7,6 +7,9 @@ import json
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 
+import re
+regex = re.compile('[^a-zA-Z0-9_]')
+
 
 class Radio(AresHtml.Html):
   """
@@ -31,7 +34,8 @@ class Radio(AresHtml.Html):
     self.col = col
     self.internalRef = internalRef
     # To replace non alphanumeric characters https://stackoverflow.com/questions/20864893/javascript-replace-all-non-alpha-numeric-characters-new-lines-and-multiple-whi
-    self.jsFrg = ["radio_val_%s = $(this).text().trim().replace(/\W+/g, '');" % self.htmlId]
+    #.replace(/\W+/g, '')
+    self.jsFrg = ["radio_val_%s = '$(this).text().trim()';" % self.htmlId]
 
   @property
   def htmlId(self):
@@ -43,13 +47,13 @@ class Radio(AresHtml.Html):
 
   def setDefault(self, value):
     """ Set a selected default value """
-    self.selected = value
-    self.aresObj.jsGlobal.add("radio_val_%s = '%s';" % (self.htmlId, value))
+    self.selected = regex.sub('', value.strip())
+    self.aresObj.jsGlobal.add("radio_val_%s = '%s';" % (self.htmlId, self.selected))
 
   def select(self, val):
     """ Change the selected value """
-    self.selected = val
-    self.aresObj.jsGlobal.add("radio_val_%s = %s" % (self.htmlId, json.dumps(val)))
+    self.selected = regex.sub('', val.strip())
+    self.aresObj.jsGlobal.add("radio_val_%s = '%s'" % (self.htmlId, self.selected))
 
   def __str__(self):
     """ Return a basic HTML radio component """

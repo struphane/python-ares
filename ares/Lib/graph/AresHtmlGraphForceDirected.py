@@ -6,6 +6,10 @@
 
 from ares.Lib.html import AresHtmlContainer
 
+import re
+regex = re.compile('[^a-zA-Z0-9_]')
+
+
 class NvD3ForceDirected(AresHtmlContainer.Svg):
   """ """
   alias, chartObject = 'forceDirected', 'forceDirectedGraph'

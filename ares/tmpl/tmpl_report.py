@@ -25,8 +25,16 @@ NAME = 'Report' # The Report Name in the left menu
 # [(Cateogry Name, [List of the script in the root directory])]
 # It is only possible to create new links for scripts in the root
 SHORTCUTS = [] # All the possible link to other pages
+FILE_CONFIG = [] # All the static and output files configurationa
+# The format in the above list should be as: {'filename': 'data.txt', 'folder': 'outputs', 'parser': InFilePricesConfig.InFilePices},
+
+HTTP_PARAMS = [] # If you want to use the param method to set parameter before running hte report
 
 import random
+
+#def params(aresObj):
+#  """ Optional param method to be run before the report method to set parameter """
+
 
 def report(aresObj):
   '''

@@ -9,6 +9,8 @@ from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 from ares.Lib.html import AresHtmlRadio
 from ares.Lib.html import AresHtmlContainer
+import re
+regex = re.compile('[^a-zA-Z0-9_]')
 
 
 class D3SpiderChart(AresHtmlGraphSvg.MultiSvg):
@@ -27,7 +29,7 @@ class D3SpiderChart(AresHtmlGraphSvg.MultiSvg):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toSplider(self.vals, self.chartKeys, self.selectedX , self.chartVals, extKeys=self.extKeys)
     for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
+      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
 
   def jsUpdate(self):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
