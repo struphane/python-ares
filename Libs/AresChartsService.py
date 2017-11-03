@@ -244,7 +244,7 @@ def toCandleStick(recordSet, dateInfo, openCol, highCol, lowCol, closeCol, volum
                 "close": float(rec[closeCol]), "volume": float(rec[volumeCol]), "adjusted": float(rec[adjustedCol])})
   return {"%s_FIXED" % dateCol: [{'values': res}]}
 
-def toSplider(recordSet, key, x, val, seriesNames=None, extKeys=None):
+def toSpider(recordSet, key, x, val, seriesNames=None, extKeys=None):
   """ """
   data = toMultiSeries(recordSet, key, x, val, seriesNames, extKeys)
   result = {}
