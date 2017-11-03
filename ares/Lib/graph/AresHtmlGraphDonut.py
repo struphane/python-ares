@@ -37,7 +37,7 @@ class NvD3Donut(AresHtmlGraphSvg.Svg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
 
-  def showLeged(self, boolFlag):
+  def showLegend(self, boolFlag):
     """ Change the D3 flag to display the legend in the chart """
     if boolFlag:
       self.addChartProp('showLegend', 'true')

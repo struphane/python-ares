@@ -39,7 +39,7 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
     for key, vals in recordSet.items():
       self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
 
-  def showLeged(self, boolFlag):
+  def showLegend(self, boolFlag):
     """ Change the D3 flag to display the legend in the chart """
     if boolFlag:
       self.addChartProp('showLegend', 'true')
