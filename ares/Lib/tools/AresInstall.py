@@ -5,13 +5,18 @@ This will retrieve the scripts but also it will get the server path
 """
 
 import shutil
-import requests
 import zipfile
 import contextlib
 import os
 import io
 import AresCreateLocalEnv
 
+try:
+  import requests
+except:
+  # not all the module will require request
+  pass 
+  
 SERVER_PATH = 'http://127.0.0.1:5000'
 
 if __name__ == '__main__':

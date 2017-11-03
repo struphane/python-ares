@@ -35,10 +35,10 @@ def getReport(results, directory, folder, reports, scriptPath):
         results[reportModule.__name__] = Ares.Report()
         try :
           for f in ['static', 'outputs']:
-            for file in os.listdir(os.path.join(directory, reportName, {})):
-              if file in extFile:
+            for file in os.listdir(os.path.join(directory, reportName, f)):
+              if file in extFiles:
                 inFile = open(os.path.join(directory, reportName, f, file))
-                results[reportModule.__name__].files[file] = extFile[file]['parser'](inFile)
+                results[reportModule.__name__].files[file] = extFiles[file]['parser'](inFile)
           results[reportModule.__name__].http['DIRECTORY'] = scriptPath
           results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
           reportModule.report(results[reportModule.__name__])
