@@ -51,11 +51,13 @@ class Button(AresHtml.Html):
     return '<button %s %s>%s</button>' % (self.strAttr(), disFlag, self.vals)
 
   def post(self, evenType, scriptName, jsDef, attr):
-    """
-
-    """
+    """ Button Post request """
     url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'%s\', script=\'%s\') }}''' % (self.aresObj.http['REPORT_NAME'], scriptName))
-    data = json.dumps(attr, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()')
+    data = json.dumps(attr, cls=AresHtml.SetEncoder)
+    for stToConv in ['.data().toArray()', '.val()', '.serializeArray()']:
+      data = data.replace('%s"' % stToConv, stToConv)
+    for stToConv, strReplace in [('$(', '"$('), (': datatable_', ': "datatable_')]:
+      data = data.replace(strReplace, stToConv)
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     preAjax.add(0, attr.get('preAjaxJs', ''))
@@ -73,6 +75,7 @@ class Button(AresHtml.Html):
 
   def click(self, jsDef, attr=None, scriptName=None):
     """ Implement the click event on the button object """
+    attr = {} if attr is None else attr
     if scriptName is not None:
       self.post('click', scriptName, jsDef, attr)
     else:

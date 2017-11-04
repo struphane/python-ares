@@ -376,6 +376,36 @@ class DataTable(AresHtml.Html):
       );
       ''' % (self.jqId, self.htmlId, strItems))
 
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML objec in a python HTML object """
+    return "%s.data().toArray()" % self.htmlId
+
+  def dblClickOvr(self):
+    """ Override a cell in the datatabble """
+    self.aresObj.jsFnc.add('''
+        %s.on('dblclick', 'tr td', function () {
+          var $this = $(this);
+          var curValue = $this.text();
+          var $input = $('<input>', {
+              value: $this.text(),
+              type: 'text',
+              blur: function() {
+                 $this.text(this.value);
+                 if (curValue != $this.text()) {
+                  $this.css({'color': '#b3b300'});
+                  var cell = %s.cell( $this );
+                  cell.data( this.value ).draw();
+                 }
+              },
+              keyup: function(e) {
+                 if (e.which === 13) $input.blur();
+              }
+          }).appendTo( $this.empty() ).focus();
+            
+        });
+        ''' % (self.jqId, self.htmlId))
+
   def click(self, jsFnc, colIndex=None, colVal=None):
     """ Add a Click event feature on the row or cell level
     The below example will display the column script from the row
