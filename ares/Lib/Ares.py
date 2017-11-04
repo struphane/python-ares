@@ -357,8 +357,6 @@ class Report(object):
   def upload(self, cssCls=None, cssAttr=None): return self.add(aresFactory['FileUploader'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
   def deployFiles(self, cssCls=None, cssAttr=None): return self.add(aresFactory['FileDeployer'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
 
-
-
   # Anchor section): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(aresFactory['InputText'](self, value, cssCls), sys._getframe().f_code.co_name)
   def inputInt(self, value='', cssCls=None): return self.add(aresFactory['InputInt'](self, value, cssCls), sys._getframe().f_code.co_name)
