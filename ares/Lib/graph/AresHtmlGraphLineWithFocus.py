@@ -33,6 +33,11 @@ class NvD3LineWithFocus(AresHtmlGraphSvg.MultiSvg):
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['jquery', 'd3']
 
+  def xAxisAsDate(self):
+    """ Force the x axis to be a date """
+    self.addChartProp('xAxis', {'tickFormat': "function(d) { return d3.time.format('%Y/%m/%d')(new Date(d)) }"})
+    self.addChartProp('x2Axis', {'tickFormat': "function(d) { return d3.time.format('%Y/%m/%d')(new Date(d)) }"})
+
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toMultiSeries(self.vals, self.chartKeys, self.selectedX , self.chartVals, extKeys=self.extKeys)
