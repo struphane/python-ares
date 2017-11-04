@@ -197,6 +197,10 @@ class MultiSvg(Svg):
     self.extKeys = keys
     self.components = components
 
+  def xAxisAsDate(self):
+    """ Force the x axis to be a date """
+    self.addChartProp('xAxis', {'tickFormat': "function(d) { return d3.time.format('%Y/%m/%d')(new Date(d)) }"})
+
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
@@ -209,10 +213,10 @@ class MultiSvg(Svg):
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
+    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
     categories.select(self.selectedChartKey)
     self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {})
+    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {})
     values.select(self.selectedChartVal)
     self.dynValSelection = values.val # The javascript representation of the radio
     categories.click([self])
