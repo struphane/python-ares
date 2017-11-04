@@ -22,11 +22,8 @@ class Svg(AresHtml.Html):
     self.headerBox = header
     self.extKeys, self.components = None, []
     self.dispatch, self.htmlContent = {}, []
-    self.recordSetId = id(vals)
     self.header = dict([(self.recKey(col), (self.recKey(col), col.get('type'), col.get('multiplier', 1))) for col in recordSetDef])
     self.svgProp = {}
-    for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
-      self.svgProp[key] = val
     if mockData:
       self.processData = self.processDataMock
 
