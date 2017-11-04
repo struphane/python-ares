@@ -391,9 +391,12 @@ def ajaxCall(report_name, script):
     report = __import__(report_name)
     for fileConfig in getattr(report, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
-    mod = __import__(script.replace(".py", ""))
-    result = {'status': 'Success', "data": mod.call(reportObj)}
+    ajaxScript = script.replace(".py", "")
+    mod = __import__("ajax.%s" % ajaxScript)
+    ajaxMod = getattr(mod, ajaxScript)
+    result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
   except Exception as e:
+    print(e)
     content = traceback.format_exc()
     error = True
   finally:
