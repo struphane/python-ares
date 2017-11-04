@@ -1,6 +1,7 @@
 """
 """
 
+import json
 from ares.Lib import AresHtml
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlRadio
@@ -23,7 +24,7 @@ class Svg(AresHtml.Html):
     self.extKeys, self.components = None, []
     self.dispatch, self.htmlContent = {}, []
     self.recordSetId = id(vals)
-    self.header = dict([(self.recKey(col), col.get('type')) for col in recordSetDef])
+    self.header = dict([(self.recKey(col), (self.recKey(col), col.get('type'), col.get('multiplier', 1))) for col in recordSetDef])
     self.svgProp = dict(self._Svg__prop)
     for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
       self.svgProp[key] = val
@@ -104,10 +105,10 @@ class Svg(AresHtml.Html):
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
+    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
     categories.select(self.selectedChartKey)
     self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, internalRef='val_%s' % self.htmlId)
+    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, internalRef='val_%s' % self.htmlId)
     values.select(self.selectedChartVal)
     self.dynValSelection = values.val # The javascript representation of the radio
 
@@ -121,12 +122,12 @@ class Svg(AresHtml.Html):
 
   def setKeys(self, keys, selected=None):
     """ Set a default key for the graph """
-    self.chartKeys = [(key, self.header[key]) for key in keys]
+    self.chartKeys = [self.header[key] for key in keys]
     self.selectedChartKey = keys[selected] if selected is not None else keys[0]
 
   def setVals(self, vals, selected=None):
     """ Set a default value for the graph """
-    self.chartVals = [(val, self.header[val]) for val in vals]
+    self.chartVals = [self.header[val] for val in vals]
     self.selectedChartVal = vals[selected] if selected is not None else vals[0]
 
   def setExtVals(self, keys, components):
@@ -189,7 +190,7 @@ class MultiSvg(Svg):
 
   def setX(self, x):
     """ """
-    self.selectedX = (x, self.header[x])
+    self.selectedX = self.header[x]
 
   def setExtVals(self, keys, components):
     """ Link the result to the different components on the page """
