@@ -63,10 +63,6 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
     # Dispatch method to add events on the chart (in progress)
     dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
-              d3.scale.myColors = function() {
-                  return d3.scale.ordinal().range(myColors);
-              };
-
               d3.select("#%s svg").remove();
               d3.select("#%s").append("svg");
               var %s = nv.models.%s().%s ;
