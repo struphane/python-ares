@@ -72,3 +72,12 @@ class FileParser(object):
     """ Close the underlying file """
     if not self.__inputFile.closed:
       self.__inputFile.close()
+
+def saveFile(aresObj, recordSet, cols, outFileName):
+  """ Write the file to the dedicated output folder """
+  outFile = open(r"%s\outputs\test.dat" % aresObj.http['DIRECTORY'], "w")
+  rowNumers = max(recordSet.keys())
+  tmplLine = " ".join(["%%(%s)s" % col for col in cols])
+  for colIndex in range(rowNumers):
+    print(recordSet[colIndex])
+    outFile.write("%s\n" % tmplLine % recordSet[colIndex])
