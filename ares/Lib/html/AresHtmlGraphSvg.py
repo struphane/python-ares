@@ -170,9 +170,9 @@ class Svg(AresHtml.Html):
   def yAxisAsInt(self, withCcy=None):
     """ Return the data as integer """
     if withCcy is None:
-      self.addChartProp("yAxis", {"tickFormat": "function(d){ return d3.format(d) }" })
+      self.addChartProp("yAxis", {"tickFormat": "function(d){ return d3.format(',.0f')(d) }" })
     else:
-      self.addChartProp("yAxis", {"tickFormat": "function(d){ return d3.format(d) + ' %s' }" % withCcy})
+      self.addChartProp("yAxis", {"tickFormat": "function(d){ return d3.format(',.0f')(d) + ' %s' }" % withCcy})
 
 
   def processDataMock(self, cat=None, val=None):
