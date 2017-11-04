@@ -12,7 +12,6 @@ class Svg(AresHtml.Html):
   """
   __css = {'width': '95%', 'height': '100%'}
   references = []
-  __prop = {} #'transition': '',
   height = 250
 
   def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
@@ -25,7 +24,7 @@ class Svg(AresHtml.Html):
     self.dispatch, self.htmlContent = {}, []
     self.recordSetId = id(vals)
     self.header = dict([(self.recKey(col), (self.recKey(col), col.get('type'), col.get('multiplier', 1))) for col in recordSetDef])
-    self.svgProp = dict(self._Svg__prop)
+    self.svgProp = {}
     for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
       self.svgProp[key] = val
     if mockData:
