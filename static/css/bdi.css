@@ -4,13 +4,19 @@ nav {
 }
 
 H1 {
+    margin-top: 10px;
     font-size: 22px;
 }
 
 H2 {
+    margin-top: 10px;
     font-size: 20px;
 }
 
+H3 {
+    margin_top: 10px;
+    font-size: 18px;
+}
 .navbar-brand a {
     color:#ffffff;
     text-decoration: none;
