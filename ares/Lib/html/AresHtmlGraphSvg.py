@@ -167,6 +167,14 @@ class Svg(AresHtml.Html):
     for comp in self.components:
       comp.link(self.jsUpdate())
 
+  def yAxisAsInt(self, withCcy=None):
+    """ Return the data as integer """
+    if withCcy is None:
+      self.chartProps("yAxis", {"tickFormat": "function(d){ return d3.format(',')(d) }" })
+    else:
+      self.chartProps("yAxis", {"tickFormat": "function(d){ return d3.format(',')(d) + ' %s' }" % withCcy})
+
+
   def processDataMock(self, cat=None, val=None):
     """ Return the json data """
     self.chartKeys = [('MOCK', None)]
