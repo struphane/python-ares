@@ -37,8 +37,6 @@ def jsonDefault(obj):
   if isinstance(obj, numpy.integer): return int(obj)
   raise TypeError("%s (%s) is not JSON serializable" % (repr(obj), type(obj)))
 
-from click import echo
-
 aresFactory = None
 if aresFactory is None:
   tmpFactory = {}
@@ -189,8 +187,6 @@ class Report(object):
     """ Add a user notfication to the report """
     notif = notifType.upper()
     if not notif in self.definedNotif:
-      echo("Notification %s not recognized !" % notif)
-      echo("Allowed notification %s" % self.definedNotif.keys())
       raise Exception("Notification Type should belong to one of the above category")
 
     alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
