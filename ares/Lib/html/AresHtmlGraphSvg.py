@@ -174,6 +174,13 @@ class Svg(AresHtml.Html):
     else:
       self.addChartProp("yAxis", {"tickFormat": "function(d){ return d3.format(',.0f')(d) + ' %s' }" % withCcy})
 
+  def yAxisLabel(self, value):
+    """ Add a label the the y axis """
+    self.addChartProp('yAxis', {'axisLabel': "'%s'" % value})
+
+  def xAxisLabel(self, value):
+    """ Add a label the the y axis """
+    self.addChartProp('xAxis', {'axisLabel': "'%s'" % value})
 
   def processDataMock(self, cat=None, val=None):
     """ Return the json data """
