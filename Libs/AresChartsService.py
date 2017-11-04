@@ -31,23 +31,23 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
   """
   data = collections.defaultdict(lambda: collections.defaultdict(float))
   trsnsfValFormat = []
-  for val, valFormat in valsWithFormat:
+  for val, valFormat, multiplier in valsWithFormat:
     if valFormat is None:
-      trsnsfValFormat.append((val, float))
+      trsnsfValFormat.append((val, float, multiplier))
     else:
-      trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat]))
+      trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat], multiplier))
 
   if extKeys is None:
     data = collections.defaultdict(lambda: collections.defaultdict(float))
-    for key, format in keysWithFormat:
+    for key, format, _ in keysWithFormat:
       if format is not None: # If there is a timestamp format defined
         # Python uses seconds in the timestamp whereas javascript uses the mili seconds
         mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
       else:
         mapFnc = lambda dt, dtFmt: str(dt)
       for rec in recordSet:
-        for val, valFormat in trsnsfValFormat:
-          data[(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
+        for val, valFormat, multiplier in trsnsfValFormat:
+          data[(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val]) * multiplier
 
     resultSets = {}
     for key, aggVals in data.items():
@@ -58,15 +58,15 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
       resultSets["_".join(key)] = result
   else:
     data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(float)))
-    for key, format in keysWithFormat:
+    for key, format, _ in keysWithFormat:
       if format is not None: # If there is a timestamp format defined
         mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp())
       else:
         mapFnc = lambda dt, dtFmt: str(dt)
       for rec in recordSet:
-        for val, valFormat in trsnsfValFormat:
+        for val, valFormat, multiplier in trsnsfValFormat:
           extkeyResolve = regex.sub('', "_".join([rec[extKey] for extKey in extKeys]))
-          data[extkeyResolve][(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val])
+          data[extkeyResolve][(key, val)][mapFnc(rec[key], format)] += valFormat(rec[val]) * multiplier
     resultSets = {}
     for extKeys, recordSet in data.items():
       for key, aggVals in recordSet.items():
@@ -96,21 +96,21 @@ def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, s
     mapFnc = lambda dt, dtFmt: str(dt)
 
   trsnsfValFormat = []
-  for val, valFormat in valsWithFormat:
+  for val, valFormat, multiplier in valsWithFormat:
     if valFormat is None:
-      trsnsfValFormat.append((val, float))
+      trsnsfValFormat.append((val, float, multiplier))
     else:
-      trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat]))
+      trsnsfValFormat.append((val, {'int': int, 'float': float, 'number': float}[valFormat], multiplier))
 
   if extKeys is None:
     # Define the temporary dataSet used to aggregate the data in the recordSet
     data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int)))
     # Aggregate the data in the recordSet
-    for key, keyFormat in keysWithFormat:
+    for key, keyFormat, _ in keysWithFormat:
       for rec in recordSet:
         dt = mapFnc(rec[xWithFormat[0]], xWithFormat[1]) # Use the map function
-        for val, valFormat in trsnsfValFormat:
-          data[(key, val)][rec[key]][dt] += valFormat(rec[val])
+        for val, valFormat, multiplier in trsnsfValFormat:
+          data[(key, val)][rec[key]][dt] += valFormat(rec[val]) * 1
     # Produce the final data structure required by the multi series charts
     resultSets = {}
     for rawKey, aggVals in data.items():
@@ -126,12 +126,12 @@ def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, s
     # Define the temporary dataSet used to aggregate the data in the recordSet
     data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(int))))
     # Aggregate the data in the recordSet
-    for key, keyFormat in keysWithFormat:
+    for key, keyFormat, _ in keysWithFormat:
       for rec in recordSet:
         dt = mapFnc(rec[xWithFormat[0]], xWithFormat[1]) # Use the map function
-        for val, valFormat in trsnsfValFormat:
+        for val, valFormat, multiplier in trsnsfValFormat:
           extkeyResolve = regex.sub('', "_".join([rec[extKey] for extKey in extKeys]))
-          data[extkeyResolve][(key, val)][rec[key]][dt] += valFormat(rec[val])
+          data[extkeyResolve][(key, val)][rec[key]][dt] += valFormat(rec[val]) * multiplier
     # Produce the final data structure required by the multi series charts
     resultSets = {}
     for extKeys, recordSet in data.items():
