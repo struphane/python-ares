@@ -112,7 +112,7 @@ def toMultiSeriesChart(recordSet, keysWithFormat, xWithFormat, valsWithFormat, s
       for rec in recordSet:
         dt = mapFnc(rec[xWithFormat[0]], xWithFormat[1]) # Use the map function
         for val, valFormat, multiplier in trsnsfValFormat:
-          data[(key, val)][rec[key]][dt] += valFormat(rec[val]) * 1
+          data[(key, val)][rec[key]][dt] += valFormat(rec[val]) * multiplier
     # Produce the final data structure required by the multi series charts
     resultSets = {}
     for rawKey, aggVals in data.items():
