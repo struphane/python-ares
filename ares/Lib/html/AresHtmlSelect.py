@@ -210,3 +210,29 @@ class SelectWithGroup(AresHtml.Html):
     item.add(0, '</select>')
     return str(item)
 
+
+class SelectMulti(AresHtml.Html):
+  """ """
+  alias, cssCls = 'select', []
+  reqCss = ['multiselect']
+  reqJs = ['multiselect']
+
+  def __init__(self, aresObj, title, vals, cssCls=None, cssAttr=None):
+    """ Instantiate the Drop Down button """
+    super(SelectMulti, self).__init__(aresObj, list(vals), cssCls, cssAttr)
+    self.title = title
+    self.disableItems = {}
+    # To replace non alphanumeric characters https://stackoverflow.com/questions/20864893/javascript-replace-all-non-alpha-numeric-characters-new-lines-and-multiple-whi
+    self.aresObj.jsOnLoadFnc.add('%s.multiselect();' % self.jqId)
+    self.allowTableFilter = []
+
+  def __str__(self):
+    """ Return the HTML string for a select """
+    item = AresItem.Item('<select %s multiple="multiple">' % self.strAttr(), self.incIndent)
+    for group, vals in self.vals:
+      item.add(1, '<optgroup label="%s">' % group)
+      for v in vals:
+        item.add(2, '<option>%s</option>' % v)
+      item.add(1, '</optgroup>')
+    item.add(0, '</select>')
+    return str(item)
