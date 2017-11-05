@@ -272,6 +272,7 @@ class Report(object):
   # Select Section
   def dropdown(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectDropDown'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def ajaxDropdown(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectDropDownAjax'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def selectmulti(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectMulti'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Radio Section
   def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
