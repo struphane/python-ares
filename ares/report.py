@@ -234,6 +234,7 @@ def run_report(report_name, script_name, user_id):
   viewScript, downloadEnv = False, False
   cssImport, jsImport = '', ''
   isAuth = True
+  reportObj = Ares.Report()
   try:
     if script_name is None:
       script_name = report_name
@@ -262,7 +263,6 @@ def run_report(report_name, script_name, user_id):
       #TODO put in place a control
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
 
-    reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
     reportObj.reportName = report_name
     if script_name in sys.modules:
@@ -318,7 +318,12 @@ def run_report(report_name, script_name, user_id):
     fileStatic = os.path.join(userDirectory, 'static')
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
-        htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='static', filename='%s') }}' target='_blank'>%s</a>" % (report_name, staticPage, staticPage)))
+        if staticPage.startswith('filt_'):
+          htmlStatics.append(render_template_string(
+            "<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportPivotView', user_report_name='%s', user_script_name='%s', static_file='%s') }}' target='_blank'>%s</a>" % (
+            report_name, script_name, staticPage, staticPage)))
+        else:
+          htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, staticPage)))
 
     if isAuth:
       if not report_name.startswith("_"):
@@ -430,57 +435,6 @@ def pivotData(format):
                                                       ))
 
   return json.dumps('Format %s not recognised' % format)
-
-@report.route("/view/<report_name>/<folder>/<filename>", methods = ['GET'])
-def showStatics(report_name, folder, filename):
-  """ Display the static data used in the report environment """
-  error, isAuth = False, True
-  userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
-  sys.path.append(userDirectory)
-  try:
-    reportObj = Ares.Report()
-    report = __import__(report_name) # run the report
-    fileConfig = None
-    for fileDef in getattr(report, 'FILE_CONFIGS', []):
-      if filename == fileDef['filename']:
-        fileConfig = fileDef['parser']
-        reportObj.files[fileDef['filename']] = fileConfig(open(os.path.join(userDirectory, fileDef['folder'], fileDef['filename'])))
-    recordSet = []
-    for rec in reportObj.files[filename]:
-      recordSet.append(rec)
-
-    table = reportObj.table(recordSet, fileConfig.getHeader())
-    table.callBackFooterColumns()
-    cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
-
-  except Exception as e:
-    error = True
-    content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
-    content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
-
-  finally:
-    htmlArchives, htmlConfigs, htmlStatics = [], [], []
-    savedHtmlLocation = os.path.join(userDirectory, 'saved')
-    if os.path.exists(savedHtmlLocation):
-      for htmlPage in os.listdir(savedHtmlLocation):
-        htmlArchives.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.savedHtmlReport', report_name='%s', html_report='%s') }}' target='_blank'>%s</a>" % (report_name, htmlPage, "".join(htmlPage.split(".")[:-1]))))
-    fileStatic = os.path.join(userDirectory, 'static')
-    if os.path.exists(fileStatic):
-      for staticPage in os.listdir(fileStatic):
-        htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.showStatics', report_name='%s', folder='static', filename='%s') }}' target='_blank'>%s</a>" % (report_name, staticPage, staticPage)))
-
-    sys.path.remove(userDirectory)
-    for module, ss in sys.modules.items():
-      if userDirectory in str(ss):
-        del sys.modules[module]
-    for f in reportObj.files.values():
-      f.close()
-
-  if error:
-    return render_template('ares_error.html', cssImport='', jsImport='', jsOnload='', content=content, jsGraphs='', jsGlobal='')
-
-  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts,
-                         name='Configuration - %s' % filename, jsGlobal=jsGlobal, report_name=report_name, script_name=report_name)
 
 @report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
 def adminEnv(report_name, token):
