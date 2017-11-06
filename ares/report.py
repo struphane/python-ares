@@ -293,9 +293,9 @@ def run_report(report_name, script_name, user_id):
     envName = getattr(report, 'NAME', '')
     side_bar.append('<br /><div style="color:white;font-size:16px;height:20px"><b>&nbsp;Dashboard</b></div>')
     for categories, links in getattr(report, 'SHORTCUTS', []):
-      side_bar.append('<div style="color:white;font-size:14px;height:20px"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></div>' % categories)
+      side_bar.append('<div style="color:white;font-size:14px;height:20px;margin-top:5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></div>' % categories)
       for name, scriptName in links:
-        side_bar.append(render_template_string('<li><a style="height:20px;white-space: nowrap;vertical-align: middle;" href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
+        side_bar.append(render_template_string('<li><a style="height:20px;white-space: nowrap;vertical-align: middle;padding-top:1px" href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
     cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
     # Database caches will be stored in the reportObj.dbCaches
     # Nothing related to the DB should be done in ares.py in order to allow users to run everything locally
