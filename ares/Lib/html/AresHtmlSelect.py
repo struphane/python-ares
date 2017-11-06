@@ -226,6 +226,10 @@ class SelectMulti(AresHtml.Html):
     self.aresObj.jsOnLoadFnc.add('%s.multiselect();' % self.jqId)
     self.allowTableFilter = []
 
+  def selected(self, vals):
+    """ Set default selected values """
+    self.aresObj.jsOnLoadFnc.add("%s.val(%s); %s.multiselect('refresh');" % (self.jqId, json.dumps(vals), self.jqId))
+
   def __str__(self):
     """ Return the HTML string for a select """
     item = AresItem.Item('<select %s multiple="multiple">' % self.strAttr(), self.incIndent)
@@ -236,3 +240,13 @@ class SelectMulti(AresHtml.Html):
       item.add(1, '</optgroup>')
     item.add(0, '</select>')
     return str(item)
+
+  def click(self):
+    """ Event on click """
+    self.aresObj.jsOnLoadFnc.add(
+     '''
+        $('#%s').change(function(e) {
+            alert('');
+        });
+     ''' % self.htmlId
+    )
