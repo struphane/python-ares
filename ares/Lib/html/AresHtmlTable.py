@@ -124,7 +124,7 @@ class DataTable(AresHtml.Html):
     for col in keys:
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
     for val in vals:
-      self.recordSetHeader.append("{ data: '%s', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
+      self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toAggTable(self.vals, keys, vals, filters)
@@ -170,7 +170,7 @@ class DataTable(AresHtml.Html):
         self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
     for col in vals:
       if withUpDown:
-        self.recordSetHeader.append('''{ data: "%s", title: "%s",
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
           render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
@@ -332,6 +332,19 @@ class DataTable(AresHtml.Html):
                             } );
                       } );
                    ''')
+
+  # def callBackSumFooter(self):
+  #   """ """
+  #   self.withFooter = True
+  #   self.callBacks('footerCallback',
+  #                  '''
+  #                     var api = this.api();
+  #                     api.columns('.sum', { page: 'current' } ).every(function () {
+  #                     var sum = this.data().reduce(function (a, b) {
+  #                         var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
+  #                     $(this.footer()).html(sum);
+  #                     } );
+  #                  ''')
 
   def callBackHeaderColumns(self):
     """  """
