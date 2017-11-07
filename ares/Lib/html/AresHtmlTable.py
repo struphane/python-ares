@@ -137,7 +137,7 @@ class DataTable(AresHtml.Html):
     """ To add a static column to the table """
     colNames = keys if colNames is None else colNames
     for i, key in enumerate(keys):
-      self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (key, colNames[i]))
+      self.recordSetHeader.append('{ data: "%s", title: "%s", className: "static_col" }' % (key, colNames[i]))
     rows = json.loads(self.__options['data'])
     for row in rows:
       for i, key in enumerate(keys):
