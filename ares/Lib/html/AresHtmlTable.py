@@ -116,7 +116,35 @@ class DataTable(AresHtml.Html):
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
 
-  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False, extendTable=False):
+  def agg(self, keys, vals, filters=None, digit=0):
+    """ Simple data aggregation, no need in this function to store the result and the different levels """
+    self.noPivot = False
+    self.recordSetHeader = []
+    for col in keys:
+      self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
+    for val in vals:
+      self.recordSetHeader.append("{ data: '%s', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
+    self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    self.__options["ordering"] = 'false'
+    rows = AresChartsService.toAggTable(self.vals, keys, vals, filters)
+    self.__options['data'] = json.dumps(rows)
+    if len(rows) < self.__options['pageLength']:
+      self.__options['info'] = 'false'
+      self.__options['bPaginate'] = 'false'
+
+  def addCols(self, keys, vals, colNames=None):
+    """ To add a static column to the table """
+    colNames = keys if colNames is None else colNames
+    for i, key in enumerate(keys):
+      self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (key, colNames[i]))
+    rows = json.loads(self.__options['data'])
+    for row in rows:
+      for i, key in enumerate(keys):
+        row[key] = vals[i]
+    self.__options['data'] = json.dumps(rows)
+    self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+
+  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False, extendTable=False, digit=0):
     """ Create the pivot table """
     self.noPivot = False
     self.__options["ordering"] = 'false'
@@ -145,19 +173,21 @@ class DataTable(AresHtml.Html):
           render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
-              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ;}
-            return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(0, ',', '.') + "</i>" ; } }
-        ''' % (col, self.recMap.get(col, col)))
+              return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(%s, ',', '.') + "</i>" ;}
+            return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(%s, ',', '.') + "</i>" ; } }
+        ''' % (col, self.recMap.get(col, col), digit, digit))
       else:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",
           render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
-              return "<font style='color:red'>" + parseFloat(data).formatMoney(0, ',', '.') + "</font>" ;
+              return "<font style='color:red'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ;
             }
-            return "<font style='color:green'>" + parseFloat(data).formatMoney(0, ',', '.') + "</font>" ; } }
-        ''' % (col, self.recMap.get(col, col)))
-
+            return "<font style='color:green'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ; } }
+        ''' % (col, self.recMap.get(col, col), digit, digit))
+    if len(rows) < self.__options['pageLength']:
+      self.__options['info'] = 'false'
+      self.__options['bPaginate'] = 'false'
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.hideColumns([0, 1, 2, 3, 4])
     self.option('scrollCollapse', 'false')
@@ -461,9 +491,9 @@ class DataTable(AresHtml.Html):
     """ Return the string representation of a HTML table """
     if self.noPivot:
       self.__options['data'] = json.dumps(self.vals)
+      if len(self.vals) < self.__options['pageLength']:
+        self.__options['info'] = 'false'
     item = AresItem.Item(None, self.incIndent)
-    #if self.filt is not None:
-    #  item.join(self.filt)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
       item.add(1, "<thead class='%s' style='white-space: nowrap;'>" % " ".join(self.theadCssCls))
