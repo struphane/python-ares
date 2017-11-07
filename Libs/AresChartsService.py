@@ -296,7 +296,7 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
           compositeKey[i] = rec[key]
           countVals = 0
           for j, val in enumerate(vals):
-            if rec[val] == 0:
+            if rec[val] == 0 and removeZero:
               continue
 
             countVals += 1
@@ -313,7 +313,7 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
         compositeKey[i] = rec[key]
         countVals = 0
         for j, val in enumerate(vals):
-          if rec[val] == 0:
+          if rec[val] == 0 and removeZero:
             continue
 
           countVals += 1
@@ -348,5 +348,45 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
     else:
       row['_parent'] = 0
     row['level'] = parents[compKey]['level']
+    result.append(row)
+  return result
+
+def toAggTable(recordSet, keys, vals, removeZero=True, filters=None):
+  """
+
+  """
+  parents = collections.defaultdict(lambda: collections.defaultdict(float))
+  if filters is not None:
+    for rec in recordSet:
+      for col, val in filters.items():
+        if not rec[col] in val:
+          break
+
+      else:
+        compositeKey = [rec[key] for key in keys]
+        for j, val in enumerate(vals):
+          if rec[val] == 0 and removeZero:
+            continue
+
+          parents[tuple(compositeKey)][val] += rec[val]
+  else:
+    for rec in recordSet:
+      compositeKey = [rec[key] for key in keys]
+      for j, val in enumerate(vals):
+        if rec[val] == 0 and removeZero:
+          continue
+
+        parents[tuple(compositeKey)][val] += rec[val]
+  fullKeys = sorted(parents.keys())
+  result = []
+  for compKey in fullKeys:
+    row = dict(zip(keys, list(compKey)))
+    for val in vals:
+      row[val] = parents[compKey][val]
+    comKeyClean = [regex.sub('', ''.join(comp).strip()) for comp in compKey]
+    classCleanKey, prevKey = [], ''
+    for i in range(0, len(comKeyClean)):
+      prevKey = "%s%s" % (prevKey, comKeyClean[i])
+      classCleanKey.append(prevKey)
     result.append(row)
   return result
