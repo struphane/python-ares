@@ -1,3 +1,8 @@
+.static_col {
+    color: darkslategrey;
+    background-color: #f1f1f1;
+}
+
 nav {
     background-color: black;
     color: white;
