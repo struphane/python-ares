@@ -14,7 +14,9 @@ ARES = {
     ],
     'FILES': [
       ('Libs', '__init__.py'),
+      ('ares', '__init__.py'),
       ('Libs', 'AresChartsService.py'),
+      ('Libs', 'AresFileParser.py'),
       ('Libs', 'flask_dummy.py')
     ],
   },
