@@ -115,6 +115,7 @@ class DataTable(AresHtml.Html):
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
+    self.option('select', 'true')
 
   def agg(self, keys, vals, filters=None, digit=0):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
