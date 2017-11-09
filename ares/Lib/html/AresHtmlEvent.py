@@ -97,16 +97,17 @@ class Slider(AresHtml.Html):
   """
   references = ['https://jqueryui.com/slider/']
   alias = 'slider'
-  reqCss = ['bootstrap', 'font-awesome']
+  reqCss = ['bootstrap', 'jquery']
   reqJs = ['bootstrap', 'jquery']
 
   def __str__(self):
     """ Return the HMTL object of for div """
-    return '<div %s>%s</div>' % (self.strAttr(), self.vals)
+    self.aresObj.jsOnLoadFnc.add('%s.slider({value: %s});' % (self.jqId, self.vals))
+    return '<div style="text-align:center;"><div id="%s_val" style="display:inline-block;">%s</div><div %s></div></div>' % (self.htmlId, self.vals, self.strAttr())
 
-  def onloadFnc(self):
-    """ Use the Jquery UI property to change the DIV in slider object """
-    return AresItem.Item.indents(2, '%s.slider();' % self.jqId)
+  def slide(self):
+    """ Action to update the HTML Input text box """
+    self.aresObj.jsOnLoadFnc.add('%s.on("slidechange", function(event, ui) { $("#%s_val").html(ui.value) ; });' % (self.jqId, self.htmlId) )
 
 
 class DropZone(AresHtml.Html):
