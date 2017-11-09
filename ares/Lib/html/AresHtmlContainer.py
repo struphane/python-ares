@@ -471,12 +471,12 @@ class Row(AresHtml.Html):
   references = ['https://getbootstrap.com/docs/3.3/css/']
 
   def __init__(self, aresObj, hltmObjs, cssCls=None, cssAttr=None):
-    if len(hltmObjs) > 3:
-      raise Exception('Row object can only display maximum 3 components')
-
-    self.cssRow = {"text-align": "center", "width": "100%",
-                   'display': 'inline-block', "padding": "20%"}
-    if len(hltmObjs) == 3:
+    self.cssRow = {"text-align": "center", "width": "100%", 'display': 'inline-block', "padding": "20%"}
+    if len(hltmObjs) >= 5:
+      vals = [('col-md-2', htmlObj) for htmlObj in hltmObjs]
+    elif len(hltmObjs) == 4:
+      vals = [('col-md-3 col-sm-6 col-xs-12', htmlObj) for htmlObj in hltmObjs]
+    elif len(hltmObjs) == 3:
       vals = [('col-6 col-md-4', htmlObj) for htmlObj in hltmObjs]
     elif len(hltmObjs) == 2:
       vals = [('col-xs-6 col-sm-6', htmlObj) for htmlObj in hltmObjs]
