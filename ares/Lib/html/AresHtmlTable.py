@@ -386,6 +386,11 @@ class DataTable(AresHtml.Html):
     self.__options['dom'] = "'Bfrtip'"
     self.__options['buttons'] = "[{ text: '%s', action: function (e, dt, node, config ) {%s ;} }]" % (title, fnc)
 
+  def buttonSumSelection(self):
+    """ Add sum on selected items """
+    self.__options['dom'] = "'Bfrtip'"
+    self.__options['buttons'] = "[{ text: 'Sum selection', action: function () { var sdata = %s.cell('.selected').data();  alert(sdata) ;} }]" % self.htmlId
+
   def contextMenu(self, contextMenu, attrList=None):
     """
     Add a Click event feature
