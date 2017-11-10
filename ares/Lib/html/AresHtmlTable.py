@@ -1,6 +1,9 @@
 """ Python Module to define all the HTML component dedicated to display tables
 @Author: Olivier Nogues
 
+TODO in this module the simple table should be remove
+A decorator will be added to this class to mention to users that going forward it should not be used anymore
+
 """
 
 import json
@@ -41,7 +44,7 @@ class Td(AresHtml.Html):
 
 class DataTable(AresHtml.Html):
   """ Python wrapper for the Javascript Datatable object """
-  cssCls, alias = ['table', 'table-striped', 'table-sm'], 'table'
+  cssCls, alias = ['table', 'table-striped', 'table-sm', 'nowrap'], 'table'
   references = ['https://datatables.net/reference/index',
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
@@ -109,13 +112,48 @@ class DataTable(AresHtml.Html):
                     return '<a href="' + url + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url, json.dumps(col['url']['cols'])))
           else:
             self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="%s">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url))
+      #elif hasattr(self.aresObj, col.get('aresFnc', '')):
+        # This part should use existing Python object to then be included to the Javascript Data Table object
+        # The idea is to try as much as possible to have only one definition of the HTML components
+        #colKey = self.recKey(col)
+        #htmlObj = getattr(self.aresObj, col['aresFnc'])("{value: '+ data + '}")
+        #self.recordSetHeader.append(
+        #  ''' { data: "%s", title: "%s", render: function (data, type, full, meta) {'%s'} } ''' % (colKey, self.recMap.get(colKey, colKey), htmlObj) )
       else:
-        self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
+        # default value for a header definition
+        # the className is an optional parameter and it might define a specific class if needed
+        if 'className' in col:
+          self.recordSetHeader.append('{ data: "%s", title: "%s", className="%s"}' % (self.recKey(col), col.get("colName"), col["className"]))
+        else:
+          self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
       self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
     self.option('select', 'true')
+    self.option('stateSave', 'true')
+    #self.option('scrollY', "'20vh'")
+
+  def scrollX(self):
+    """ Set the horizontal scrollbar """
+    self.option('scrollX', "true")
+
+  def doc(self):
+    """ Html content for the class table documentation """
+    return '''
+      This module is dedicated to display javascript tables.
+      This componenet is a wrapper to the javazcript module datatable. You can get more details on this component
+       on the datatable website. All the features of the existing datatable are available in the python interace 
+  
+       Please do not hesitate to liaise with us if you have implemented cool stullf that you think should be shared; 
+       Indeed we will be happy to move this going forward to the new wrapper. Thus all our users will benefit from 
+       your changes.
+      '''
+
+  def cssNoCenterCol(self, colsId):
+    """ Change the style of the defined columns to remove the center """
+    for colId in colsId:
+      self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % colId)
 
   def agg(self, keys, vals, filters=None, digit=0):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
@@ -375,21 +413,64 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
 
+  def addButton(self, jsDict):
+    """ Internal function to add a button to the datatable """
+    if not 'buttons' in self.__options:
+      self.__options['buttons'] = [jsDict]
+    else:
+      self.__options['buttons'].append(jsDict)
+
   def buttons(self, jsParameters, dom=None):
     """ Add the parameters dedicated to display buttons on the top of the table"""
     if dom is not None:
       self.__options['dom'] = "'%s'" % dom
-    self.__options['buttons'] = jsParameters
+    self.addButton(jsParameters)
 
   def buttonAction(self, title, fnc):
     """ Add simple action https://datatables.net/extensions/buttons/examples/initialisation/custom.html """
     self.__options['dom'] = "'Bfrtip'"
-    self.__options['buttons'] = "[{ text: '%s', action: function (e, dt, node, config ) {%s ;} }]" % (title, fnc)
+    self.addButton("{ text: '%s', action: function (e, dt, node, config ) {%s ;} }" % (title, fnc))
+
+  def buttonRemoveCols(self):
+    """ Add simple action https://datatables.net/extensions/buttons/examples/initialisation/custom.html """
+    self.__options['dom'] = "'Bfrtip'"
+    self.addButton("{ text: 'Remove Rows', action: function (e, dt, node, config ) { %s.row('.selected').remove().draw( false ) ;} }" % self.htmlId )
 
   def buttonSumSelection(self):
     """ Add sum on selected items """
     self.__options['dom'] = "'Bfrtip'"
-    self.__options['buttons'] = "[{ text: 'Sum selection', action: function () { var sdata = %s.cell('.selected').data();  alert(sdata) ;} }]" % self.htmlId
+    self.addButton('''
+      { text: 'Sum selection', 
+         action: function () { 
+            var result = 0 ;
+            var countCells = 0 ;
+            %s.cells('.blue-border').every( function () {
+                  result += parseFloat(this.data()) ;
+                  countCells += 1
+              }
+            ) ;
+            display("sum:" + result + ", count: " + countCells + ", average: " + result / countCells) ;
+         }
+       }''' % self.htmlId)
+
+  def selectRows(self):
+    """ """
+    self.aresObj.jsFnc.add(
+      '''%s.on('click', 'tr', function() {
+            if ( $(this).hasClass('selected') ) { $(this).removeClass('selected'); }
+            else {
+              //%s.$('tr.selected').removeClass('selected');
+              $(this).addClass('selected'); }
+            } );''' % (self.jqId, self.htmlId))
+
+  def selectCells(self):
+    """ """
+    self.aresObj.jsFnc.add(
+      '''%s.on('click', 'tr td', function() {
+            var table = %s ;
+            var cell = table.cell(this).node() ;
+            if ( $(cell).hasClass('blue-border') ) { $(cell).removeClass('blue-border'); }
+            else { $(cell).addClass('blue-border'); } } );''' % (self.jqId, self.htmlId))
 
   def contextMenu(self, contextMenu, attrList=None):
     """
@@ -554,6 +635,9 @@ class DataTable(AresHtml.Html):
       if isinstance(val, list):
         if key in self.__callBackWrapper:
           options.append("%s: %s" % (key, self.__callBackWrapper[key] % ";".join(val)))
+        else:
+          print key, "[%s]" % ",".join(val)
+          options.append("%s: [%s]" % (key, ",".join(val)))
       else:
         options.append("%s: %s" % (key, val))
     self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ;' % (self.htmlId, self.jqId, ",".join(options)))
