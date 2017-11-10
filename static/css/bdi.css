@@ -3,6 +3,9 @@
     background-color: #f1f1f1;
 }
 
+.blue-border {
+    border: 1px solid blue ;
+}
 nav {
     background-color: black;
     color: white;
@@ -411,7 +414,8 @@ tr.nodetails td:first-child:before {
 #temp-message {
     position: fixed;
     bottom: 10px;
-    width: 200px;
+    width: 400px;
+    white-space: nowrap;
     display: none;
     right: 50px;
 }
