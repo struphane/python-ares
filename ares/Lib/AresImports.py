@@ -15,6 +15,14 @@ JS_IMPORTS = {
                              'dataTables.responsive.min.js', 'buttons.colVis.min.js',
                              'dataTables.fixedColumns.min.js']},
 
+  # Datatable column reordering modules
+  'dataTables-col-order': {'req': ['dataTables'],
+                          'modules': ['dataTables.colReorder.min.js']},
+
+  # Datatable column reordering modules
+  'dataTables-select': {'req': ['dataTables'],
+                           'modules': ['dataTables.select.min.js']},
+
   # Jquery package
   'jquery': {'modules': ['jquery-3.2.1.min.js', 'jquery-ui.min.js']},
 
@@ -39,14 +47,22 @@ JS_IMPORTS = {
   'mapael': {'req': ['jquery', 'raphael'], 'modules': ['jquery.mapael.min.js']},
 
   # Javascript module for Spider chart
-  'spider': {'req': ['ares', 'd3'], 'modules': ['RadarChart.js']}
-  }
+  'spider': {'req': ['ares', 'd3'], 'modules': ['RadarChart.js']},
+
+  # Javascript module for the multi select component
+  'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.js']}
+}
 
 CSS_IMPORTS = {
   'jquery': {'modules': ['jquery-ui.css']},
 
   'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css',
                                                    'buttons.dataTables.min.css']},
+
+  'dataTables-col-order': {'req': ['dataTables'], 'modules': ['colReorder.bootstrap4.min.css']},
+
+  # Datatable column reordering modules
+  'dataTables-select': {'req': ['dataTables'], 'modules': ['select.bootstrap4.min.css']},
 
   'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css']},
 
@@ -57,6 +73,8 @@ CSS_IMPORTS = {
   'd3': {'req': ['bootstrap'], 'modules': ['nv.d3.min.css']},
 
   'ares': {'req': ['bootstrap'], 'modules': ['bdi.css', 'bootstrap-simple-sidebar.css']},
+
+  'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.css']}
   }
 
 
