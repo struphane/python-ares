@@ -636,7 +636,7 @@ class DataTable(AresHtml.Html):
         if key in self.__callBackWrapper:
           options.append("%s: %s" % (key, self.__callBackWrapper[key] % ";".join(val)))
         else:
-          print key, "[%s]" % ",".join(val)
+          print(key, "[%s]" % ",".join(val))
           options.append("%s: [%s]" % (key, ",".join(val)))
       else:
         options.append("%s: %s" % (key, val))
