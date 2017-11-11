@@ -52,8 +52,8 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
                 'https://datatables.net/examples/api/multi_filter_select.html',
                 'https://datatables.net/extensions/fixedcolumns/examples/initialisation/size_fluid.html']
-  reqCss = ['dataTables']
-  reqJs = ['bootstrap', 'dataTables']
+  __reqCss = ['dataTables']
+  __reqJs = ['dataTables']
   __callBackWrapper = {
       'initComplete': "function(settings, json) { %s }",
       'createdRow': "function ( row, data, index ) { %s }",
@@ -63,6 +63,8 @@ class DataTable(AresHtml.Html):
 
   def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
     self.theadCssCls = ['thead-inverse']
+    self.reqCss = list(self.__reqCss)
+    self.reqJs = list(self.__reqJs)
     if dataFilters is not None:
       recordSet = []
       for rec in vals:
@@ -130,9 +132,19 @@ class DataTable(AresHtml.Html):
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
-    self.option('select', 'true')
     self.option('stateSave', 'true')
-    #self.option('scrollY', "'20vh'")
+
+  def colReOrdering(self):
+    """ Include the column reordering Datatable plugin """
+    self.aresObj.cssImport.add('dataTables-col-order')
+    self.aresObj.jsImports.add('dataTables-col-order')
+    self.option('colReorder', 'true')
+
+  def selectable(self):
+    """ Include the select Datatable plugin """
+    self.aresObj.cssImport.add('dataTables-select')
+    self.aresObj.jsImports.add('dataTables-select')
+    self.option('select', 'true')
 
   def scrollX(self):
     """ Set the horizontal scrollbar """
@@ -636,7 +648,6 @@ class DataTable(AresHtml.Html):
         if key in self.__callBackWrapper:
           options.append("%s: %s" % (key, self.__callBackWrapper[key] % ";".join(val)))
         else:
-          print(key, "[%s]" % ",".join(val))
           options.append("%s: [%s]" % (key, ",".join(val)))
       else:
         options.append("%s: %s" % (key, val))
