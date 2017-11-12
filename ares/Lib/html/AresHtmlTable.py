@@ -704,6 +704,7 @@ class SimpleTable(AresHtml.Html):
   dflt = None
   formatVals = True
 
+  @AresHtml.deprecated
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
     """ Create an Simple Table object """
     super(SimpleTable, self).__init__(aresObj, vals, cssCls, cssAttr)
