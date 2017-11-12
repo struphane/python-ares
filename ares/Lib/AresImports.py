@@ -13,14 +13,13 @@ JS_IMPORTS = {
   'dataTables': {'req': ['jquery', 'bootstrap'],
                  'modules': ['jquery.dataTables.min.js', 'dataTables.buttons.min.js',
                              'dataTables.responsive.min.js',
-
-                             'buttons.jqueryui.min.js', 'buttons.print.min.js', 'buttons.semanticui.min.js',
                              'dataTables.fixedColumns.min.js']},
 
   # Datatable data export
   'dataTables-export': {'req': ['dataTables'], 'modules': ['jszip.min.js', 'buttons.colVis.min.js',
                                                            'buttons.bootstrap4.min.js', 'buttons.foundation.min.js',
-                                                           'buttons.html5.js']},
+                                                           'buttons.html5.js', 'buttons.jqueryui.min.js', 'buttons.print.min.js',
+                                                           'buttons.semanticui.min.js']},
 
   # Datatable column reordering modules
   'dataTables-col-order': {'req': ['dataTables'],
