@@ -429,6 +429,8 @@ class DataTable(AresHtml.Html):
   def addButton(self, jsDict):
     """ Internal function to add a button to the datatable """
     if not 'buttons' in self.__options:
+      self.aresObj.cssImport.add('dataTables-export')
+      self.aresObj.jsImports.add('dataTables-export')
       self.__options['buttons'] = [jsDict]
     else:
       self.__options['buttons'].append(jsDict)
@@ -452,8 +454,6 @@ class DataTable(AresHtml.Html):
 
   def buttonExport(self):
     """ Add common data export """
-    self.aresObj.cssImport.add('dataTables-export')
-    self.aresObj.jsImports.add('dataTables-export')
     self.__options['dom'] = "'Bfrtip'"
     self.addButton( "'copyHtml5', 'csvHtml5', 'excelHtml5'" )
 
