@@ -51,7 +51,8 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/reference/option/drawCallback',
                 'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
                 'https://datatables.net/examples/api/multi_filter_select.html',
-                'https://datatables.net/extensions/fixedcolumns/examples/initialisation/size_fluid.html']
+                'https://datatables.net/extensions/fixedcolumns/examples/initialisation/size_fluid.html',
+                'https://stackoverflow.com/questions/42569531/span-rows-of-a-table-with-mousedown-and-drag-in-jquery']
   __reqCss = ['dataTables']
   __reqJs = ['dataTables']
   __callBackWrapper = {
@@ -446,7 +447,15 @@ class DataTable(AresHtml.Html):
   def buttonRemoveCols(self):
     """ Add simple action https://datatables.net/extensions/buttons/examples/initialisation/custom.html """
     self.__options['dom'] = "'Bfrtip'"
-    self.addButton("{ text: 'Remove Rows', action: function (e, dt, node, config ) { %s.row('.selected').remove().draw( false ) ;} }" % self.htmlId )
+    self.addButton(
+      "{ text: 'Remove Rows', action: function (e, dt, node, config ) { %s.row('.selected').remove().draw( false ) ;} }" % self.htmlId)
+
+  def buttonExport(self):
+    """ Add common data export """
+    self.aresObj.cssImport.add('dataTables-export')
+    self.aresObj.jsImports.add('dataTables-export')
+    self.__options['dom'] = "'Bfrtip'"
+    self.addButton( "'copyHtml5', 'csvHtml5', 'excelHtml5'" )
 
   def buttonSumSelection(self):
     """ Add sum on selected items """
@@ -561,6 +570,13 @@ class DataTable(AresHtml.Html):
     else:
       filterCol = 'var rowData = %s.row(this).data()%s;%s' % (self.htmlId, colTag, jsFnc)
     self.aresObj.jsFnc.add("%s.on('click', '%s', function () {%s ;});" % (self.jqId, eventLevel, filterCol))
+
+  def mouseSelect(self):
+    """ """
+    self.aresObj.jsGlobal.add("isMouseDown = false ;")
+    self.aresObj.jsFnc.add("%s.on('mousedown', 'td', function () {isMouseDown = true;});" % (self.jqId))
+    self.aresObj.jsFnc.add("%s.on('mouseover', 'td', function () { var cell = %s.cell(this).node() ; ;if (isMouseDown) {$(cell).addClass('blue-border') ;} });" % (self.jqId, self.htmlId))
+    self.aresObj.jsFnc.add("%s.on('mouseup', 'td', function () {isMouseDown = false;});" % (self.jqId))
 
   def mouveHover(self, backgroundColor, fontColor):
     self.aresObj.jsFnc.add('''
