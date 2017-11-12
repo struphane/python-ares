@@ -24,14 +24,25 @@ def deprecated(func):
 
     @functools.wraps(func)
     def new_func(*args, **kwargs):
-        warnings.simplefilter('############################################################################')
         warnings.simplefilter('always', DeprecationWarning) #turn off filter
+        warnings.warn('############################################################################')
         warnings.warn("Call to deprecated function {}.".format(func.__name__), category=DeprecationWarning, stacklevel=2)
+        warnings.warn('############################################################################')
         warnings.simplefilter('default', DeprecationWarning) #reset filter
-        warnings.simplefilter('############################################################################')
         return func(*args, **kwargs)
     return new_func
 
+def inprogress(func):
+  @functools.wraps(func)
+  def new_func(*args, **kwargs):
+    warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+    warnings.warn('############################################################################')
+    warnings.warn("Call to a test function {}.".format(func.__name__), category=DeprecationWarning, stacklevel=2)
+    warnings.warn('############################################################################')
+    warnings.simplefilter('default', DeprecationWarning)  # reset filter
+    return func(*args, **kwargs)
+
+  return new_func
 
 class SetEncoder(json.JSONEncoder):
 
@@ -324,38 +335,6 @@ class NavBar(object):
 class WebStorage(object):
   """ This module should manage local and also session storage
   """
-
-
-class WebWorkers(object):
-  """ This module should create web workers for any javascript functions
-  """
-  references = ['https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers']
-
-  def __init__(self, aresObj, htmlObj, jsFile):
-    """ Define the script attached to the worker in the main module """
-    self.aresObj = aresObj
-    self.htmlId = "%s_%s" % (self.__class__.__name__.lower(), id(self))
-    if not 'htmlWorkers' in self.aresObj:
-      self.aresObj['htmlWorkers'] = {self.htmlId: jsFile}
-    else:
-      self.aresObj['htmlWorkers'][self.htmlId] = jsFile
-
-  def onmessage(self, jsFragment):
-    """ Define the javascript event for the worker """
-    return '''
-             .onmessage  = function(e) {
-                  %s ;
-              }
-           ''' % jsFragment
-
-  def terminate(self):
-    """  """
-    return ".terminate() ;"
-
-  def stop(self):
-    """ Returns the javascript function to stop the worker """
-    return ".close() ;"
-
 
 class WebSharedWorkers(object):
   """ """

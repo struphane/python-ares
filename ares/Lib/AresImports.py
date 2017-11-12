@@ -56,7 +56,10 @@ JS_IMPORTS = {
   'spider': {'req': ['ares', 'd3'], 'modules': ['RadarChart.js']},
 
   # Javascript module for the multi select component
-  'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.js']}
+  'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.js']},
+
+  # Javascript workers
+  'worker': {'req': ['bootstrap', 'jquery'], 'modules': ['ajaxWorker.js']}
 }
 
 CSS_IMPORTS = {

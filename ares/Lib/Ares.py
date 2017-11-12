@@ -175,6 +175,7 @@ class Report(object):
     self.jsGraphs, self.jsFnc, self.files = [], set(), {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
+    self.workers = {}
 
   def structure(self):
     return self.content
@@ -369,6 +370,10 @@ class Report(object):
   def aresInput(self, cssCls=None, cssAttr=None): return self.add(aresFactory['TextInput'](self, 'Put your text here', cssCls, cssAttr), sys._getframe().f_code.co_name)
   def aresDataSource(self, cssCls=None, cssAttr=None): return self.add(aresFactory['DataSource'](self, 'Drop here', cssCls, cssAttr), sys._getframe().f_code.co_name)
   def aresDragItems(self, vals, cssCls=None, cssAttr=None): return self.add(aresFactory['DragItems'](self, vals, cssCls, cssAttr), sys._getframe().f_code.co_name)
+
+  # HTML5 objects
+  def webworker(self, htmlObj, jsFile): return self.add(aresFactory['WebWorker'](self, htmlObj, jsFile), sys._getframe().f_code.co_name)
+
 
   def changeSiteColor(self, bgColor, fontColor):
     """ To change from Ares the color of the nav bar and side bar """
