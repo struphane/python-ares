@@ -67,14 +67,13 @@ class NvD3ForceDirected(AresHtmlGraphSvg.Svg):
   def jsUpdate(self):
     """ Add the Graph definition in the Javascript method """
     return '''
-              alert(%s) ;
               d3.select("#%s svg").remove();
               d3.select("#%s").append("svg");
               var %s = nv.models.%s().%s ;
               %s
               d3.select("#%s svg").style("height", '%spx').datum(%s)%s.call(%s);
               nv.utils.windowResize(%s.update);
-          ''' % ( self.jqData,self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
+          ''' % (self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
                    self.height, self.jqData, # recordSet key
                    self.getSvg(), self.htmlId, self.htmlId)
 
