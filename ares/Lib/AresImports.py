@@ -29,6 +29,9 @@ JS_IMPORTS = {
   'dataTables-select': {'req': ['dataTables'],
                            'modules': ['dataTables.select.min.js']},
 
+  # Datatable pivot
+  'pivot': {'req': [], 'modules': ['pivot.js']},
+
   # Jquery package
   'jquery': {'modules': ['jquery-3.2.1.min.js', 'jquery-ui.min.js']},
 
@@ -86,7 +89,9 @@ CSS_IMPORTS = {
 
   'ares': {'req': ['bootstrap'], 'modules': ['bdi.css', 'bootstrap-simple-sidebar.css']},
 
-  'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.css']}
+  'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.css']},
+
+  'pivot': {'req': [], 'modules': ['pivot.css']}
   }
 
 
