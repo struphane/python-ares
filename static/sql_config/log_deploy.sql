@@ -1,4 +1,2 @@
-INSERT INTO logs_deploy (uid, folder, file, type)
-SELECT  user_accnt.uid, "%(report_name)s", "%(file)s", "%(type)s"
-FROM user_accnt
-WHERE user_accnt.email_addr = '%(usr_id)s';
+INSERT INTO logs_deploy (email, team_name, folder, file, type)
+VALUES ("%(username)s", "%(team_name)s","%(report_name)s", "%(file)s", "%(type)s");

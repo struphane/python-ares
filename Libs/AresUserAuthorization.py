@@ -19,7 +19,6 @@ import base64
 # Enjoy !
 # AReS Team"""
 
-SALT = '3L!SeFr3D4!'
 def encrypt_old(pwd, key):
   """ """
   iv = os.urandom(16)
@@ -36,14 +35,14 @@ def decrypt_old(cipher_text, key, iv):
 
 def encrypt(pwd, key):
   """ """
-  kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=bytes(SALT.encode('utf-8')), iterations=100000, backend=default_backend())
+  salt = os.urandom(32)
+  kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
   encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
   f = Fernet(encrypted_key)
-  return f.encrypt(bytes(pwd.encode('utf-8'))), SALT
+  return f.encrypt(bytes(pwd.encode('utf-8'))), salt
 
 def decrypt(cipher_txt, key, salt):
-  encode_salt = bytes(salt.encode('utf-8'))
-  kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=encode_salt, iterations=100000, backend=default_backend())
+  kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
   encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
   f = Fernet(encrypted_key)
   return f.decrypt(cipher_txt).decode('utf-8')

@@ -163,7 +163,7 @@ def checkAuth(dbpath, report_name):
   db = AresSql.SqliteDB(report_name)
   query = """SELECT 1 FROM env_auth 
                INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
-               INNER JOIN user_accnt ON env_auth.uid = user_accnt.uid and user_accnt.email_addr = '%s'""" % (report_name, session['user_id'])
+               INNER JOIN team_def ON env_auth.team_id = team_def.team_id and team_def.team_name = '%s'""" % (report_name, session['TEAM'])
 
   if not list(db.select(query)):
     return False
@@ -174,8 +174,8 @@ def checkAuth(dbpath, report_name):
 def getEnvAdmin(dbPath, report_name):
   """ """
   db = AresSql.SqliteDB(report_name)
-  query = """SELECT email_addr 
-             FROM user_accnt
+  query = """SELECT team_name 
+             FROM team_def
              WHERE role = 'admin'"""
 
   return list(db.select(dbPath, query))
@@ -184,8 +184,8 @@ def getUserRole(dbPath, report_name, user_id):
   """ """
   db = AresSql.SqliteDB(report_name)
   query = """SELECT role 
-             FROM user_accnt
-             WHERE user_id = '%s' """ % user_id
+             FROM team_def
+             WHERE team_name = '%s' """ % session['TEAM']
   return list(db.select(dbPath, query))
 
 def getFileAuth(dbPath, report_name, file_name, user_id):
@@ -194,8 +194,8 @@ def getFileAuth(dbPath, report_name, file_name, user_id):
   query = """SELECT file_auth.alias as "alias", file_map.disk_name as "raw_name" 
               FROM file_auth
               INNER JOIN file_map on file_map.file_id = file_auth.file_id
-              INNER JOIN user_accnt on user_accnt.uid = file_map.uid
-              WHERE user_accnt.user_id = '%s' and file_map.raw_name = '%s' """ % (user_id, file_name)
+              INNER JOIN team_def on team_def.team_id = file_map.uid
+              WHERE team_def.team_name = '%s' and file_map.raw_name = '%s' """ % (session['TEAM'], file_name)
   return list(db.select(dbPath, query))
 
 def checkFileExist(dbPath, report_name, file_name):
@@ -261,7 +261,7 @@ def run_report(report_name, script_name, user_id):
         if not checkAuth(dbPath, report_name):
           raise AresExceptions.AuthException('Not authorized to visualize this data')
 
-        queryParams = {'script_name': script_name, 'env_name': report_name, 'usr_id': session['user_id']}
+        queryParams = {'script_name': script_name, 'env_name': report_name, 'username': current_user.email, 'team_name': session['TEAM']}
         executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_request.sql')).read(), params=queryParams)
       side_bar = []
       if not userDirectory in sys.path:
@@ -484,13 +484,14 @@ def userAccount():
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
 
 
-@report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
+@report.route("/admin/<report_name>/", defaults={'token': None}, methods=['GET'])
 def adminEnv(report_name, token):
   """ Admin session for the environment """
   #
   #
   #if not checkAuth(dbPath, report_name, user_id):
   #  raise AresExceptions.AuthException('Not authorized to visualize this data')
+
   script_name = '_AresAdmin' # run the report
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
@@ -575,13 +576,14 @@ def savedHtmlReport(report_name, html_report):
 # For more information please look at the documentation of the local runs
 # ------------------------------------------------------------------------------------------------------------
 
-@report.route("/create/env/<email_address>", methods = ['POST'])
-def ajaxCreate(email_address):
+@report.route("/create/env", methods = ['POST'])
+def ajaxCreate():
   """ Special Ajax call to set up the environment
 
   This service will create the environment and also add an emtpy report.
   The log file will be produce and the zip archive with the history will be defined
   """
+  email_address = current_user.email
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
@@ -598,20 +600,17 @@ def ajaxCreate(email_address):
     # Create a dedicated database in the user environment
     # This will be there in order to ensure the data access but also it will allow us to check the admin and log tables
     dbPath = os.path.join(scriptPath, 'db')
-    h = hashlib.new('md5')
-    h.update(bytes(email_address.encode('utf-8')))
-    hash_id = h.hexdigest()
     os.makedirs(dbPath)
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
 
-    queryParams = {'usr_id': email_address, 'hash_id': hash_id, 'env_name': reportObj.http['REPORT_NAME']}
+    queryParams = {'team_name': session['TEAM'], 'env_name': reportObj.http['REPORT_NAME']}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
     env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM'])
     db.add(env_dsc)
     db.commit()
-    queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'usr_id': email_address}
+    queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'team_name': session['TEAM'], 'username': email_address}
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
@@ -665,10 +664,10 @@ def createEnv(environment):
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
 
-    queryParams = {'usr_id': email_addr, 'env_name': environment}
+    queryParams = {'team_name': session['TEAM'], 'env_name': environment}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
-    queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'usr_id': email_addr}
+    queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'username': email_addr, 'team_name': session['TEAM']}
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
@@ -683,7 +682,7 @@ def deployFiles(env, DATA):
   """ """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   result = []
-  user_name = session['user_id']
+  user_name = current_user.email
   report_name = env
   reportTypes = {'report': (['.PY'], None), 'static': (['.DAT', '.TXT', '.CSV', '.JSON'], 'static'),
                  'outputs': (None, 'outputs'), 'styles': (['.CSS', '.JS'], 'styles'),
@@ -725,9 +724,9 @@ def deployFiles(env, DATA):
       if not fileCod and fileType == 'outputs':
         return json.dumps('You have to provide a file code for the outputs type'), 500
       fileCod = filename if not fileCod else fileCod
-      fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'usr_id': user_name}
+      fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'team_name': session['TEAM']}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
-    queryParams = {'report_name': report_name, 'file': filename, 'type': fileType, 'usr_id': user_name}
+    queryParams = {'report_name': report_name, 'file': filename, 'type': fileType, 'username': user_name, 'team_name': session['TEAM']}
     executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
     result.append(filename)
   return json.dumps(result), 200
@@ -784,7 +783,7 @@ def uploadFiles(report_type, report_name, user_name):
             os.makedirs(filePath)
           fileFullPath = os.path.join(filePath, file.filename)
       file.save(fileFullPath)
-      queryParams = {'report_name': report_name, 'file': file.filename, 'type': report_type, 'usr_id': user_name}
+      queryParams = {'report_name': report_name, 'file': file.filename, 'type': report_type, 'username': user_name, 'team_name': session['TEAM']}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
       result.append(filename)
