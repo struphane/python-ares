@@ -1032,13 +1032,16 @@ def getAresFilesVersions():
 
 @report.route('/ares/source/create', methods=['GET', 'POST'])
 def createDataSource():
-  print(request.args)
   app_id = request.args['app_id']
   source = request.args['source']
   username = request.args['username']
   password = request.args['password']
   user = User.query.filter_by(email=app_id).first()
   encryptPwd, salt= AresUserAuthorization.encrypt(password, session['PWD'])
+  dataSource = DataSource.query.filter_by(uid=user.uid, source_name=source).first()
+  if dataSource:
+    db.session.delete(dataSource)
+    db.session.commit()
   dataSource = DataSource(source, user.uid, username, encryptPwd, salt)
   db.session.add(dataSource)
   db.session.commit()

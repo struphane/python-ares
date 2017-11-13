@@ -73,7 +73,7 @@ class DataSource(db.Model):
   source_pwd = db.Column(db.String(120))
   salt = db.Column(db.Integer, nullable=False)
 
-  __table_args__ = (db.UniqueConstraint('source_name', 'uid', name='uix_1'), None)
+  __table_args__ = (db.UniqueConstraint('source_name', 'uid', name='uix_1'), )
 
   def __init__(self, source_name, uid, source_username, source_pwd, salt):
     """ """
