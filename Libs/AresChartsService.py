@@ -293,7 +293,7 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
       else:
         compositeKey = [''] * len(keys)
         for i, key in enumerate(keys):
-          compositeKey[i] = rec[key]
+          compositeKey[i] = str(rec[key])
           countVals = 0
           for j, val in enumerate(vals):
             if rec[val] == 0 and removeZero:
@@ -310,7 +310,7 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
     for rec in recordSet:
       compositeKey = [''] * len(keys)
       for i, key in enumerate(keys):
-        compositeKey[i] = rec[key]
+        compositeKey[i] = str(rec[key])
         countVals = 0
         for j, val in enumerate(vals):
           if rec[val] == 0 and removeZero:
