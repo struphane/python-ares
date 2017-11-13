@@ -36,7 +36,6 @@ def decrypt_old(cipher_text, key, iv):
 
 def encrypt(pwd, key):
   """ """
-  print('1st --\n\n', bytes(SALT.encode('utf-8')))
   kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=bytes(SALT.encode('utf-8')), iterations=100000, backend=default_backend())
   encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
   f = Fernet(encrypted_key)
@@ -44,7 +43,6 @@ def encrypt(pwd, key):
 
 def decrypt(cipher_txt, key, salt):
   encode_salt = bytes(salt.encode('utf-8'))
-  print(encode_salt)
   kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=encode_salt, iterations=100000, backend=default_backend())
   encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
   f = Fernet(encrypted_key)

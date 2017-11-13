@@ -1089,7 +1089,7 @@ def aresLogin():
         session['TEAM'] = user.team_name
         session['PWD'] = data['password']
         for source in user.datasources:
-          session[source['source_name'].upper()] = (source['source_username'], source['source_pwd'])
+          session[source.source_name.upper()] = (source.source_username, AresUserAuthorization.decrypt(source.source_pwd, session['PWD'], source.salt))
         login_user(user)
         return redirect(next or url_for('ares.run_report'))
 
