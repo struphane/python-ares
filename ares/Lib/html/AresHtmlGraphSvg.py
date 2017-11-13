@@ -180,9 +180,9 @@ class Svg(AresHtml.Html):
 
   def processDataMock(self, cat=None, val=None):
     """ Return the json data """
-    self.chartKeys = [('MOCK', None)]
+    self.chartKeys = [('MOCK', None, None)]
     self.selectedChartKey = 'MOCK'
-    self.chartVals = [('DATA', None)]
+    self.chartVals = [('DATA', None, None)]
     self.selectedChartVal = self.chartVals[0][0]
     self.aresObj.jsGlobal.add("%s_%s_%s = %s" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
                                                  open(r"ares\json\%sData.json" % self.alias).read().strip()))
