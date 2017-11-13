@@ -14,10 +14,10 @@ import sqlite3
 import datetime
 import hashlib
 
-from app import User, db
+from app import User, Team, EnvironmentDesc, DataSource, db
 
-from flask_login import LoginManager, login_user, login_required, logout_user
-from flask import session, current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask import redirect, url_for, session, current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
 from app import login_manager
 import config
@@ -45,6 +45,21 @@ except:
 
 
 report = Blueprint('ares', __name__, url_prefix='/reports')
+
+def no_login(function):
+  function.no_login = True
+  return function
+
+@report.before_request
+def ask_login():
+  if not current_user.is_anonymous:
+    return
+
+  if getattr(current_app.view_functions[request.endpoint], 'no_login', False):
+    return
+
+  return redirect(url_for('ares.aresLogin', next=request.endpoint))
+
 
 # Return the list of all the scripts needed to run this package
 # This will group all the module CSS, JS and Python scripts
@@ -205,7 +220,6 @@ def checkFileExist(dbPath, report_name, file_name):
 
 
 
-@login_required
 @report.route("/deploy", methods=['GET'])
 def aresDeploy():
   """ """
@@ -436,6 +450,40 @@ def pivotData(format):
 
   return json.dumps('Format %s not recognised' % format)
 
+@report.route("/account", methods=['GET'])
+def userAccount():
+  """ """
+  script_name = '_AresUserAccount'  # run the report
+  onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
+
+  systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', '_AresUserAccount')
+  if not systemDirectory in sys.path:
+    sys.path.append(systemDirectory)
+
+  userData = User.query.filter_by(email=current_user.email).first()
+
+  reportObj = Ares.Report()
+  reportObj.http = getHttpParams(request)
+  reportObj.reportName = script_name
+  mod = __import__(script_name)  # run the report
+  envName = getattr(mod, 'NAME', '')
+  sourceRec = []
+  for source in userData.datasources:
+    sourceRec.append({'src_nam': source.source_name, 'src_username': source.source_username,
+                         'src_pwd': AresUserAuthorization.decrypt(source.source_pwd,
+                                                      session['PWD'], source.salt)})
+  reportObj.http['USERDATA'] = {'envs': userData.environments,
+                                'sources': sourceRec,
+                                'team': userData.team_name
+                                }
+  reportObj.http['USERNAME'] = current_user.email
+  mod.report(reportObj)
+  cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
+                         jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
+                         name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
+
+
 @report.route("/admin/<report_name>/<token>", defaults={'token': None}, methods=['GET'])
 def adminEnv(report_name, token):
   """ Admin session for the environment """
@@ -469,7 +517,6 @@ def adminEnv(report_name, token):
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
 
-@login_required
 @report.route("/saved/<report_name>/<html_report>", methods = ['GET'])
 def savedHtmlReport(report_name, html_report):
   """  """
@@ -561,6 +608,9 @@ def ajaxCreate(email_address):
     queryParams = {'usr_id': email_address, 'hash_id': hash_id, 'env_name': reportObj.http['REPORT_NAME']}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
+    env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM'])
+    db.add(env_dsc)
+    db.commit()
     queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'usr_id': email_address}
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
@@ -682,7 +732,6 @@ def deployFiles(env, DATA):
     result.append(filename)
   return json.dumps(result), 200
 
-@login_required
 @report.route("/upload/<report_type>/<report_name>", methods = ['POST'])
 def uploadFiles(report_type, report_name, user_name):
   """ Add all the files that a users will drag and drop in the section """
@@ -836,7 +885,6 @@ def downloadJsonFiles(jsonFile):
   mokfilePath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'json')
   return send_from_directory(mokfilePath, jsonFile, as_attachment=True)
 
-@login_required
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
   """ Return in a Zip archive the full python package """
@@ -982,7 +1030,22 @@ def getAresFilesVersions():
       files[pyFile] = [stat.st_mtime, stat.st_size]
   return json.dumps(files)
 
+@report.route('/ares/source/create', methods=['GET', 'POST'])
+def createDataSource():
+  print(request.args)
+  app_id = request.args['app_id']
+  source = request.args['source']
+  username = request.args['username']
+  password = request.args['password']
+  user = User.query.filter_by(email=app_id).first()
+  encryptPwd, salt= AresUserAuthorization.encrypt(password, session['PWD'])
+  dataSource = DataSource(source, user.uid, username, encryptPwd, salt)
+  db.session.add(dataSource)
+  db.session.commit()
+  return redirect(request.args['next'])
+
 @report.route("/ares/registration", methods = ['GET', 'POST'])
+@no_login
 def aresRegistration():
   """ """
   if request.method == 'GET':
@@ -993,15 +1056,19 @@ def aresRegistration():
   if request.method == 'POST':
     data = request.form
     if User.query.filter_by(email=data['email_addr']).first():
-      return "User Already exists"
+      return redirect(url_for('ares.aresLogin', next=url_for('ares.run_report')))
 
-
-    user = User(data['email_addr'], data['password'])
+    if not Team.query.filter_by(team_name=data['team']).first():
+      team = Team(data['team'])
+      db.session.add(team)
+    print(data['team'], data['password'])
+    user = User(data['email_addr'], data['team'], data['password'])
     db.session.add(user)
     db.session.commit()
-    return "User Created"
+    return redirect(url_for('ares.aresLogin', next=url_for('ares.run_report')))
 
 @report.route("/ares/login", methods= ['GET', 'POST'])
+@no_login
 def aresLogin():
   """ """
 
@@ -1013,14 +1080,19 @@ def aresLogin():
   if request.method == 'POST':
     data = request.form
     user = User.query.filter_by(email=data['email_addr']).first()
+    next = request.args.get('next')
     if user:
-      if user.password == data['password']:
+      if user.password == hashlib.sha256(bytes(data['password'].encode('utf-8'))).hexdigest():
+        session['TEAM'] = user.team_name
+        session['PWD'] = data['password']
+        for source in user.datasources:
+          session[source['source_name'].upper()] = (source['source_username'], source['source_pwd'])
         login_user(user)
-        return "User Logged in"
+        return redirect(next or url_for('ares.run_report'))
 
-      return "Wrong Password"
+      return redirect(url_for('ares.aresLogin'))
 
-    return "Email Address not registered"
+    return redirect(url_for('ares.aresLogin'))
 
 @login_required
 @report.route('/ares/user_account')
@@ -1031,6 +1103,6 @@ def aresUserAccount(user_id):
 @report.route('/ares/logout')
 def aresLogout():
   """ """
-  print('toto')
+  session.clear()
   logout_user()
-  return "Logged out"
+  return redirect(url_for('ares.aresLogin'))

@@ -1,63 +1,51 @@
-import datetime
+
 import hashlib
-import random
-import sqlite3
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.fernet import Fernet
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import os
-from Libs import AresSecurity
-from ares.Lib import AresSql
-import mailer
-from flask_wtf import Form
+import base64
+# import mailer
 
-mailer._DEBUG = False
-mail_server = mailer.SMTPServer('smtp.gmail.com', 587)
-mail_server.connect(user='ares.pymailer@gmail.com', password='H3reCom3sAReS')
-mail_subject = 'Welcom To AReS - Your account has been created !'
-mail_content = """Hello,
-Your account has been created and you can now logon to AReS using simply your email address and the following token:
-%s.
-Enjoy !
-AReS Team"""
+# mailer._DEBUG = False
+# mail_server = mailer.SMTPServer('smtp.gmail.com', 587)
+# mail_server.connect(user='ares.pymailer@gmail.com', password='H3reCom3sAReS')
+# mail_subject = 'Welcom To AReS - Your account has been created !'
+# mail_content = """Hello,
+# Your account has been created and you can now logon to AReS using simply your email address and the following token:
+# %s.
+# Enjoy !
+# AReS Team"""
 
-
-class SignupForm(Form):
-  email = StringField('email')
-  password = PasswordField('password')
-  submit = SubmitField("Register")
-
-class AuthenticationBase(object):
+SALT = '3L!SeFr3D4!'
+def encrypt_old(pwd, key):
   """ """
+  iv = os.urandom(16)
+  cipher = cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+  encryptor = cipher.encryptor()
+  cipher_text = encryptor.update(bytes(pwd.encode('utf-8'))) + encryptor.finalize()
+  return cipher_text, iv
 
-  __db = AresSql.MainDB()
+def decrypt_old(cipher_text, key, iv):
+  """ """
+  cipher = cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+  decryptor = cipher.decryptor()
+  return decryptor.update(cipher_text) + decryptor.finalize()
 
-  @classmethod
-  def addUser(cls, email_addr):
-    """ """
-    if cls.user_exists(email_addr):
-      return True, AresSecurity.generate_key(email_addr, result[0]['random_nbr'])
+def encrypt(pwd, key):
+  """ """
+  print('1st --\n\n', bytes(SALT.encode('utf-8')))
+  kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=bytes(SALT.encode('utf-8')), iterations=100000, backend=default_backend())
+  encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
+  f = Fernet(encrypted_key)
+  return f.encrypt(bytes(pwd.encode('utf-8'))), SALT
 
-    ADD_USER = """ INSERT INTO main_usr_def (email, random_nbr) VALUES ('%s', '%s');"""
-    random.seed(datetime.datetime.now())
-    random_number = int(random.random() * 1000)
-    cls.__db.modify(ADD_USER % (email_addr, random_number))
-    # now return the salt from the random number
-    token = AresSecurity.generate_key(email_addr, random_number)
-    email = mailer.Email('ares.pymailer@gmail.com', [email_addr], mail_subject, mail_content % token)
-    mail_server.sendmail(email)
-    return True, token
-
-  @classmethod
-  def get_user_base(cls):
-    """ """
-    USER_BASE = """SELECT email FROM main_usr_def;"""
-    return list(cls.__db.select(USER_BASE))
-
-  @classmethod
-  def user_exists(cls, email_addr):
-    """ """
-    result = list(cls.__db.select("""SELECT random_nbr FROM main_usr_def WHERE email = '%s'""" % email_addr))
-    if result:
-      return True
-
-    return False
-
-
+def decrypt(cipher_txt, key, salt):
+  encode_salt = bytes(salt.encode('utf-8'))
+  print(encode_salt)
+  kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=encode_salt, iterations=100000, backend=default_backend())
+  encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
+  f = Fernet(encrypted_key)
+  return f.decrypt(cipher_txt).decode('utf-8')

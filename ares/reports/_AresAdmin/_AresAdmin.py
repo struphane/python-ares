@@ -64,8 +64,8 @@ def ajaxCall(aresObj, userLst):
   mailer._DEBUG = False
   mail_server = mailer.SMTPServer('smtp.gmail.com', 587)
   mail_server.connect(user='ares.pymailer@gmail.com', password='H3reCom3sAReS')
-  ADD_USER = """ INSERT INTO user_accnt (email_addr, hash_id) VALUES ('%s', '%s');"""
-  ADD_AUTH = """ INSERT INTO env_auth (env_id, uid) VALUES (%s, %s);"""
+  ADD_USER = """ INSERT INTO team_def (team_name) VALUES ('%s');"""
+  ADD_AUTH = """ INSERT INTO env_auth (env_id, team_id) VALUES (%s, %s);"""
   sqlCon = AresSql.SqliteDB(aresObj.http['REPORT_NAME'])
 
   env_id = list(sqlCon.select("SELECT env_id FROM env_def WHERE env_name = '%s'" % aresObj.http['REPORT_NAME']))[0]['env_id']

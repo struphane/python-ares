@@ -324,7 +324,7 @@ class Report(object):
 
 
   # Modal Section
-  def modal(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Modal'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def modal(self, values, cssCls=None, cssAttr=None, btnCls=None): return self.add(aresFactory['Modal'](self, self.supp(values), cssCls, cssAttr, btnCls), sys._getframe().f_code.co_name)
   def fixedModal(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['FixedModal'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 

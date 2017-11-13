@@ -76,6 +76,7 @@ https://www.bootply.com/60886#
                         <input name="email" id="inputEmail" type="email" placeholder="Email" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" required="">
                         <input name="password" id="regPassword" type="password" placeholder="password" title="Enter your password" required=""><br>
                         <input name="password_confirm" id="password_confirm" type="password" placeholder="password" title="Confirm password" required=""><br>
+                        <input name="team" id="team" type="text" placeholder="Team" title="Enter your team" required=""><br>
                         <button id="btnRegister" class="btn">Sign Up</button>
                     </form>
                     <a data-toggle="modal" role="button" href="#forgotPasswordModal" style="display:block">Forgot username or password?</a>
@@ -127,7 +128,7 @@ https://www.bootply.com/60886#
 
                 $('#formRegister').submit(function(event) {
                     event.preventDefault();
-                    $.post("{{ url_for('ares.aresRegistration') }}", {'email_addr': $('#inputEmail').val(), 'password': $('#regPassword').val()}, function(result) {
+                    $.post("{{ url_for('ares.aresRegistration') }}", {'email_addr': $('#inputEmail').val(), 'password': $('#regPassword').val(), 'user_team': $('#team').val()}, function(result) {
                         if (result != 'User Created') {
                             alert("This email is already registered with us, try connecting using the token we've sent you via email");
                         }
