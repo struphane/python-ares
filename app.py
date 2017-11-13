@@ -37,6 +37,7 @@ class User(db.Model, UserMixin):
   email = db.Column(db.String(120), unique=True, nullable=False)
   team_name = db.Column(db.String(120), db.ForeignKey('team.team_name'), nullable=False)
   password = db.Column(db.String(80), nullable=False)
+  team_confirm = db.Column(db.String(1), nullable=False, default='N')
   datasources = db.relationship('DataSource')
   environments = db.relationship('EnvironmentDesc')
 
@@ -58,6 +59,7 @@ class Team(db.Model):
 
   team_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   team_name = db.Column(db.String(120), nullable=False, unique=True)
+  team_approvals = db.relationship('TeamApproval')
 
   def __init__(self, team_name):
     self.team_name = team_name
@@ -82,6 +84,22 @@ class DataSource(db.Model):
     self.source_username = source_username
     self.source_pwd = source_pwd
     self.salt = salt
+
+class TeamApproval(db.Model):
+  """ """
+  __tablename__ = 'table_approve'
+
+  id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+  team_id = db.Column(db.Integer, db.ForeignKey('team.team_id'), nullable=False)
+  username = db.Column(db.String(120),  nullable=False)
+
+  __table_args__ = (db.UniqueConstraint('team_id', 'username', name='uix_2'), )
+
+  def __init__(self, team_id, username):
+    """ """
+    self.team_id = team_id
+    self.username = username
+
 
 class EnvironmentDesc(db.Model):
   __tablename__ = 'env_dsc'

@@ -664,7 +664,7 @@ def createEnv(environment):
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
 
-    queryParams = {'team_name': session['TEAM'], 'env_name': environment}
+    queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': environment}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
     queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'username': email_addr, 'team_name': session['TEAM']}
@@ -1063,7 +1063,6 @@ def aresRegistration():
     if not Team.query.filter_by(team_name=data['team']).first():
       team = Team(data['team'])
       db.session.add(team)
-    print(data['team'], data['password'])
     user = User(data['email_addr'], data['team'], data['password'])
     db.session.add(user)
     db.session.commit()
@@ -1085,7 +1084,8 @@ def aresLogin():
     next = request.args.get('next')
     if user:
       if user.password == hashlib.sha256(bytes(data['password'].encode('utf-8'))).hexdigest():
-        session['TEAM'] = user.team_name
+        suffix = '' if user.team_confirm == 'Y' else '#TEMP'
+        session['TEAM'] = user.team_name + suffix
         session['PWD'] = data['password']
         for source in user.datasources:
           session[source.source_name.upper()] = (source.source_username, AresUserAuthorization.decrypt(source.source_pwd, session['PWD'], source.salt))

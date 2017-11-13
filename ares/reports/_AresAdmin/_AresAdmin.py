@@ -25,11 +25,10 @@ def getUserData(aresObj, sqlCon):
 
 def getDeployData(aresObj, sqlCon):
   """ """
-  deploy_logs = """ SELECT user_accnt.email_addr as "user"
+  deploy_logs = """ SELECT email as "user"
                     ,strftime('%%Y-%%m-%%d', lst_mod_dt) as "date"
                     ,count(*) as "count"
                     FROM logs_deploy
-                    INNER JOIN user_accnt ON user_accnt.uid = logs_deploy.uid
                     WHERE folder = '%s' 
                     GROUP by "date" """ % aresObj.http['REPORT_NAME']
 
@@ -38,11 +37,10 @@ def getDeployData(aresObj, sqlCon):
 def getAuthorizedUsers(aresObj, sqlCon):
   """ """
   auth_users = """ SELECT 
-                  user_accnt.email_addr as "user" 
-                  ,user_accnt.hash_id as "token"
+                  team_def.team_name as "team" 
                   ,role
-                  FROM user_accnt
-                  INNER JOIN env_auth ON env_auth.uid = user_accnt.uid
+                  FROM team_def
+                  INNER JOIN env_auth ON env_auth.team_id = team_def.team_id
                   INNER JOIN env_def ON env_def.env_id = env_auth.env_id
                   WHERE env_def.env_name = '%s' """ % aresObj.http['REPORT_NAME']
 
