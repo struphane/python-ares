@@ -273,6 +273,34 @@ def toSpider(recordSet, key, x, val, seriesNames=None, extKeys=None):
 
   return result
 
+def toNetwork(recordSet, grpKeys):
+  """ Return the data structure used for the Network - Force directed - chart """
+  result = {}
+  for keys in grpKeys:
+    groups = collections.defaultdict(set)
+    links = collections.defaultdict(set)
+    for rec in recordSet:
+      preVals = None
+      for i, key in enumerate(keys):
+        groups[i].add(rec[key])
+        if preVals is not None:
+          links["%s_%s" % (preVals, i-1)].add("%s_%s" % (rec[key], i))
+        preVals = rec[key]
+
+    nodes, j, mapLinks = [], 0, {}
+    for i in range(len(keys)):
+      for name in groups[i]:
+        nodes.append({"name": name, "group": i},)
+        mapLinks["%s_%s" % (name, i)] = j
+        j += 1
+
+    treeLinks = []
+    for src, dsts in links.items():
+      for dst in dsts:
+        treeLinks.append({"source": mapLinks[src], "target": mapLinks[dst], "value": 1})
+    result[regex.sub('', "_".join(keys))] = {'nodes': nodes, 'links': treeLinks}
+  return result
+
 # ------------------------------------------------------------------------------
 # Interface for the tables
 # ------------------------------------------------------------------------------
@@ -293,7 +321,7 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
       else:
         compositeKey = [''] * len(keys)
         for i, key in enumerate(keys):
-          compositeKey[i] = rec[key]
+          compositeKey[i] = str(rec[key])
           countVals = 0
           for j, val in enumerate(vals):
             if rec[val] == 0 and removeZero:
@@ -310,7 +338,7 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
     for rec in recordSet:
       compositeKey = [''] * len(keys)
       for i, key in enumerate(keys):
-        compositeKey[i] = rec[key]
+        compositeKey[i] = str(rec[key])
         countVals = 0
         for j, val in enumerate(vals):
           if rec[val] == 0 and removeZero:
@@ -390,3 +418,13 @@ def toAggTable(recordSet, keys, vals, removeZero=True, filters=None):
       classCleanKey.append(prevKey)
     result.append(row)
   return result
+
+
+if __name__ == '__main__':
+  recordSet = [{'cpty': 'BNPPAR', 'ptf' : 11, 'prd': 'Trs', 'value': 10},
+               {'cpty': 'BNPPAR', 'ptf' : 12, 'prd': 'Bond', 'value': 10},
+               {'cpty': 'BNPPAR', 'ptf' : 12, 'prd': 'Cds', 'value': 10}]
+
+  keys = [['cpty', 'ptf', 'prd']]
+  vals = ['value']
+  print( toNetwork(recordSet, keys) )
