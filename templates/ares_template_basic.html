@@ -45,6 +45,23 @@
     Those are specific to the template on the server and they should not be shared
     -->
     <script>
+    function ZoomIn(divId, chartId) {
+        $("#popup-black-background").show();
+        var chartWith = $("#" + divId).width();
+        var chartHeight = $("#" + divId).height();
+        var divStyle = $("#" + divId).attr('style');
+        $("#" + divId).css({'position':'fixed', width: '80%', 'z-index': 5000, 'background-color': 'white', top: "40%", left: "15%"});
+        window.dispatchEvent(new Event('resize'));
+
+        $("#popup-black-background").click(function() {
+            // Reload the charts directly instead of trying to resize them
+            $("#popup-black-background").hide();
+            $("#" + divId).css({'position':'relative', width: chartWith, height: chartHeight, 'z-index': 1, top: 0, left: 0,  'background-color': 'white'});
+            window.dispatchEvent(new Event('resize'));
+        });
+
+    };
+
     $(document).ready(function() {
 
         $('a[name="side_change"]').click(function () {
@@ -108,6 +125,7 @@
 <div id="loading"><img src="/static/images/loading.gif" alt="Be patient.."/></div>
 <div class="alert alert-success" id="temp-message">Test</div>
 <div id="context-menu">Test</div>
+<div id="popup-chart">&nbsp</div>
 <div id="popup-info">RRRRR</div>
 <div id="popup-black-background">&nbsp;RR</div>
 
