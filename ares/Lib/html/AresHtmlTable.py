@@ -455,7 +455,8 @@ class DataTable(AresHtml.Html):
   def buttonExport(self):
     """ Add common data export """
     self.__options['dom'] = "'Bfrtip'"
-    self.addButton( "'copyHtml5', 'csvHtml5', 'excelHtml5'" )
+    for button, name in [('copyHtml5', 'copy'), ('csvHtml5', 'csv'), ('excelHtml5', 'excel')]:
+      self.addButton("{extend: '%s', text: '%s', className: 'btn btn-success btn-xs'}" % (button, name))
 
   def buttonSumSelection(self):
     """ Add sum on selected items """
