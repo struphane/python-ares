@@ -62,30 +62,11 @@ https://www.bootply.com/60886#
              <li class="nav-item  dropdown " id="menuLogin">
                 <a class=" nav-link dropdown-toggle fa fa-user-circle" href="#" data-toggle="dropdown" id="navLogin" style="color:white;padding-top:2px;font-size:24px;padding-top:7px;"></a>
                 <div id="currentDiv" class="dropdown-menu" style="padding:17px;">
-
-                </div>
-                <div id="authDiv" class="dropdown-menu" style="padding:17px;" hidden>
-                    <form id="formLogin" class="form" href="#">
-                        <label>Login</label>
-                        <input name="username" id="username" type="text" placeholder="Username" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" data-valid-min="6" title="Enter your username" required="">
-                        <input name="password" id="password" type="password" placeholder="password" title="Enter your password" required=""><br>
-                        <button id="btnLogin" class="btn">Login</button>
+                    <form action="{{ url_for('ares.userAccount') }}" method="GET">
+                        <button class="btn btn-link" type="submit">User Account</button>
                     </form>
-                    <form id="enableRegister" style="display:block"><a href="#" title="Fast and free sign up!" id="btnNewUser" data-toggle="collapse" data-target="#formRegister">New User? Sign-up..</a></form>
-                    <form id="formRegister" class="form collapse" href="#">
-                        <input name="email" id="inputEmail" type="email" placeholder="Email" pattern="^[a-z,A-Z,0-9,_,\.]+@[a-z,A-Z,0-9,_,\.]+\.[a-z,A-Z,0-9,_,\.]+$" required="">
-                        <input name="password" id="regPassword" type="password" placeholder="password" title="Enter your password" required=""><br>
-                        <input name="password_confirm" id="password_confirm" type="password" placeholder="password" title="Confirm password" required=""><br>
-                        <input name="team" id="team" type="text" placeholder="Team" title="Enter your team" required=""><br>
-                        <button id="btnRegister" class="btn">Sign Up</button>
-                    </form>
-                    <a data-toggle="modal" role="button" href="#forgotPasswordModal" style="display:block">Forgot username or password?</a>
-                    <a data-toggle="modal" role="button" href="#contactModal" style="display:block"><small>Need help? Contact us</small></a>
-                </div>
-                <div id="logoutDiv" class="dropdown-menu" style="padding:17px;" hidden>
-                    <form id="formLogout" class='form' href='#'>
-                        <button id='buttonLogout' class='btn'>Log Out</button><br>
-                        <form><a href='#' title='Manage your account' id='userAccount' data-target="{{ url_for('ares.aresUserAccount') }}">User Account</a>
+                    <form action="{{ url_for('ares.aresLogout') }}" method="GET">
+                        <button class="btn btn-link" type="submit">Log Out</button>
                     </form>
                 </div>
             </li>
@@ -96,57 +77,6 @@ https://www.bootply.com/60886#
         <script>
 
 
-            $(document).ready(function () {
-
-               var sessionState = localStorage.getItem("isLoggedIn")
-               if (sessionState == "True")
-               {
-                  var newHtml = $('#logoutDiv').html();
-                  $('#currentDiv').html(newHtml);
-               }
-               else
-               {
-                  var newHtml = $('#authDiv').html();
-                  $('#currentDiv').html(newHtml);
-               }
-
-                $('#formLogin').submit(function(event) {
-                    event.preventDefault();
-                    var userDict = {'email_addr': $('#username').val(), 'password': $('#password').val()};
-                    $.post("{{ url_for('ares.aresLogin') }}", userDict, function(result) {
-                        if (result != 'User Logged in') {
-                            alert("Wrong email or password entered !");
-                        }
-                        else {
-                            localStorage.setItem("isLoggedIn", "True");
-                            var newHtml = $('#logoutDiv').html();
-                            $('#currentDiv').html(newHtml);
-                        }
-
-                    });
-                });
-
-                $('#formRegister').submit(function(event) {
-                    event.preventDefault();
-                    $.post("{{ url_for('ares.aresRegistration') }}", {'email_addr': $('#inputEmail').val(), 'password': $('#regPassword').val(), 'user_team': $('#team').val()}, function(result) {
-                        if (result != 'User Created') {
-                            alert("This email is already registered with us, try connecting using the token we've sent you via email");
-                        }
-                        else {
-                            alert(result);
-                        }
-                    });
-                });
-
-
-                $('#formLogout').submit(function(event) {
-                    event.preventDefault();
-                    $.post("{{ url_for('ares.aresLogout') }}");
-                    localStorage.setItem("isLoggedIn", "False");
-                    var newHtml = $('#authDiv').html();
-                    $('#currentDiv').html(newHtml);
-                });
-            });
         </script>
 
         <form class="form-inline my-2 my-md-0">
