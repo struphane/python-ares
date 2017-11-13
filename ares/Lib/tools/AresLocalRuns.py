@@ -24,7 +24,7 @@ def getReport(results, directory, folder, reports, scriptPath):
   """ Recursively runs all the reports """
   mainreport = __import__(folder)
   extFiles = {}
-  for extFile in getattr(mainreport, 'FILE_CONFIG', {}):
+  for extFile in getattr(mainreport, 'FILE_CONFIGS', {}):
     extFiles[extFile['filename']] = extFile
   for report in reports:
     reportName = report.replace(".py", "")
@@ -33,6 +33,9 @@ def getReport(results, directory, folder, reports, scriptPath):
       if hasattr(reportModule, 'report'):
         print("  > Loading report %s" % report)
         results[reportModule.__name__] = Ares.Report()
+        if hasattr(reportModule, 'HTTP_PARAMS'):
+          for param in getattr(reportModule, 'HTTP_PARAMS'):
+            results[reportModule.__name__].http[param['code']] = param['dflt']
         try :
           for f in ['static', 'outputs']:
             for file in os.listdir(os.path.join(directory, reportName, f)):
@@ -59,9 +62,9 @@ if __name__ == '__main__':
   directory = os.getcwd() # The path of this script by default
   # This will move all the results in a html folder
   # It only work locally
-  folder = "NewReport" # The name of the main script with the report
+  folder = "PivotTable" # The name of the main script with the report
   scripts = [
-    'NewReport.py',
+    'PivotTable.py',
     ]
 
   path = os.path.join(directory, result_folder, folder)
