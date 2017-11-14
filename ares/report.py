@@ -22,6 +22,10 @@ from click import echo
 from app import login_manager
 import config
 
+import re
+
+regex = re.compile('[^a-zA-Z0-9_]')
+
 # TODO add a check on the variable DIRECTORY to ensure that it cannot be changed
 # TODO add the Flask url_for for an even using a text file like the attempt in JsTable
 # TODO remove the use of chidren pages. Everything should use run
@@ -296,6 +300,7 @@ def run_report(report_name, script_name, user_id):
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
     for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+      reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
     getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
@@ -410,6 +415,7 @@ def ajaxCall(report_name, script):
     report = __import__(report_name)
     for fileConfig in getattr(report, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+      reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)

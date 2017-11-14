@@ -622,6 +622,7 @@ class DataTable(AresHtml.Html):
       self.__options['data'] = json.dumps(self.vals)
       if len(self.vals) < self.__options['pageLength']:
         self.__options['info'] = 'false'
+        self.__options['paginate'] = 'false'
     item = AresItem.Item(None, self.incIndent)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
