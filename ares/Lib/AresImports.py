@@ -30,7 +30,7 @@ JS_IMPORTS = {
                            'modules': ['dataTables.select.min.js']},
 
   # Datatable pivot
-  'pivot': {'req': [], 'modules': ['pivot.js']},
+  'pivot': {'req': ['d3'], 'modules': ['pivot.min.js', 'd3_renderers.min.js']},
 
   # Jquery package
   'jquery': {'modules': ['jquery-3.2.1.min.js', 'jquery-ui.min.js']},
@@ -91,7 +91,7 @@ CSS_IMPORTS = {
 
   'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.css']},
 
-  'pivot': {'req': [], 'modules': ['pivot.css']}
+  'pivot': {'req': [], 'modules': ['pivot.min.css']}
   }
 
 

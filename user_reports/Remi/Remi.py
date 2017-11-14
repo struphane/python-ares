@@ -28,5 +28,9 @@ def report(aresObj):
                        , {"colName": "PV", "key": "pv"}
                        , {"colName": "Expo", "key": "exposure"}
                        ], headerBox="Table Pivot Test")
+  table.setCols(["cpty_cod"])
+  table.setRows(["rtg", "ptf_cod"])
+  table.setRendererName("Heatmap")
+  table.setAggFun(("Sum over Sum", ["pv", "exposure"]))
   #table.pivot(["cpty_cod", "rtg"], ["pv", "exposure"])
   #aresObj.table([], [])
