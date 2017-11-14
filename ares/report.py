@@ -355,7 +355,7 @@ def run_report(report_name, script_name, user_id):
             del sys.modules[module]
       else:
         sys.path.remove(systemDirectory)
-        for module, ss in sys.modules.items():
+        for module, ss in dict(sys.modules).items():
           if systemDirectory in str(ss):
             del sys.modules[module]
       for f in reportObj.files.values():
