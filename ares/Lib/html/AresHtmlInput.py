@@ -45,6 +45,12 @@ class InputText(AresHtml.Html):
     return str(item)
 
 
+class InputPass(InputText):
+  """ Input text box for a password """
+  references = ['https://developer.mozilla.org/fr/docs/Web/HTML/Element/Input/password']
+  inputType = "password"
+
+
 class InputInt(InputText):
   """ """
   references = ['https://www.alsacreations.com/tuto/lire/1409-formulaire-html5-type-number.html']

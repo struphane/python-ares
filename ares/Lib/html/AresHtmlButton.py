@@ -81,6 +81,14 @@ class Button(AresHtml.Html):
     else:
       self.js('click', jsDef)
 
+  def clickWithValid(self, scriptName, attr):
+    """ Click run an Ajax call and print the return message in the ajax service """
+    self.click("display(data);", attr, scriptName)
+
+  def clickWithValidCloseModal(self, scriptName, modal, attr):
+    """ Click run the ajax call, close the modal and returns the message in the ajax service """
+    self.click("%s.modal('hide') ;display(data);" % modal.jqId, attr, scriptName)
+
   def toJs(self, parent):
     """ Returns the Javascript representation of this item """
     return '%s.append("%s")' % (parent, self)

@@ -573,6 +573,7 @@ class AresBox(AresHtml.Html):
     item.add(2, '<strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
     item.add(3, '<button class="btn btn-xs " id="%s_close" name="ares_close"></button>' % self.htmlId)
     item.add(3, '<button class="btn btn-xs" id="%s_min" name="ares_min"></button>' % self.htmlId)
+    item.add(3, '<button class="btn btn-xs " id="%s_zoom" name="ares_zoom" onclick="ZoomIn(\'%s\', \'%s\')"></button>' % (self.htmlId, self.htmlId, self.idContainer))
     if self.prop is not None:
       item.add(3, '<button class="btn btn-xs" name="ares_prop" data-toggle="modal" data-target="#%s_prop"></button>' % self.htmlId)
     item.add(1, '</div>')
@@ -595,6 +596,4 @@ class AresBox(AresHtml.Html):
       item.add(1, '</div>')
       item.add(0, '</div>')
     return str(item)
-
-
 
