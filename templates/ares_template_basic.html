@@ -52,7 +52,6 @@
         var newStyleProps = {'position':'fixed', width: '80%', height: '80%', 'z-index': 5000, 'background-color': 'white', top: "10%", left: "15%"};
         var oldStyleProps = $("#" + divId).css(Object.keys(newStyleProps));
 
-        console.log(newStyleProps);
         $("#" + divId).css(newStyleProps);
         window.dispatchEvent(new Event('resize'));
 
