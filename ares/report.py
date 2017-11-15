@@ -586,6 +586,11 @@ def savedHtmlReport(report_name, html_report):
 # For more information please look at the documentation of the local runs
 # ------------------------------------------------------------------------------------------------------------
 
+def logEventDeployment(scriptPath, queryParams):
+  """ """
+  # executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+  pass
+
 @report.route("/create/env", methods = ['POST'])
 def ajaxCreate():
   """ Special Ajax call to set up the environment
@@ -1071,7 +1076,7 @@ def aresRegistration():
       return redirect(url_for('ares.aresLogin', next=url_for('ares.run_report')))
 
     if not Team.query.filter_by(team_name=data['team']).first():
-      team = Team(data['team'])
+      team = Team(data['team'], data['team_email'])
       db.session.add(team)
     user = User(data['email_addr'], data['team'], data['password'])
     db.session.add(user)
