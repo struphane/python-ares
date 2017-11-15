@@ -253,3 +253,49 @@ class GeneratePdf(AresHtml.Html):
     """
     self.jsEvent["var"] = varTxt#"var docDefinition = { content: 'This is an sample PDF printed with pdfMake' };"
     self.js("click", "pdfMake.createPdf(%s).download('%s.pdf');" % (varName, fileName))
+
+
+class ButtonSaveTable(AresHtml.Html):
+  """ Python wrapper to create a button in charge of calling a service in order to udpdate a file """
+  disable = False
+  alias, __cssCls = 'button', ['btn', 'btn-success']
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = ['bootstrap', 'jquery']
+  __css = {'margin-bottom': '20p', 'margin-top': '-10p'}
+
+  def __init__(self, aresObj, name, cssCls, cssAttr, awsIcon):
+    """  Instantiate the object and store the icon """
+    self.cssCls = self.__cssCls
+    super(ButtonSaveTable, self).__init__(aresObj, name, cssCls, cssAttr)
+    self.awsIcon = awsIcon
+
+  def post(self, evenType, jsDef, dataTable, fileParserClass, fileName):
+    """ Button Post request """
+    url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'_AresReports\', script=\'SrvSaveToFile\') }}''')
+    preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
+    preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
+    jsDef = '''
+              %s
+              $.post("%s", {fileName: '%s', parserModule: '%s', reportName: '%s', datatable: %s}, function(data) {
+                  var res = JSON.parse(data) ;
+                  var data = res.data ;
+                  var status = res.status ;
+                  %s
+                  %s.html(%s);
+              } );
+            ''' % (preAjax, url,
+                   fileName, fileParserClass, self.aresObj.http['REPORT_NAME'], dataTable.val,
+                   jsDef, self.jqId, self.htmlId)
+    self.js(evenType, jsDef, url=url)
+
+  def click(self, dataTable, fileParserClass, fileName):
+    """ Click function to update a file """
+    self.post('click', "display(data);", dataTable, fileParserClass, fileName)
+
+  def __str__(self):
+    """ Return the String representation of HTML button """
+    disFlag = "disabled" if self.disable else ''
+    if self.awsIcon is not None:
+      return '<button type="button" %s %s><span class="fa fa-%s">&nbsp;%s</span></button>' % (self.strAttr(), disFlag, self.awsIcon, self.vals)
+
+    return '<button %s %s>%s</button>' % (self.strAttr(), disFlag, self.vals)

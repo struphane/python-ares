@@ -99,11 +99,15 @@ def report(aresObj):
   #aresObj.row([pie, bar])
 
   table = aresObj.table(data, header)
+  table.dblClickOvr()
   #table.hideColumns([0, 1])
-  table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], colRenders={'CCY': {'url': {'script_name': "youpi"}, 'cols': ['CCY', 'COB'] }}, extendTable=True)
-  table.callBackFooterColumns()
-  table.setExtVals(['PTF'], [dropdown])
+  #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], colRenders={'CCY': {'url': {'script_name': "youpi"}, 'cols': ['CCY', 'COB'] }}, extendTable=True)
+  #table.callBackFooterColumns()
+  #table.setExtVals(['PTF'], [dropdown])
         #{ 'visible': False, 'targets': [1,3] }
+
+  saveButton = aresObj.savetable('Save')
+  saveButton.click(table, 'InFileData.InFileMyData', "Youpi.txt")
 
   #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
   #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})
