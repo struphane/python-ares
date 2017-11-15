@@ -120,6 +120,33 @@ button[name="ares_close"] {
     margin-right: 5px;
 }
 
+button[name="ares_zoom"]:before  {
+    content: "\f00e";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+    font-size: 18px;
+    position: absolute;
+    top: 0px;
+    right: 0;
+    font-size: 12px;
+}
+
+button[name="ares_zoom"] {
+    text-align: center;
+    float:right;
+    background:white;
+    position: relative;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 10px;
+    margin-right: 5px;
+}
+
 button[name="ares_min"]:before {
     content: "\f2d1";
     font-family: FontAwesome;
@@ -449,6 +476,20 @@ tr.nodetails td:first-child:before {
     left: 50%;
     top: 50%;
 }
+
+#popup-chart {
+    background-color: #d7d7d7 ;
+    border: 1px solid #000000 ;
+    position: fixed;
+    width: 200px;
+    display: none;
+    z-index: 2000;
+    left: 10px;
+    top: 10px;
+    width: 90%;
+    height: 90%;
+}
+
 
 #popup-black-background {
     background-color: #000000 ;
