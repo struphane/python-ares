@@ -1054,7 +1054,7 @@ def createDataSource():
   dataSource = DataSource(source, user.uid, username, encryptPwd, salt)
   db.session.add(dataSource)
   db.session.commit()
-  return redirect(request.args['next'])
+  return json.dumps('Success'), 200
 
 @report.route("/ares/registration", methods = ['GET', 'POST'])
 @no_login

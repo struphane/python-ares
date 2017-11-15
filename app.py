@@ -59,10 +59,12 @@ class Team(db.Model):
 
   team_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   team_name = db.Column(db.String(120), nullable=False, unique=True)
+  team_email = db.Column(db.String(120), nullable=False, unique=True)
   team_approvals = db.relationship('TeamApproval')
 
-  def __init__(self, team_name):
+  def __init__(self, team_name, email):
     self.team_name = team_name
+    self.team_email = email
 
 class DataSource(db.Model):
   """ """
