@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Definition of all the different HTML Containers wrappers.
 
@@ -599,8 +598,6 @@ class AresBox(AresHtml.Html):
     return str(item)
 
 
-
-=======
 """
 Definition of all the different HTML Containers wrappers.
 
@@ -1200,6 +1197,3 @@ class AresBox(AresHtml.Html):
       item.add(0, '</div>')
     return str(item)
 
-
-
->>>>>>> 9f3089f63cbce178dccf6e6bfd44354f6b5051bb
