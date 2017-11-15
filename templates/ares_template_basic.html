@@ -58,17 +58,40 @@
         var oldStyleProps = $("#" + divId).css(Object.keys(newStyleProps));
 
         $("#popup-black-background").show();
+        $("#" + divId).resize(function() {
+            var p = $("#" + divId);
+            var w = p.clientWidth | p.innerWidth;
+
+            console.log(w);
+            $("#" + divId + " > svg").attr('width', w + "px");
+
+        });
         $("#" + divId).css(newStyleProps);
 
-        window.dispatchEvent(new Event('resize'));
+        try {
+            window.dispatchEvent(new Event('resize'));
+        } catch(e) {
+            var evt = document.createElement("UIEvent");
+            evt.initUIEvent('resize', true, false, window, 0);
+
+            window.dispatchEvent(evt);
+        }
+
+        $(window).simulate("resize");
 
         $("#popup-black-background").click(function() {
             $("#popup-black-background").hide();
             $("#" + divId).css(oldStyleProps);
 
-            window.dispatchEvent(new Event('resize'));
-        });
+            try {
+                window.dispatchEvent(new Event('resize'));
+            } catch(e) {
+                var evt = document.createElement("UIEvent");
+                evt.initUIEvent('resize', true, false, window, 0);
 
+                window.dispatchEvent(evt);
+            }
+            });
     };
 
     $(document).ready(function() {
