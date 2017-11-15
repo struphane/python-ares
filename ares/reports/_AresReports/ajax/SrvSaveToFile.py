@@ -24,18 +24,26 @@ def call(aresObj):
       if match:
         resultObj[int(match.group(1))][match.group(2)] = val
   moduleName, className = aresObj.http['parserModule'].split(".")
-
   reportPath = os.path.join(aresObj.http['DIRECTORY'], aresObj.http['reportName'])
   sys.path.append(reportPath)
 
-  __import__(aresObj.http['reportName'])
-  mod = __import__("utils.%s" % moduleName)
-  ajaxMod = getattr(getattr(mod, moduleName), className)
-  recordSet = []
-  if ajaxMod.hdrLines != 0:
-    recordSet.append(dict([(col.get('key', regex.sub('', col['colName'])), col['colName']) for col in ajaxMod.cols]))
-  rowNumers = max(resultObj.keys())
-  for colIndex in range(rowNumers+1):
-    recordSet.append(resultObj[colIndex])
-  AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols], ajaxMod.delimiter, aresObj.http['fileName'])
+  try:
+    __import__(aresObj.http['reportName'])
+    mod = __import__("utils.%s" % moduleName)
+    ajaxMod = getattr(getattr(mod, moduleName), className)
+    recordSet = []
+    if ajaxMod.hdrLines != 0:
+      recordSet.append(dict([(col.get('key', regex.sub('', col['colName'])), col['colName']) for col in ajaxMod.cols]))
+    rowNumers = max(resultObj.keys())
+    for colIndex in range(rowNumers+1):
+      recordSet.append(resultObj[colIndex])
+    AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols], ajaxMod.delimiter, aresObj.http['fileName'])
+  except Exception as e:
+    pass
+  finally:
+    sys.path.remove(reportPath)
+    for module, ss in dict(sys.modules).items():
+      if reportPath in str(ss):
+        del sys.modules[module]
+
   return 'File - %s - updated' % aresObj.http['fileName']
