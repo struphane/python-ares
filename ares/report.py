@@ -22,6 +22,10 @@ from click import echo
 from app import login_manager
 import config
 
+import re
+
+regex = re.compile('[^a-zA-Z0-9_]')
+
 # TODO add a check on the variable DIRECTORY to ensure that it cannot be changed
 # TODO add the Flask url_for for an even using a text file like the attempt in JsTable
 # TODO remove the use of chidren pages. Everything should use run
@@ -283,19 +287,23 @@ def run_report(report_name, script_name, user_id):
       del sys.modules[script_name]
 
     mod = __import__(script_name) # run the report
-    fnct = 'report'
-    for param in getattr(mod, 'HTTP_PARAMS', []):
-      if not param['code'] in reportObj.http:
-        if not 'dflt' in param:
-          fnct = 'params'
-          break
-          
-        else:
-          reportObj.http[param['code']] = param['dflt']
+    if reportObj.http.get('show_params') == '1':
+      fnct = 'params'
+    else:
+      fnct = 'report'
+      for param in getattr(mod, 'HTTP_PARAMS', []):
+        if not param['code'] in reportObj.http:
+          if not 'dflt' in param:
+            fnct = 'params'
+            break
+
+          else:
+            reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
     for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+      reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
     getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
@@ -347,7 +355,7 @@ def run_report(report_name, script_name, user_id):
             del sys.modules[module]
       else:
         sys.path.remove(systemDirectory)
-        for module, ss in sys.modules.items():
+        for module, ss in dict(sys.modules).items():
           if systemDirectory in str(ss):
             del sys.modules[module]
       for f in reportObj.files.values():
@@ -410,6 +418,7 @@ def ajaxCall(report_name, script):
     report = __import__(report_name)
     for fileConfig in getattr(report, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+      reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
