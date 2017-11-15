@@ -63,7 +63,6 @@ class Team(db.Model):
   team_approvals = db.relationship('TeamApproval')
 
   def __init__(self, team_name, email):
-    print(team_name, email)
     self.team_name = team_name
     self.team_email = email
 
