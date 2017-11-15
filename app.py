@@ -37,7 +37,7 @@ class User(db.Model, UserMixin):
   email = db.Column(db.String(120), unique=True, nullable=False)
   team_name = db.Column(db.String(120), db.ForeignKey('team.team_name'), nullable=False)
   password = db.Column(db.String(80), nullable=False)
-  team_confirm = db.Column(db.String(1), nullable=False, default='N')
+  team_confirm = db.Column(db.String(1), default='N')
   datasources = db.relationship('DataSource')
   environments = db.relationship('EnvironmentDesc')
 
@@ -63,6 +63,7 @@ class Team(db.Model):
   team_approvals = db.relationship('TeamApproval')
 
   def __init__(self, team_name, email):
+    print(team_name, email)
     self.team_name = team_name
     self.team_email = email
 
