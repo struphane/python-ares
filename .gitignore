@@ -106,3 +106,4 @@ ENV/
 # Byte-compiled / optimized / DLL files
 run.py
 run.py
+user_reports/deploy_test/outputs/test2.txt

@@ -6,6 +6,7 @@ from ares.Lib import AresSql
 from Libs import mailer
 from Libs import AresUserAuthorization
 
+
 NAME = 'Administrator'
 
 
@@ -16,7 +17,7 @@ def getUserData(aresObj, sqlCon):
   nbGlobalUsers = """ SELECT user_accnt.email_addr as "user", user_accnt.role as "role"
                       FROM env_auth 
                       INNER JOIN env_def ON env_def.env_id = env_auth.env_id 
-                      INNER JOIN user_accnt ON user_accnt.uid = env_auth.uid
+                      INNER JOIN team_def ON team_def.team_id = env_auth.uid
                       WHERE  env_def.env_name = '%s'
                       AND date('now') BETWEEN env_auth.stt_dt AND env_auth.end_dt
                       GROUP BY "role" """ % aresObj.http['REPORT_NAME']
@@ -46,10 +47,6 @@ def getAuthorizedUsers(aresObj, sqlCon):
 
   return sqlCon.select(auth_users)
 
-def createUserAccnt(email_addr):
-  """ """
-  main_db = AresUserAuthorization.AuthenticationBase
-  return main_db.addUser(email_addr)
 
 
 def ajaxCall(aresObj, userLst):
