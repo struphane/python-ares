@@ -631,6 +631,10 @@ class DataTable(AresHtml.Html):
                     }
                     ''' % json.dumps(colNumber))
 
+  def search(self, flag):
+    """ Display or not the search item """
+    self.__options['searching'] = json.dumps(flag)
+
   def __str__(self):
     """ Return the string representation of a HTML table """
     if self.noPivot:
@@ -638,6 +642,7 @@ class DataTable(AresHtml.Html):
       if len(self.vals) < self.__options['pageLength']:
         self.__options['info'] = 'false'
         self.__options['paginate'] = 'false'
+        self.__options['searching'] = 'false'
     item = AresItem.Item(None, self.incIndent)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
