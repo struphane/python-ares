@@ -438,9 +438,9 @@ class Report(object):
   def listDataFrom(self, folder):
     """ List the file available in the folder in the output area """
     folders = []
-    for (path, dirs, files) in os.walk(os.path.join(self.http['DIRECTORY'], 'outputs', folder)):
+    for (path, dirs, files) in os.walk(os.path.join(self.http['DIRECTORY'], 'data', folder)):
       for file in files:
-        fileData =  self.getFileInfo(file, ['outputs', folder])
+        fileData =  self.getFileInfo(file, ['data', folder])
         fileData.update({'folderPath': folder, 'file': file})
         folders.append(fileData)
     return folders

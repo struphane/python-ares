@@ -345,11 +345,7 @@ def run_report(report_name, script_name, user_id):
     fileStatic = os.path.join(userDirectory, 'static')
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
-        if staticPage.startswith('filt_'):
-          htmlStatics.append(render_template_string(
-            "<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportPivotView', user_report_name='%s', user_script_name='%s', static_file='%s') }}' target='_blank'>%s</a>" % (
-            report_name, script_name, staticPage, staticPage)))
-        else:
+        if not staticPage.startswith('filterTable_'):
           htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, fileNameToParser.get(staticPage, ''), staticPage)))
 
     if isAuth:
@@ -640,7 +636,7 @@ def ajaxCreate():
 
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
 
-    os.makedirs(os.path.join(scriptPath, 'outputs'))
+    os.makedirs(os.path.join(scriptPath, 'data'))
     return json.dumps("New environment created: %s" % scriptName), 200
 
   return json.dumps("Existing Environment"), 200
@@ -668,7 +664,7 @@ def createEnv(environment):
   This service will create the environment and also add an emtpy report.
   The log file will be produce and the zip archive with the history will be defined
   """
-  DIR_LIST = ['outputs', 'static', 'styles', 'saved', 'utils']
+  DIR_LIST = ['data', 'static', 'styles', 'saved', 'utils']
   email_addr = session['user_id']
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   reportObj = Ares.Report()
@@ -710,7 +706,7 @@ def deployFiles(env, DATA):
   user_name = current_user.email
   report_name = env
   reportTypes = {'report': (['.PY'], None), 'static': (['.DAT', '.TXT', '.CSV', '.JSON'], 'static'),
-                 'outputs': (None, 'outputs'), 'styles': (['.CSS', '.JS'], 'styles'),
+                 'data': (None, 'data'), 'styles': (['.CSS', '.JS'], 'styles'),
                  'saved': (['.HTML'], 'saved'), 'utils': (['.PY'], 'utils') }
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
 
@@ -729,8 +725,8 @@ def deployFiles(env, DATA):
     if filename == '':
       continue
 
-    if fileType != 'outputs':
-      # No checks for the outputs folder
+    if fileType != 'data':
+      # No checks for the data folder
       # User can deploy whatever they want in this folder
       fileWithoutExt = getFileName(filename, ext)
       if fileWithoutExt is None:
@@ -745,9 +741,9 @@ def deployFiles(env, DATA):
         os.makedirs(filePath)
       fileFullPath = os.path.join(filePath, filename)
     fileObj.save(fileFullPath)
-    if fileType in ['outputs', 'static', 'saved']:
-      if not fileCod and fileType == 'outputs':
-        return json.dumps('You have to provide a file code for the outputs type'), 500
+    if fileType in ['data', 'static', 'saved']:
+      if not fileCod and fileType == 'data':
+        return json.dumps('You have to provide a file code for the data type'), 500
       fileCod = filename if not fileCod else fileCod
       fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'team_name': session['TEAM']}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
@@ -763,7 +759,7 @@ def uploadFiles(report_type, report_name, user_name):
   result = []
   reportTypes = {'report': (['.PY'], None), 'configuration': (['.DAT', '.TXT', '.CSV', '.JSON'], 'config'),
                  'ajax': (['.PY'], 'ajax'), 'javascript': (['.JS'], 'js'),
-                 'views': (['.TXT', '.CSV'], 'statics'), 'outputs': (None, 'outputs'),
+                 'views': (['.TXT', '.CSV'], 'statics'), 'data': (None, 'data'),
                  'styles': (['.CSS', '.JS'], 'styles'), 'saved': (['.HTML'], 'saved')
                  }
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
@@ -782,8 +778,8 @@ def uploadFiles(report_type, report_name, user_name):
     postParams = getHttpParams(request)
     for filename, fileType in request.files.items():
       file = request.files[filename]
-      if report_type != 'outputs':
-        # No checks for the outputs folder
+      if report_type != 'data':
+        # No checks for the data folder
         # User can deploy whatever they want in this folder
         fileWithoutExt = getFileName(file.filename, ext)
         if fileWithoutExt is None:
@@ -1025,10 +1021,10 @@ def downloadPackage(name):
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % name, as_attachment=True)
 
-@report.route("/download/<report_name>/outputs/<file_name>", methods = ['GET'])
+@report.route("/download/<report_name>/data/<file_name>", methods = ['GET'])
 def downloadOutputs(report_name, file_name):
   """ Download the up to date Ares package """
-  aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'outputs', file_name)
+  aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'data', file_name)
   #no need to check for error the normal raise should be fine
   return send_file(aresoutputFile)
 
