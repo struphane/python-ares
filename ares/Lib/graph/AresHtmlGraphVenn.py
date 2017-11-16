@@ -1,4 +1,4 @@
-""" Chart module in charge of generating a Pie Chart
+""" Chart module in charge of generating a Venn Chart
 @author: Olivier Nogues
 
 """
@@ -11,19 +11,17 @@ import re
 regex = re.compile('[^a-zA-Z0-9_]')
 
 class NvD3Venn(AresHtmlGraphSvg.Svg):
-  """ NVD3 Pie Chart python interface """
+  """ NVD3 Venn Chart python interface """
   alias, chartObject = 'venn', 'pieChart'
   references = ['https://github.com/benfred/venn.js']
-  __chartStyle = {}
+  __chartStyle = {'width': 500, 'height': 200}
 
   __svgProp = {
-    #'transition': '',
   }
 
   __chartProp = {
-  #  'pie': {'startAngle': 'function(d) { return d.startAngle/2 -Math.PI/2 }',
-  #          'endAngle': 'function(d) { return d.endAngle/2 -Math.PI/2 }'}
   }
+  height = 200
 
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
@@ -41,7 +39,7 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
     return '''
               var chartId = '%s' ;
               d3.select("#"+ chartId +" svg").remove();
-              var %s = venn.VennDiagram() ;
+              var %s = venn.VennDiagram().%s ;
               %s
               d3.select("#" + chartId).style("height", '%spx').datum(eval(%s))%s.call(%s);
               nv.utils.windowResize(%s.update);
@@ -63,7 +61,8 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
                                        .style("font-size", "24px");
                 });
 
-              d3.select("#" + chartId).selectAll("g")
+              var div = d3.select("#" + chartId);
+              div.selectAll("g")
                   .on("mouseover", function(d, i) {
                       // sort all the areas relative to the current item
                       venn.sortAreas(div, d);
@@ -91,7 +90,7 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
                           .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
                           .style("stroke-opacity", 0);
                   });
-            ''' % (self.htmlId, self.htmlId, self.propToStr(),
+            ''' % (self.htmlId, self.htmlId, self.attrToStr(), self.propToStr(),
                    self.height, self.jqData, # recordSet key
                    self.getSvg(), self.htmlId, self.htmlId)
 
