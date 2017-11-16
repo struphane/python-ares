@@ -413,6 +413,9 @@ def ajaxCall(report_name, script):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+      if script == 'SrvSaveToFile' and config.ARES_MODE != 'local':
+        queryParams = {'report_name': reportObj.http['reportName'], 'file': reportObj.http['fileName'], 'type': 'file', 'team_name': session['TEAM'], 'username': current_user.email}
+        logEventDeployment(os.path.join(userDirectory, reportObj.http['reportName']), queryParams)
     else:
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       sys.path.append(userDirectory)
@@ -593,8 +596,10 @@ def savedHtmlReport(report_name, html_report):
 
 def logEventDeployment(scriptPath, queryParams):
   """ """
-  # executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
-  pass
+
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
+  dbPath = os.path.join(scriptPath, 'db', 'admin.db')
+  executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
 @report.route("/create/env", methods = ['POST'])
 def ajaxCreate():
@@ -631,7 +636,7 @@ def ajaxCreate():
     db.add(env_dsc)
     db.commit()
     queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'team_name': session['TEAM'], 'username': email_address}
-    executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+    logEventDeployment(scriptPath, queryParams)
 
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
 

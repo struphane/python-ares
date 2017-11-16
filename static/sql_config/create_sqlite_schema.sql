@@ -36,8 +36,8 @@ CREATE TABLE env_def (
 CREATE TABLE like_env (
   env_id integer NOT NULL,
   username text NOT NULL,
-  CONSTRAINT u_like UNIQUE (env_id, username),
-  lst_mod_dt timestamp NOT NULL DEFAULT (datetime('now', '+30 days'))
+  lst_mod_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT u_like UNIQUE (env_id, username)
 );
 
 --env_auth table
