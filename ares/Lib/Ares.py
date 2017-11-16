@@ -358,6 +358,7 @@ class Report(object):
 
   # Anchor section): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def input(self, value='', cssCls=None): return self.add(aresFactory['InputText'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def pwd(self, value='', cssCls=None): return self.add(aresFactory['InputPass'](self, value, cssCls), sys._getframe().f_code.co_name)
   def inputInt(self, value='', cssCls=None): return self.add(aresFactory['InputInt'](self, value, cssCls), sys._getframe().f_code.co_name)
   def inputRange(self, value='', cssCls=None): return self.add(aresFactory['InputRange'](self, value, cssCls), sys._getframe().f_code.co_name)
 

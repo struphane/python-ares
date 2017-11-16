@@ -473,6 +473,7 @@ def userAccount():
 
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
+  reportObj.http['REPORT_NAME'] = script_name
   reportObj.reportName = script_name
   mod = __import__(script_name)  # run the report
   envName = getattr(mod, 'NAME', '')

@@ -35,9 +35,13 @@ def report(aresObj):
   sourceDropDown = aresObj.select([rec['source'] for rec in DATASOURCES])
   sourceDropDown.setDefault('MRX')
   usernameInput = aresObj.input("Username", '')
-  pwdInput = aresObj.input("Password", '')
+  pwdInput = aresObj.pwd("Password", '')
   rowModal = aresObj.row([sourceDropDown, usernameInput, pwdInput])
   addSource = aresObj.button('Add', '')
+
+  # Ajax call using a post message
+  addSource.clickWithValidCloseModal('AresUserAddPass', editModal, {'user': usernameInput, 'pass': pwdInput})
+
   aresObj.addTo(editModal, rowModal)
   aresObj.addTo(editModal, addSource)
 
