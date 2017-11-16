@@ -50,7 +50,7 @@ class Button(AresHtml.Html):
 
     return '<button %s %s>%s</button>' % (self.strAttr(), disFlag, self.vals)
 
-  def post(self, evenType, scriptName, jsDef, attr):
+  def post(self, evenType, scriptName, jsDef, attr, subPost=False):
     """ Button Post request """
     url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'%s\', script=\'%s\') }}''' % (self.aresObj.http['REPORT_NAME'], scriptName))
     data = json.dumps(attr, cls=AresHtml.SetEncoder)
@@ -61,23 +61,40 @@ class Button(AresHtml.Html):
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     preAjax.add(0, attr.get('preAjaxJs', ''))
-    jsDef = '''
-              %s
-              $.post("%s", %s, function(data) {
-                  var res = JSON.parse(data) ;
-                  var data = res.data ;
-                  var status = res.status ;
-                  %s
-                  %s.html(%s);
-              } );
-            ''' % (preAjax, url, data, jsDef, self.jqId, self.htmlId)
+    if subPost:
+      jsDef = '''
+                    %s
+                    $.post("%s", %s, function(data) {
+                        var res = JSON.parse(data) ;
+                        var data = res.data ;
+                        console.log(data);
+                        $.post(data, function(data2) {
+                          location.reload()
+                          });
+                        
+                        var status = res.status ;
+                        %s
+                        %s.html(%s);
+                    } );
+                  ''' % (preAjax, url, data, jsDef, self.jqId, self.htmlId)
+    else:
+      jsDef = '''
+                %s
+                $.post("%s", %s, function(data) {
+                    var res = JSON.parse(data) ;
+                    var data = res.data ;
+                    var status = res.status ;
+                    %s
+                    %s.html(%s);
+                } );
+              ''' % (preAjax, url, data, jsDef, self.jqId, self.htmlId)
     self.js(evenType, jsDef, url=url)
 
-  def click(self, jsDef, attr=None, scriptName=None):
+  def click(self, jsDef, attr=None, scriptName=None, subPost=False):
     """ Implement the click event on the button object """
     attr = {} if attr is None else attr
     if scriptName is not None:
-      self.post('click', scriptName, jsDef, attr)
+      self.post('click', scriptName, jsDef, attr, subPost=subPost)
     else:
       self.js('click', jsDef)
 
@@ -85,9 +102,9 @@ class Button(AresHtml.Html):
     """ Click run an Ajax call and print the return message in the ajax service """
     self.click("display(data);", attr, scriptName)
 
-  def clickWithValidCloseModal(self, scriptName, modal, attr):
+  def clickWithValidCloseModal(self, scriptName, modal, attr, subPost=False):
     """ Click run the ajax call, close the modal and returns the message in the ajax service """
-    self.click("%s.modal('hide') ;display(data);" % modal.jqId, attr, scriptName)
+    self.click("%s.modal('hide') ;display(data);" % modal.jqId, attr, scriptName, subPost)
 
   def toJs(self, parent):
     """ Returns the Javascript representation of this item """

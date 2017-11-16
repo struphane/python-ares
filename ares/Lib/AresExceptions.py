@@ -5,3 +5,6 @@ class AuthException(Exception):
 
 class EnvException(AuthException):
   """ """
+
+class ReportException(AuthException):
+  """ """

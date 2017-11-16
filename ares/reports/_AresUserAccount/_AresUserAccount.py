@@ -11,14 +11,6 @@ from Libs import AresUserAuthorization
 DATASOURCES = [{'source': 'MRX', 'inputParams': ('Username', 'Password')}
                ]
 
-def ajaxCall(newSourceData, username):
-  """   """
-  sourcename = newSourceData['name']
-  src_username = newSourceData['username']
-  src_pwd = newSourceData['pwd']
-  print(url_for('ares.createDataSource', source=sourcename, app_id=username, username=src_username, password=src_pwd, next=url_for('ares.userAccount')))
-  return redirect(url_for('ares.createDataSource', source=sourcename, app_id=username, username=src_username, password=src_pwd, next=url_for('ares.userAccount')))
-
 def report(aresObj):
   # userRecordSet = getEnvData(aresObj)
   userdata = aresObj.http['USERDATA']
@@ -40,7 +32,7 @@ def report(aresObj):
   addSource = aresObj.button('Add', '')
 
   # Ajax call using a post message
-  addSource.clickWithValidCloseModal('AresUserAddPass', editModal, {'user': usernameInput, 'pass': pwdInput})
+  addSource.clickWithValidCloseModal('AresUserAddPass', editModal, {'source':sourceDropDown, 'username': usernameInput, 'pwd': pwdInput, 'app_id': account_id}, subPost=True)
 
   aresObj.addTo(editModal, rowModal)
   aresObj.addTo(editModal, addSource)
@@ -71,9 +63,6 @@ def report(aresObj):
   else:
     for envs in userdata['envs']:
       aresObj.text(envs.env_name)
-
-  ajaxCall({'name': 'MRX', 'username': '913196', 'pwd': 'blabla'}, account_id)
-
 
 
 
