@@ -40,6 +40,6 @@ def report(aresObj):
   if aresObj.http['file_parser'] != '':
     table.dblClickOvr()
     aresObj.http['REPORT_NAME'] = aresObj.http['user_report_name']
-    saveButton.click(table, aresObj.http['file_parser'], aresObj.http['static_file'])
+    saveButton.clickStatic(table, aresObj.http['file_parser'], aresObj.http['static_file'])
   else:
     saveButton.disable = True

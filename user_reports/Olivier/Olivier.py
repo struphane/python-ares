@@ -107,7 +107,7 @@ def report(aresObj):
         #{ 'visible': False, 'targets': [1,3] }
 
   saveButton = aresObj.savetable('Save')
-  saveButton.click(table, 'InFileData.InFileMyData', "Youpi.txt")
+  saveButton.clickOutputs(table, 'InFileData.InFileMyData', "Youpi.txt")
 
   #table = aresObj.simpletable(data, header, headerBox='Currencies', cssCls=['table'])
   #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], filters={'PTF': ['1']})

@@ -269,14 +269,14 @@ class ButtonSaveTable(AresHtml.Html):
     super(ButtonSaveTable, self).__init__(aresObj, name, cssCls, cssAttr)
     self.awsIcon = awsIcon
 
-  def post(self, evenType, jsDef, dataTable, fileParserClass, fileName):
+  def post(self, evenType, jsDef, dataTable, fileParserClass, fileName, folder):
     """ Button Post request """
     url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'_AresReports\', script=\'SrvSaveToFile\') }}''')
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     jsDef = '''
               %s
-              $.post("%s", {fileName: '%s', parserModule: '%s', reportName: '%s', datatable: %s}, function(data) {
+              $.post("%s", {fileName: '%s', parserModule: '%s', reportName: '%s', datatable: %s, folder: '%s'}, function(data) {
                   var res = JSON.parse(data) ;
                   var data = res.data ;
                   var status = res.status ;
@@ -284,13 +284,17 @@ class ButtonSaveTable(AresHtml.Html):
                   %s.html(%s);
               } );
             ''' % (preAjax, url,
-                   fileName, fileParserClass, self.aresObj.http['REPORT_NAME'], dataTable.val,
+                   fileName, fileParserClass, self.aresObj.http['REPORT_NAME'], dataTable.val, folder,
                    jsDef, self.jqId, self.htmlId)
     self.js(evenType, jsDef, url=url)
 
-  def click(self, dataTable, fileParserClass, fileName):
+  def clickStatic(self, dataTable, fileParserClass, fileName):
     """ Click function to update a file """
-    self.post('click', "display(data);", dataTable, fileParserClass, fileName)
+    self.post('click', "display(data);", dataTable, fileParserClass, fileName, 'static')
+
+  def clickOutputs(self, dataTable, fileParserClass, fileName):
+    """ Click function to update a file """
+    self.post('click', "display(data);", dataTable, fileParserClass, fileName, 'outputs')
 
   def __str__(self):
     """ Return the String representation of HTML button """

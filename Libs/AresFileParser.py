@@ -73,9 +73,9 @@ class FileParser(object):
     if not self.__inputFile.closed:
       self.__inputFile.close()
 
-def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName):
+def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName, folder='outputs'):
   """ Write the file to the dedicated output folder """
-  outFile = open(r"%s\%s\outputs\%s" % (aresObj.http['DIRECTORY'], reportName, outFileName), "w")
+  outFile = open(r"%s\%s\%s\%s" % (aresObj.http['DIRECTORY'], reportName, folder, outFileName), "w")
   tmplLine = delimiter.join(["%%(%s)s" % col for col in cols])
   for rec in recordSet:
     outFile.write("%s\n" % tmplLine % rec)

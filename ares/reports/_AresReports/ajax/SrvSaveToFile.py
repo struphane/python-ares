@@ -37,7 +37,8 @@ def call(aresObj):
     rowNumers = max(resultObj.keys())
     for colIndex in range(rowNumers+1):
       recordSet.append(resultObj[colIndex])
-    AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols], ajaxMod.delimiter, aresObj.http['fileName'])
+    AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols],
+                            ajaxMod.delimiter, aresObj.http['fileName'], aresObj.http['folder'])
   except Exception as e:
     print e
   finally:
