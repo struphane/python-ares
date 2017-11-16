@@ -305,10 +305,10 @@ def run_report(report_name, script_name, user_id):
     for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
       reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
-      fileNameToParser[fileConfig['filename']] = "%s.%s" % (fileConfig['parser'].__module__, fileConfig['parser'].__name__)
+      fileNameToParser[fileConfig['filename']] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
       if 'names' in fileConfig:
         for name in fileConfig['names']:
-          fileNameToParser[name] = "%s.%s" % (fileConfig['parser'].__module__, fileConfig['parser'].__name__)
+          fileNameToParser[name] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
     getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:

@@ -11,7 +11,7 @@ def report(aresObj):
   """ View used only to display the content of a static cache """
 
   aresObj.title("Static configuration View")
-  aresObj.button("Save Changes")
+  saveButton = aresObj.savetable("Save Changes")
   aresObj.newline()
   aresObj.newline()
 
@@ -28,7 +28,6 @@ def report(aresObj):
 
       table = aresObj.table(recordSet, fileConfig.getHeader())
       table.callBackFooterColumns()
-      table.dblClickOvr()
 
   sys.path.remove(userDirectory)
   for module, ss in sys.modules.items():
@@ -37,3 +36,10 @@ def report(aresObj):
 
   for f in aresObj.files.values():
     f.close()
+
+  if aresObj.http['file_parser'] != '':
+    table.dblClickOvr()
+    aresObj.http['REPORT_NAME'] = aresObj.http['user_report_name']
+    saveButton.click(table, aresObj.http['file_parser'], aresObj.http['static_file'])
+  else:
+    saveButton.disable = True
