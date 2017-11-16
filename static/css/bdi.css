@@ -892,6 +892,7 @@ tr.details td:first-child:before {
 
 td.left_align {
     text-align: left !important;
+    font-weight: bold;
 }
 
 tr.details td.changed:first-child:before {

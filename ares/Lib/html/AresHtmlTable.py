@@ -595,19 +595,25 @@ class DataTable(AresHtml.Html):
     self.aresObj.jsFnc.add("%s.on('mouseup', 'td', function () {isMouseDown = false;});" % (self.jqId))
 
   def mouveHover(self, backgroundColor, fontColor):
+    self.aresObj.jsGlobal.add("%s_originalBackground" % self.htmlId)
+    self.aresObj.jsGlobal.add("%s_originalColor" % self.htmlId)
     self.aresObj.jsFnc.add('''
         %s.on( 'mouseover', 'tr', function () {
+            if ($(this).css('background-color') != '%s') {
+              %s_originalBackground = $(this).css('background-color') ;
+              %s_originalColor = $(this).css('color') ;
+            }
             $(this).css('background-color', '%s');
             $(this).css('color', '%s');
         });
-       ''' % (self.jqId, backgroundColor, fontColor) )
+       ''' % (self.jqId, backgroundColor, self.htmlId, self.htmlId, backgroundColor, fontColor) )
 
     self.aresObj.jsFnc.add('''
         %s.on( 'mouseout', 'tr', function () {
-            $(this).css('background-color', 'white');
-            $(this).css('color', 'black');
+            $(this).css('background-color', %s_originalBackground);
+            $(this).css('color', %s_originalColor);
         });
-       ''' % self.jqId)
+       ''' % (self.jqId, self.htmlId, self.htmlId))
 
   def callBackFooterSum(self, colNumber):
     """ Add a footer with a sum on the datatable """
@@ -631,6 +637,10 @@ class DataTable(AresHtml.Html):
                     }
                     ''' % json.dumps(colNumber))
 
+  def search(self, flag):
+    """ Display or not the search item """
+    self.__options['searching'] = json.dumps(flag)
+
   def __str__(self):
     """ Return the string representation of a HTML table """
     if self.noPivot:
@@ -638,6 +648,7 @@ class DataTable(AresHtml.Html):
       if len(self.vals) < self.__options['pageLength']:
         self.__options['info'] = 'false'
         self.__options['paginate'] = 'false'
+        self.__options['searching'] = 'false'
     item = AresItem.Item(None, self.incIndent)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
