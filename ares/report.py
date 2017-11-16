@@ -249,6 +249,7 @@ def run_report(report_name, script_name, user_id):
   """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
+  fileNameToParser = {}
   viewScript, downloadEnv = False, False
   cssImport, jsImport = '', ''
   isAuth = True
@@ -301,7 +302,6 @@ def run_report(report_name, script_name, user_id):
             reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
-    fileNameToParser = {}
     for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
       reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
