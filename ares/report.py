@@ -301,9 +301,14 @@ def run_report(report_name, script_name, user_id):
             reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
+    fileNameToParser = {}
     for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
       reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
       reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
+      fileNameToParser[fileConfig['filename']] = "%s.%s" % (fileConfig['parser'].__module__, fileConfig['parser'].__name__)
+      if 'names' in fileConfig:
+        for name in fileConfig['names']:
+          fileNameToParser[name] = "%s.%s" % (fileConfig['parser'].__module__, fileConfig['parser'].__name__)
     getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
@@ -345,7 +350,7 @@ def run_report(report_name, script_name, user_id):
             "<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportPivotView', user_report_name='%s', user_script_name='%s', static_file='%s') }}' target='_blank'>%s</a>" % (
             report_name, script_name, staticPage, staticPage)))
         else:
-          htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, staticPage)))
+          htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, fileNameToParser.get(staticPage, ''), staticPage)))
 
     if isAuth:
       if not report_name.startswith("_"):
