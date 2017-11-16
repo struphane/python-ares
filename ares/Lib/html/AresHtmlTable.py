@@ -151,6 +151,13 @@ class DataTable(AresHtml.Html):
     """ Set the horizontal scrollbar """
     self.option('scrollX', "true")
 
+  def autoWidth(self, flag=True):
+    """ Set the autowith flag in the datatable """
+    if flag:
+      self.option('autoWidth', "true")
+    else:
+      self.option('autoWidth', "false")
+
   def doc(self):
     """ Html content for the class table documentation """
     return '''
@@ -326,6 +333,10 @@ class DataTable(AresHtml.Html):
     """ Callback to hide the table header """
     self.callBacks('initComplete', "alert('%s');" % self.htmlId)
 
+  #--------------------------------------------------------------------------------------------------------------
+  #
+  #   Dedicated to wrap the section createdRow
+  #--------------------------------------------------------------------------------------------------------------
   def callBackCreateRow(self, fnc):
     """
     Calback to change a cell
@@ -384,6 +395,11 @@ class DataTable(AresHtml.Html):
                       } );
                    ''')
 
+  def callBackCreateRowFlag(self, colName, val, cssCls):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow',
+                   "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
+
   # def callBackSumFooter(self):
   #   """ """
   #   self.withFooter = True
@@ -421,11 +437,10 @@ class DataTable(AresHtml.Html):
     self.callBacks('rowCallback',
                    "if (data['%s'] == '%s') {$(row).css('background-color', '%s'); }" % (colName, value, bgColor))
 
-  def callBackCreateRowFlag(self, colName, val, cssCls):
-    """  Change the cell according to a float threshold """
-    self.callBacks('createdRow',
-                   "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
-
+  #--------------------------------------------------------------------------------------------------------------
+  #
+  #   Dedicated to wrap the section buttons
+  #--------------------------------------------------------------------------------------------------------------
   def addButton(self, jsDict):
     """ Internal function to add a button to the datatable """
     if not 'buttons' in self.__options:
@@ -693,6 +708,10 @@ class DataTable(AresHtml.Html):
        ''' % (htmlObj[0].htmlId, htmlObj[0].htmlId))
     htmlObj[0].link("var oTable = $('#%s').dataTable(); oTable.fnDraw(); " % self.htmlId)
     htmlObj[0].allowTableFilter.append(self.htmlId)
+
+  def order(self, colName, typeOrd):
+    """ Set the table order according to a column in the table """
+    self.option(json.dumps([[colName, typeOrd]]))
 
 
 class SimpleTable(AresHtml.Html):
