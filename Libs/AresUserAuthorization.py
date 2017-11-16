@@ -39,9 +39,11 @@ def encrypt(pwd, key):
   kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
   encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
   f = Fernet(encrypted_key)
-  return f.encrypt(bytes(pwd.encode('utf-8'))), salt
+  return f.encrypt(bytes(pwd.encode('utf-8'))).decode('latin1'), salt.decode('latin1')
 
 def decrypt(cipher_txt, key, salt):
+  salt = bytes(salt.encode('latin1'))
+  cipher_txt = bytes(str(cipher_txt).encode('latin1'))
   kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=100000, backend=default_backend())
   encrypted_key = base64.urlsafe_b64encode(kdf.derive(bytes(key.encode('utf-8'))))
   f = Fernet(encrypted_key)
