@@ -287,7 +287,7 @@ def run_report(report_name, script_name, user_id):
       del sys.modules[script_name]
 
     mod = __import__(script_name) # run the report
-    if reportObj.http.get('show_params') == '1':
+    if reportObj.http.get('show_params') == '1' and getattr(mod, 'HTTP_PARAMS', []):
       fnct = 'params'
     else:
       fnct = 'report'
