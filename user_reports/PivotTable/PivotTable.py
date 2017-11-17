@@ -3,9 +3,12 @@
 
 from utils import InFilePricesConfig
 
+import AresFileParser
+
 NAME = 'Pivot Table'
 FILE_CONFIGS = [
     {'filename': 'data.txt', 'folder': 'outputs', 'parser': InFilePricesConfig.InFilePices},
+    {'filename': 'filterTable_mytable.txt', 'folder': 'static', 'parser': AresFileParser.FilePivot},
     {'filename': 'country.txt', 'folder': 'static', 'parser': InFilePricesConfig.InFileCountry},
     ]
 
@@ -30,7 +33,10 @@ def report(aresObj):
     recordSet.append(rec)
 
   pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi")
-  pivotTable.pivot(['TYPE', 'ISSUER'], ['TTTT'], extendTable=True)
+  pivotTable.addPivotFilter('filterTable_mytable.txt')
+  pivotTable.agg(['TYPE', 'ISSUER'], ['TTTT'])
+
+
   #pivotTable.callBackFooterSum([2, 4])
   #pivotTable.callBackHeaderColumns()
   pivotTable.callBackNumHeatMap('TTTT', 2)
