@@ -7,7 +7,7 @@ import AresFileParser
 
 NAME = 'Pivot Table'
 FILE_CONFIGS = [
-    {'filename': 'data.txt', 'folder': 'outputs', 'parser': InFilePricesConfig.InFilePices},
+    {'filename': 'data.txt', 'folder': 'data', 'parser': InFilePricesConfig.InFilePices},
     {'filename': 'filterTable_mytable.txt', 'folder': 'static', 'parser': AresFileParser.FilePivot},
     {'filename': 'country.txt', 'folder': 'static', 'parser': InFilePricesConfig.InFileCountry},
     ]

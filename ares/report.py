@@ -917,16 +917,20 @@ def downloadReport(report_name):
           continue
 
         folder = path.replace("%s" % reportPath, "")
-        zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s" % (folder, pyFile))
+        if folder == '\data':
+          #TODO Add check on the scurity to add the data for a given user
+          continue
+
+        zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
     # Add all the external libraries
-    libPath = os.path.join(current_app.config['ROOT_PATH'], 'Lib')
+    libPath = os.path.join(current_app.config['ROOT_PATH'], 'Libs')
     for (path, dirs, files) in os.walk(libPath):
       for pyFile in  files:
         if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
-        zf.write(os.path.join(libPath, path, pyFile), r"Lib\%s" % pyFile)
+        zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s" % pyFile)
 
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
