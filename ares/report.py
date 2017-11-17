@@ -11,7 +11,6 @@ import traceback
 import time
 import shutil
 import sqlite3
-import datetime
 import hashlib
 
 from app import User, Team, EnvironmentDesc, DataSource, db
@@ -930,7 +929,10 @@ def downloadReport(report_name):
           continue
 
         folder = path.replace("%s" % libPath, "")
-        zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s" % pyFile)
+        if pyFile in ['__init__.py', 'AresFileParser.py', 'AresChartsService.py']:
+          zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s" % pyFile)
+        elif not path.endswith('Ares\Libs'):
+          zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s\%s" % (folder, pyFile))
 
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
