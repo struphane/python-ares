@@ -11,9 +11,15 @@
   opacity: 0;
 }
 
+.static_row {
+    color: #768488;
+    font-style: italic;
+}
+
 .static_col {
-    color: darkslategrey;
-    background-color: #f1f1f1;
+    color: #768488;
+    background-color: #f6f6f6;
+    font-style: italic;
 }
 
 .blue-border {

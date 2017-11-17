@@ -136,6 +136,7 @@ class DataTable(AresHtml.Html):
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
     self.option('stateSave', 'true')
+    self.tableUpdates = []
 
   def colReOrdering(self):
     """ Include the column reordering Datatable plugin """
@@ -653,11 +654,17 @@ class DataTable(AresHtml.Html):
     """ Display or not the search item """
     self.__options['searching'] = json.dumps(flag)
 
-  def addRow(self):
-    """ Add a button to add an entry to the Data Table """
-    self.__options['dom'] = "'Bfrtip'"
-    emptyCol = dict([(self.recKey(col), '') for col in self.header[-1]])
-    self.addButton("{ text: 'Add Row', className: 'btn btn-success', action: function (e, dt, node, config ) {%s.row.add( %s ).draw( false ) ;} }" % (self.htmlId, json.dumps(emptyCol)))
+  def addRow(self, vals=None):
+    """ Add a button to add an entry to the Data Table
+
+    vals - should be a list of dictionaries
+    """
+    if vals is None:
+      self.__options['dom'] = "'Bfrtip'"
+      emptyCol = dict([(self.recKey(col), '') for col in self.header[-1]])
+      self.addButton("{ text: 'Add Row', className: 'btn btn-success', action: function (e, dt, node, config ) {%s.row.add( %s ).draw( false ) ;} }" % (self.htmlId, json.dumps(emptyCol)))
+    else:
+      self.tableUpdates.append("%s.rows.add( %s ).draw( false ).nodes().to$().addClass('static_row')" % (self.htmlId, json.dumps(vals)))
 
   def __str__(self):
     """ Return the string representation of a HTML table """
@@ -726,7 +733,7 @@ class DataTable(AresHtml.Html):
           options.append("%s: [%s]" % (key, ",".join(val)))
       else:
         options.append("%s: %s" % (key, val))
-    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ;' % (self.htmlId, self.jqId, ",".join(options)))
+    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ; %s' % (self.htmlId, self.jqId, ",".join(options), ";".join(self.tableUpdates)))
     return str(item)
 
   def recKey(self, col):

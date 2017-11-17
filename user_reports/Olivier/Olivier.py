@@ -100,7 +100,10 @@ def report(aresObj):
 
   table = aresObj.table(data, header)
   table.dblClickOvr()
+  table.agg(["CCY", "COB", "PRD", "PTF"], ["VAL", "VAL2"])
   table.mouveHover('#BFFCA6', 'black')
+  table.addRow([{"CCY": 'YYY', "COB": 0, "PRD": '', "PTF": '', "VAL": 0, "VAL2": 0, 'T': 0}])
+  table.addCols(['T'], [7])
   #table.hideColumns([0, 1])
   #table.pivot(['CCY', 'PTF', 'COB'], ['VAL2'], colRenders={'CCY': {'url': {'script_name': "youpi"}, 'cols': ['CCY', 'COB'] }}, extendTable=True)
   #table.callBackFooterColumns()
