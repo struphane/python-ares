@@ -2,11 +2,11 @@
 
  */
 
-if ( typeof String.prototype.startsWith != 'function' ) {
-  String.prototype.startsWith = function( str ) {
-    return this.substring( 0, str.length ) === str;
-  }
-};
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position){
+      return this.substr(position || 0, searchString.length) === searchString;
+  };
+}
 
 Number.prototype.formatMoney = function(decPlaces, thouSeparator, decSeparator) {
     var n = this,

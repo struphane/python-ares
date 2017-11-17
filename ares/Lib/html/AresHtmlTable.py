@@ -44,7 +44,7 @@ class Td(AresHtml.Html):
 
 class DataTable(AresHtml.Html):
   """ Python wrapper for the Javascript Datatable object """
-  cssCls, alias = ['table', 'table-striped', 'table-sm', 'nowrap'], 'table'
+  __cssCls, alias = ['table', 'table-sm', 'nowrap'], 'table'
   references = ['https://datatables.net/reference/index',
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
@@ -63,6 +63,7 @@ class DataTable(AresHtml.Html):
   }
 
   def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
+    self.cssCls = list(self.__cssCls)
     self.theadCssCls = ['thead-inverse']
     self.reqCss = list(self.__reqCss)
     self.reqJs = list(self.__reqJs)
@@ -176,9 +177,11 @@ class DataTable(AresHtml.Html):
     for colId in colsId:
       self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % colId)
 
-  def agg(self, keys, vals, digit=0):
+  def agg(self, keys, vals, digit=0, isColStriped=True):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
     self.noPivot = False
+    if isColStriped:
+      self.addClass('table-striped')
     self.recordSetHeader = []
     for col in keys:
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
@@ -261,10 +264,10 @@ class DataTable(AresHtml.Html):
       self.callBackCreateRowHideFlag('_parent', '0')
       self.callBackCreateRowFlag('_hasChildren', 0, 'details')
       self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
-                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+                                       if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
     else:
       self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); $('td:eq(0)', row).toggleClass('changed');} ;
-                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+                                       if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
     self.click('''
                 var currentTable = %s;
                 var trObj = $(this).closest('tr');
@@ -659,6 +662,7 @@ class DataTable(AresHtml.Html):
   def __str__(self):
     """ Return the string representation of a HTML table """
     if self.noPivot:
+      self.addClass('table-striped')
       self.__options['data'] = json.dumps(self.vals)
       if len(self.vals) < self.__options['pageLength']:
         self.__options['info'] = 'false'
