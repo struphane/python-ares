@@ -181,13 +181,17 @@ class DataTable(AresHtml.Html):
   def agg(self, keys, vals, digit=0, isColStriped=True):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
     self.noPivot = False
+    newHeader = []
     if isColStriped:
       self.addClass('table-striped')
     self.recordSetHeader = []
     for col in keys:
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
+      newHeader.append({'key': col, 'colName': self.recMap.get(col, col)})
     for val in vals:
       self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
+      newHeader.append({'key': val, 'colName': self.recMap.get(val, val)})
+    self.header[-1] = newHeader
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
@@ -214,10 +218,13 @@ class DataTable(AresHtml.Html):
   def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0):
     """ Create the pivot table """
     self.noPivot = False
+    newHeader = []
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
+    for col in keys:
+      newHeader.append({'key': col, 'colName': self.recMap.get(col, col)})
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
       if colRenders is not None and col in colRenders:
         if 'url' in colRenders[col]:
@@ -235,6 +242,7 @@ class DataTable(AresHtml.Html):
       else:
         self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
     for col in vals:
+      newHeader.append({'key': col, 'colName': self.recMap.get(col, col)})
       if withUpDown:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
           render: function (data, type, full, meta) {
@@ -252,6 +260,7 @@ class DataTable(AresHtml.Html):
             }
             return "<font style='color:green'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ; } }
         ''' % (col, self.recMap.get(col, col), digit, digit))
+    self.header[-1] = newHeader
     if len(rows) < self.__options['pageLength']:
       self.__options['info'] = 'false'
       self.__options['bPaginate'] = 'false'
@@ -416,18 +425,18 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
 
-  # def callBackSumFooter(self):
-  #   """ """
-  #   self.withFooter = True
-  #   self.callBacks('footerCallback',
-  #                  '''
-  #                     var api = this.api();
-  #                     api.columns('.sum', { page: 'current' } ).every(function () {
-  #                     var sum = this.data().reduce(function (a, b) {
-  #                         var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
-  #                     $(this.footer()).html(sum);
-  #                     } );
-  #                  ''')
+  def callBackSumFooter(self):
+    """ """
+    self.withFooter = True
+    self.callBacks('footerCallback',
+                   '''
+                      var api = this.api();
+                      api.columns('.sum', { page: 'current' } ).every(function () {
+                          var sum = this.data().reduce(function (a, b) {
+                            var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
+                      $(this.footer()).html(sum);
+                      } );
+                   ''')
 
   def callBackHeaderColumns(self):
     """  """
