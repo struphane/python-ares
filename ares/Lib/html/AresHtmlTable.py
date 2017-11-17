@@ -697,7 +697,18 @@ class DataTable(AresHtml.Html):
     item.add(1, "</tbody>")
     item.add(0, '</table>')
     if self.pivotFilters:
-      item.add(0, '<i class="fa fa-filter" aria-hidden="true"></i>&nbsp;<i>Static Data filter applied on the recordSet</i>')
+      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static Data filter applied on the recordSet</a>' % self.htmlId)
+      self.aresObj.jsOnLoadFnc.add('''
+        $('#filter_%s').click(function () {
+            $("#popup-black-background").show();
+            $("#popup-chart").show();
+
+            $("#popup-black-background").click(function() {
+              $("#popup-black-background").hide();
+              $("#popup-chart").hide();
+            });
+        });
+      ''' % self.htmlId)
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
 
