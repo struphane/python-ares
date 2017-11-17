@@ -17,8 +17,7 @@ class Modal(AresHtml.Html):
   cssCls, alias = ['modal fade'], 'modal'
   modal_header = '' # The title for the modal popup
   reference = 'https://v4-alpha.getbootstrap.com/components/modal/'
-  default = {'color': '#398438', 'font-family': 'anchorjs-icons', 'font-style': 'normal', 'font-varian': 'normal',
-             'font-weight': 'normal', 'line-height': 'inherit'}
+  default = {'color': 'white', 'font-size': '15px', 'margin-top': '5px'}
 
   def __init__(self, aresObj, name, cssCls=None, cssAttr=None, btnCls=None):
     """ Create an python HTML object """
@@ -39,11 +38,11 @@ class Modal(AresHtml.Html):
     item.add(0, '<div %s tabindex="-1" role="dialog" aria-labelledby="%sTitle" aria-hidden="true">' % (self.strAttr(), self.htmlId))
     item.add(1, '<div class="modal-dialog">')
     item.add(2, '<div class="modal-content">')
-    item.add(3, '<div class="modal-header" style="padding-top: 42px">')
-    item.add(4, '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+    item.add(3, '<div class="modal-header" style="padding-top: 2px;background-color:#398438;height:34px">')
+    item.add(4, '<button type="button" style="margin-top:10px" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
     self.style = dict(self.default)
     styleStr = ";".join(["%s:%s" % (key, val) for key, val in self.style.items()])
-    item.add(4, '<h4 class="modal-title" id="%sTitle" style="%s">%s</h4>' % (self.htmlId, styleStr, self.modal_header))
+    item.add(4, '<div class="modal-title" id="%sTitle" style="%s">%s</div>' % (self.htmlId, styleStr, self.modal_header))
     item.add(3, '</div>')
     item.add(3, '<div class="modal-body">')
     for val in self.vals:

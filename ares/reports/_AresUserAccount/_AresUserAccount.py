@@ -24,12 +24,13 @@ def report(aresObj):
 
   title3 = aresObj.title2('Data Sources')
   editModal = aresObj.modal('Edit', btnCls=['btn btn-link'])
+  editModal.modal_header = 'Add External System credentials'
   sourceDropDown = aresObj.select([rec['source'] for rec in DATASOURCES])
   sourceDropDown.setDefault('MRX')
   usernameInput = aresObj.input("Username", '')
   pwdInput = aresObj.pwd("Password", '')
   rowModal = aresObj.row([sourceDropDown, usernameInput, pwdInput])
-  addSource = aresObj.button('Add', '')
+  addSource = aresObj.button('Add')
 
   # Ajax call using a post message
   addSource.clickWithValidCloseModal('AresUserAddPass', editModal, {'source':sourceDropDown, 'username': usernameInput, 'pwd': pwdInput, 'app_id': account_id}, subPost=True)
