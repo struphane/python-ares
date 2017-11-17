@@ -13,7 +13,8 @@ regex = re.compile('[^a-zA-Z0-9_]')
 class NvD3Venn(AresHtmlGraphSvg.Svg):
   """ NVD3 Venn Chart python interface """
   alias, chartObject = 'venn', 'pieChart'
-  references = ['https://github.com/benfred/venn.js']
+  references = ['https://github.com/benfred/venn.js',
+                'http://bl.ocks.org/bessiec/986e971203b4b8ddc56d3d165599f9d0']
   __chartStyle = {'width': 500, 'height': 200}
 
   __svgProp = {

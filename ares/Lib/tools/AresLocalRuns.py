@@ -98,9 +98,7 @@ if __name__ == '__main__':
   res = {}
   directoryPath = os.path.join(directory, folder)
   sys.path.append(directoryPath)
-  ajaxPath = os.path.join(directory, folder, 'ajax')
-  if os.path.exists(ajaxPath):
-    sys.path.append(ajaxPath)
+  sys.path.append(os.path.join(directory, 'Libs'))
   getReport(res, directory, folder, scripts, directoryPath)
 
   for report, htmlReport in res.items():
