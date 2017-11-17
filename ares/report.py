@@ -924,13 +924,16 @@ def downloadReport(report_name):
     # Add all the external libraries
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Libs')
     for (path, dirs, files) in os.walk(libPath):
+      if '.svn' in path:
+        continue
+
       for pyFile in  files:
         if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
         if pyFile in ['__init__.py', 'AresFileParser.py', 'AresChartsService.py']:
-          zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s" % pyFile)
+          zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s\%s" % (folder, pyFile))
         elif not path.endswith('Ares\Libs'):
           zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s\%s" % (folder, pyFile))
 
