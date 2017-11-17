@@ -35,7 +35,7 @@ def report(aresObj):
   pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi")
   pivotTable.addPivotFilter('filterTable_mytable.txt')
   pivotTable.agg(['TYPE', 'ISSUER'], ['TTTT'])
-
+  pivotTable.addRow()
 
   #pivotTable.callBackFooterSum([2, 4])
   #pivotTable.callBackHeaderColumns()

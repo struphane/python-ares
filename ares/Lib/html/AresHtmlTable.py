@@ -650,6 +650,12 @@ class DataTable(AresHtml.Html):
     """ Display or not the search item """
     self.__options['searching'] = json.dumps(flag)
 
+  def addRow(self):
+    """ Add a button to add an entry to the Data Table """
+    self.__options['dom'] = "'Bfrtip'"
+    emptyCol = dict([(self.recKey(col), '') for col in self.header[-1]])
+    self.addButton("{ text: 'Add Row', action: function (e, dt, node, config ) {%s.row.add( %s ).draw( false ) ;} }" % (self.htmlId, json.dumps(emptyCol)))
+
   def __str__(self):
     """ Return the string representation of a HTML table """
     if self.noPivot:
@@ -690,7 +696,8 @@ class DataTable(AresHtml.Html):
     item.add(1, "<tbody>")
     item.add(1, "</tbody>")
     item.add(0, '</table>')
-
+    if self.pivotFilters:
+      item.add(0, '<i class="fa fa-filter" aria-hidden="true"></i>&nbsp;<i>Static Data filter applied on the recordSet</i>')
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
 
