@@ -192,6 +192,9 @@ class DataTable(AresHtml.Html):
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
+    self.mouveHover('#BFFCA6', 'black')
+    self.option('scrollCollapse', 'false')
+    self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
     if len(rows) < self.__options['pageLength']:
       self.__options['info'] = 'false'
       self.__options['bPaginate'] = 'false'
