@@ -425,18 +425,20 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
 
-  def callBackSumFooter(self):
+  def callBackSumFooter(self, digit=2):
     """ """
     self.withFooter = True
     self.callBacks('footerCallback',
                    '''
                       var api = this.api();
                       api.columns('.sum', { page: 'current' } ).every(function () {
-                          var sum = this.data().reduce(function (a, b) {
-                            var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
-                      $(this.footer()).html(sum);
+                          var sum = this.data().reduce(function (a, b) {var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
+                      var result;
+                      if (sum < 0) {result = "<font style='color:red'>" + sum.formatMoney(%s, ',', '.') + "</font>" ;}
+                      result = "<font style='color:green'>" + sum.formatMoney(%s, ',', '.') + "</font>";
+                      $(this.footer()).html(result);
                       } );
-                   ''')
+                   ''' % (digit, digit))
 
   def callBackHeaderColumns(self):
     """  """
