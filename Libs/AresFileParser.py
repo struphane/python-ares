@@ -18,6 +18,7 @@ import csv
 
 regex = re.compile('[^a-zA-Z0-9_]')
 
+
 class FileParser(object):
   """
   """
@@ -72,6 +73,14 @@ class FileParser(object):
     """ Close the underlying file """
     if not self.__inputFile.closed:
       self.__inputFile.close()
+
+
+class FilePivot(FileParser):
+  """ Standard file format for the files used to filter a pivot table from a Datatable """
+  hdrLines = 1
+  delimiter = '#'
+  cols = [{'colName': 'Column ID', 'key': 'COL_ID', 'dsc': 'The column ID in the recordSet'},
+          {'colName': 'Value', 'key': 'COL_VALS', 'dsc': 'values are delimited with a pipe'}]
 
 def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName, folder='outputs'):
   """ Write the file to the dedicated output folder """

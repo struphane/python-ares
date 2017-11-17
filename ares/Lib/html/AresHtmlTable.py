@@ -66,6 +66,7 @@ class DataTable(AresHtml.Html):
     self.theadCssCls = ['thead-inverse']
     self.reqCss = list(self.__reqCss)
     self.reqJs = list(self.__reqJs)
+    self.pivotFilters = {}
     if dataFilters is not None:
       recordSet = []
       for rec in vals:
@@ -175,7 +176,7 @@ class DataTable(AresHtml.Html):
     for colId in colsId:
       self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % colId)
 
-  def agg(self, keys, vals, filters=None, digit=0):
+  def agg(self, keys, vals, digit=0):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
     self.noPivot = False
     self.recordSetHeader = []
@@ -185,7 +186,7 @@ class DataTable(AresHtml.Html):
       self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.__options["ordering"] = 'false'
-    rows = AresChartsService.toAggTable(self.vals, keys, vals, filters)
+    rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
     if len(rows) < self.__options['pageLength']:
       self.__options['info'] = 'false'
@@ -203,11 +204,11 @@ class DataTable(AresHtml.Html):
     self.__options['data'] = json.dumps(rows)
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
 
-  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False, extendTable=False, digit=0):
+  def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0):
     """ Create the pivot table """
     self.noPivot = False
     self.__options["ordering"] = 'false'
-    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
@@ -292,6 +293,14 @@ class DataTable(AresHtml.Html):
 
                }
                ''' % self.htmlId, colIndex=5)
+
+  def addPivotFilter(self, fileName):
+    """ Simple function to add filter rules in the pivot logic based on a text file """
+    if not fileName.startswith("filterTable_"):
+      raise Exception("%s should start with the name filterTable_" % fileName)
+
+    for rec in self.aresObj.files[fileName]:
+      self.pivotFilters[rec['COL_ID']] = rec['COL_VALS'].split("|")
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
