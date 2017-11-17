@@ -374,6 +374,8 @@ def toPivotTable(recordSet, keys, vals, removeZero=True, filters=None):
       row['_parent'] = 1
       row['_leaf'] = 0
     else:
+      for i in range(parents[compKey]['level']):
+        row[keys[i]] = '' # Remove the duplicated entries
       row['_parent'] = 0
     row['level'] = parents[compKey]['level']
     result.append(row)
