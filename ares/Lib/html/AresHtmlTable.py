@@ -654,7 +654,7 @@ class DataTable(AresHtml.Html):
     """ Add a button to add an entry to the Data Table """
     self.__options['dom'] = "'Bfrtip'"
     emptyCol = dict([(self.recKey(col), '') for col in self.header[-1]])
-    self.addButton("{ text: 'Add Row', action: function (e, dt, node, config ) {%s.row.add( %s ).draw( false ) ;} }" % (self.htmlId, json.dumps(emptyCol)))
+    self.addButton("{ text: 'Add Row', className: 'btn btn-success', action: function (e, dt, node, config ) {%s.row.add( %s ).draw( false ) ;} }" % (self.htmlId, json.dumps(emptyCol)))
 
   def __str__(self):
     """ Return the string representation of a HTML table """
