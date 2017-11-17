@@ -49,18 +49,21 @@ class InputPass(InputText):
   """ Input text box for a password """
   references = ['https://developer.mozilla.org/fr/docs/Web/HTML/Element/Input/password']
   inputType = "password"
+  __css = {'width': '100%', 'height': '32px'}
 
 
 class InputInt(InputText):
   """ """
   references = ['https://www.alsacreations.com/tuto/lire/1409-formulaire-html5-type-number.html']
   inputType = "number"
+  __css = {'width': '100%', 'height': '32px'}
 
 
 class InputRange(InputText):
   """ """
   references = ['https://www.alsacreations.com/tuto/lire/1410-formulaire-html5-type-range.html']
   inputType = "range"
+  __css = {'width': '100%', 'height': '32px'}
 
 
 class DatePicker(AresHtml.Html):
