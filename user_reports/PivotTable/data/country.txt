@@ -1,5 +1,5 @@
 Code	Country
-ad	Andorra
+Youpi	Andorra
 ae	United Arab Emirates
 af	Afghanistan
 ag	Antigua and Barbuda
@@ -250,4 +250,4 @@ yu	Yugoslavia
 za	South Africa
 zm	Zambia
 zr	Zaire
-zw	Zimbabwe
+jhkhkjh	Zimbabwe
