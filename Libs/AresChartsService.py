@@ -422,6 +422,26 @@ def toAggTable(recordSet, keys, vals, removeZero=True, filters=None):
   return result
 
 
+def toVenn(recordSet, col1, col2, vals, extKeys=None):
+  """
+  Simple Venn chart based on two columns
+
+  """
+  tmpResults = collections.defaultdict(int)
+  for rec in recordSet:
+    if vals[0][1] is not None:
+      tmpResults[(rec[col1], rec[col2])] += vals[0][1](rec[vals[0][0]])
+      tmpResults[(rec[col1],)] += vals[0][1](rec[vals[0][0]])
+      tmpResults[(rec[col2],)] += vals[0][1](rec[vals[0][0]])
+    else:
+      tmpResults[(rec[col1], rec[col2])] += rec[vals[0][0]]
+      tmpResults[(rec[col1],)] += rec[vals[0][0]]
+      tmpResults[(rec[col2],)] += rec[vals[0][0]]
+  result = []
+  for cat, value in tmpResults.items():
+    result.append({'sets': cat, 'size': int(value)},)
+  return {'%s_%s_%s' % (col1, col2, vals[0][0]): result}
+
 if __name__ == '__main__':
   recordSet = [{'cpty': 'BNPPAR', 'ptf' : 11, 'prd': 'Trs', 'value': 10},
                {'cpty': 'BNPPAR', 'ptf' : 12, 'prd': 'Bond', 'value': 10},
@@ -429,4 +449,5 @@ if __name__ == '__main__':
 
   keys = [['cpty', 'ptf', 'prd']]
   vals = ['value']
-  print( toNetwork(recordSet, keys) )
+  import json
+  print( json.dumps(toVenn(recordSet, 'cpty', 'ptf', 'value')))

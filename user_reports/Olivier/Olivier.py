@@ -65,11 +65,11 @@ def report(aresObj):
     val = random.randrange(0, 1000)
     mod = val % size
     data.append({"CCY": ccys[mod], 'VAL': val, 'COB': '2017-10-20'})
-  aresObj.venn([], [], mockData=True)
+
   data = [{"CCY": 'EUR', 'PRD': 'Bond', "PTF": '4', 'VAL': 66, 'VAL2': -1e4, 'COB': '2017-10-18'},
-        {"CCY": 'EUR', 'PRD': 'Bond Option', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
-        {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
-        {"CCY": 'USD', 'PRD': 'Cds', "PTF": '4', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
+          {"CCY": 'EUR', 'PRD': 'Bond Option', "PTF": '4', 'VAL': 66, 'VAL2': -164, 'COB': '2017-10-17'},
+          {"CCY": 'GBP', 'PRD': 'Bond', "PTF": '2', 'VAL': 45, 'VAL2': 3, 'COB': '2017-10-15'},
+          {"CCY": 'USD', 'PRD': 'Cds', "PTF": '4', 'VAL': 103, 'VAL2': 100, 'COB': '2017-10-20'},
         ]
 
   header = [
@@ -81,6 +81,9 @@ def report(aresObj):
     {'key': "VAL2", 'colName': 'Pv'}
   ]
 
+  venn = aresObj.venn(data, header)
+  venn.setKeys(["CCY", "PRD"])
+  venn.setVals(["VAL"])
   dropdownPrd = aresObj.select(data, 'PRD')
   dropdownPrd.setDefault("Cds")
 
