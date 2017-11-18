@@ -755,6 +755,8 @@ class DataTable(AresHtml.Html):
       item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
+      if 'width' in self.attr.get('css', {}):
+        item.cssAttr['width'] = self.attr['css']['width']
 
     # Add the javascript dynamique part to the DataTabe
     options = []
