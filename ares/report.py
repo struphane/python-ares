@@ -403,6 +403,7 @@ def run_report(report_name, script_name, user_id):
 def ajaxCall(report_name, script):
   """ Generic Ajax call """
   onload, js, error = '', '', False
+  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
   try:
     reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
@@ -422,8 +423,24 @@ def ajaxCall(report_name, script):
     reportObj.reportName = report_name
     report = __import__(report_name)
     for fileConfig in getattr(report, 'FILE_CONFIGS', []):
-      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
-      reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
+      if fileConfig.get('type') == 'data':
+        if file['alias'] in reportObj.http.get('FILE_MAP', {}):
+          raise AresExceptions('You cannot use the same code for a static and an output')
+
+        queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
+        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
+        for file in files:
+          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
+          reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
+      elif fileconfig.get('type') == 'static':
+        if file['alias'] in reportObj.http.get('FILE_MAP', {}):
+          raise AresExceptions('You cannot use the same code for a static and an output')
+
+        queryFileMapPrm = {'type': fileconfig.get('type'), 'file_cod': fileConfig['filename']}
+        reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
+        reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
+        reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
+
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
