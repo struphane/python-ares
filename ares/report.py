@@ -46,7 +46,7 @@ try:
 except:
   pass
 
-
+AUTHORIZED_SOURCES = []
 report = Blueprint('ares', __name__, url_prefix='/reports')
 
 def no_login(function):
@@ -111,6 +111,8 @@ def getHttpParams(request):
   httpParams['CONFIG'] = {}
   httpParams['CONFIG']['WRK'] = config.WORK_PATH
   httpParams['CONFIG']['COMPANY'] = config.COMPANY
+  for source in AUTHORIZED_SOURCES:
+    httpParams[source] = session[source]
   return httpParams
 
 def getFileName(script, exts):
@@ -1071,6 +1073,7 @@ def createDataSource():
   if dataSource:
     db.session.delete(dataSource)
     db.session.commit()
+    session[source] = (username, password)
   dataSource = DataSource(source, user.uid, username, encryptPwd, salt)
   db.session.add(dataSource)
   db.session.commit()
