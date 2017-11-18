@@ -19,6 +19,7 @@ CREATE TABLE file_map (
 CREATE TABLE file_auth (
  file_id integer,
  team_id integer,
+ temp_owner text,
  stt_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  end_dt timestamp NOT NULL DEFAULT '3000-01-01',
  CONSTRAINT FK_FilemapFileauth FOREIGN KEY (file_id) REFERENCES file_map(file_id),
@@ -44,6 +45,7 @@ CREATE TABLE like_env (
 CREATE TABLE env_auth (
  env_id integer,
  team_id integer,
+ temp_owner text,
  stt_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  end_dt timestamp NOT NULL DEFAULT '3000-01-01',
  CONSTRAINT FK_EnvDefEnvAuth FOREIGN KEY (env_id) REFERENCES env_def(env_id),

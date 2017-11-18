@@ -170,8 +170,14 @@ def checkAuth(dbpath, report_name):
                INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
                INNER JOIN team_def ON env_auth.team_id = team_def.team_id and team_def.team_name = '%s'""" % (report_name, session['TEAM'])
 
+  subQuery = """SELECT 1 FROM env_auth
+                WHERE temp_owner = '%s'""" % current_user.email
   if not list(db.select(query)):
-    return False
+    if not list(db.select(subQuery)):
+      return False
+
+    else:
+      return True
 
   else:
     return True
@@ -666,7 +672,11 @@ def deployment():
   hasFiles = False
   if request.files.getlist('file')[0]:
     hasFiles = True
-  DATA = {'files': zip(request.files.getlist('file'), request.values.getlist('File Type'), request.values.getlist('file_code'))}
+  DATA = {'files': list(zip(request.files.getlist('file'), request.form.getlist('File Type'), request.form.getlist('file_code')))}
+  for file, fileType, fileCod in DATA['files']:
+    if fileType in ['static', 'data'] and not fileCod:
+      return json.dumps('Error - You should specify a file code for statics and outputs'), 500
+
   env = request.values['env']
   isNew = True if request.values['isNew'] == 'true' else False
   if isNew:
@@ -682,7 +692,7 @@ def createEnv(environment):
   This service will create the environment and also add an emtpy report.
   The log file will be produce and the zip archive with the history will be defined
   """
-  DIR_LIST = ['data', 'static', 'styles', 'saved', 'utils']
+  DIR_LIST = ['data', 'ajax', 'static', 'styles', 'saved', 'utils']
   email_addr = session['user_id']
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   reportObj = Ares.Report()
@@ -703,7 +713,8 @@ def createEnv(environment):
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
 
-    queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': environment}
+    # queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': environment}
+    queryParams = {'team_name': session['TEAM'], 'env_name': environment,  'username': email_addr,}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
     queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'username': email_addr, 'team_name': session['TEAM']}
@@ -725,14 +736,16 @@ def deployFiles(env, DATA):
   report_name = env
   reportTypes = {'report': (['.PY'], None), 'static': (['.DAT', '.TXT', '.CSV', '.JSON'], 'static'),
                  'data': (None, 'data'), 'styles': (['.CSS', '.JS'], 'styles'),
-                 'saved': (['.HTML'], 'saved'), 'utils': (['.PY'], 'utils') }
+                 'saved': (['.HTML'], 'saved'), 'utils': (['.PY'], 'utils'), 'ajax': (['.PY'], 'ajax') }
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
 
   if not checkAuth(dbPath, report_name):
+    print("Not Authorized")
     return json.dumps('Not authorized to deploy on environment: %s' % report_name), 500
 
   if report_name.startswith("_"):
     return json.dumps("Environment Name cannot start with _"), 500
+
 
   for fileObj, fileType, fileCod in DATA['files']:
     if fileType not in reportTypes:
