@@ -276,7 +276,7 @@ class ButtonSaveTable(AresHtml.Html):
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     jsDef = '''
               %s
-              $.post("%s", {fileName: '%s', parserModule: '%s', reportName: '%s', datatable: %s, folder: '%s'}, function(data) {
+              $.post("%s", {fileName: %s, parserModule: '%s', reportName: '%s', datatable: %s, folder: '%s'}, function(data) {
                   var res = JSON.parse(data) ;
                   var data = res.data ;
                   var status = res.status ;
