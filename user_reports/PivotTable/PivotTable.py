@@ -58,7 +58,6 @@ def report(aresObj):
   #pivotTable.addPivotFilter('filterTable_mytable.txt')
   pivotTable.agg(['TYPE', 'ISSUER'], ['TTTT'])
   pivotTable.buttonExport()
-  pivotTable.dblClickOvr()
   pivotTable.addCols(['Aurelie'], ['Youpi'])
   pivotTable.callBackSumFooter()
   #pivotTable.addRow()
