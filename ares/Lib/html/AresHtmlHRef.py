@@ -105,6 +105,8 @@ class InternalLink(AresHtml.Html):
 
     data = json.dumps(self.getData, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()')
     jsDef = '''
+                %s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing');
+                %s.addClass('disabled');
                 var baseUrl = "%s";
                 var data = %s;
                 var params = "";
@@ -117,6 +119,6 @@ class InternalLink(AresHtml.Html):
                 if (baseUrl.indexOf("?") !== -1) { var ullUrl = baseUrl + "&" + params ; }
                 else { var ullUrl = baseUrl + "?" + params ; }
                 window.location.href = ullUrl ;
-            ''' % (url, data)
+            ''' % (self.jqId, self.jqId, url, data)
     self.js('click', jsDef)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)

@@ -11,6 +11,12 @@
   opacity: 0;
 }
 
+a.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+}
+
 .static_row {
     color: #768488;
     font-style: italic;
