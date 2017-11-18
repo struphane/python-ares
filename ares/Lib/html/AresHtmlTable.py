@@ -324,11 +324,13 @@ class DataTable(AresHtml.Html):
                }
                ''' % self.htmlId, colIndex=5)
 
-  def addPivotFilter(self, fileName):
+  def addPivotFilter(self, fileCod, fileName):
     """ Simple function to add filter rules in the pivot logic based on a text file """
     if not fileName.startswith("filterTable_"):
       raise Exception("%s should start with the name filterTable_" % fileName)
 
+    self.pivotFilterFileName = fileName
+    self.pivotFilterFileCode = fileCod
     for rec in self.aresObj.files[fileName]:
       self.pivotFilters[rec['COL_ID']] = rec['COL_VALS'].split("|")
 
@@ -746,15 +748,50 @@ class DataTable(AresHtml.Html):
       item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static filters applied on the recordSet</a><br/>' % self.htmlId)
       self.aresObj.jsOnLoadFnc.add('''
         $('#filter_%s').click(function () {
+            var internalTableId = '%s' ;
             $("#popup-black-background").show();
+            $("#popup-chart").empty();
+            $("#popup-chart").append('<div style="width:100%%;height:40px;background-color:#7bb062;color:white;font-size: 20px">Filter configuration</div>');
+            $("#popup-chart").append('<input type="text" class="form-control" id="filename_' + internalTableId + '" value="%s">');
+            $("#popup-chart").append("%s");
+
+            var filters = %s;
+            for(key in filters){
+              $("#popup-chart").append('<div style="text-align:left;width:90%%;height:30px;margin-left:5%%;margin-right:5%%;margin-top:10px">' + key + '<input class="form-control" id="filter_new_' + key + '_'+ internalTableId +'" style="width:60%%;display:inline;margin-left:5px;margin-right:5px;height:35px" type="text"><button id="filter_add_'+ key + '_' + internalTableId + '" class="btn btn-success">add</button>&nbsp;<button id="filter_del_'+ key + '_' + internalTableId + '" class="btn btn-danger">remove</button></div>');
+              var selectbox = $('<select id="filter_val_'+ key + '_' + internalTableId +'" size="4" style="width:90%%;padding-left:5%%;padding-right:5%%;margin-top:10px">');
+              for (val in filters[key]){
+                selectbox.append($('<option>').text(filters[key][val]).val(filters[key][val]));
+              }
+              $("#popup-chart").append(selectbox);
+              $("#popup-chart").append("<BR>") ;
+
+              $("#filter_add_"+ key + "_" + internalTableId).click({srcInput: '#filter_new_' + key + '_' + internalTableId, selectBox:'#filter_val_'+ key + '_' + internalTableId}, function(event) {
+                  var newItem = $(event.data.srcInput).val();
+                  $(event.data.selectBox).append($('<option>').text(newItem).val(newItem));
+              });
+
+              $("#filter_del_"+ key + "_" + internalTableId).click({selectBox:'#filter_val_'+ key + '_' + internalTableId}, function(event) {
+                  $(event.data.selectBox +" option:selected").remove();
+              });
+            }
+
+            $("#popup-chart").append("<input id='filter_valid_" + internalTableId + "' type='submit' class='btn btn-success' value='Save'>")
             $("#popup-chart").show();
 
             $("#popup-black-background").click(function() {
               $("#popup-black-background").hide();
               $("#popup-chart").hide();
             });
+
+            $("#filter_valid_"+ internalTableId).click(function() {
+              $("input[name=filter_val_" + internalTableId + "]").each(function (i, el) {
+                alert($(el).attr('id'));
+              });
+            });
+
         });
-      ''' % self.htmlId)
+      ''' % (self.htmlId, self.htmlId, self.pivotFilterFileName, self.pivotFilterFileCode, json.dumps(self.pivotFilters)))
+
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
       if 'width' in self.attr.get('css', {}):
