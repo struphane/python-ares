@@ -34,6 +34,10 @@ class Svg(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
+  def dispatch(self, dispatchType, dispatchFnc):
+    """ Add items and the functions in the dispatch methods in the chart """
+    self.dispatch[dispatchType] = dispatchFnc
+
   def changeColor(self, rangeColors):
     """ Change the default colors in the chart """
     self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
