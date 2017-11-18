@@ -743,7 +743,7 @@ class DataTable(AresHtml.Html):
       sortType = 'worst' if self.sortBy[1] == 'dsc' else 'top'
       item.add(0, '<a id="sort_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
     if self.pivotFilters:
-      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static Data filter applied on the recordSet</a><br/>' % self.htmlId)
+      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static filters applied on the recordSet</a><br/>' % self.htmlId)
       self.aresObj.jsOnLoadFnc.add('''
         $('#filter_%s').click(function () {
             $("#popup-black-background").show();
