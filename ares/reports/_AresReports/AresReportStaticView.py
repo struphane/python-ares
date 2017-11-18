@@ -28,7 +28,7 @@ def report(aresObj):
       for rec in aresObj.files[fileDef['filename']]:
         recordSet.append(rec)
 
-      table = aresObj.table(recordSet, fileConfig.getHeader(), headerBox="Static File - %s" % aresObj.http['static_file'])
+      table = aresObj.table(recordSet, fileConfig.getHeader(), headerBox="Static File - %s" % aresObj.http['static_file'], cssAttr={'width': '600px'})
       table.callBackFooterColumns()
 
   sys.path.remove(userDirectory)
