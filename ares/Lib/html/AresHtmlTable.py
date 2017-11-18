@@ -210,7 +210,6 @@ class DataTable(AresHtml.Html):
     for val in vals:
       self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
-    self.__options["ordering"] = 'false'
     rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
     self.mouveHover('#BFFCA6', 'black')
@@ -600,7 +599,7 @@ class DataTable(AresHtml.Html):
               blur: function() {
                  $this.text(this.value);
                  if (curValue != $this.text()) {
-                  $this.css({'color': '#b3b300'});
+                  $this.css({'color': '#2807ff'});
                   var cell = %s.cell( $this );
                   cell.data( this.value ).draw();
                  }
