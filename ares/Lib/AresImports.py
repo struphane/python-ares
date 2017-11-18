@@ -85,7 +85,7 @@ CSS_IMPORTS = {
   'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css']},
 
   'font-awesome': {'modules': ['font-awesome.min.css'],
-                   'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css'
+                   #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css'
                    },
 
   'd3': {'req': ['bootstrap'], 'modules': ['nv.d3.min.css']},
