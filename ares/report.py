@@ -209,6 +209,22 @@ def getFileAuth(dbPath, report_name, file_name, user_id):
               WHERE team_def.team_name = '%s' and file_map.raw_name = '%s' """ % (session['TEAM'], file_name)
   return list(db.select(dbPath, query))
 
+def getEnvFiles(dbPath, report_name, team, username):
+  """ """
+  db = AresSql.SqliteDB(report_name)
+  query = """SELECT file_map.disk_name as file
+              FROM file_map
+              INNER JOIN file_auth ON file_auth.file_id = file_map.file_id
+              INNER JOIN team_def ON team_def.team_id = file_auth.team_id
+              WHERE team_def.team_id = '%s' """ % team
+
+  subquery = """SELECT file_map.disk_name as file
+              FROM file_map
+              INNER JOIN file_auth ON file_auth.file_id = file_map.file_id
+              WHERE file_auth.temp_owner = '%s' """ % username
+
+  result = list(db.select(dbPath, query)) + list(db.select(dbPath, subquery))
+
 def checkFileExist(dbPath, report_name, file_name):
   """ """
   db = AresSql.SqliteDB(report_name)
@@ -951,10 +967,12 @@ def downloadReport(report_name):
 
         folder = path.replace("%s" % reportPath, "")
         if folder == '\data':
-          #TODO Add check on the scurity to add the data for a given user
-          continue
+          listAuthFiles = [rec['file'] for rec in getEnvFiles()]
+          if pyFile in in listAuthFiles:
+            zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
+        else:
+          zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
 
-        zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
     # Add all the external libraries
     libPath = os.path.join(current_app.config['ROOT_PATH'], 'Libs')
     for (path, dirs, files) in os.walk(libPath):
