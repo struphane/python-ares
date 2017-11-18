@@ -27,7 +27,6 @@ db = SQLAlchemy(app)
 app.config['SECRET_KEY'] = 'K3y2BCh4ng3d'#Change this if you want the app to work
 
 
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 

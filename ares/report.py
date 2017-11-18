@@ -229,7 +229,9 @@ def checkFileExist(dbPath, report_name, file_name):
 # _ is dedicated to internal environments (for BDI only)
 # ------------------------------------------------------------------------------------------------------------
 
-
+@report.route('/favicon.ico')
+def favicon():
+  return send_from_directory(os.path.join(current_app.config['ROOT_PATH'], 'static', 'images'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @report.route("/deploy", methods=['GET'])
 def aresDeploy():

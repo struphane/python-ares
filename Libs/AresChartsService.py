@@ -16,7 +16,6 @@ in the chart interface in the future your report will not be impacted as this in
 """
 
 import re
-import json
 import time
 import datetime
 import collections

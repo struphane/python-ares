@@ -560,6 +560,7 @@ class AresBox(AresHtml.Html):
     self.vals = vals
     self.headerBox = headerBox
     self.prop = properties
+    self.cssAttr = {'margin-top': '10px'}
 
   @property
   def htmlId(self):
@@ -568,7 +569,8 @@ class AresBox(AresHtml.Html):
 
   def __str__(self):
     """  Return the HTML representation of the Box objects """
-    item = AresItem.Item('<div class="%s" id="%s_main" style="margin-top:10px">' % (" ".join(self.cssCls), self.htmlId))
+    attr = 'style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.cssAttr.items()])
+    item = AresItem.Item('<div class="%s" id="%s_main" %s>' % (" ".join(self.cssCls), self.htmlId, attr))
     item.add(1, '<div class="ares-panel-heading">')
     item.add(2, '<strong><i class="fa fa-table" aria-hidden="true"></i>&nbsp;%s</strong>' % self.headerBox)
     item.add(3, '<button class="btn btn-xs " id="%s_close" name="ares_close"></button>' % self.htmlId)
