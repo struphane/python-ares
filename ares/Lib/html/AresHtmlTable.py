@@ -149,7 +149,7 @@ class DataTable(AresHtml.Html):
         # default value for a header definition
         # the className is an optional parameter and it might define a specific class if needed
         if 'className' in col:
-          self.recordSetHeader.append('{ data: "%s", title: "%s", className="%s"}' % (self.recKey(col), col.get("colName"), col["className"]))
+          self.recordSetHeader.append('{ data: "%s", title: "%s", className: "%s"}' % (self.recKey(col), col.get("colName"), col["className"]))
         else:
           self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
       self.recMap[self.recKey(col)] = col.get("colName")
@@ -202,17 +202,13 @@ class DataTable(AresHtml.Html):
   def agg(self, keys, vals, digit=0, isColStriped=True):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
     self.noPivot = False
-    newHeader = []
     if isColStriped:
       self.addClass('table-striped')
     self.recordSetHeader = []
     for col in keys:
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
-      newHeader.append({'key': col, 'colName': self.recMap.get(col, col)})
     for val in vals:
       self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
-      newHeader.append({'key': val, 'colName': self.recMap.get(val, val)})
-    self.header[-1] = newHeader
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
@@ -240,13 +236,10 @@ class DataTable(AresHtml.Html):
   def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0):
     """ Create the pivot table """
     self.noPivot = False
-    newHeader = []
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
-    for col in keys:
-      newHeader.append({'key': col, 'colName': self.recMap.get(col, col)})
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
       if colRenders is not None and col in colRenders:
         if 'url' in colRenders[col]:
@@ -254,35 +247,33 @@ class DataTable(AresHtml.Html):
           colRenders[col]['url']['report_name'] = self.aresObj.http['REPORT_NAME']
           getParams = ",".join(["%s='%s'"% (key, val) for key, val in colRenders[col]['url'].items()])
           url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % getParams)
-          self.recordSetHeader.append('''{ data: "%s", title: "%s",
-              render: function (data, type, full, meta) {
+          self.recordSetHeader.append('''{ "data": "%s", "title": "%s",
+              "render": function (data, type, full, meta) {
                   var url = "%s"; var cols = JSON.parse('%s'); rowParams = '' ;
                   for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];}
                   if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
                   else {url = url + '?' + rowParams.substring(1) ;}
                   return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(colRenders[col]['cols'])))
       else:
-        self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
+        self.recordSetHeader.append('{ "data": "%s", "title": "%s" }' % (col, self.recMap.get(col, col)))
     for col in vals:
-      newHeader.append({'key': col, 'colName': self.recMap.get(col, col)})
       if withUpDown:
-        self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
-          render: function (data, type, full, meta) {
+        self.recordSetHeader.append('''{ "data": "%s", "title": "%s",  "className": 'sum',
+          "render": function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
               return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(%s, ',', '.') + "</i>" ;}
             return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(%s, ',', '.') + "</i>" ; } }
         ''' % (col, self.recMap.get(col, col), digit, digit))
       else:
-        self.recordSetHeader.append('''{ data: "%s", title: "%s",
-          render: function (data, type, full, meta) {
+        self.recordSetHeader.append('''{ "data": "%s", "title": "%s",
+          "render": function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
               return "<font style='color:red'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ;
             }
             return "<font style='color:green'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ; } }
         ''' % (col, self.recMap.get(col, col), digit, digit))
-    self.header[-1] = newHeader
     if len(rows) < self.__options['pageLength']:
       self.__options['info'] = 'false'
       self.__options['bPaginate'] = 'false'
@@ -735,9 +726,13 @@ class DataTable(AresHtml.Html):
     if self.withFooter:
       item.add(1, "<tfoot>")
       item.add(2, "<tr>")
-      for col in self.header[-1]:
-        if col.get("visible", True):
-          item.add(3, "<th>%s</th>" % col.get("colName"))
+      if len(self.header) > 1:
+        for col in self.header[-1]:
+          if col.get("visible", True):
+            item.add(3, "<th>%s</th>" % col.get("colName"))
+      else:
+        for _ in self.recordSetHeader:
+          item.add(2, "<th></th>")
       item.add(2, "</tr>")
       item.add(1, "</tfoot>")
     item.add(1, "<tbody>")
