@@ -47,11 +47,13 @@ def report(aresObj):
     content.append({'report_name': name, 'Date': folderInfo['LAST_MOD_DT'], 'Size': float(folderInfo['SIZE'].split(" ")[0]),
                     'FolderName': folder, 'Day': folderInfo['LAST_MOD_DT'].split(" ")[0], #'folderLink': aresObj.internalLink(name, folder, attrs={'REPORT_NAME': folder}, cssCls=[]),
                     'FolderFiles': len(aresObj.getFiles([folder])), 'activity': folderEvents[folder]['count'],
+                    'show_params': '1',
                     'creationDate': folderEvents[folder]['data'].get('FOLDER CREATION', '')})
 
   # Create a new report # 'Existing Reports',
   tableComp = aresObj.table(content, [{'key': 'FolderName', 'colName': 'Folder Name'},
-                                      {'key': 'report_name', 'colName': 'Folder Name', 'url': {'cols': ['report_name', 'FolderName']}},
+                                      {'key': 'show_params', 'colName': 'Show Params', 'visible': 'false'},
+                                      {'key': 'report_name', 'colName': 'Folder Name', 'url': {'cols': ['report_name', 'FolderName', 'show_params']}},
                                       {'key': 'FolderFiles', 'colName': 'Count Files'},
                                       {'key': 'creationDate', 'colName': 'Creation'},
                                       {'key': 'Date', 'colName': 'Last Modification'},
