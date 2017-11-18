@@ -64,12 +64,21 @@ CREATE TABLE mrx_calls (
 --logs connection
 CREATE TABLE logs_con (
  email text NOT NULL,
- team_name NOT NULL,
- env_id text NOT NULL,
+ team_name text NOT NULL,
+ env_id integer NOT NULL,
  script text NOT NULL,
  lst_mod_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
  CONSTRAINT FK_EnvDefLogsCon FOREIGN KEY (env_id) REFERENCES env_def(env_id)
  );
+
+--logs download
+CREATE TABLE logs_download (
+  email text NOT NULL,
+  team_name text NOT NULL,
+  env_id integer NOT NULL,
+  lst_mod_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT FK_EnvDefLogDown FOREIGN KEY (env_id) REFERENCES env_def(env_id)
+);
 
 --logs deployment
 CREATE TABLE logs_deploy (

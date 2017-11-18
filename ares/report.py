@@ -199,7 +199,7 @@ def getUserRole(dbPath, report_name, user_id):
              WHERE team_name = '%s' """ % session['TEAM']
   return list(db.select(dbPath, query))
 
-def getFileAuth(dbPath, report_name, file_name, user_id):
+def getFileAuth(report_name, file_name):
   """ """
   db = AresSql.SqliteDB(report_name)
   query = """SELECT file_auth.alias as "alias", file_map.disk_name as "raw_name" 
@@ -207,9 +207,9 @@ def getFileAuth(dbPath, report_name, file_name, user_id):
               INNER JOIN file_map on file_map.file_id = file_auth.file_id
               INNER JOIN team_def on team_def.team_id = file_map.uid
               WHERE team_def.team_name = '%s' and file_map.raw_name = '%s' """ % (session['TEAM'], file_name)
-  return list(db.select(dbPath, query))
+  return list(db.select(query))
 
-def getEnvFiles(dbPath, report_name, team, username):
+def getEnvFiles(report_name, team, username):
   """ """
   db = AresSql.SqliteDB(report_name)
   query = """SELECT file_map.disk_name as file
@@ -223,7 +223,7 @@ def getEnvFiles(dbPath, report_name, team, username):
               INNER JOIN file_auth ON file_auth.file_id = file_map.file_id
               WHERE file_auth.temp_owner = '%s' """ % username
 
-  result = list(db.select(dbPath, query)) + list(db.select(dbPath, subquery))
+  return list(db.select(query)) + list(db.select(subquery))
 
 def checkFileExist(dbPath, report_name, file_name):
   """ """
@@ -231,7 +231,7 @@ def checkFileExist(dbPath, report_name, file_name):
   query = """SELECT file_id 
                 FROM file_map
                 WHERE disk_name = '%s' """ % file_name
-  return list(db.select(dbPath, query))
+  return list(db.select(query))
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
@@ -794,7 +794,7 @@ def deployFiles(env, DATA):
       if not fileCod and fileType == 'data':
         return json.dumps('You have to provide a file code for the data type'), 500
       fileCod = filename if not fileCod else fileCod
-      fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'team_name': session['TEAM']}
+      fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'username': user_name, 'team_name': session['TEAM']}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
     queryParams = {'report_name': report_name, 'file': filename, 'type': fileType, 'username': user_name, 'team_name': session['TEAM']}
     executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
@@ -957,6 +957,7 @@ def downloadJsonFiles(jsonFile):
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
   """ Return in a Zip archive the full python package """
+  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
     reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
@@ -967,7 +968,7 @@ def downloadReport(report_name):
 
         folder = path.replace("%s" % reportPath, "")
         if folder == '\data':
-          listAuthFiles = [rec['file'] for rec in getEnvFiles()]
+          listAuthFiles = [rec['file'] for rec in getEnvFiles(report_name, session['TEAM'], current_user.email)]
           if pyFile in listAuthFiles:
             zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
         else:
@@ -989,6 +990,8 @@ def downloadReport(report_name):
         elif not path.endswith('Ares\Libs'):
           zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s\%s" % (folder, pyFile))
 
+  logDownloadParam = {'email': current_user.email, 'team': session['TEAM'], 'report_name': report_name}
+  executeScriptQuery(dbPath, open(os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION, 'log_download.sql')).read(), params=logDownloadParam)
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
