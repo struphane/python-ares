@@ -55,7 +55,7 @@ def report(aresObj):
     recordSet.append(rec)
 
   pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi", cssAttr={'width': '500px'})
-  #pivotTable.addPivotFilter('filterTable_mytable.txt')
+  pivotTable.addPivotFilter('filterTable_mytable.txt')
   pivotTable.agg(['TYPE', 'ISSUER'], ['TTTT'])
   pivotTable.buttonExport()
   pivotTable.addCols(['Aurelie'], ['Youpi'])
@@ -66,14 +66,14 @@ def report(aresObj):
   #pivotTable.callBackHeaderColumns()
   #pivotTable.callBackNumHeatMap('TTTT', 2)
 
-  thread_1 = Afficheur("1")
-  thread_2 = Afficheur("2")
+  #thread_1 = Afficheur("1")
+  #thread_2 = Afficheur("2")
 
-  thread_1.start()
-  thread_2.start()
+  #thread_1.start()
+  #thread_2.start()
 
-  thread_1.join()
-  thread_2.join()
+  #thread_1.join()
+  #thread_2.join()
 
 
 
