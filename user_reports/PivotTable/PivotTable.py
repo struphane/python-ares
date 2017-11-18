@@ -54,7 +54,7 @@ def report(aresObj):
   for rec in aresObj.files['data.txt']:
     recordSet.append(rec)
 
-  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi", cssAttr={'width': '500px'})
+  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi", cssAttr={'width': '500px'}, globalSortBy=('TTTT', 'dsc', 10))
   pivotTable.addPivotFilter('filterTable_mytable.txt')
   pivotTable.agg(['TYPE', 'ISSUER'], ['TTTT'])
   pivotTable.buttonExport()
