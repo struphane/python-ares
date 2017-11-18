@@ -968,7 +968,7 @@ def downloadReport(report_name):
         folder = path.replace("%s" % reportPath, "")
         if folder == '\data':
           listAuthFiles = [rec['file'] for rec in getEnvFiles()]
-          if pyFile in in listAuthFiles:
+          if pyFile in listAuthFiles:
             zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
         else:
           zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
