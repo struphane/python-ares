@@ -19,7 +19,8 @@ FILE_CONFIGS = [
     ]
 
 HTTP_PARAMS = [{'code': 'perimeter', 'dflt': ''},
-               {'code': 'multiplier', 'dflt': 1}]
+               {'code': 'multiplier', 'dflt': 1},
+               {'code': 'countrows', 'dflt': 10}]
 
 
 class Afficheur(Thread):
@@ -42,10 +43,13 @@ def params(aresObj):
   popup.modal_header = "Report parameters"
   aresObj.jsOnLoadFnc.add("%s.modal('show'); " % popup.jqId)
   perimeter = aresObj.input('Perimeter')
+  coutRow = aresObj.inputInt('Count Table')
+  coutRow.addVal(10)
   multiplier = aresObj.input('Multiplier')
-  button = aresObj.internalLink('Run', aresObj.reportName, attrs={'perimeter': perimeter, 'multiplier': multiplier})
+  button = aresObj.internalLink('Run', aresObj.reportName, attrs={'perimeter': perimeter, 'multiplier': multiplier, 'countrows': coutRow})
   aresObj.addTo(popup, perimeter)
   aresObj.addTo(popup, multiplier)
+  aresObj.addTo(popup, coutRow)
   aresObj.addTo(popup, button)
 
 def report(aresObj):
@@ -54,7 +58,7 @@ def report(aresObj):
   for rec in aresObj.files['data.txt']:
     recordSet.append(rec)
 
-  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi", cssAttr={'width': '500px'}, globalSortBy=('TTTT', 'dsc', ''))
+  pivotTable = aresObj.table(recordSet, InFilePricesConfig.InFilePices.getHeader(), headerBox="Youpi", cssAttr={'width': '500px'}, globalSortBy=('TTTT', 'dsc', int(aresObj.http['countrows'])))
   pivotTable.addPivotFilter('filterTable_mytable.txt')
   pivotTable.agg(['TYPE', 'ISSUER'], ['TTTT'])
   pivotTable.buttonExport()
