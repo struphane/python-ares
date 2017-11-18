@@ -7,6 +7,7 @@ A decorator will be added to this class to mention to users that going forward i
 """
 
 import json
+import operator
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -22,7 +23,7 @@ class Td(AresHtml.Html):
   colspan, rowspan = 1, 1
 
 
-  def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None, sortBy=None):
     super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.cssCls = [] if cssCls is None else cssCls
     self.cssAttr = [] if cssAttr is None else cssCls
@@ -62,7 +63,27 @@ class DataTable(AresHtml.Html):
       'footerCallback': "function ( row, data, start, end, display ) { %s }",
   }
 
-  def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None, sortBy=None):
+    """
+
+    :param aresObj:
+    :param vals:
+    :param isheader:
+    :param cssCls:
+    :param cssAttr:
+    :param sortBy: Should be a tuple with (column name, asc / dsc, number of items or Nene)
+    :return:
+    """
+    self.sortBy = sortBy
+    if self.sortBy is not None:
+      if self.sortBy[1].lower() == 'dsc':
+        sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]))
+      else:
+        sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]), reverse=True)
+      if self.sortBy[2] is not None:
+        sortedItems = sortedItems[:self.sortBy[2]]
+      vals = sortedItems
+
     self.cssCls = list(self.__cssCls)
     self.theadCssCls = ['thead-inverse']
     self.reqCss = list(self.__reqCss)
@@ -722,7 +743,7 @@ class DataTable(AresHtml.Html):
     item.add(1, "</tbody>")
     item.add(0, '</table>')
     if self.pivotFilters:
-      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static Data filter applied on the recordSet</a>' % self.htmlId)
+      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static Data filter applied on the recordSet</a><br/>' % self.htmlId)
       self.aresObj.jsOnLoadFnc.add('''
         $('#filter_%s').click(function () {
             $("#popup-black-background").show();
@@ -734,6 +755,9 @@ class DataTable(AresHtml.Html):
             });
         });
       ''' % self.htmlId)
+    if self.sortBy is not None and self.sortBy[2] is not None:
+      sortType = 'worst' if self.sortBy[1] == 'dsc' else 'top'
+      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
 
