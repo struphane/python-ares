@@ -176,6 +176,7 @@ class Report(object):
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
     self.workers = {}
+    self.fileMap = {}
 
   def structure(self):
     return self.content
