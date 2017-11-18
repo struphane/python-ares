@@ -80,7 +80,7 @@ class DataTable(AresHtml.Html):
         sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]))
       else:
         sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]), reverse=True)
-      if self.sortBy[2] is not None:
+      if self.sortBy[2] not in ['', None]:
         sortedItems = sortedItems[:self.sortBy[2]]
       vals = sortedItems
 
@@ -739,8 +739,11 @@ class DataTable(AresHtml.Html):
     item.add(1, "<tbody>")
     item.add(1, "</tbody>")
     item.add(0, '</table>')
+    if self.sortBy is not None and self.sortBy[2] not in [None, '']:
+      sortType = 'worst' if self.sortBy[1] == 'dsc' else 'top'
+      item.add(0, '<a id="sort_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
     if self.pivotFilters:
-      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static Data filter applied on the recordSet</a><br/>' % self.htmlId)
+      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static filters applied on the recordSet</a><br/>' % self.htmlId)
       self.aresObj.jsOnLoadFnc.add('''
         $('#filter_%s').click(function () {
             $("#popup-black-background").show();
@@ -752,9 +755,6 @@ class DataTable(AresHtml.Html):
             });
         });
       ''' % self.htmlId)
-    if self.sortBy is not None and self.sortBy[2] is not None:
-      sortType = 'worst' if self.sortBy[1] == 'dsc' else 'top'
-      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
       if 'width' in self.attr.get('css', {}):
