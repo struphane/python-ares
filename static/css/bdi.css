@@ -514,16 +514,17 @@ tr.nodetails td:first-child:before {
     top: 10px;
     width: 90%;
     height: 90%;
+    overflow : auto;
 }
 
 #popup-chart {
     background-color: white;
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 30%;
     text-align: center;
     width:546px;
-    height:265px;
+    height:565px;
     margin-left: -273px; /*half width*/
     margin-top: -132px; /*half height*/
 }
