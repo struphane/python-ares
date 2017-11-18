@@ -56,7 +56,7 @@ def report(aresObj):
                                       {'key': 'creationDate', 'colName': 'Creation'},
                                       {'key': 'Date', 'colName': 'Last Modification'},
                                       {'key': 'Size', 'colName': 'Size in Ko'}], 'Existing Reports')
-  
+
   #tableComp.filters(['Folder Name'])
   bar = aresObj.bar(content, [{'key': 'report_name', 'colName': 'Folder Name'},
                               {'key': 'Day', 'colName': 'Last Modification'},
