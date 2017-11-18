@@ -370,7 +370,7 @@ def run_report(report_name, script_name, user_id):
     fileStatic = os.path.join(userDirectory, 'static')
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
-        if not staticPage.startswith('filterTable_'):
+        if not staticPage.startswith('filterTable_') and not staticPage.startswith('sortTable_'):
           htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, fileNameToParser.get(staticPage, ''), staticPage)))
 
     if isAuth:

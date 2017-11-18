@@ -82,6 +82,14 @@ class FilePivot(FileParser):
   cols = [{'colName': 'Column ID', 'key': 'COL_ID', 'dsc': 'The column ID in the recordSet'},
           {'colName': 'Value', 'key': 'COL_VALS', 'dsc': 'values are delimited with a pipe'}]
 
+class FileTableSortTopWorst(FileParser):
+  """ Standard file format for the sorting filter to be applied on the datatables """
+  hdrLines = 1
+  delimiter = '#'
+  cols = [{'colName': 'Column ID', 'key': 'COL_ID', 'dsc': 'The column ID in the recordSet'},
+          {'colName': 'Type Sort', 'key': 'COL_SORT', 'dsc': 'Value should be asc or dsc'},
+          {'colName': 'Filter Results', 'key': 'COL_FILTER', 'dsc': 'The count of rows to be displayed'}]
+
 def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName, folder='outputs'):
   """ Write the file to the dedicated output folder """
   outFile = open(r"%s\%s\%s\%s" % (aresObj.http['DIRECTORY'], reportName, folder, outFileName), "w")
