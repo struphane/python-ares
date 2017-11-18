@@ -350,7 +350,7 @@ def run_report(report_name, script_name, user_id):
         if fileConfig['filename'] in reportObj.fileMap:
           raise AresExceptions('You cannot use the same code for a static and an output')
 
-        queryFileMapPrm = {'type': fileconfig.get('folder'), 'file_cod': fileConfig['filename']}
+        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename']}
         staticFiles = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
                                          open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
         for file in staticFiles:
@@ -489,7 +489,7 @@ def ajaxCall(report_name, script):
           reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
           # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
       elif fileConfig.get('type') == 'static':
-        queryFileMapPrm = {'type': fileconfig.get('type'), 'file_cod': fileConfig['filename']}
+        queryFileMapPrm = {'type': fileConfig.get('type'), 'file_cod': fileConfig['filename']}
         files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
         for file in files:
           reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
