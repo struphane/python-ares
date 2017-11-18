@@ -328,12 +328,39 @@ def run_report(report_name, script_name, user_id):
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
     for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
-      reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
-      reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
-      fileNameToParser[fileConfig['filename']] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
-      if 'names' in fileConfig:
-        for name in fileConfig['names']:
-          fileNameToParser[name] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
+      if fileConfig.get('type') == 'data':
+        if file['alias'] in reportObj.fileMap:
+          raise AresExceptions('You cannot use the same code for a static and an output')
+
+        queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
+        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
+        for file in files:
+          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
+          reportObj.files[regex.sub('', file['disk_name'].strip())] = reportObj.files[file['disk_name']]
+          fileNameToParser[file['disk_name']] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
+          if 'names' in fileConfig:
+            for name in fileConfig['names']:
+              fileNameToParser[name] = "%s.%s" % (
+                fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
+          if fnct == 'params':
+            reportObj.fileMap.setdefault(file['alias'], []).append(file['disk_name'])
+      elif fileConfig.get('type') == 'static':
+        if file['alias'] in reportObj.fileMap:
+          raise AresExceptions('You cannot use the same code for a static and an output')
+
+        queryFileMapPrm = {'type': fileconfig.get('type'), 'file_cod': fileConfig['filename']}
+        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
+        for file in files:
+          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
+          reportObj.files[regex.sub('', file['disk_name'].strip())] = reportObj.files[file['disk_name']]
+          fileNameToParser[file['disk_name']] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
+          if 'names' in fileConfig:
+            for name in fileConfig['names']:
+              fileNameToParser[name] = "%s.%s" % (
+              fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
+          if fnct == 'params':
+            reportObj.fileMap.setdefault(file['alias'], []).append(file['disk_name'])
+
     getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
@@ -455,15 +482,13 @@ def ajaxCall(report_name, script):
         files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
         for file in files:
           reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
-          reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
-      elif fileconfig.get('type') == 'static':
-        if file['alias'] in reportObj.http.get('FILE_MAP', {}):
-          raise AresExceptions('You cannot use the same code for a static and an output')
-
+          # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
+      elif fileConfig.get('type') == 'static':
         queryFileMapPrm = {'type': fileconfig.get('type'), 'file_cod': fileConfig['filename']}
-        reportObj.files[fileConfig['filename']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], fileConfig['filename'])))
-        reportObj.files[regex.sub('', fileConfig['filename'].strip())] = reportObj.files[fileConfig['filename']]
-        reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
+        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
+        for file in files:
+          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
+          reportObj.files[regex.sub('', file['disk_name'].strip())] = reportObj.files[file['disk_name']]
 
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
