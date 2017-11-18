@@ -229,11 +229,12 @@ class DataTable(AresHtml.Html):
     colNames = keys if colNames is None else colNames
     for i, key in enumerate(keys):
       self.recordSetHeader.append('{ data: "%s", title: "%s", className: "static_col" }' % (key, colNames[i]))
-    rows = json.loads(self.__options['data'])
+    rows = json.loads(self.__options['data']) if 'data' in self.__options else self.vals
     for row in rows:
       for i, key in enumerate(keys):
         row[key] = vals[i]
-    self.__options['data'] = json.dumps(rows)
+    if 'data' in self.__options:
+      self.__options['data'] = json.dumps(rows)
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
 
   def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0):
