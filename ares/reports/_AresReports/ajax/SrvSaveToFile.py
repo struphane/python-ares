@@ -48,7 +48,7 @@ def call(aresObj):
       #queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
       #executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
     except:
-      pass
+      return 'Problem during the update'
 
     finally:
       sys.path.remove(reportPath)
