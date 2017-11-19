@@ -591,7 +591,7 @@ class DataTable(AresHtml.Html):
     """ Property to get the jquery value of the HTML objec in a python HTML object """
     return "%s.data().toArray()" % self.htmlId
 
-  def dblClickOvr(self):
+  def allowOverride(self):
     """ Override a cell in the datatabble """
     self.aresObj.jsFnc.add('''
         %s.on('dblclick', 'tr td', function () {
@@ -775,7 +775,7 @@ class DataTable(AresHtml.Html):
               });
             }
 
-            $("#popup-chart").append("<input id='filter_valid_" + internalTableId + "' type='submit' class='btn btn-success' value='Save'>")
+            $("#popup-chart").append("<br/><input id='filter_valid_" + internalTableId + "' type='submit' class='btn btn-success' value='Save'><br/><br/>")
             $("#popup-chart").show();
 
             $("#popup-black-background").click(function() {

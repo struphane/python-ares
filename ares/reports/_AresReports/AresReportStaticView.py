@@ -40,7 +40,7 @@ def report(aresObj):
     f.close()
 
   if aresObj.http['file_parser'] != '':
-    table.dblClickOvr()
+    table.allowOverride()
     aresObj.http['REPORT_NAME'] = aresObj.http['user_report_name']
     saveButton.clickStatic(table, aresObj.http['file_parser'], input.val)
   else:
