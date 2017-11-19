@@ -751,26 +751,26 @@ class DataTable(AresHtml.Html):
             var internalTableId = '%s' ;
             $("#popup-black-background").show();
             $("#popup-chart").empty();
-            $("#popup-chart").append('<div style="width:100%%;height:40px;background-color:#7bb062;color:white;font-size: 20px">Filter configuration</div>');
+            $("#popup-chart").append('<div class="logo_small">Filter configuration</div>');
             $("#popup-chart").append('<input type="text" class="form-control" id="filename_' + internalTableId + '" value="%s">');
-            $("#popup-chart").append("%s");
+            $("#popup-chart").append('<input type="hidden" class="form-control" id="fileCode_' + internalTableId + '" value="%s">');
 
             var filters = %s;
             for(key in filters){
               $("#popup-chart").append('<div style="text-align:left;width:90%%;height:30px;margin-left:5%%;margin-right:5%%;margin-top:10px">' + key + '<input class="form-control" id="filter_new_' + key + '_'+ internalTableId +'" style="width:60%%;display:inline;margin-left:5px;margin-right:5px;height:35px" type="text"><button id="filter_add_'+ key + '_' + internalTableId + '" class="btn btn-success">add</button>&nbsp;<button id="filter_del_'+ key + '_' + internalTableId + '" class="btn btn-danger">remove</button></div>');
-              var selectbox = $('<select id="filter_val_'+ key + '_' + internalTableId +'" size="4" style="width:90%%;padding-left:5%%;padding-right:5%%;margin-top:10px">');
+              var selectbox = $('<select name="filter_val_' + internalTableId + '" id="'+ key +'" size="4" style="width:90%%;padding-left:5%%;padding-right:5%%;margin-top:10px">');
               for (val in filters[key]){
                 selectbox.append($('<option>').text(filters[key][val]).val(filters[key][val]));
               }
               $("#popup-chart").append(selectbox);
               $("#popup-chart").append("<BR>") ;
 
-              $("#filter_add_"+ key + "_" + internalTableId).click({srcInput: '#filter_new_' + key + '_' + internalTableId, selectBox:'#filter_val_'+ key + '_' + internalTableId}, function(event) {
+              $("#filter_add_"+ key + "_" + internalTableId).click({srcInput: '#filter_new_' + key + '_' + internalTableId, selectBox:'#'+ key}, function(event) {
                   var newItem = $(event.data.srcInput).val();
                   $(event.data.selectBox).append($('<option>').text(newItem).val(newItem));
               });
 
-              $("#filter_del_"+ key + "_" + internalTableId).click({selectBox:'#filter_val_'+ key + '_' + internalTableId}, function(event) {
+              $("#filter_del_"+ key + "_" + internalTableId).click({selectBox:'#'+ key}, function(event) {
                   $(event.data.selectBox +" option:selected").remove();
               });
             }
@@ -784,13 +784,27 @@ class DataTable(AresHtml.Html):
             });
 
             $("#filter_valid_"+ internalTableId).click(function() {
-              $("input[name=filter_val_" + internalTableId + "]").each(function (i, el) {
-                alert($(el).attr('id'));
+              var content = [];
+              $("select[name=filter_val_" + internalTableId + "]").each(function (i, el) {
+                var row = [$(el).attr('id')] ;
+                var values = [];
+                $('#' + $(el).attr('id') + ' option').each(function(){
+                  values.push($(this).text());
+                });
+                row.push(values.join("|"));
+                content.push(row.join("#"));
               });
+              alert( $('#filename_' + internalTableId).val());
+              //$.post("reports/ajax/_AresReports/SrvSaveToFile", {fileName: $('#filename_' + internalTableId).val(), fileCode: $('#fileCode_' + internalTableId).val(), reportName: '%s', rows: content, folder: 'static'}, function(data) {
+              //    var res = JSON.parse(data) ;
+              //    var data = res.data ;
+              //    var status = res.status ;
+              //    display(data);
+              //} );
             });
 
         });
-      ''' % (self.htmlId, self.htmlId, self.pivotFilterFileName, self.pivotFilterFileCode, json.dumps(self.pivotFilters)))
+      ''' % (self.htmlId, self.htmlId, self.pivotFilterFileName, self.pivotFilterFileCode, json.dumps(self.pivotFilters), self.aresObj.reportName))
 
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
