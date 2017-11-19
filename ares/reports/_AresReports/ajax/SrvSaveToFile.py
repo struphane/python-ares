@@ -39,7 +39,6 @@ def call(aresObj):
     rowNumers = max(resultObj.keys())
     for colIndex in range(rowNumers+1):
       recordSet.append(resultObj[colIndex])
-
     AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols],
                             ajaxMod.delimiter, aresObj.http['fileName'], aresObj.http['folder'])
 
@@ -47,8 +46,9 @@ def call(aresObj):
     executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
     queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
     executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
-  except Exception as e:
-    print(e)
+  except:
+    pass
+
   finally:
     sys.path.remove(reportPath)
     for module, ss in dict(sys.modules).items():

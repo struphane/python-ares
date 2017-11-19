@@ -50,10 +50,9 @@ def getReport(results, directory, folder, reports, scriptPath):
           results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
           reportModule.report(results[reportModule.__name__])
           print("  > Done in %s seconds !" % (time.time() - t0))
-        except Exception as e:
+        except:
           print("Error with report %s" % report)
           print(traceback.print_exc())
-          print(e)
       else:
         print("Module ignore %s" % report)
 
