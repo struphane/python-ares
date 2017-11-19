@@ -54,13 +54,13 @@ def call(aresObj):
                               ajaxMod.delimiter, aresObj.http['fileName'], ajaxMod.hdrLines, aresObj.http['folder'])
 
 
-    db = AresSql.SqliteDB(aresObj.http['reportName'])
-    fileParams = {'filename': aresObj.http['fileName'], 'fileCode': aresObj.http['static_code'], 'file_type': aresObj.http['folder'], 'username': current_user.email, 'team_name': session['TEAM']}
-    db.modify(CREATE_FILE_QUERY % fileParams)
-    queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
-    db.modify(LOG_DEPLOY % queryParams)
-  except Exception as e:
-    return 'Problem during the update'
+      db = AresSql.SqliteDB(aresObj.http['reportName'])
+      fileParams = {'filename': aresObj.http['fileName'], 'fileCode': aresObj.http['static_code'], 'file_type': aresObj.http['folder'], 'username': current_user.email, 'team_name': session['TEAM']}
+      db.modify(CREATE_FILE_QUERY % fileParams)
+      queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
+      db.modify(LOG_DEPLOY % queryParams)
+    except Exception as e:
+      return 'Problem during the update'
 
     finally:
       sys.path.remove(reportPath)
