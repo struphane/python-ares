@@ -39,8 +39,9 @@ def call(aresObj):
       recordSet.append(resultObj[colIndex])
     AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols],
                             ajaxMod.delimiter, aresObj.http['fileName'], aresObj.http['folder'])
-  except Exception as e:
-    print e
+  except:
+    pass
+
   finally:
     sys.path.remove(reportPath)
     for module, ss in dict(sys.modules).items():
