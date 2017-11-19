@@ -795,10 +795,13 @@ class DataTable(AresHtml.Html):
                 content.push(row.join("#"));
               });
 
-              $.post("../../ajax/_AresReports/SrvSaveToFile", {fileName: $('#filename_' + internalTableId).val(), fileCode: $('#fileCode_' + internalTableId).val(), reportName: '%s', rows: content, folder: 'static'}, function(data) {
+              $.post("../../ajax/_AresReports/SrvSaveToFile", {fileName: $('#filename_' + internalTableId).val(), fileCode: $('#fileCode_' + internalTableId).val(), reportName: '%s', rows: content.join("\\n"), folder: 'static'}, function(data) {
                   var res = JSON.parse(data) ;
                   var data = res.data ;
                   var status = res.status ;
+                  $("#popup-black-background").hide();
+                  $("#popup-chart").hide();
+                  $("#popup-chart").empty();
                   display(data);
               } );
             });
