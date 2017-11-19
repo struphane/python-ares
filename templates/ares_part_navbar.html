@@ -13,7 +13,7 @@ https://www.bootply.com/60886#
           <a  href="#"><strong>RiskLab</strong></a>
           &nbsp;&nbsp;&nbsp;&nbsp;
           <a href="{{ url_for('ares.run_report', report_name=report_name, script_name=script_name, show_params=1  ) }}"  class="btn" style="top:0px;margin-left:3px"><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;Reset</a>
-          <a href="#"  class="btn btn-outline-success active" style="top:0px"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
+          <a href="#" class="active_report" style="top:0px"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
           {% if downloadEnv %}
             <a  href="{{ url_for('ares.downloadReport', report_name=downloadEnv ) }}" style="top:0px" class="btn"><i class="fa fa-cloud-download" aria-hidden="true">&nbsp;&nbsp;Download</i></a>
           {% endif %}
@@ -80,8 +80,8 @@ https://www.bootply.com/60886#
         </script>
 
         <form class="form-inline my-2 my-md-0">
-          <input class="form-control mr-sm-2" type="text" placeholder="Search">
-          <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px" type="submit">Search</button>
+          <input class="form-control mr-sm-2" type="text" placeholder="Search" style="font-size:12px">
+          <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px;background-color:#69a370" type="submit">Search</button>
         </form>
       </div>
     </nav>
