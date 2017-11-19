@@ -346,7 +346,6 @@ def run_report(report_name, script_name, user_id):
                 fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
           if fnct == 'params':
             reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
-        print(reportObj.files)
       elif fileConfig.get('folder') == 'static':
         if fileConfig['filename'] in reportObj.fileMap:
           raise AresExceptions('You cannot use the same code for a static and an output')
@@ -403,7 +402,9 @@ def run_report(report_name, script_name, user_id):
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
         if not staticPage.startswith('filterTable_') and not staticPage.startswith('sortTable_'):
-          htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, fileNameToParser.get(staticPage, ''), staticPage)))
+          static_code = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
+                                   "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)[0][0]
+          htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', static_code='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, static_code, fileNameToParser.get(staticPage, ''), staticPage)))
 
     if isAuth:
       if not report_name.startswith("_"):

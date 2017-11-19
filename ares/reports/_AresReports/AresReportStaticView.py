@@ -21,11 +21,11 @@ def report(aresObj):
   sys.path.append(userDirectory)
   module = __import__(aresObj.http['user_script_name'])
   for fileDef in getattr(module, 'FILE_CONFIGS', {}):
-    if fileDef['filename'] == aresObj.http['static_file']:
+    if fileDef['filename'] == aresObj.http['static_code']:
       fileConfig = fileDef['parser']
-      aresObj.files[fileDef['filename']] = fileConfig(open(os.path.join(aresObj.http['DIRECTORY'], aresObj.http['user_report_name'], fileDef['folder'], fileDef['filename'])))
+      aresObj.files[aresObj.http['static_file']] = fileConfig(open(os.path.join(aresObj.http['DIRECTORY'], aresObj.http['user_report_name'], fileDef['folder'], aresObj.http['static_file'])))
       recordSet = []
-      for rec in aresObj.files[fileDef['filename']]:
+      for rec in aresObj.files[aresObj.http['static_file']]:
         recordSet.append(rec)
 
       table = aresObj.table(recordSet, fileConfig.getHeader(), headerBox="Static File - %s" % aresObj.http['static_file'], cssAttr={'width': '600px'})

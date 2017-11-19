@@ -6,6 +6,8 @@ import re
 import sys
 import re
 import collections
+from flask_login import current_user
+
 
 regex = re.compile('[^a-zA-Z0-9_]')
 
@@ -37,10 +39,16 @@ def call(aresObj):
     rowNumers = max(resultObj.keys())
     for colIndex in range(rowNumers+1):
       recordSet.append(resultObj[colIndex])
+
     AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols],
                             ajaxMod.delimiter, aresObj.http['fileName'], aresObj.http['folder'])
+
+    fileParams = {'filename': aresObj.http['fileName'], 'fileCode': aresObj.http['static_code'], 'file_type': aresObj.http['folder'], 'username': current_user.email, 'team_name': session['TEAM']}
+    executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
+    queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
+    executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
   except Exception as e:
-    print e
+    print(e)
   finally:
     sys.path.remove(reportPath)
     for module, ss in dict(sys.modules).items():
