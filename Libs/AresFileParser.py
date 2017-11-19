@@ -83,7 +83,7 @@ class FilePivot(FileParser):
           {'colName': 'Value', 'key': 'COL_VALS', 'dsc': 'values are delimited with a pipe'}]
 
 
-def saveFile(aresObj, alias, reportName, recordSet, cols, delimiter, outFileName, folder='data'):
+def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName, folder='data'):
   """ Write the file to the dedicated output folder """
   outFile = open(r"%s\%s\%s\%s" % (aresObj.http['DIRECTORY'], reportName, folder, outFileName), "w")
   tmplLine = delimiter.join(["%%(%s)s" % col for col in cols])

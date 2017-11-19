@@ -346,7 +346,6 @@ def run_report(report_name, script_name, user_id):
                 fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
           if fnct == 'params':
             reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
-        print(reportObj.files)
       elif fileConfig.get('folder') == 'static':
         if fileConfig['filename'] in reportObj.fileMap:
           raise AresExceptions('You cannot use the same code for a static and an output')
@@ -403,7 +402,9 @@ def run_report(report_name, script_name, user_id):
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
         if not staticPage.startswith('filterTable_') and not staticPage.startswith('sortTable_'):
-          htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, fileNameToParser.get(staticPage, ''), staticPage)))
+          static_code = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
+                                   "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)[0][0]
+          htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', static_code='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, static_code, fileNameToParser.get(staticPage, ''), staticPage)))
 
     if isAuth:
       if not report_name.startswith("_"):
@@ -478,22 +479,23 @@ def ajaxCall(report_name, script):
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
     report = __import__(report_name)
-    for fileConfig in getattr(report, 'FILE_CONFIGS', []):
-      if fileConfig.get('type') == 'data':
-        if file['alias'] in reportObj.http.get('FILE_MAP', {}):
+    ALIAS, DISK_NAME = 0, 1
+    for fileConfig in reportObj.fileMap:
+      if fileConfig.get('folder') == 'data':
+        if file[ALIAS] in reportObj.fileMap:
           raise AresExceptions('You cannot use the same code for a static and an output')
 
         queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
         files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
         for file in files:
-          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
+          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
           # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
-      elif fileConfig.get('type') == 'static':
-        queryFileMapPrm = {'type': fileConfig.get('type'), 'file_cod': fileConfig['filename']}
+      elif fileConfig.get('folder') == 'static':
+        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename']}
         files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
         for file in files:
-          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
-          reportObj.files[regex.sub('', file['disk_name'].strip())] = reportObj.files[file['disk_name']]
+          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+          reportObj.files[regex.sub('', file[DISK_NAME].strip())] = reportObj.files[file[DISK_NAME]]
 
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
