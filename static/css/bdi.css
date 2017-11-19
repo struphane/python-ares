@@ -425,10 +425,12 @@ tr.nodetails td:first-child:before {
 }
 
 .btn-primary {
-    border-radius: 7px;
-    background-color: #7bb062;
+    border-radius: 5px;
+    background-color: #69a370;
     border: 1px solid #bb062;
-
+    margin-top: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     }
 
 .btn-primary:hover
