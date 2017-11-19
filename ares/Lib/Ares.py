@@ -278,7 +278,8 @@ class Report(object):
 
   # Radio Section
   def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def select(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def select(self, recordSet, title='Select list', col=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, title, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def selectfiles(self, fileName, title='Select list', cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.fileMap.get(fileName, []), title, None, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
   # Title section

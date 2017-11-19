@@ -141,7 +141,7 @@ class Select(AresHtml.Html):
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
-  def __init__(self, aresObj, recordSet, col=None, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, recordSet, title, col=None, cssCls=None, cssAttr=None):
     """ Instanciate the object and store the selected item """
     if col is not None:
       vals = set([])
@@ -152,6 +152,8 @@ class Select(AresHtml.Html):
       vals = set(recordSet)
     super(Select, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.jsFrg = ["%s = $(this).val().trim(); " % self.htmlId]
+    self.title = title
+    self.selected = None
 
   def setDefault(self, value):
     """ Set a selected default value """
@@ -161,7 +163,7 @@ class Select(AresHtml.Html):
   def __str__(self):
     """ Return the HTML string for a select """
     item = AresItem.Item('<div class="form-group">', self.incIndent)
-    item.add(1, '<label for="sel1">Select list:</label>')
+    item.add(1, '<label for="sel1">%s:</label>' % self.title)
     item.add(1, '<select %s>' % self.strAttr())
     for val in self.vals:
       if val == self.selected:
