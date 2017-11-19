@@ -41,12 +41,12 @@ def call(aresObj):
       for colIndex in range(rowNumers+1):
         recordSet.append(resultObj[colIndex])
       AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols],
-                              ajaxMod.delimiter, aresObj.http['fileName'], aresObj.http['folder'])
+                              ajaxMod.delimiter, aresObj.http['fileName'], ajaxMod.hdrLines, aresObj.http['folder'])
 
-      fileParams = {'filename': aresObj.http['fileName'], 'fileCode': aresObj.http['static_code'], 'file_type': aresObj.http['folder'], 'username': current_user.email, 'team_name': session['TEAM']}
-      executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
-      queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
-      executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+      #fileParams = {'filename': aresObj.http['fileName'], 'fileCode': aresObj.http['static_code'], 'file_type': aresObj.http['folder'], 'username': current_user.email, 'team_name': session['TEAM']}
+      #executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
+      #queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
+      #executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
     except:
       pass
 
@@ -57,11 +57,16 @@ def call(aresObj):
           del sys.modules[module]
   else:
     recordSet = []
-    for row in aresObj.http['rows'].split("\n"):
-      recordSet.append(row.split(AresFileParser.FilePivot.delimiter))
-    AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in AresFileParser.FilePivot.cols],
-                            AresFileParser.FilePivot.delimiter, aresObj.http['fileName'], aresObj.http['folder'])
-    executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
-    queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
-    executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+    try:
+      header = [col['key'] for col in AresFileParser.FilePivot.cols]
+      for row in aresObj.http['rows'].split("\n"):
+        recordSet.append(dict(zip(header, row.split(AresFileParser.FilePivot.delimiter))))
+      AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in AresFileParser.FilePivot.cols],
+                              AresFileParser.FilePivot.delimiter, aresObj.http['fileName'], 1, aresObj.http['folder'])
+      #executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
+      #queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
+      #executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
+    except:
+      return 'Problem during the update'
+
   return 'File - %s - updated' % aresObj.http['fileName']
