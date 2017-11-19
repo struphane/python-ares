@@ -76,8 +76,7 @@ class FileParser(object):
 
 
 class MemFileParser(FileParser):
-  """
-  """
+  """ Stores the records in an list during the first iteration, and iterates over the list during the next ones """
   def __init__(self, inFile):
     super(MemFileParser, self).__init__(inFile)
     self.inputFileRecSet = []
