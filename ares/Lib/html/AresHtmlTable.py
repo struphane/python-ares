@@ -751,7 +751,7 @@ class DataTable(AresHtml.Html):
             var internalTableId = '%s' ;
             $("#popup-black-background").show();
             $("#popup-chart").empty();
-            $("#popup-chart").append('<div style="width:100%%;height:40px;background-color:#7bb062;color:white;font-size: 20px">Filter configuration</div>');
+            $("#popup-chart").append('<div style="width:100%%;height:40px;background-color:#69a370;color:white;font-size: 20px">Filter configuration</div>');
             $("#popup-chart").append('<input type="text" class="form-control" id="filename_' + internalTableId + '" value="%s">');
             $("#popup-chart").append("%s");
 
