@@ -346,6 +346,7 @@ def run_report(report_name, script_name, user_id):
                 fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
           if fnct == 'params':
             reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
+        print(reportObj.files)
       elif fileConfig.get('folder') == 'static':
         if fileConfig['filename'] in reportObj.fileMap:
           raise AresExceptions('You cannot use the same code for a static and an output')
@@ -478,7 +479,6 @@ def ajaxCall(report_name, script):
     reportObj.reportName = report_name
     report = __import__(report_name)
     for fileConfig in getattr(report, 'FILE_CONFIGS', []):
-      print('ajaxCall', fileConfig)
       if fileConfig.get('type') == 'data':
         if file['alias'] in reportObj.http.get('FILE_MAP', {}):
           raise AresExceptions('You cannot use the same code for a static and an output')
@@ -788,16 +788,14 @@ def deployFiles(env, DATA):
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
 
   if not checkAuth(dbPath, report_name):
-    print("Not Authorized")
     return json.dumps('Not authorized to deploy on environment: %s' % report_name), 500
 
   if report_name.startswith("_"):
     return json.dumps("Environment Name cannot start with _"), 500
 
-
   for fileObj, fileType, fileCod in DATA['files']:
     if fileType not in reportTypes:
-      return json.dumps('Error %s category not recognized !' % report_type), 500
+      return json.dumps('Error %s category not recognized !' % fileType), 500
 
     ext, path = reportTypes[fileType]
     filename = fileObj.filename
@@ -823,6 +821,7 @@ def deployFiles(env, DATA):
     if fileType in ['data', 'static', 'saved']:
       if not fileCod and fileType == 'data':
         return json.dumps('You have to provide a file code for the data type'), 500
+
       fileCod = filename if not fileCod else fileCod
       fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'username': user_name, 'team_name': session['TEAM']}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
