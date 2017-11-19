@@ -13,6 +13,21 @@ div.logo_small {
     padding-top: 6px;
 }
 
+.logo_small_grey {
+    background :url(../../static/images/risklab_small_grey.png);
+    background-repeat: no-repeat;
+    padding-left:5px;
+    background-position: 5px 5px;
+    height:40px;
+    background-color: #404040;
+    color: #32603c;
+    font-size: 18px;
+    text-align: right;
+    padding-right:5px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
 .active_report {
  background-color: #69a370;
  padding: 12px;
@@ -410,10 +425,12 @@ tr.nodetails td:first-child:before {
 }
 
 .btn-primary {
-    border-radius: 7px;
-    background-color: #7bb062;
+    border-radius: 5px;
+    background-color: #69a370;
     border: 1px solid #bb062;
-
+    margin-top: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     }
 
 .btn-primary:hover
