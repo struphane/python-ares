@@ -42,6 +42,6 @@ def report(aresObj):
   if aresObj.http['file_parser'] != '':
     table.allowOverride()
     aresObj.http['REPORT_NAME'] = aresObj.http['user_report_name']
-    saveButton.clickStatic(table, aresObj.http['file_parser'], input.val)
+    saveButton.clickStatic(table, aresObj.http['file_parser'], input.val, aresObj.http['static_code'])
   else:
     saveButton.disable = True

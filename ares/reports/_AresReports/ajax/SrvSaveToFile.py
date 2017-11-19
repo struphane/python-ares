@@ -7,16 +7,28 @@ import sys
 import re
 import collections
 from flask_login import current_user
-
+from flask import session
+from ares.Lib import AresSql
 
 regex = re.compile('[^a-zA-Z0-9_]')
 
 from Libs import AresFileParser
 
+CREATE_FILE_QUERY = '''REPLACE INTO file_map (alias, file_type, disk_name) VALUES ('%(fileCode)s', '%(file_type)s', '%(filename)s');
+                      INSERT INTO file_auth (file_id, team_id, temp_owner)
+                      SELECT file_map.file_id, team_def.team_id, '%(username)s'
+                      FROM file_map, team_def
+                      WHERE file_map.disk_name = '%(filename)s' and team_def.team_name = '%(team_name)s';'''
+
+LOG_DEPLOY = '''INSERT INTO logs_deploy (email, team_name, folder, file, type)
+                VALUES ("%(username)s", "%(team_name)s","%(report_name)s", "%(file)s", "%(type)s");'''
+
 def call(aresObj):
   """
 
   """
+  import pprint
+  pprint.pprint(aresObj.http)
   tableAlias = 'datatable'
   pattern = re.compile("%s\[([0-9]*)\]\[([0-9a-zA-Z_]*)\]" % tableAlias)
   resultObj = collections.defaultdict(dict)
@@ -42,11 +54,13 @@ def call(aresObj):
     AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in ajaxMod.cols],
                             ajaxMod.delimiter, aresObj.http['fileName'], aresObj.http['folder'])
 
+
+    db = AresSql.SqliteDB(aresObj.http['reportName'])
     fileParams = {'filename': aresObj.http['fileName'], 'fileCode': aresObj.http['static_code'], 'file_type': aresObj.http['folder'], 'username': current_user.email, 'team_name': session['TEAM']}
-    executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
+    db.modify(CREATE_FILE_QUERY % fileParams)
     queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
-    executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
-  except:
+    db.modify(LOG_DEPLOY % queryParams)
+  except Exception as e:
     pass
 
   finally:

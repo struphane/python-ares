@@ -18,7 +18,7 @@ class SqliteDB(object):
 
   def modify(self, query):
     """ method used for update, insert, delete """
-    self.cursor.execute(query)
+    self.cursor.executescript(query)
     self.conn.commit()
 
   def select(self, query):

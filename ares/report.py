@@ -402,8 +402,11 @@ def run_report(report_name, script_name, user_id):
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
         if not staticPage.startswith('filterTable_') and not staticPage.startswith('sortTable_'):
-          static_code = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
-                                   "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)[0][0]
+          static_code_rsl = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
+                                   "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)
+          print(static_code_rsl)
+          static_code = static_code_rsl[0][0]
+          print(static_code)
           htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', static_code='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, static_code, fileNameToParser.get(staticPage, ''), staticPage)))
 
     if isAuth:
@@ -459,6 +462,7 @@ def run_report(report_name, script_name, user_id):
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
   """ Generic Ajax call """
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   onload, js, error = '', '', False
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
   try:
