@@ -794,13 +794,13 @@ class DataTable(AresHtml.Html):
                 row.push(values.join("|"));
                 content.push(row.join("#"));
               });
-              alert( $('#filename_' + internalTableId).val());
-              //$.post("reports/ajax/_AresReports/SrvSaveToFile", {fileName: $('#filename_' + internalTableId).val(), fileCode: $('#fileCode_' + internalTableId).val(), reportName: '%s', rows: content, folder: 'static'}, function(data) {
-              //    var res = JSON.parse(data) ;
-              //    var data = res.data ;
-              //    var status = res.status ;
-              //    display(data);
-              //} );
+
+              $.post("../../ajax/_AresReports/SrvSaveToFile", {fileName: $('#filename_' + internalTableId).val(), fileCode: $('#fileCode_' + internalTableId).val(), reportName: '%s', rows: content, folder: 'static'}, function(data) {
+                  var res = JSON.parse(data) ;
+                  var data = res.data ;
+                  var status = res.status ;
+                  display(data);
+              } );
             });
 
         });

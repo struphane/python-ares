@@ -1,3 +1,25 @@
+div.logo_small {
+    background :url(../../static/images/risklab_small_green.png);
+    width:100%;
+    background-repeat: no-repeat;
+    padding-left:5px;
+    background-position: 5px 5px;
+    height:40px;
+    background-color: #e1efd8;
+    color: #32603c;
+    font-size: 18px;
+    text-align: right;
+    padding-right:5px;
+    padding-top: 6px;
+}
+
+.active_report {
+ background-color: #69a370;
+ padding: 12px;
+ font-size: 14px;
+
+}
+
 .venntooltip {
   position: absolute;
   text-align: center;
@@ -507,12 +529,10 @@ tr.nodetails td:first-child:before {
     background-color: #d7d7d7 ;
     border: 1px solid #000000 ;
     position: fixed;
-    width: 200px;
     display: none;
     z-index: 2000;
     left: 10px;
     top: 10px;
-    width: 90%;
     height: 90%;
     overflow : auto;
 }
@@ -523,8 +543,8 @@ tr.nodetails td:first-child:before {
     left: 50%;
     top: 30%;
     text-align: center;
-    width:546px;
-    height:565px;
+    width:600px;
+    height:665px;
     margin-left: -273px; /*half width*/
     margin-top: -132px; /*half height*/
 }
