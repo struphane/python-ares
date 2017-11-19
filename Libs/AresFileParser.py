@@ -75,6 +75,24 @@ class FileParser(object):
       self.__inputFile.close()
 
 
+class MemFileParser(FileParser):
+  """
+  """
+  def __init__(self, inFile):
+    super(MemFileParser, self).__init__(inFile)
+    self.inputFileRecSet = []
+
+  def __iter__(self):
+    """ Iterator to return a line """
+    if len(self.inputFileRecSet) == 0:
+      for rec in super(MemFileParser, self).__iter__():
+        self.inputFileRecSet.append(rec)
+        yield rec
+    else:
+      for rec in self.inputFileRecSet:
+        yield rec
+
+
 class FilePivot(FileParser):
   """ Standard file format for the files used to filter a pivot table from a Datatable """
   hdrLines = 1
