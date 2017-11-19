@@ -479,22 +479,23 @@ def ajaxCall(report_name, script):
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
     report = __import__(report_name)
-    for fileConfig in getattr(report, 'FILE_CONFIGS', []):
-      if fileConfig.get('type') == 'data':
-        if file['alias'] in reportObj.http.get('FILE_MAP', {}):
+    ALIAS, DISK_NAME = 0, 1
+    for fileConfig in reportObj.fileMap:
+      if fileConfig.get('folder') == 'data':
+        if file[ALIAS] in reportObj.fileMap:
           raise AresExceptions('You cannot use the same code for a static and an output')
 
         queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
         files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
         for file in files:
-          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
+          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
           # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
-      elif fileConfig.get('type') == 'static':
-        queryFileMapPrm = {'type': fileConfig.get('type'), 'file_cod': fileConfig['filename']}
+      elif fileConfig.get('folder') == 'static':
+        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename']}
         files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
         for file in files:
-          reportObj.files[file['disk_name']] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file['disk_name'])))
-          reportObj.files[regex.sub('', file['disk_name'].strip())] = reportObj.files[file['disk_name']]
+          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+          reportObj.files[regex.sub('', file[DISK_NAME].strip())] = reportObj.files[file[DISK_NAME]]
 
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
