@@ -4,6 +4,7 @@
 TODO in this module the simple table should be remove
 A decorator will be added to this class to mention to users that going forward it should not be used anymore
 
+#TODO Split the Datatable into 3 tables Table, TablePivot and TableAgg
 """
 
 import json
@@ -72,13 +73,13 @@ class DataTable(AresHtml.Html):
     :param isheader:
     :param cssCls:
     :param cssAttr:
-    :param sortBy: Should be a tuple with (column name, asc / dsc, number of items or Nene)
+    :param sortBy: Should be a tuple with (column name, asc / desc, number of items or Nene)
     :return:
     """
     self.sortBy = sortBy
     self.pivotLevel = 1
     if self.sortBy is not None:
-      if self.sortBy[1].lower() == 'dsc':
+      if self.sortBy[1].lower() == 'desc':
         sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]))
       else:
         sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]), reverse=True)
@@ -102,6 +103,7 @@ class DataTable(AresHtml.Html):
           recordSet.append(rec)
     else:
       recordSet = vals
+    self.tableToolTips = {}
     super(DataTable, self).__init__(aresObj, recordSet, cssCls, cssAttr)
     self.aresObj.jsGlobal.add(self.htmlId) # table has to be registered as a global variable in js
     self.headerBox = headerBox
@@ -111,7 +113,9 @@ class DataTable(AresHtml.Html):
       self.header = [header]
     else: # we have a header on several lines, nothing to do
       self.header = header
-    for col in self.header[-1]:
+    for i, col in enumerate(self.header[-1]):
+      if 'dsc' in col:
+        self.addToolTips(i, col['dsc'])
       if 'url' in col:
         # This will only work for static urls (not javascript tranalation for the time being)
         colKey = self.recKey(col)
@@ -162,6 +166,10 @@ class DataTable(AresHtml.Html):
     self.withFooter, self.noPivot = False, True
     self.option('stateSave', 'true')
     self.tableUpdates = []
+    self.mapDsc = {}
+    for i, header in enumerate(self.header[-1]):
+      if 'dsc' in header:
+        self.mapDsc[self.recKey(header)] = (i, header['dsc'])
 
   def colReOrdering(self):
     """ Include the column reordering Datatable plugin """
@@ -209,10 +217,20 @@ class DataTable(AresHtml.Html):
     if isColStriped:
       self.addClass('table-striped')
     self.recordSetHeader = []
-    for col in keys:
+    self.tableToolTips = {}
+    colToIndex = {}
+    for i, col in enumerate(keys):
+      colToIndex[col] = i
+      if col in self.mapDsc:
+        self.addToolTips(i+1, self.mapDsc[col][1])
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
-    for val in vals:
+    for i, val in enumerate(vals):
+      colToIndex[val] = i + len(keys)
+      if val in self.mapDsc:
+        self.addToolTips(i + len(keys), self.mapDsc[val][1])
       self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
+    if self.sortBy is not None:
+      self.order(colToIndex[self.sortBy[0]], self.sortBy[1])
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
@@ -250,7 +268,10 @@ class DataTable(AresHtml.Html):
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
     self.hiddenCols.extend([ '_id', '_leaf', 'level', '_hasChildren', '_parent'])
-    for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
+    self.tableToolTips = {}
+    for i, col in enumerate([ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys):
+      if col in self.mapDsc:
+        self.addToolTips(i, self.mapDsc[col][1])
       if colRenders is not None and col in colRenders:
         if 'url' in colRenders[col]:
           # This will only work for static urls (not javascript tranalation for the time being)
@@ -266,7 +287,9 @@ class DataTable(AresHtml.Html):
                   return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(colRenders[col]['cols'])))
       else:
         self.recordSetHeader.append('{ "data": "%s", "title": "%s" }' % (col, self.recMap.get(col, col)))
-    for col in vals:
+    for i, col in enumerate(vals):
+      if col in self.mapDsc:
+        self.addToolTips(i + len(keys), self.mapDsc[col][1])
       if withUpDown:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
           render: function (data, type, full, meta) {
@@ -346,6 +369,10 @@ class DataTable(AresHtml.Html):
     self.pivotFilterFileCode = fileCod
     for rec in self.aresObj.files[fileName]:
       self.pivotFilters[rec['COL_ID']] = rec['COL_VALS'].split("|")
+
+  def addToolTips(self, col, dsc):
+    """  Function to add a tooltip on the column headers """
+    self.tableToolTips[col] = "$('#%s > thead > tr > th:eq(%s)').attr('title', '%s')" % (self.htmlId, col, dsc)
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
@@ -788,7 +815,7 @@ class DataTable(AresHtml.Html):
     item.add(1, "</tbody>")
     item.add(0, '</table>')
     if self.sortBy is not None and self.sortBy[2] not in [None, '']:
-      sortType = 'worst' if self.sortBy[1] == 'dsc' else 'top'
+      sortType = 'worst' if self.sortBy[1] == 'desc' else 'top'
       item.add(0, '<a id="sort_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
     if self.pivotFilters:
       item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static filters applied on the recordSet</a><br/>' % self.htmlId)
@@ -870,7 +897,14 @@ class DataTable(AresHtml.Html):
           options.append("%s: [%s]" % (key, ",".join(val)))
       else:
         options.append("%s: %s" % (key, val))
-    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ; %s;' % (self.htmlId, self.jqId, ",".join(options), ";".join(self.tableUpdates)))
+
+    headerToolTips = []
+    if  self.tableToolTips:
+      headerToolTips = []
+      for toolTips in self.tableToolTips.values():
+        headerToolTips.append(toolTips)
+      headerToolTips.append('$("#%s > thead > tr > th").tooltip()' % self.htmlId)
+    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ; %s; %s ;' % (self.htmlId, self.jqId, ",".join(options), ";".join(self.tableUpdates), ";".join(headerToolTips)))
     return str(item)
 
   def recKey(self, col):
@@ -895,9 +929,34 @@ class DataTable(AresHtml.Html):
     htmlObj[0].link("var oTable = $('#%s').dataTable(); oTable.fnDraw(); " % self.htmlId)
     htmlObj[0].allowTableFilter.append(self.htmlId)
 
-  def order(self, colName, typeOrd):
+  def order(self, colIndex, typeOrd):
     """ Set the table order according to a column in the table """
-    self.option(json.dumps([[colName, typeOrd]]))
+    self.option("order", json.dumps([[colIndex, typeOrd]]))
+
+
+
+class DataTablePivot(DataTable):
+  """
+
+  """
+
+  def setKeys(self, keys, selected=None):
+    self.chartKeys = [self.header[key] for key in keys]
+
+  def setVals(self, vals, selected=None):
+    self.chartVals = [self.header[val] for val in vals]
+
+class DataTableAgg(DataTable):
+  """
+
+  """
+
+  def setKeys(self, keys, selected=None):
+    self.chartKeys = [self.header[key] for key in keys]
+
+  def setVals(self, vals, selected=None):
+    self.chartVals = [self.header[val] for val in vals]
+
 
 
 class SimpleTable(AresHtml.Html):
