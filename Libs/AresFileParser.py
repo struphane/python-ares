@@ -63,10 +63,15 @@ class FileParser(object):
     """ Return the header definition """
     fileHeader = []
     for col in cls.cols:
-      if 'key' not in col:
-        fileHeader.append({'colName': col['colName'], 'key': regex.sub('', col['colName'])})
+      row = {}
+      for key in ['dsc', 'colName']:
+        if key in col:
+          row[key] = col[key]
+      if not 'key' in col:
+        row['key'] = regex.sub('', col['colName'])
       else:
-        fileHeader.append({'colName': col['colName'], 'key': col['key']})
+        row['key'] = col['key']
+      fileHeader.append(row)
     return fileHeader
 
   def close(self):
