@@ -4,6 +4,7 @@
 TODO in this module the simple table should be remove
 A decorator will be added to this class to mention to users that going forward it should not be used anymore
 
+#TODO Split the Datatable into 3 tables Table, TablePivot and TableAgg
 """
 
 import json
@@ -301,7 +302,6 @@ class DataTable(AresHtml.Html):
             }
             return "<font style='color:green'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ; } }
         ''' % (col, self.recMap.get(col, col), digit, digit))
-    print self.tableToolTips
     if len(rows) < self.__options['pageLength']:
       self.__options['info'] = 'false'
       self.__options['bPaginate'] = 'false'
