@@ -73,13 +73,13 @@ class DataTable(AresHtml.Html):
     :param isheader:
     :param cssCls:
     :param cssAttr:
-    :param sortBy: Should be a tuple with (column name, asc / dsc, number of items or Nene)
+    :param sortBy: Should be a tuple with (column name, asc / desc, number of items or Nene)
     :return:
     """
     self.sortBy = sortBy
     self.pivotLevel = 1
     if self.sortBy is not None:
-      if self.sortBy[1].lower() == 'dsc':
+      if self.sortBy[1].lower() == 'desc':
         sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]))
       else:
         sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]), reverse=True)
@@ -218,14 +218,19 @@ class DataTable(AresHtml.Html):
       self.addClass('table-striped')
     self.recordSetHeader = []
     self.tableToolTips = {}
+    colToIndex = {}
     for i, col in enumerate(keys):
+      colToIndex[col] = i
       if col in self.mapDsc:
         self.addToolTips(i+1, self.mapDsc[col][1])
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
     for i, val in enumerate(vals):
+      colToIndex[val] = i + len(keys)
       if val in self.mapDsc:
         self.addToolTips(i + len(keys), self.mapDsc[val][1])
       self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
+    if self.sortBy is not None:
+      self.order(colToIndex[self.sortBy[0]], self.sortBy[1])
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
@@ -810,7 +815,7 @@ class DataTable(AresHtml.Html):
     item.add(1, "</tbody>")
     item.add(0, '</table>')
     if self.sortBy is not None and self.sortBy[2] not in [None, '']:
-      sortType = 'worst' if self.sortBy[1] == 'dsc' else 'top'
+      sortType = 'worst' if self.sortBy[1] == 'desc' else 'top'
       item.add(0, '<a id="sort_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
     if self.pivotFilters:
       item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static filters applied on the recordSet</a><br/>' % self.htmlId)
@@ -924,9 +929,9 @@ class DataTable(AresHtml.Html):
     htmlObj[0].link("var oTable = $('#%s').dataTable(); oTable.fnDraw(); " % self.htmlId)
     htmlObj[0].allowTableFilter.append(self.htmlId)
 
-  def order(self, colName, typeOrd):
+  def order(self, colIndex, typeOrd):
     """ Set the table order according to a column in the table """
-    self.option(json.dumps([[colName, typeOrd]]))
+    self.option("order", json.dumps([[colIndex, typeOrd]]))
 
 
 
