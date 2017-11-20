@@ -120,9 +120,23 @@ def report(aresObj):
   aresObj.newline()
   aresObj.newline()
 
-  input =aresObj.input(value='Authorise users to view this report (comma separated list)')
+  input =aresObj.input(value='Authorise bespokes users to view this report (comma separated list)')
   submitButton = aresObj.button('Submit')
-  aresObj.col([input, submitButton])
+  submitButton.clickWithValid('addUsers', {'users': input, 'type': 'bespoke'})
+  col1 = aresObj.col([input, submitButton])
+
+  input2 =aresObj.input(value='Allow new teams to view/edit this report')
+  btnText = aresObj.text('Choose permission:')
+  roleButton = aresObj.radio([{'role': 'admin'}, {'role': 'user'}], 'role', [{'key': 'role', 'colName': 'Role'}])
+  col2 = aresObj.col([btnText, aresObj.newline(), roleButton])
+  roleRow = aresObj.row([input2, col2])
+  submitButton2 = aresObj.button('Submit')
+  submitButton2.clickWithValid('addUsers', {'team': input2, 'role': roleButton, 'type': 'team'})
+  col3 = aresObj.col([roleRow, submitButton2])
+
+
+
+  aresObj.row([col1, col3])
 
   aresObj.newline()
   aresObj.newline()

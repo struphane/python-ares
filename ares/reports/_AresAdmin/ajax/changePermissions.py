@@ -7,5 +7,6 @@ UPDATE_PERMISSION = """ UPDATE team_def
 
 def call(aresObj):
   db = AresSql.SqliteDB(aresObj.http['REPORT_NAME'])
-  db.modify(UPDATE_PERMISSION % (aresObj.http['btnValue'], aresObj.http['team']))
+  role = 'Normal' if aresObj.http['btnValue'] == 'user' else 'admin'
+  db.modify(UPDATE_PERMISSION % (role, aresObj.http['team']))
   return "Role Updated"
