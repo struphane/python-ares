@@ -39,7 +39,7 @@ class D3SpiderChart(AresHtmlGraphSvg.MultiSvg):
               var LegendOptions = data.keys;
               var d = data.values ;
 
-              var mycfg = {w: '%spx', h: %s, maxValue: 0.6, levels: 6, ExtraWidthX: 300};
+              var mycfg = {w: %s, h: %s, maxValue: 0.6, levels: 6, ExtraWidthX: 300};
               RadarChart.draw("#%s", d, mycfg);
 
               var svg = d3.select('#body').selectAll('svg').append('svg').attr("width", w+300).attr("height", h);
