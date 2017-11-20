@@ -246,6 +246,7 @@ class DataTable(AresHtml.Html):
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.pivotLevel = len(keys)
+    self.pivotKeys = keys
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
     self.hiddenCols.extend([ '_id', '_leaf', 'level', '_hasChildren', '_parent'])
@@ -698,7 +699,7 @@ class DataTable(AresHtml.Html):
 
                       // Total over this page
                       pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
-                      pageTotal = pageTotal / %s ; // for the pivot table  
+                      pageTotal = pageTotal / %s ; // for the pivot table
                       // Update footer
                       $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
                     }
@@ -708,7 +709,7 @@ class DataTable(AresHtml.Html):
     """ Display or not the search item """
     self.__options['searching'] = json.dumps(flag)
 
-  def addRow(self, vals=None):
+  def addRows(self, vals=None):
     """ Add a button to add an entry to the Data Table
 
     vals - should be a list of dictionaries
@@ -719,6 +720,26 @@ class DataTable(AresHtml.Html):
       self.addButton("{ text: 'Add Row', className: 'btn btn-success', action: function (e, dt, node, config ) {%s.row.add( %s ).draw( false ) ;} }" % (self.htmlId, json.dumps(emptyCol)))
     else:
       self.tableUpdates.append("%s.rows.add( %s ).draw( false ).nodes().to$().addClass('static_row')" % (self.htmlId, json.dumps(vals)))
+
+  # def addRow(self, rec, level, hasChild=False):
+  #   """ Add a row """
+  #   if hasChild:
+  #     rec.update({'_hasChildren': 1, '_leaf': level, '_parent': 1})
+  #     rec['cssCls'] = []
+  #     for i, key in enumerate(self.pivotKeys):
+  #       if i < level:
+  #         rec[key] = ''
+  #       elif i == level:
+  #   else:
+  #     rec.update({'_hasChildren': '0', '_leaf': 1, '_parent': 1})
+  #
+  #
+  #   pivotTable.addRows([{'_hasChildren': 0, 'cssCls': ['SelfFundingInstalments', 'SelfFundingInstalmentsYoupi'], 'level': 1,
+  #                      '_leaf': 1, '_parent': 0, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': '', 'ISSUER': 'Youpi', 'Aurelie': ''}])
+  #   pivotTable.addRows([{'_hasChildren': 1, 'cssCls': ['Youpi'], 'level': 0,
+  #                        '_leaf': 0, '_parent': 1, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': 'Youpi', 'ISSUER': '', 'Aurelie': ''}])
+  #   pivotTable.addRows([{'_hasChildren': 0, 'cssCls': ['Youpi', 'YoupiSuper'], 'level': 1,
+  #                        '_leaf': 1, '_parent': 0, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': '', 'ISSUER': 'Super', 'Aurelie': ''}])
 
   def __str__(self):
     """ Return the string representation of a HTML table """
