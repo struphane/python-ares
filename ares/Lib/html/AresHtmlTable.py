@@ -76,6 +76,7 @@ class DataTable(AresHtml.Html):
     :return:
     """
     self.sortBy = sortBy
+    self.pivotLevel = 1
     if self.sortBy is not None:
       if self.sortBy[1].lower() == 'dsc':
         sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]))
@@ -244,6 +245,7 @@ class DataTable(AresHtml.Html):
     self.noPivot = False
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
+    self.pivotLevel = len(keys)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
     self.hiddenCols.extend([ '_id', '_leaf', 'level', '_hasChildren', '_parent'])
@@ -460,11 +462,12 @@ class DataTable(AresHtml.Html):
                       api.columns('.sum', { page: 'current' } ).every(function (el) {
                           var sum = this.data().reduce(function (a, b) {var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
                       var result;
+                      var sum = sum / %s ;
                       if (sum < 0) {result = "<font style='color:red'>" + sum.formatMoney(%s, ',', '.') + "</font>" ;}
                       result = "<font style='color:green'>" + sum.formatMoney(%s, ',', '.') + "</font>";
                       $(this.footer()).html(result);
                       } );
-                   ''' % (digit, digit))
+                   ''' % (self.pivotLevel, digit, digit))
 
   def callBackHeaderColumns(self):
     """  """
@@ -695,11 +698,11 @@ class DataTable(AresHtml.Html):
 
                       // Total over this page
                       pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
-
+                      pageTotal = pageTotal / %s ; // for the pivot table  
                       // Update footer
                       $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
                     }
-                    ''' % json.dumps(colNumber))
+                    ''' % (json.dumps(colNumber), self.pivotLevel))
 
   def search(self, flag):
     """ Display or not the search item """
