@@ -53,7 +53,8 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
                 'https://datatables.net/examples/api/multi_filter_select.html',
                 'https://datatables.net/extensions/fixedcolumns/examples/initialisation/size_fluid.html',
-                'https://stackoverflow.com/questions/42569531/span-rows-of-a-table-with-mousedown-and-drag-in-jquery']
+                'https://stackoverflow.com/questions/42569531/span-rows-of-a-table-with-mousedown-and-drag-in-jquery',
+                'https://datatables.net/examples/server_side/row_details.html']
   __reqCss = ['dataTables']
   __reqJs = ['dataTables']
   __callBackWrapper = {
@@ -83,7 +84,7 @@ class DataTable(AresHtml.Html):
       if self.sortBy[2] not in ['', None]:
         sortedItems = sortedItems[:self.sortBy[2]]
       vals = sortedItems
-
+    self.hiddenCols = []
     self.cssCls = list(self.__cssCls)
     self.theadCssCls = ['thead-inverse']
     self.reqCss = list(self.__reqCss)
@@ -201,7 +202,7 @@ class DataTable(AresHtml.Html):
     for colId in colsId:
       self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % colId)
 
-  def agg(self, keys, vals, digit=0, isColStriped=True):
+  def agg(self, keys, vals, digit=0, isColStriped=True, colCenter=False):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
     self.noPivot = False
     if isColStriped:
@@ -216,7 +217,11 @@ class DataTable(AresHtml.Html):
     self.__options['data'] = json.dumps(rows)
     self.mouveHover('#BFFCA6', 'black')
     self.option('scrollCollapse', 'false')
-    self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
+    if colCenter:
+      self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
+    else:
+      for i in range(len(keys)):
+        self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % i)
     if len(rows) < self.__options['pageLength']:
       self.__options['info'] = 'false'
       self.__options['bPaginate'] = 'false'
@@ -234,13 +239,14 @@ class DataTable(AresHtml.Html):
       self.__options['data'] = json.dumps(rows)
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
 
-  def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0):
+  def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0, colCenter=False):
     """ Create the pivot table """
     self.noPivot = False
     self.__options["ordering"] = 'false'
     rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
+    self.hiddenCols.extend([ '_id', '_leaf', 'level', '_hasChildren', '_parent'])
     for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
       if colRenders is not None and col in colRenders:
         if 'url' in colRenders[col]:
@@ -259,16 +265,16 @@ class DataTable(AresHtml.Html):
         self.recordSetHeader.append('{ "data": "%s", "title": "%s" }' % (col, self.recMap.get(col, col)))
     for col in vals:
       if withUpDown:
-        self.recordSetHeader.append('''{ "data": "%s", "title": "%s",  "className": 'sum',
-          "render": function (data, type, full, meta) {
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
+          render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
               return "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + parseFloat(data).formatMoney(%s, ',', '.') + "</i>" ;}
             return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(%s, ',', '.') + "</i>" ; } }
         ''' % (col, self.recMap.get(col, col), digit, digit))
       else:
-        self.recordSetHeader.append('''{ "data": "%s", "title": "%s",
-          "render": function (data, type, full, meta) {
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
+          render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
               return "<font style='color:red'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ;
@@ -284,7 +290,11 @@ class DataTable(AresHtml.Html):
     self.option('paging', 'false')
     self.option('scrollY', "'50vh'")
     self.mouveHover('#BFFCA6', 'black')
-    self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
+    if colCenter:
+      self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
+    else:
+      for i in range(len(keys)):
+        self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % i)
     #self.option('order', "[[0, 'asc']]") # default behaviour anyway
     if not extendTable:
       self.callBackCreateRowHideFlag('_leaf', '1')
@@ -447,7 +457,7 @@ class DataTable(AresHtml.Html):
     self.callBacks('footerCallback',
                    '''
                       var api = this.api();
-                      api.columns('.sum', { page: 'current' } ).every(function () {
+                      api.columns('.sum', { page: 'current' } ).every(function (el) {
                           var sum = this.data().reduce(function (a, b) {var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
                       var result;
                       if (sum < 0) {result = "<font style='color:red'>" + sum.formatMoney(%s, ',', '.') + "</font>" ;}
@@ -472,6 +482,17 @@ class DataTable(AresHtml.Html):
                             column.data().unique().sort().each( function ( d, j ) {
                               select.append('<option value=' + d+ '>' + d +'</option>' )
                             } );
+                      } );
+                   ''')
+
+  def callBackHeaderColumnsTootips(self):
+    """ To add a header on the datatable headers - in progress """
+    self.__options["ordering"] = 'false'
+    self.callBacks('initComplete',
+                   '''
+                      this.api().columns().every( function (el) {
+                            var column = this;
+                            $('td', this).tooltip( {placement : '', html : true, content: 'youpi'}) ;
                       } );
                    ''')
 
@@ -726,6 +747,7 @@ class DataTable(AresHtml.Html):
       item.add(1, "</thead>")
     else:
       item.add(1, "<thead class='%s' style='white-space: nowrap;'></thead>" % " ".join(self.theadCssCls))
+
     if self.withFooter:
       item.add(1, "<tfoot>")
       item.add(2, "<tr>")
@@ -824,7 +846,7 @@ class DataTable(AresHtml.Html):
           options.append("%s: [%s]" % (key, ",".join(val)))
       else:
         options.append("%s: %s" % (key, val))
-    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ; %s' % (self.htmlId, self.jqId, ",".join(options), ";".join(self.tableUpdates)))
+    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ; %s;' % (self.htmlId, self.jqId, ",".join(options), ";".join(self.tableUpdates)))
     return str(item)
 
   def recKey(self, col):
