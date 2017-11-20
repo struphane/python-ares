@@ -11,6 +11,35 @@ class TablePivot(AresHtml.Html):
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       }
 
+      var sumAgg = function(attributeArray) {
+      
+            return function(data, rowKey, colKey) {
+                return {
+                  keyAgg: 0,
+                  push: function(record) {
+                      this.keyAgg += parseFloat(record[attributeArray[0]]);
+                      },
+                  value: function() {return this.keyAgg;},
+                  format: function(x) {return numberWithCommas(x.toFixed(2));},
+                  numInputs: 1
+                };
+            };
+      };
+
+      var absSumAgg = function(attributeArray) {
+      
+            return function(data, rowKey, colKey) {
+                return {
+                  keyAgg: 0,
+                  push: function(record) {
+                      this.keyAgg += Math.abs(parseFloat(record[attributeArray[0]]));
+                      },
+                  value: function() {return this.keyAgg;},
+                  format: function(x) {return numberWithCommas(x.toFixed(2));},
+                  numInputs: 1
+                };
+            };
+      };
   
       var diffAgg = function(attributeArray) {
       
@@ -158,7 +187,9 @@ class TablePivot(AresHtml.Html):
                         $.pivotUtilities.export_renderers
                         ),
                 rendererName: "%s",
-                aggregators: { "Diff": diffAgg
+                aggregators: { "Sum": sumAgg
+                             , "Sum Abs": absSumAgg
+                             , "Diff": diffAgg
                              , "Diff Pct": diffPctAgg
                              , "Diff Abs": diffAbsAgg
                              , "Diff Abs Pct": diffAbsPctAgg

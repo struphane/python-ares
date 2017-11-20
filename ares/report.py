@@ -396,9 +396,9 @@ def run_report(report_name, script_name, user_id):
       downloadEnv = report_name
     report = __import__(report_name) # run the report
     envName = getattr(report, 'NAME', '')
-    side_bar.append('<br /><div style="color:white;font-size:16px;height:20px"><b>&nbsp;Dashboard</b></div>')
+    side_bar.append('<div style="color:white; margin-top:10px;font-size:16px;height:20px"><b>&nbsp;Dashboard</b></div>')
     for categories, links in getattr(report, 'SHORTCUTS', []):
-      side_bar.append('<div style="color:white;font-size:14px;height:20px;margin-top:5px"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></div>' % categories)
+      side_bar.append('<div style="color:white;font-size:14px;height:20px;"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></div>' % categories)
       for name, scriptName in links:
         side_bar.append(render_template_string('<li><a style="height:20px;white-space: nowrap;vertical-align: middle;padding-top:1px" href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
     cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
@@ -426,9 +426,7 @@ def run_report(report_name, script_name, user_id):
         if not staticPage.startswith('filterTable_') and not staticPage.startswith('sortTable_'):
           static_code_rsl = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
                                    "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)
-          print(static_code_rsl)
           static_code = static_code_rsl[0][0]
-          print(static_code)
           htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', static_code='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, static_code, fileNameToParser.get(staticPage, ''), staticPage)))
 
     if isAuth:
@@ -504,8 +502,7 @@ def ajaxCall(report_name, script):
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
-  except Exception as e:
-    print(e)
+  except:
     content = traceback.format_exc()
     error = True
   finally:
