@@ -112,7 +112,7 @@ def getHttpParams(request):
   httpParams['CONFIG']['WRK'] = config.WORK_PATH
   httpParams['CONFIG']['COMPANY'] = config.COMPANY
   for source in AUTHORIZED_SOURCES:
-    httpParams[source] = session[source]
+    httpParams[source] = session.get(source, None)
   return httpParams
 
 def getFileName(script, exts):
@@ -182,14 +182,27 @@ def checkAuth(dbpath, report_name):
   else:
     return True
 
-def getEnvAdmin(dbPath, report_name):
+def getEnvAdmin(report_name):
   """ """
   db = AresSql.SqliteDB(report_name)
   query = """SELECT team_name 
              FROM team_def
-             WHERE role = 'admin'"""
+             WHERE role != 'Normal'"""
 
-  return list(db.select(dbPath, query))
+  return list(db.select(query))
+
+def getTempAdmin(report_name, username):
+  """ """
+  db = AresSql.SqliteDB(report_name)
+  query = """SELECT env_auth.temp_owner FROM env_auth
+              INNER JOIN env_def.env_id = env_auth.env_id 
+              WHERE env_def.env_name = '%s' 
+              AND env_auth.temp_owner = '%s'
+              """ % (report_name, username)
+  if list(db.select(query)):
+    return True
+
+  return False
 
 def getUserRole(dbPath, report_name, user_id):
   """ """
@@ -279,6 +292,7 @@ def run_report(report_name, script_name, user_id):
   cssImport, jsImport = '', ''
   isAuth = True
   reportObj = Ares.Report()
+  adminEnv = False
   try:
     if script_name is None:
       script_name = report_name
@@ -286,6 +300,14 @@ def run_report(report_name, script_name, user_id):
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+      for rec in getEnvAdmin(report_name):
+        if rec['team_name'] == session['TEAM']:
+          adminEnv = True
+          break
+
+      # else:
+      #   if getTempAdmin(report_name, current_user.email):
+      #     adminEnv = True
       if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
         if not checkAuth(dbPath, report_name):
@@ -433,31 +455,8 @@ def run_report(report_name, script_name, user_id):
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
                          viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
-                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name)
+                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name, adminEnv=adminEnv)
 
-
-# def generateFiles(report_name):
-#   """ """
-#   user_id = session['user_id']
-#   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
-#   isAdmin = True if getUserRole(dbPath, report_name, user_id)[0] in ['admin', 'super_user'] else False
-#   report = __import__(report_name)
-#   data = request.form
-#   filesKey = ''
-#   fileCfg = getattr(report, 'FILE_CONFIGS', None)
-#   if fileCfg:
-#     filesKey = '#'.join(data.values())
-#     for file in fileCfg:
-#       diskName = '%s#%s' % (filesKey, file['filename'])
-#       if isAdmin:
-#         if checkFileExist(dbPath, report_name, diskName):
-#           pass
-#         else:
-#           g
-#
-#       if not getFileAuth(dbPath, report_name, diskName):
-#         return json.dumps(
-#           "You don't have the authorization to run this report with those params %s" % filesKey.replace('#', ' - ')), 500
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script):
@@ -576,18 +575,22 @@ def userAccount():
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
 
 
-@report.route("/admin/<report_name>/", defaults={'token': None}, methods=['GET'])
-def adminEnv(report_name, token):
+@report.route("/<report_name>/admin", methods=['GET'])
+def adminEnv(report_name):
   """ Admin session for the environment """
-  #
-  #
-  #if not checkAuth(dbPath, report_name, user_id):
-  #  raise AresExceptions.AuthException('Not authorized to visualize this data')
+  isAdmin = False
+  for rec in getEnvAdmin(report_name):
+    if rec['team_name'] == session['TEAM']:
+      isAdmin = True
+  # else:
+  #   if getTempAdmin(report_name, current_user.email):
+  #     isAdmin = True
+
+  if not isAdmin:
+    return "You are not an administrator of this environment", 500
 
   script_name = '_AresAdmin' # run the report
-  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
-  cssImport, jsImport = '', ''
   systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', script_name)
   if not systemDirectory in sys.path:
     sys.path.append(systemDirectory)
@@ -767,8 +770,8 @@ def createEnv(environment):
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
 
-    # queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': environment}
-    queryParams = {'team_name': session['TEAM'], 'env_name': environment,  'username': email_addr,}
+    queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': environment, 'username': email_addr}
+    # queryParams = {'team_name': session['TEAM'], 'env_name': environment,  'username': email_addr,}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
     queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'username': email_addr, 'team_name': session['TEAM']}
@@ -829,7 +832,7 @@ def deployFiles(env, DATA):
         return json.dumps('You have to provide a file code for the data type'), 500
 
       fileCod = filename if not fileCod else fileCod
-      fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'username': user_name, 'team_name': session['TEAM']}
+      fileParams = {'filename': filename, 'fileCode': fileCod, 'file_type': fileType, 'username': user_name, 'team_name': session['TEAM'].replace('#TEMP', '')}
       executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'create_file.sql')).read(), params=fileParams)
     queryParams = {'report_name': report_name, 'file': filename, 'type': fileType, 'username': user_name, 'team_name': session['TEAM']}
     executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)

@@ -4,25 +4,35 @@
 
 from ares.Lib import AresSql
 from Libs import mailer
-from Libs import AresUserAuthorization
 
 
-NAME = 'Administrator'
+NAME = 'Administration'
 
 
 
 
-def getUserData(aresObj, sqlCon):
+def getTeamData(aresObj, sqlCon):
   """ """
-  nbGlobalUsers = """ SELECT user_accnt.email_addr as "user", user_accnt.role as "role"
+  nbGlobalUsers = """ SELECT team_def.team_name as "team", team_def.role as "role"
                       FROM env_auth 
                       INNER JOIN env_def ON env_def.env_id = env_auth.env_id 
-                      INNER JOIN team_def ON team_def.team_id = env_auth.uid
+                      INNER JOIN team_def ON team_def.team_id = env_auth.team_id
                       WHERE  env_def.env_name = '%s'
-                      AND date('now') BETWEEN env_auth.stt_dt AND env_auth.end_dt
+                      AND datetime('now') BETWEEN env_auth.stt_dt AND env_auth.end_dt
                       GROUP BY "role" """ % aresObj.http['REPORT_NAME']
 
+
   return sqlCon.select(nbGlobalUsers)
+
+def getTempAdminUsers(aresObj, sqlCon):
+  """ """
+  nbBespokeUsers = """ SELECT env_auth.temp_owner as "user", 'Normal' as "role"
+                       FROM env_auth
+                       INNER JOIN env_def ON env_def.env_id = env_auth.env_id
+                       WHERE env_def.env_name = '%s'""" % aresObj.http['REPORT_NAME']
+
+  return sqlCon.select(nbBespokeUsers)
+
 
 def getDeployData(aresObj, sqlCon):
   """ """
@@ -83,25 +93,30 @@ def ajaxCall(aresObj, userLst):
 def report(aresObj):
   # userRecordSet = getEnvData(aresObj)
   sqlCon = AresSql.SqliteDB(aresObj.http['REPORT_NAME'])
-  nbUsers, ndAdmin, nbWatchers = 0, 0, 0
+  nbUsers, nbTeams, nbBespoke = 0, 0, 0
   table2Rec = []
-  for rec in getUserData(aresObj, sqlCon):
+  for rec in getTeamData(aresObj, sqlCon):
     nbUsers += 1
-    ndAdmin += 1 if rec['role'] == 'admin' else 0
-    nbWatchers += 1 if rec['role'] != 'admin' else 0
+    nbTeams += 1
     radiobutton = aresObj.radio([{'role': 'admin'}, {'role': 'user'}], 'role', [{'key': 'role', 'colName': 'Role'}])
     radiobutton.select(rec['role'])
-    table2Rec.append({'user': rec['user'], 'role': radiobutton})
+    radiobutton.clickWithPost('changePermissions', {'team': rec['team']})
+    table2Rec.append({'user': rec['team'], 'role': radiobutton})
+
+  for rec in getTempAdminUsers(aresObj, sqlCon):
+    nbUsers += 1
+    nbBespoke += 1
+    table2Rec.append({'user': rec['user'], 'role': rec['role']})
 
   deployRec = list(getDeployData(aresObj, sqlCon))
 
   aresObj.title("Env Administration - %s" % aresObj.http['REPORT_NAME'])
   aresObj.newline()
   aresObj.newline()
-  tableRec = [{'total': str(nbUsers), 'admin': str(ndAdmin), 'watchers': str(nbWatchers)}]
+  tableRec = [{'total': str(nbUsers), 'Teams': str(nbTeams), 'Bespoke Users': str(nbBespoke)}]
   aresObj.simpletable(tableRec, [{'key': 'total', 'colName': 'Total Users'},
-                                         {'key': 'admin', 'colName': 'Contributors'},
-                                         {'key': 'watchers', 'colName': 'Watchers'}])
+                                         {'key': 'Teams', 'colName': 'Teams'},
+                                         {'key': 'Bespoke Users', 'colName': 'Bespoke Users'}])
   aresObj.newline()
   aresObj.newline()
 

@@ -13,8 +13,13 @@ https://www.bootply.com/60886#
           <a  href="#"><strong>RiskLab</strong></a>
           <!--<a href="#" class="logo_small_grey">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>-->
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <a href="{{ url_for('ares.run_report', report_name=report_name, script_name=script_name, show_params=1  ) }}"  class="btn" style="top:0px;margin-left:3px"><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;Reset</a>
+          <a href="{{ url_for('ares.run_report', report_name=report_name, script_name=script_name, show_params=1  ) }}"  class="btn" style="top:0px;margin-left:3px"><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp;Reset</a>
           <a href="#" class="active_report" style="top:0px"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
+
+          {% if adminEnv %}
+            <a  href="{{ url_for('ares.adminEnv', report_name=report_name ) }}" style="top:0px" class="btn"><i class="fa fa-wrench" aria-hidden="true">&nbsp;&nbsp;</i>Admin</a>
+          {% endif %}
+
           {% if downloadEnv %}
             <a  href="{{ url_for('ares.downloadReport', report_name=downloadEnv ) }}" style="top:0px" class="btn"><i class="fa fa-cloud-download" aria-hidden="true">&nbsp;&nbsp;Download</i></a>
           {% endif %}
