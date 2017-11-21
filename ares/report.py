@@ -1177,6 +1177,28 @@ def createDataSource():
   db.session.commit()
   return json.dumps('Success'), 200
 
+@report.route('/ares/create_team', methods=['GET', 'POST'])
+def createTeam():
+  """ """
+  if request.environ.get('HTTP_ORIGIN') == request.host_url[:-1]:
+    newTeam = Team.query.filter_by(team_name=request.args['team']).first()
+    dbEnv = AresSql.SqliteDB(request.args['report_name'])
+    if not newTeam:
+      team = Team(request.args['team'], request.args['team_email'])
+      db.session.add(team)
+      db.session.commit()
+      newTeam = Team.query.filter_by(team_name=request.args['team']).first()
+    team_id = newTeam.team_id
+    dbEnv.modify("""INSERT INTO team_def (team_id, team_name, role) VALUES (%s, '%s', '%s');
+                 INSERT INTO env_auth (env_id, team_id)
+                 SELECT env_def.env_id, %s
+                 FROM env_def
+                 WHERE env_def.env_name = '%s' ;""" % (team_id, request.args['team'], request.args['role'], team_id, request.args['report_name']))
+    return json.dumps('Success'), 200
+
+  return json.dumps('Forbidden', 403)
+
+
 @report.route("/ares/registration", methods = ['GET', 'POST'])
 @no_login
 def aresRegistration():

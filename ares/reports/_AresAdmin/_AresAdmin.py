@@ -19,7 +19,7 @@ def getTeamData(aresObj, sqlCon):
                       INNER JOIN team_def ON team_def.team_id = env_auth.team_id
                       WHERE  env_def.env_name = '%s'
                       AND datetime('now') BETWEEN env_auth.stt_dt AND env_auth.end_dt
-                      GROUP BY "role" """ % aresObj.http['REPORT_NAME']
+                      GROUP BY "team", "role" """ % aresObj.http['REPORT_NAME']
 
 
   return sqlCon.select(nbGlobalUsers)
@@ -29,7 +29,8 @@ def getTempAdminUsers(aresObj, sqlCon):
   nbBespokeUsers = """ SELECT env_auth.temp_owner as "user", 'Normal' as "role"
                        FROM env_auth
                        INNER JOIN env_def ON env_def.env_id = env_auth.env_id
-                       WHERE env_def.env_name = '%s'""" % aresObj.http['REPORT_NAME']
+                       WHERE env_def.env_name = '%s'
+                       AND env_auth.temp_owner != ''""" % aresObj.http['REPORT_NAME']
 
   return sqlCon.select(nbBespokeUsers)
 
@@ -119,10 +120,18 @@ def report(aresObj):
     createdTeams.append((splitKey[0], [splitKey[1]]))
 
 
-  team_modal = aresObj.modal('Add new Team', btnCls=['fa fa-plus fa-5`x btn btn-link'])
-  team_modal.clickWithValidCloseModal('AresUserAddPass', editModal,
-                            {'source': sourceDropDown, 'username': usernameInput, 'pwd': pwdInput,
-                             'app_id': account_id}, subPost=True)
+  team_modal = aresObj.modal('  Create new team', btnCls=['fa fa-plus fa-5`x btn btn-link'])
+  t_name = aresObj.input('Team Name')
+  t_email = aresObj.input('Email Address')
+  role_modal = aresObj.select(['Administrator', 'User'])
+  modal_row = aresObj.row([t_name, t_email])
+  modal_submit = aresObj.button('Add')
+  modal_submit.clickWithValidCloseModal('createAndAddTeam', team_modal, {'team_name': t_name, 'team_email': t_email, 'role': role_modal}, subPost=True)
+  aresObj.addTo(team_modal, role_modal)
+  aresObj.addTo(team_modal, aresObj.newline())
+  aresObj.addTo(team_modal, modal_row)
+  aresObj.addTo(team_modal, modal_submit)
+
   aresObj.newline()
   aresObj.newline()
   tableRec = [{'total': str(nbUsers), 'Teams': str(nbTeams), 'Bespoke Users': str(nbBespoke)}]
@@ -139,16 +148,22 @@ def report(aresObj):
   aresObj.newline()
   aresObj.newline()
 
+  team_map_str = ''
+  for name, id in aresObj.http['TEAM_DSC'].items():
+    team_map_str = '%s%s#%s;' % (team_map_str, name, id)
+  team_map_str = team_map_str[:-1]
+
   input =aresObj.input(value='Authorise bespoke users to view this report (comma separated list)')
   submitButton = aresObj.button('Submit')
-  submitButton.clickWithValid('addUsers', {'users': input, 'type': 'bespoke'})
+  submitButton.clickWithValidAndRefresh('addUsers', {'users': input, 'type': 'bespoke'})
   col1 = aresObj.col([input, submitButton])
 
   select = aresObj.selectmulti('', tuple(createdTeams))
-  roleButton = aresObj.radio([{'role': 'admin'}, {'role': 'user'}], 'role', [{'key': 'role', 'colName': 'Role'}])
+  roleButton = aresObj.select(['Administrator', 'User'])
+  roleButton.setDefault('User')
   roleRow = aresObj.row([select, roleButton])
   submitButton2 = aresObj.button('Submit')
-  submitButton2.clickWithValid('addUsers', {'team': select, 'role': roleButton, 'type': 'team'})
+  submitButton2.clickWithValidAndRefresh('addUsers', {'team': select, 'role': roleButton, 'type': 'team', 'team_dsc': team_map_str})
   col3 = aresObj.col([roleRow, submitButton2])
 
 

@@ -67,9 +67,9 @@ class Button(AresHtml.Html):
                     $.post("%s", %s, function(data) {
                         var res = JSON.parse(data) ;
                         var data = res.data ;
-                        console.log(data);
                         $.post(data, function(data2) {
-                          location.reload()
+                          var res = JSON.parse(data2);
+                          //location.reload()
                           });
                         
                         var status = res.status ;
@@ -99,8 +99,12 @@ class Button(AresHtml.Html):
       self.js('click', jsDef)
 
   def clickWithValid(self, scriptName, attr):
-    """ Click run an Ajax call and print the return message in the ajax service """
+    """ Click run an Ajax call and print the return messa0ge in the ajax service """
     self.click("display(data);", attr, scriptName)
+
+  def clickWithValidAndRefresh(self, scriptName, attr):
+    """ """
+    self.click("display(data);location.reload();", attr, scriptName)
 
   def clickWithValidCloseModal(self, scriptName, modal, attr, subPost=False):
     """ Click run the ajax call, close the modal and returns the message in the ajax service """
