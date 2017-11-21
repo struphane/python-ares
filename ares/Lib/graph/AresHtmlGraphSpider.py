@@ -60,6 +60,7 @@ class D3SpiderChart(AresHtmlGraphSvg.MultiSvg):
               legend.selectAll('text').data(LegendOptions).enter().append("text").attr("x", w - 52)
                 .attr("y", function(d, i){ return i * 20 + 9;}).attr("font-size", "11px")
                 .attr("fill", "#737373").text(function(d) { return d; });
+
             ''' % (self.jqData, self.width, self.height-55, self.htmlId)
 
   def __str__(self):

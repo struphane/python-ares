@@ -387,7 +387,6 @@ def run_report(report_name, script_name, user_id):
           if fnct == 'params':
             reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
 
-
     getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
@@ -409,10 +408,8 @@ def run_report(report_name, script_name, user_id):
     isAuth = False
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
-
   except Exception as e:
     error = True
-    print(str(traceback.format_exc()))
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
@@ -508,8 +505,10 @@ def ajaxCall(report_name, script):
     content = traceback.format_exc()
     error = True
   finally:
-    if script in sys.modules:
-      del sys.modules[script]
+    sys.path.remove(userDirectory)
+    for module, ss in sys.modules.items():
+      if userDirectory in str(ss):
+        del sys.modules[module]
 
     for f in reportObj.files.values():
       f.close()
