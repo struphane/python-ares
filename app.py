@@ -65,6 +65,13 @@ class Team(db.Model):
     self.team_name = team_name
     self.team_email = email
 
+  def __repr__(self):
+    return '<Team %r>' % self.team_email
+
+  def get_id(self):
+    """ """
+    return self.team_email
+
 class DataSource(db.Model):
   """ """
   __tablename__ = 'datasource'

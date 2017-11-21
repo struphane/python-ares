@@ -1,6 +1,6 @@
 -- team table
 CREATE TABLE team_def (
- team_id integer PRIMARY KEY AUTOINCREMENT,
+ team_id integer PRIMARY KEY NOT NULL,
  team_name text NOT NULL UNIQUE,
  role text DEFAULT 'Normal',
  crea_dt timestamp DEFAULT CURRENT_TIMESTAMP

@@ -113,6 +113,18 @@ def report(aresObj):
   aresObj.title("Env Administration - %s" % aresObj.http['REPORT_NAME'])
   aresObj.newline()
   aresObj.newline()
+  createdTeams = []
+  for key in sorted(aresObj.http['TEAM_DSC']):
+    splitKey = key.split('#')
+    createdTeams.append((splitKey[0], [splitKey[1]]))
+
+
+  team_modal = aresObj.modal('Add new Team', btnCls=['fa fa-plus fa-5`x btn btn-link'])
+  team_modal.clickWithValidCloseModal('AresUserAddPass', editModal,
+                            {'source': sourceDropDown, 'username': usernameInput, 'pwd': pwdInput,
+                             'app_id': account_id}, subPost=True)
+  aresObj.newline()
+  aresObj.newline()
   tableRec = [{'total': str(nbUsers), 'Teams': str(nbTeams), 'Bespoke Users': str(nbBespoke)}]
   aresObj.simpletable(tableRec, [{'key': 'total', 'colName': 'Total Users'},
                                          {'key': 'Teams', 'colName': 'Teams'},
@@ -120,18 +132,23 @@ def report(aresObj):
   aresObj.newline()
   aresObj.newline()
 
-  input =aresObj.input(value='Authorise bespokes users to view this report (comma separated list)')
+
+
+  aresObj.newline()
+  aresObj.newline()
+  aresObj.newline()
+  aresObj.newline()
+
+  input =aresObj.input(value='Authorise bespoke users to view this report (comma separated list)')
   submitButton = aresObj.button('Submit')
   submitButton.clickWithValid('addUsers', {'users': input, 'type': 'bespoke'})
   col1 = aresObj.col([input, submitButton])
 
-  input2 =aresObj.input(value='Allow new teams to view/edit this report')
-  btnText = aresObj.text('Choose permission:')
+  select = aresObj.selectmulti('', tuple(createdTeams))
   roleButton = aresObj.radio([{'role': 'admin'}, {'role': 'user'}], 'role', [{'key': 'role', 'colName': 'Role'}])
-  col2 = aresObj.col([btnText, aresObj.newline(), roleButton])
-  roleRow = aresObj.row([input2, col2])
+  roleRow = aresObj.row([select, roleButton])
   submitButton2 = aresObj.button('Submit')
-  submitButton2.clickWithValid('addUsers', {'team': input2, 'role': roleButton, 'type': 'team'})
+  submitButton2.clickWithValid('addUsers', {'team': select, 'role': roleButton, 'type': 'team'})
   col3 = aresObj.col([roleRow, submitButton2])
 
 

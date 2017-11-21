@@ -12,7 +12,7 @@ import time
 import shutil
 import sqlite3
 import hashlib
-
+import logging
 from app import User, Team, EnvironmentDesc, DataSource, db
 
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -195,7 +195,7 @@ def getTempAdmin(report_name, username):
   """ """
   db = AresSql.SqliteDB(report_name)
   query = """SELECT env_auth.temp_owner FROM env_auth
-              INNER JOIN env_def.env_id = env_auth.env_id 
+              INNER JOIN env_def ON env_def.env_id = env_auth.env_id 
               WHERE env_def.env_name = '%s' 
               AND env_auth.temp_owner = '%s'
               """ % (report_name, username)
@@ -305,9 +305,10 @@ def run_report(report_name, script_name, user_id):
           adminEnv = True
           break
 
-      # else:
-      #   if getTempAdmin(report_name, current_user.email):
-      #     adminEnv = True
+      else:
+        if getTempAdmin(report_name, current_user.email):
+          adminEnv = True
+
       if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
         if not checkAuth(dbPath, report_name):
@@ -411,6 +412,7 @@ def run_report(report_name, script_name, user_id):
 
   except Exception as e:
     error = True
+    print(str(traceback.format_exc()))
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
@@ -576,15 +578,22 @@ def userAccount():
 def adminEnv(report_name):
   """ Admin session for the environment """
   isAdmin = False
+
   for rec in getEnvAdmin(report_name):
     if rec['team_name'] == session['TEAM']:
       isAdmin = True
-  # else:
-  #   if getTempAdmin(report_name, current_user.email):
-  #     isAdmin = True
+  else:
+    if getTempAdmin(report_name, current_user.email):
+      isAdmin = True
 
   if not isAdmin:
     return "You are not an administrator of this environment", 500
+
+  teamLst = Team.query.all()
+  teamRec = {}
+  for team in teamLst:
+    teamStr = "%s#%s" % (team.team_name, team.team_email)
+    teamRec[teamStr] = team.team_id
 
   script_name = '_AresAdmin' # run the report
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
@@ -604,6 +613,7 @@ def adminEnv(report_name):
   reportObj.http['FILE'] = script_name
   reportObj.http['REPORT_NAME'] = report_name
   reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  reportObj.http['TEAM_DSC'] = teamRec
   mod.report(reportObj)
   cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
@@ -703,10 +713,10 @@ def ajaxCreate():
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
 
-    queryParams = {'team_name': session['TEAM'], 'env_name': reportObj.http['REPORT_NAME']}
+    queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': reportObj.http['REPORT_NAME']}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
-    env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM'])
+    env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM'].replace('#TEMP', ''))
     db.add(env_dsc)
     db.commit()
     queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'team_name': session['TEAM'], 'username': email_address}
@@ -767,11 +777,11 @@ def createEnv(environment):
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'create_sqlite_schema.sql')).read())
     #fisrt user insert to appoint an admin on the environment
 
-    queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': environment, 'username': email_addr}
+    queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': environment, 'username': email_addr, 'team_id': session['TEAM_ID']}
     # queryParams = {'team_name': session['TEAM'], 'env_name': environment,  'username': email_addr,}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
-    queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'username': email_addr, 'team_name': session['TEAM']}
+    queryParams = {'report_name': environment, 'file': 'environment', 'type': 'environment', 'username': email_addr, 'team_name': session['TEAM'], 'team_id': session['TEAM_ID']}
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), open(os.path.join(SQL_CONFIG, 'log_deploy.sql')).read(), params=queryParams)
 
     shutil.copyfile(os.path.join(reportObj.http['ARES_TMPL'], 'tmpl_report.py'), os.path.join(scriptPath, scriptName))
@@ -1204,9 +1214,12 @@ def aresLogin():
     user = User.query.filter_by(email=data['email_addr']).first()
     next = request.args.get('next')
     if user:
+      team_def = Team.query.filter_by(team_name=user.team_name).first()
       if user.password == hashlib.sha256(bytes(data['password'].encode('utf-8'))).hexdigest():
         suffix = '' if user.team_confirm == 'Y' else '#TEMP'
         session['TEAM'] = user.team_name + suffix
+        session['TEAM_ID'] = team_def.team_id
+        print(session['TEAM_ID'])
         session['PWD'] = data['password']
         for source in user.datasources:
           session[source.source_name.upper()] = (source.source_username, AresUserAuthorization.decrypt(source.source_pwd, session['PWD'], source.salt))
