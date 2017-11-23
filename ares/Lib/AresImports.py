@@ -65,7 +65,9 @@ JS_IMPORTS = {
   'worker': {'req': ['bootstrap', 'jquery'], 'modules': ['ajaxWorker.js']},
 
   # javascript package for the Venn chart
-  'venn': {'req': ['ares', 'd3'], 'modules': ['venn.js']}
+  'venn': {'req': ['ares', 'd3'], 'modules': ['venn.js']},
+
+  'vis': {'req': [], 'modules': ['vis.min.js']}
 }
 
 CSS_IMPORTS = {
@@ -94,7 +96,9 @@ CSS_IMPORTS = {
 
   'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.css']},
 
-  'pivot': {'req': [], 'modules': ['pivot.min.css']}
+  'pivot': {'req': [], 'modules': ['pivot.min.css']},
+
+  'vis': {'req': [], 'modules': ['vis.min.css']}
   }
 
 
