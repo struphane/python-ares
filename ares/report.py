@@ -425,6 +425,9 @@ def run_report(report_name, script_name, user_id):
         if not staticPage.startswith('filterTable_') and not staticPage.startswith('sortTable_'):
           static_code_rsl = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
                                    "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)
+          if not static_code_rsl:
+            continue
+
           static_code = static_code_rsl[0][0]
           htmlStatics.append(render_template_string("<a class='dropdown-item' href='{{ url_for('ares.run_report', report_name='_AresReports', script_name='AresReportStaticView', user_report_name='%s', user_script_name='%s', static_file='%s', static_code='%s', file_parser='%s') }}' target='_blank'>%s</a>" % (report_name, script_name, staticPage, static_code, fileNameToParser.get(staticPage, ''), staticPage)))
 
