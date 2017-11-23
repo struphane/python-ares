@@ -1,3 +1,13 @@
+# TODO: To use it to replace the redondant functions calls
+# TODO: implement a decorator to wrap the current part in the functions
+
+import os
+import sys
+import time
+import inspect
+import collections
+import json
+
 """ Report Interface
 
 This module will be used to produce the final report
@@ -18,16 +28,6 @@ javascript defined in the different classes. It is possible to test the differen
 
 QUESTION: Should we call the html() function in the wrapper or should we let the user call it ?
 """
-# TODO: To use it to replace the redondant functions calls
-# TODO: implement a decorator to wrap the current part in the functions
-
-import os
-import sys
-import time
-import inspect
-import collections
-import json
-
 from importlib import import_module
 from ares.Lib import AresImports
 
@@ -359,7 +359,7 @@ class Report(object):
   def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def spider(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['D3SpiderChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def venn(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Venn'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
-
+  def vis3DSurface(self, values): return self.add(aresFactory['Vis3DSurfaceChart'](self, values), sys._getframe().f_code.co_name)
 
   # File HTML Section
   # def upload(self, values='', cssCls=None, cssAttr=None): return self.add(aresFactory['UploadFile'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name)
