@@ -324,11 +324,13 @@ class Report(object):
   def iframe(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['IFrame'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   def table(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTable'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
+
   # in progress
   def tablepivot(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTablePivot'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
   def tableagg(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableAgg'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
+  def tablehyr(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableHyr'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
 
-  def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
+  def tableBase(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['TableBase'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
   def pivot(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None): return self.add(aresFactory['TablePivot'](self, headerBox, values, header, dataFilters, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
