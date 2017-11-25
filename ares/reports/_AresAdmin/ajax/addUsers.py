@@ -11,6 +11,7 @@ ADD_TEAM = """INSERT INTO team_def (team_id, team_name, role) VALUES (%s, '%s', 
 ADD_BESPOKE_USER = """ INSERT INTO env_auth (temp_owner, team_id) 
                         SELECT '%s', team_id FROM team_def WHERE team_name = 'BESPOKE_TEAM'; """
 
+
 def call(aresObj):
   import pprint
   pprint.pprint(aresObj.http)
