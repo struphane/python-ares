@@ -166,12 +166,8 @@ def executeSelectQuery(dbPath, query, params=None):
   conn.close()
   return res
 
-def checkAuth(dbpath, report_name):
+def checkAuth(report_name):
   """ Check whether user has authorization to see data within the environment """
-
-  if not os.path.exists(dbpath):
-    raise IOError("Path to DB does not exist - the SQLite Database may have been deleted")
-
 
   db = AresSql.SqliteDB(report_name)
   query = """SELECT 1 FROM env_auth 
@@ -326,7 +322,7 @@ def run_report(report_name, script_name, user_id):
 
       if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
-        if not checkAuth(dbPath, report_name):
+        if not checkAuth(report_name):
           raise AresExceptions.AuthException('Not authorized to visualize this data')
 
         queryParams = {'script_name': script_name, 'env_name': report_name, 'username': current_user.email, 'team_name': session['TEAM']}
@@ -642,8 +638,7 @@ def adminEnv(report_name):
 def savedHtmlReport(report_name, html_report):
   """  """
   if config.ARES_MODE.upper() != 'LOCAL':
-    dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
-    if not checkAuth(dbPath, report_name):
+    if not checkAuth(report_name):
       raise AresExceptions.AuthException("""Sorry, you are not authorised to view this report - please contact this environment administrator to request access.
                                          Administrator: %s """ ", ".join([rec['email_addr'] for rec in getEnvAdmin()]))
 
@@ -821,7 +816,7 @@ def deployFiles(env, DATA):
                  'saved': (['.HTML'], 'saved'), 'utils': (['.PY'], 'utils'), 'ajax': (['.PY'], 'ajax') }
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
 
-  if not checkAuth(dbPath, report_name):
+  if not checkAuth(report_name):
     return json.dumps('Not authorized to deploy on environment: %s' % report_name), 500
 
   if report_name.startswith("_"):
@@ -876,7 +871,7 @@ def uploadFiles(report_type, report_name, user_name):
                  }
   dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
 
-  if not checkAuth(dbPath, report_name, user_name):
+  if not checkAuth(report_name):
     return json.dumps('Not authorized to deploy on environment: %s' % report_name), 500
 
   if not report_type in reportTypes:
