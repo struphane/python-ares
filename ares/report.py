@@ -293,6 +293,13 @@ def run_report(report_name, script_name, user_id):
   isAuth = True
   reportObj = Ares.Report()
   adminEnv = False
+  #TODO Improve this
+  # Ensure that all the modules attached to a report have been removed
+  # This will be a problem is multiple request at the same time (especially if they take some time
+  for reportFolderName in ['utils', 'ajax']:
+    if reportFolderName in sys.modules:
+      del sys.modules[reportFolderName]
+
   try:
     if script_name is None:
       script_name = report_name
@@ -423,8 +430,7 @@ def run_report(report_name, script_name, user_id):
     if os.path.exists(fileStatic):
       for staticPage in os.listdir(fileStatic):
         if not staticPage.startswith('filterTable_') and not staticPage.startswith('sortTable_'):
-          static_code_rsl = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
-                                   "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)
+          static_code_rsl = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'), "SELECT alias FROM file_map WHERE disk_name = '%s'" % staticPage)
           if not static_code_rsl:
             continue
 
@@ -433,7 +439,9 @@ def run_report(report_name, script_name, user_id):
 
     if isAuth:
       if not report_name.startswith("_"):
-        sys.path.remove(userDirectory)
+        if userDirectory in sys.path:
+          sys.path.remove(userDirectory)
+        # Logic to remove all the modules attaced to a report
         for module, ss in sys.modules.items():
           if userDirectory in str(ss):
             del sys.modules[module]
