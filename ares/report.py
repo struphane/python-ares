@@ -14,7 +14,7 @@ import sqlite3
 import hashlib
 import logging
 from app import User, Team, EnvironmentDesc, DataSource, db
-
+from functools import wraps
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import redirect, url_for, session, current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
@@ -64,6 +64,7 @@ def ask_login():
   return redirect(url_for('ares.aresLogin', next=request.endpoint))
 
 def noCache(f):
+  @wraps(f)
   def respFunc(*args, **kwargs):
     resp = make_response(f(*args, **kwargs))
     resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
@@ -1094,7 +1095,7 @@ def download():
 
 
 @report.route("/download/package/<name>")
-# @noCache
+@noCache
 def downloadPackage(name):
   modules = getattr(packages, name, None)
   memory_file = io.BytesIO()
