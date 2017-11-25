@@ -63,6 +63,14 @@ def ask_login():
 
   return redirect(url_for('ares.aresLogin', next=request.endpoint))
 
+def noCache(f):
+  def respFunc(*args, **kwargs):
+    resp = make_response(f(*args, **kwargs))
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    resp.headers['Pragma'] = 'no-cache'
+    return resp
+  return respFunc
+
 
 # Return the list of all the scripts needed to run this package
 # This will group all the module CSS, JS and Python scripts
@@ -1086,7 +1094,9 @@ def download():
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='ares.zip', as_attachment=True)
 
+
 @report.route("/download/package/<name>")
+@noCache
 def downloadPackage(name):
   modules = getattr(packages, name, None)
   memory_file = io.BytesIO()
