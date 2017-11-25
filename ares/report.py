@@ -166,6 +166,9 @@ def executeSelectQuery(dbPath, query, params=None):
   conn.close()
   return res
 
+def isPrivateEnv(report_name):
+  """ """
+
 def checkAuth(report_name):
   """ Check whether user has authorization to see data within the environment """
 
@@ -1091,7 +1094,7 @@ def download():
 
 
 @report.route("/download/package/<name>")
-@noCache
+# @noCache
 def downloadPackage(name):
   modules = getattr(packages, name, None)
   memory_file = io.BytesIO()
