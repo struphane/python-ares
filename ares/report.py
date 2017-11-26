@@ -390,7 +390,7 @@ def run_report(report_name, script_name, user_id):
         if fileConfig['filename'] in reportObj.fileMap:
           raise AresExceptions('You cannot use the same code for a static and an output')
 
-        queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
+        queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.email}
         files = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
                                    open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
         for file in files:
