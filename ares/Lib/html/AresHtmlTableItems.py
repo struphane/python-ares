@@ -12,8 +12,6 @@ class Td(AresHtml.Html):
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, sortBy=None, rowspan=1, colspan=1):
     super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.cssCls = [] if cssCls is None else cssCls
-    self.cssAttr = [] if cssAttr is None else cssCls
     self.colspan, self.rowspan = rowspan, colspan
 
   def __str__(self):
@@ -35,8 +33,6 @@ class Th(AresHtml.Html):
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, rowspan=1, colspan=1, title=None):
     super(Th, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.cssCls = [] if cssCls is None else cssCls
-    self.cssAttr = [] if cssAttr is None else cssCls
     self.colspan, self.rowspan = rowspan, colspan,
     if title is not None:
       self.attr['title'] = title
@@ -54,8 +50,6 @@ class ThwithDivSpan(AresHtml.Html):
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, rowspan=1, colspan=1, title=None):
     super(ThwithDivSpan, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.cssCls = [] if cssCls is None else cssCls
-    self.cssAttr = [] if cssAttr is None else cssCls
     self.colspan, self.rowspan = rowspan, colspan
     if title is not None:
       self.attr['title'] = title

@@ -85,13 +85,13 @@ class Html(object):
     if cssCls is not None:
       # If the cssCls is defined it will replace the default one
       # We do not want to extend the list of the class
-      self.attr['class'] = cssCls
+      self.attr['class'] = list(cssCls)
     if css is not None:
       # we need to do a copy of the CSS style at this stage
       self.attr['css'] = dict(css)
     if cssAttr is not None:
       if css is None:
-        self.attr['css'] = cssAttr
+        self.attr['css'] = dict(cssAttr)
       else:
         self.attr['css'].update(cssAttr)
     self.jsOnLoad, self.jsEvent, self.jsEventFnc = set(), {}, collections.defaultdict(set)
@@ -152,7 +152,7 @@ class Html(object):
     if name == 'css':
       # Section for the Style attributes
       if not 'css' in self.attr:
-        self.attr['css'] = value
+        self.attr['css'] = dict(value)
       else:
         self.attr['css'].update(value)
     elif name == 'class':

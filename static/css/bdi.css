@@ -178,6 +178,12 @@ td.red_cell {
     color: red;
 }
 
+td.grey_cell {
+    background-color: #f2f2f2;
+    text-align: center;
+    color: black;
+}
+
 a[name="side_change"] {
     color:white;
     width:20px;

@@ -263,6 +263,7 @@ class TableComplex(AresHtml.Html):
     """  """
     self.cssPivotRows = attr
 
+
 class TableBase(AresHtml.Html):
   """
 
@@ -319,13 +320,12 @@ class TableBase(AresHtml.Html):
           cellTd.addAttr('name', "%s_col_%s" % (self.htmlId, i))
           row.append(cellTd)
       self.__data.append(row)
-    self.mouveHover('#BFFCA6', 'black')
 
   def mouveHover(self, backgroundColor, fontColor):
     self.aresObj.jsGlobal.add("%s_originalBackground" % self.htmlId)
     self.aresObj.jsGlobal.add("%s_originalColor" % self.htmlId)
     self.aresObj.jsFnc.add('''
-        %s.on( 'mouseover', 'tr', function () {
+        %s.on( 'mouseover', 'tbody > tr', function () {
             if ($(this).css('background-color') != '%s') {
               %s_originalBackground = $(this).css('background-color') ;
               %s_originalColor = $(this).css('color') ;
@@ -336,7 +336,7 @@ class TableBase(AresHtml.Html):
        ''' % (self.jqId, backgroundColor, self.htmlId, self.htmlId, backgroundColor, fontColor) )
 
     self.aresObj.jsFnc.add('''
-        %s.on( 'mouseout', 'tr', function () {
+        %s.on( 'mouseout', 'tbody > tr', function () {
             $(this).css('background-color', %s_originalBackground);
             $(this).css('color', %s_originalColor);
         });
@@ -372,6 +372,21 @@ class TableBase(AresHtml.Html):
     for colNumber in colNumbers:
       for i, row in enumerate(self.__data[fromRow:]):
         row[colNumber].addClass(classname)
+
+  def callBackCreateCellThreshold(self, colNumbers, threshold, digit=2, fromRow=None):
+    """
+
+    :param colNumber: Column number
+    :param classname: The className to add to the cell
+    :return:
+    """
+    fromRow = self.hdrLines if fromRow is None else fromRow
+    for row in self.__data[fromRow:]:
+      for colNumber in colNumbers:
+        if row[colNumber].vals >= threshold:
+          row[colNumber].addAttr('css', {'color': 'green'})
+        else:
+          row[colNumber].addAttr('css', {'color': 'red'})
 
   def addAttrCol(self, colNumbers, name, value, fromRow=None):
     """
@@ -435,6 +450,7 @@ class TableBase(AresHtml.Html):
 
   def __str__(self):
     """  Returns the string representation of a HTML Table """
+    self.mouveHover('#BFFCA6', 'black')
     trAttr = []
     if 'css' in self.__rows_attr['ALL']:
       trAttr.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.__rows_attr['ALL']["css"].items()]))
@@ -495,7 +511,6 @@ class TableBase(AresHtml.Html):
           styleVals = "style='%s'" % self.header[-1][j].get('aresCssAttr') if self.header[-1][j].get('aresCssAttr') is not None else ''
           url = render_template_string('''{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}''' % (self.aresObj.reportName, self.header[-1][j]['script_name']))
           url = "%s?%s=%s" % (url, self.recKey(self.header[-1][j]), td.vals)
-          print url
           td.vals = "<a href='%s' %s target='_blank'>%s</a>" % (url, styleVals, td.vals)
         cells.append(str(td))
       html.append("<tr %s>%s</tr>" % (strTrAttr, "".join(cells)))
