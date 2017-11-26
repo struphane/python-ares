@@ -67,6 +67,9 @@ JS_IMPORTS = {
   # javascript package for the Venn chart
   'venn': {'req': ['ares', 'd3'], 'modules': ['venn.js']},
 
+  # javascript package for the 3D charts
+  'donut-3d': {'req': [], 'modules': ['d3.donut-3D.js']},
+
   'vis': {'req': [], 'modules': ['vis.min.js']}
 }
 

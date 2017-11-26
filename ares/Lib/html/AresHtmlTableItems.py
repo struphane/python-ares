@@ -9,13 +9,10 @@ from ares.Lib import AresHtml
 
 class Td(AresHtml.Html):
   """ Python class for the TD objects """
-  colspan, rowspan = 1, 1
 
-  def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None, sortBy=None):
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, sortBy=None, rowspan=1, colspan=1):
     super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.cssCls = [] if cssCls is None else cssCls
-    self.cssAttr = [] if cssAttr is None else cssCls
-    self.tag = 'th' if isheader else 'td'
+    self.colspan, self.rowspan = rowspan, colspan
 
   def __str__(self):
     if self.colspan > 1:
@@ -23,7 +20,7 @@ class Td(AresHtml.Html):
     if self.rowspan > 1:
       self.attr['rowspan'] = self.rowspan
     withId = 'title' in self.attr
-    return '<%s %s>%s</%s>' % (self.tag, self.strAttr(withId=withId), self.vals, self.tag)
+    return '<td %s valign="middle">%s</td>' % (self.strAttr(withId=withId), self.vals)
 
   def mouseOver(self, bgcolor, fontColor='#FFFFFF'):
     """ Change the behaviour of the cell """
@@ -31,3 +28,35 @@ class Td(AresHtml.Html):
     self.attr['onMouseOut'] = "this.style.background='#FFFFFF';this.style.color='#000000'"
 
 
+class Th(AresHtml.Html):
+  """ Python class for the TD objects """
+
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, rowspan=1, colspan=1, title=None):
+    super(Th, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.colspan, self.rowspan = rowspan, colspan,
+    if title is not None:
+      self.attr['title'] = title
+
+  def __str__(self):
+    if self.colspan > 1:
+      self.attr['colspan'] = self.colspan
+    if self.rowspan > 1:
+      self.attr['rowspan'] = self.rowspan
+    return '<th %s>%s</th>' % (self.strAttr(False), self.vals)
+
+
+class ThwithDivSpan(AresHtml.Html):
+  """ Python class for the TD objects """
+
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, rowspan=1, colspan=1, title=None):
+    super(ThwithDivSpan, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.colspan, self.rowspan = rowspan, colspan
+    if title is not None:
+      self.attr['title'] = title
+
+  def __str__(self):
+    if self.colspan > 1:
+      self.attr['colspan'] = self.colspan
+    if self.rowspan > 1:
+      self.attr['rowspan'] = self.rowspan
+    return '<th %s><div><span>%s</span></div></th>' % (self.strAttr(False), self.vals)

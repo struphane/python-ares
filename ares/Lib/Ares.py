@@ -330,7 +330,8 @@ class Report(object):
   def tableagg(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableAgg'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
   def tablehyr(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableHyr'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
 
-  def tableBase(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['TableBase'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
+  def tablebase(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None, globalSortBy=None): return self.add(aresFactory['TableBase'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr, globalSortBy), sys._getframe().f_code.co_name)
+  def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None, globalSortBy=None): return self.add(aresFactory['TableComplex'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr, globalSortBy), sys._getframe().f_code.co_name)
   def pivot(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None): return self.add(aresFactory['TablePivot'](self, headerBox, values, header, dataFilters, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
@@ -361,6 +362,9 @@ class Report(object):
   def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def spider(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['D3SpiderChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def venn(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Venn'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+
+  # 3D charts
+  def pie3D(self, values): return self.add(aresFactory['Donut3D'](self, values), sys._getframe().f_code.co_name)
   def vis3DSurface(self, values): return self.add(aresFactory['Vis3DSurfaceChart'](self, values), sys._getframe().f_code.co_name)
 
   # File HTML Section
