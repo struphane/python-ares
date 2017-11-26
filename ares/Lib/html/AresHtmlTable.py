@@ -12,36 +12,10 @@ import operator
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresJs
 from ares.Lib.html import AresHtmlContainer
-from ares.Lib.html import AresHtmlText
 
 from flask import render_template_string
 from Libs import AresChartsService
-
-class Td(AresHtml.Html):
-  """ Python class for the TD objects """
-  colspan, rowspan = 1, 1
-
-
-  def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None, sortBy=None):
-    super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.cssCls = [] if cssCls is None else cssCls
-    self.cssAttr = [] if cssAttr is None else cssCls
-    self.tag = 'th' if isheader else 'td'
-
-  def __str__(self):
-    if self.colspan > 1:
-      self.attr['colspan'] = self.colspan
-    if self.rowspan > 1:
-      self.attr['rowspan'] = self.rowspan
-    withId = 'title' in self.attr
-    return '<%s %s>%s</%s>' % (self.tag, self.strAttr(withId=withId), self.vals, self.tag)
-
-  def mouseOver(self, bgcolor, fontColor='#FFFFFF'):
-    """ Change the behaviour of the cell """
-    self.attr['onMouseOver'] = "this.style.background='%s';this.style.color='%s'" % (bgcolor, fontColor)
-    self.attr['onMouseOut'] = "this.style.background='#FFFFFF';this.style.color='#000000'"
 
 
 class DataTable(AresHtml.Html):
@@ -946,6 +920,7 @@ class DataTablePivot(DataTable):
   def setVals(self, vals, selected=None):
     self.chartVals = [self.header[val] for val in vals]
 
+
 class DataTableAgg(DataTable):
   """
 
@@ -958,232 +933,13 @@ class DataTableAgg(DataTable):
     self.chartVals = [self.header[val] for val in vals]
 
 
+class DataTableHyr(DataTable):
+  """
 
-class SimpleTable(AresHtml.Html):
-  """ Python wrapper for the table HTML object """
-  cssCls, alias = ['table'], 'table'
-  references = ['https://www.w3schools.com/html/html_tables.asp',
-                'https://www.w3schools.com/css/css_table.asp',
-                'https://api.jquery.com/dblclick/']
-  reqCss = ['bootstrap', 'jquery']
-  reqJs = ['bootstrap', 'jquery']
-  dflt = None
-  formatVals = True
+  """
 
-  @AresHtml.deprecated
-  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
-    """ Create an Simple Table object """
-    super(SimpleTable, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.headerBox = headerBox
-    self.header = header
-    self.cssPivotRows = {'font-weight': 'bold'}
-    self.__rows_attr = {'rows': {'ALL': {}}}
-    if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
-      self.header = [header]
-    self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
-    self.tdCssCls = tdCssCls
-    self.tdCssAttr = tdCssAttr
-    for val in vals:
-      row = []
-      for header in self.header[-1]:
-        cellVal = val.get(self.recKey(header), self.dflt)
-        if cellVal is not None:
-          row.append(Td(aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=self.tdCssAttr))
-      self.__data.append(row)
+  def setKeys(self, keys, selected=None):
+    self.chartKeys = [self.header[key] for key in keys]
 
-  def recKey(self, col):
-    """ Return the record Key taken into accounr th possible user options """
-    return col.get("key", col.get("colName"))
-
-  def pivot(self, keys, vals, filters=None):
-    """ """
-    mapHeader = dict([(self.recKey(hdr), hdr['colName']) for hdr in self.header[-1]])
-    self.__data = [[Td(self.aresObj, mapHeader[header], True, cssAttr={'background': '#225D32', 'text-align': 'center',
-                                                                       'color': 'white', 'font-weight': 'bold'}) for header in keys + vals]]
-    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
-    self.__rows_hidden = {}
-    for i, val in enumerate(rows):
-      if self.formatVals:
-        for keyVal in vals:
-          val[keyVal] = AresHtmlText.UpDown(self.aresObj, val[keyVal], val[keyVal])
-      row, indexCol = [], i+1
-      #
-      if not indexCol in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][indexCol] = {'name': val['_id']}
-      else:
-        self.__rows_attr['rows'][indexCol]['name'] = val['_id']
-      self.__rows_attr['rows'][indexCol]['data-index'] = val['level']
-
-      if 'class' in self.__rows_attr['rows'][indexCol]:
-        self.__rows_attr['rows'][indexCol]['class'].extend(val['cssCls'])
-      else:
-        self.__rows_attr['rows'][indexCol]['class'] = val['cssCls']
-
-      if val.get('_parent', 0) == 0:
-        if 'css' in self.__rows_attr['rows'][indexCol]:
-          self.__rows_attr['rows'][indexCol]['css'].update({'display': 'None'})
-        else:
-          self.__rows_attr['rows'][indexCol]['css'] = {'display': 'None'}
-
-      #
-      if val.get('_hasChildren', 0) == 1:
-        self.__rows_attr['rows'][indexCol]['class'].append('details')
-        if 'css' in self.__rows_attr['rows'][indexCol]:
-          self.__rows_attr['rows'][indexCol]['css'].update(self.cssPivotRows)
-        else:
-          self.__rows_attr['rows'][indexCol]['css'] = self.cssPivotRows
-      for j, header in enumerate(self.header[-1]):
-        cellVal = val.get(self.recKey(header), self.dflt)
-        attrCss = dict(self.tdCssAttr) if self.tdCssAttr is not None else {}
-        if cellVal is not None:
-          if j == 0:
-            attrCss['padding-left'] = '%spx' % (val['level'] * 20)
-          row.append(Td(self.aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=attrCss))
-      self.__data.append(row)
-
-    self.aresObj.jsOnLoadFnc.add(
-      '''
-      $( ".details > td:first-child" ).click(function() {
-        var trObj = $(this).closest('tr');
-        var children_data_id = trObj.data('index') + 1;
-        var trName = trObj.attr('name');
-        var isVisible = $(this).hasClass('changed');
-        $(this).toggleClass('changed');
-        $('#%s > tbody  > tr').each(function() {
-          var trId = $(this).data('index');
-          var trHasParent = $(this).hasClass(trName);
-          if (isVisible) {
-            if ((trId >= children_data_id) && trHasParent ) {
-              if ($(this).hasClass('details')){
-                var firstTd = $(this).find('td:first-child');
-                if  (firstTd.hasClass('changed')) {
-                  $(this).find('td:first-child').removeClass('changed');}
-              }
-              $(this).hide() ;
-            }
-         } else {
-            if ((trId == children_data_id) && trHasParent ) {
-              $(this).toggle() ;
-            }
-          }
-          //alert($(this).attr('name'));
-        } );
-      });
-      ''' % self.htmlId)
-
-  def getCell(self, row, col):
-    """ Returns the underlying cell object """
-    return self.__data[row][col]
-
-  def addRowsAttr(self, name, value, rowNum=None):
-    """ Set an attribute to the TR HTML object """
-    if rowNum is None:
-      row = self.__rows_attr
-    else:
-      if not rowNum in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][rowNum] = {}
-      row = self.__rows_attr['rows'][rowNum]
-
-    if name == 'css': # Section for the Style attributes
-      if not 'css' in row:
-        row['css'] = value
-      else:
-        row['css'].update(value)
-    elif name == 'class': # Section dedicated to manage the CSS classes
-      row['class'].add(value)
-    else: # Section for all the other attributes
-      row[name] = value
-
-  def __str__(self):
-    """  Returns the string representation of a HTML Table """
-    trAttr, trSpecialAttr = [], {}
-    if 'css' in self.__rows_attr:
-      trAttr.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.__rows_attr["css"].items()]))
-    for attrCod in ['onmouseover', 'onMouseOut', 'class']:
-      if attrCod in self.__rows_attr:
-        trAttr.append('%s="%s"' %(attrCod, " ".join(self.__rows_attr[attrCod])))
-    for attrCod in ['name', 'id', 'data-index']:
-      if attrCod in self.__rows_attr:
-        trAttr.append('%s="%s"' % (attrCod, self.__rows_attr[attrCod]))
-    strTrAttr = " ".join(trAttr)
-
-    # Special extra part of some line in the table
-    for row in self.__rows_attr['rows']:
-      attr = self.__rows_attr['rows'][row]
-      trRes = []
-      if 'css' in attr:
-        trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
-      for attrCod in ['onmouseover', 'onMouseOut', 'class']:
-        # Here we consider those properties as ones that could be propagated to the extra defintiion
-        # This will allow in the case of the pivot table to keep the onmouseover event for example
-        if attrCod in self.__rows_attr:
-          if attrCod in attr:
-            attr[attrCod].extend(self.__rows_attr[attrCod])
-          else:
-            attr[attrCod] = self.__rows_attr[attrCod]
-        if attrCod in attr:
-          trRes.append('%s="%s"' % (attrCod, " ".join(set(attr[attrCod]))))
-      for attrCod in ['data-index', 'name', 'id']:
-        if attrCod in attr:
-          if attrCod == 'data-index':
-            trRes.append('%s=%s' % (attrCod, attr[attrCod]))
-          else:
-            trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
-      trSpecialAttr[row] = " ".join(trRes)
-
-    # Build the table
-    html = ["<thead>"]
-    html.append("<tr %s>%s</tr>" % (trSpecialAttr[0] if 0 in trSpecialAttr else strTrAttr, "".join([str(td) for td in self.__data[0]])))
-    html.append("</thead>")
-    html.append("<tbody>")
-    for i, row in enumerate(self.__data[1:]):
-      html.append("<tr %s>%s</tr>" % (trSpecialAttr[i+1] if i+1 in trSpecialAttr else strTrAttr, "".join([str(td) for td in row])))
-    html.append("</tbody>")
-    item =  "<table %s>%s</table>" % (self.strAttr(), "".join(html))
-    if self.headerBox is not None:
-      return str(AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references))
-
-    return item
-
-  def cell_dblclick(self, jsFnc):
-    """ Add an event on the cells, $(this).html() will return the selected value """
-    self.aresObj.jsFnc(AresJs.JQueryEvents(self.htmlId, "$('#%s td,th')" % self.htmlId, 'dblclick', jsFnc))
-
-  def row_dblclick(self, jsFnc):
-    """ Add an event on the cells, $(this).html() will return the selected value """
-    self.aresObj.jsFnc(AresJs.JQueryEvents(self.htmlId, "$('#%s tr')" % self.htmlId, 'dblclick', jsFnc))
-
-  def update_cell(self):
-    """ Update a cell in the table """
-    jsFnc = '''
-                var html = '<div id="dialog" title="update value">' ;
-                html = html + '<div class="form-group">';
-                html = html + '<label for="formgroupexampleinput">example label</label>';
-                html = html + '<input id="temp_cell" type="text" class="form-control">';
-                html = html + '</div>';
-                html = html + '<button type="submit" id="temp_submit" class="btn btn-primary">submit</button>' ;
-                html = html + '</div>';
-                $('body').append(html) ;
-                $('#temp_cell').val($(event.target).html());
-                $("#dialog").dialog();
-                // Update the data to the table
-                $( "#temp_submit" ).on( "click", { item: $(event.target) }, function (event){
-                    event.data.item.html($('#temp_cell').val());
-                    $( "#dialog" ).remove();
-                });
-            '''
-    self.aresObj.jsFnc.add(AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc))
-
-  def cssRowMouseHover(self, bgColor='#BDFFC2', fontColor='black', rowNum=None):
-    if rowNum is None:
-      row = self.__rows_attr
-    else:
-      if not rowNum in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][rowNum] = {}
-      row = self.__rows_attr['rows'][rowNum]
-    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontColor)]
-    row['onMouseOut'] = ["this.style.background='#FFFFFF';this.style.color='#000000'"]
-
-  def cssPivotAggRow(self, attr):
-    """  """
-    self.cssPivotRows = attr
+  def setVals(self, vals, selected=None):
+    self.chartVals = [self.header[val] for val in vals]
