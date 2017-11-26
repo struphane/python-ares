@@ -661,7 +661,6 @@ def adminEnv(report_name):
 def savedHtmlReport(report_name, html_report):
   """  """
   if config.ARES_MODE.upper() != 'LOCAL':
-    #TODO Change this to just query file_auth
     if not getAllowedSavedFiles(report_name, session['TEAM'], current_user.email, html_report):
       raise AresExceptions.AuthException("""Sorry, you are not authorised to view this report - please contact this environment administrator to request access.
                                          Administrator: %s """ ", ".join([rec['email_addr'] for rec in getEnvAdmin()]))
@@ -782,12 +781,8 @@ def deployment():
   isNew = True if request.values['isNew'] == 'true' else False
   if isNew:
     createEnv(env)
-    if hasFiles:
-      return deployFiles(env, DATA)
-
-
   if hasFiles:
-    pass
+    return deployFiles(env, DATA)
 
   return json.dumps("Environment created"), 200
 
