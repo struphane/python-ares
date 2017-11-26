@@ -89,3 +89,8 @@ CREATE TABLE logs_deploy (
  type text NOT NULL,
  lst_mod_dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
  );
+
+ CREATE TABLE admin_env (
+  env_id integer NOT NULL,
+  CONSTRAINT  CONSTRAINT FK_EnvDefAdminEnv FOREIGN KEY (env_id) REFERENCES env_def(env_id)
+ );

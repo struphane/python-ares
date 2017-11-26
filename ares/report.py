@@ -169,6 +169,15 @@ def executeSelectQuery(dbPath, query, params=None):
 
 def isPrivateEnv(report_name):
   """ """
+  db = AresSql.SqliteDB(report_name)
+  query = ''' SELECT 1 FROM admin_env 
+              INNER JOIN env_def ON env_def.env_id = admin_env.env_id
+              WHERE env_def.env_name = '%s' ''' % report_name
+  if not list(db.select(query)):
+    return False
+
+  return True
+
 
 def checkAuth(report_name):
   """ Check whether user has authorization to see data within the environment """
@@ -510,7 +519,7 @@ def ajaxCall(report_name, script):
           reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
           # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
       elif fileConfig.get('folder') == 'static':
-        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename']}
+        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename'], 'username': current_user.email}
         files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
         for file in files:
           reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))

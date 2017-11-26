@@ -69,7 +69,7 @@ class Button(AresHtml.Html):
                         var data = res.data ;
                         $.post(data, function(data2) {
                           var res = JSON.parse(data2);
-                          //location.reload()
+                          location.reload()
                           });
                         
                         var status = res.status ;
