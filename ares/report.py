@@ -180,12 +180,13 @@ def isPrivateEnv(report_name):
 
 
 def checkAuth(report_name):
-  """ Check whether user has authorization to see data within the environment """
+  """ Check whether user has authorization to change data within the environment """
 
   db = AresSql.SqliteDB(report_name)
   query = """SELECT 1 FROM env_auth 
                INNER JOIN env_def ON env_auth.env_id = env_def.env_id and env_def.env_name = '%s'
-               INNER JOIN team_def ON env_auth.team_id = team_def.team_id and team_def.team_name = '%s'""" % (report_name, session['TEAM'])
+               INNER JOIN team_def ON env_auth.team_id = team_def.team_id and team_def.team_name = '%s'
+               WHERE team_def.role = 'admin'""" % (report_name, session['TEAM'])
 
   subQuery = """SELECT 1 FROM env_auth
                 WHERE temp_owner = '%s'""" % current_user.email
@@ -198,6 +199,18 @@ def checkAuth(report_name):
 
   else:
     return True
+
+def getAllowedSavedFiles(report_name, user_name, team, file_name):
+  """ """
+  query = """ SELECT 1
+              FROM file_map fm
+              INNER JOIN file_auth fa ON fa.file_id = fm.file_id
+              INNER JOIN team_def td ON td.team_id = fa.team_id
+              WHERE (td.team_name = '%s' OR fa.temp_owner = '%s')
+              AND fm.file_type = 'saved'
+              AND fm.alias = '%s'""" % (team, user_name, file_name)
+
+  return list(db.select(query))
 
 def getEnvAdmin(report_name):
   """ """
@@ -335,9 +348,6 @@ def run_report(report_name, script_name, user_id):
 
       if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
-        if not checkAuth(report_name):
-          raise AresExceptions.AuthException('Not authorized to visualize this data')
-
         queryParams = {'script_name': script_name, 'env_name': report_name, 'username': current_user.email, 'team_name': session['TEAM']}
         executeScriptQuery(dbPath, open(os.path.join(SQL_CONFIG, 'log_request.sql')).read(), params=queryParams)
       side_bar = []
@@ -651,7 +661,8 @@ def adminEnv(report_name):
 def savedHtmlReport(report_name, html_report):
   """  """
   if config.ARES_MODE.upper() != 'LOCAL':
-    if not checkAuth(report_name):
+    #TODO Change this to just query file_auth
+    if not getAllowedSavedFiles(report_name, session['TEAM'], current_user.email, html_report):
       raise AresExceptions.AuthException("""Sorry, you are not authorised to view this report - please contact this environment administrator to request access.
                                          Administrator: %s """ ", ".join([rec['email_addr'] for rec in getEnvAdmin()]))
 
@@ -771,8 +782,12 @@ def deployment():
   isNew = True if request.values['isNew'] == 'true' else False
   if isNew:
     createEnv(env)
+    if hasFiles:
+      return deployFiles(env, DATA)
+
+
   if hasFiles:
-    return deployFiles(env, DATA)
+    pass
 
   return json.dumps("Environment created"), 200
 
