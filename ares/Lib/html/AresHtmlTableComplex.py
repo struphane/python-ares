@@ -296,6 +296,7 @@ class TableBase(AresHtml.Html):
     self.headerBox = headerBox
     self.header = header
     self.buttons = []
+    self.tbody = '<tbody>'
     self.cssPivotRows = {'font-weight': 'bold'}
     self.__rows_attr = {'rows': {}, 'ALL': {}}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
@@ -320,6 +321,12 @@ class TableBase(AresHtml.Html):
         cellTd.addAttr('name', "%s_col_%s" % (self.htmlId, i))
         row.append(cellTd)
       self.__data.append(row)
+
+  def fixedHeader(self, height):
+    """ Fix the header in the Table """
+    self.addClass('fixed-header')
+    self.attr.get('css', {})['height'] = "%spx" % (height + 100)
+    self.tbody = "<tbody style='height:%spx'>" % height
 
   def mouveHover(self, backgroundColor, fontColor):
     self.aresObj.jsGlobal.add("%s_originalBackground" % self.htmlId)
@@ -542,13 +549,12 @@ class TableBase(AresHtml.Html):
         htmlButtons.append(button)
     html = ["<thead>"]
     for i in range(self.hdrLines):
-      if i == (self.hdrLines -1):
+      if i == (self.hdrLines-1):
         html.append("<tr class='thead-inverse' %s>%s</tr>" % (strTrAttr, "".join([str(th) for th in self.__data[i]])))
       else:
         html.append("<tr %s>%s</tr>" % (strTrAttr, "".join([str(th) for th in self.__data[i]])))
-
     html.append("</thead>")
-    html.append("<tbody>")
+    html.append(self.tbody)
     for i, row in enumerate(self.__data[self.hdrLines:]):
       cells = []
       for j, td in enumerate(row):
@@ -568,8 +574,9 @@ class TableBase(AresHtml.Html):
     html.append("</tbody>")
     item =  "%s<table %s>%s</table>" % ("".join(htmlButtons), self.strAttr(), "".join(html))
     if self.headerBox is not None:
+      height = int(self.attr.get('css', {'height': '300px'})['height'].replace("px", ""))
       container = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
-      container.cssAttr['height'] = "%spx" % (int(self.attr.get('css', {'height': '300px'})['height'].replace("px", "")) + 100)
+      container.cssAttr['height'] = "%spx" % (height + 100)
       return str(container)
 
     return item

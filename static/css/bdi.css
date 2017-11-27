@@ -1,3 +1,18 @@
+table.fixed-header tr {
+width: 100%;
+display: inline-table;
+table-layout: fixed;
+}
+
+table.fixed-header {
+ display: -moz-groupbox;    // Firefox Bad Effect
+}
+
+table.fixed-header tbody{
+  overflow-y: scroll;
+  width: 100%;
+  position: absolute;
+}
 
 .table-header-rotated th.rotate-45 > div{
   position: relative;
