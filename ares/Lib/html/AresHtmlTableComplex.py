@@ -502,6 +502,24 @@ class TableBase(AresHtml.Html):
 
     ''' % (self.htmlId, idButton, colNumber, self.htmlId, json.dumps(groupColNumber)))
 
+  def selectableRow(self):
+    """ Change the table to have selectable columns """
+    self.aresObj.jsGlobal.add("%s_bgcolors = {} ;" % self.htmlId)
+    self.aresObj.jsOnLoadFnc.add('''
+          $('#%(htmlId)s tr').on('click', function (event){
+              var trId = $(this).index() ;
+              if( !(trId in %(htmlId)s_bgcolors) ) {
+                %(htmlId)s_bgcolors[trId] = %(htmlId)s_originalBackground ;
+                %(htmlId)s_originalBackground = 'rgb(105, 163, 112)' ;
+                $(this).css( { 'background-color': 'rgb(105, 163, 112)' } ) ;
+              } else
+              {
+                %(htmlId)s_originalBackground = %(htmlId)s_bgcolors[trId];
+                $(this).css( { 'background-color': %(htmlId)s_bgcolors[trId] } );
+                delete %(htmlId)s_bgcolors[trId];
+              }
+          })''' % {'htmlId': self.htmlId})
+
   def __str__(self):
     """  Returns the string representation of a HTML Table """
     self.mouveHover('#BFFCA6', 'black')
