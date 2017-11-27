@@ -297,11 +297,12 @@ class TableBase(AresHtml.Html):
     self.headerBox = headerBox
     self.header = header
     self.buttons = []
+    self.tbody = '<tbody>'
     self.cssPivotRows = {'font-weight': 'bold'}
     self.__rows_attr = {'rows': {}, 'ALL': {}}
-    self.hdrLines = len(header)
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
+    self.hdrLines = len(header)
     self.__data = []
     for headerLine in self.header:
       row = []
@@ -315,12 +316,18 @@ class TableBase(AresHtml.Html):
     for val in vals:
       row = []
       for i, header in enumerate(self.header[-1]):
-        cellVal = val.get(self.recKey(header), self.dflt)
-        if cellVal is not None:
-          cellTd = AresHtmlTableItems.Td(aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=self.tdCssAttr)
-          cellTd.addAttr('name', "%s_col_%s" % (self.htmlId, i))
-          row.append(cellTd)
+        colId = self.recKey(header)
+        cellVal = val.get(colId, self.dflt)
+        cellTd = AresHtmlTableItems.Td(aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=self.tdCssAttr, title=val.get('dsc_%s' % colId))
+        cellTd.addAttr('name', "%s_col_%s" % (self.htmlId, i))
+        row.append(cellTd)
       self.__data.append(row)
+
+  def fixedHeader(self, height):
+    """ Fix the header in the Table """
+    self.addClass('fixed-header')
+    self.attr.get('css', {})['height'] = "%spx" % (height + 100)
+    self.tbody = "<tbody style='height:%spx'>" % height
 
   def mouveHover(self, backgroundColor, fontColor):
     self.aresObj.jsGlobal.add("%s_originalBackground" % self.htmlId)
@@ -374,6 +381,36 @@ class TableBase(AresHtml.Html):
       for i, row in enumerate(self.__data[fromRow:]):
         row[colNumber].addClass(classname)
 
+  def hideRows(self, rowNumbers, ButtonLabel):
+    """
+    :param rowNumber: The row numbers to be hidden in the table
+    :return:
+    """
+    for rowNumber in rowNumbers:
+      self.__rows_attr['rows'][rowNumber] = {'css': {'display': 'none'}}
+
+    idButton = "_".join(map(lambda x: str(x), rowNumbers))
+    self.buttons.append("<button id='%s_button_rows_%s' class='btn btn-success' type='button' style='margin-left:5px;margin-bottom:10px'>%s</button>" % (self.htmlId, idButton, ButtonLabel))
+    self.aresObj.jsOnLoadFnc.add('''
+          $('#%s_button_rows_%s').on('click', function (event){
+            var rows = %s;
+            var headerSize = %s ;
+            var trTable = $('#%s tr');
+            trTable.eq(rows[0] + headerSize).toggle() ;
+            if ( trTable.eq(rows[0] + headerSize).css('display') == 'none') {
+              for (idx in rows) {
+                trTable.eq(rows[idx] + headerSize).hide() ;
+              }
+            }
+            else {
+              for (idx in rows) {
+                trTable.eq(rows[idx] + headerSize).show() ;
+              }
+            }
+
+          });
+      ''' % (self.htmlId, idButton, json.dumps(rowNumbers), self.hdrLines, self.htmlId))
+
   def callBackCreateCellThreshold(self, colNumbers, threshold, digit=2, fromRow=None):
     """
 
@@ -388,6 +425,8 @@ class TableBase(AresHtml.Html):
           row[colNumber].addAttr('css', {'color': 'green'})
         else:
           row[colNumber].addAttr('css', {'color': 'red'})
+    for colNumber in colNumbers:
+      self.aresObj.jsOnLoadFnc.add('$("td[name=%s_col_%s]").each(function() { $(this).html(parseFloat($(this).html()).formatMoney(%s, ",", ".")) })' % (self.htmlId, colNumber, digit))
 
   def addAttrCol(self, colNumbers, name, value, fromRow=None):
     """
@@ -415,9 +454,24 @@ class TableBase(AresHtml.Html):
     :return:
     """
     idButton = "_".join(map(lambda x: str(x), colNumbers))
-    self.buttons.append("<button id='%s_button_%s' class='btn btn-success' type='button' style='margin-left:5px'>%s</button>" % (self.htmlId, idButton, title))
-    jsFnc = ["$('[name=%s_col_%s]').toggle()" % (self.htmlId, col) for col in colNumbers]
-    self.aresObj.jsOnLoadFnc.add("$('#%s_button_%s').on('click', function (event){ %s });" % (self.htmlId, idButton, "; ".join(jsFnc)))
+    self.buttons.append("<button id='%s_button_%s' class='btn btn-success' type='button' style='margin-left:5px;margin-bottom:10px'>%s</button>" % (self.htmlId, idButton, title))
+    self.aresObj.jsOnLoadFnc.add('''
+          $('#%s_button_%s').on('click', function (event){
+            var colsIndex = %s ;
+            var col_def = '%s_col_';
+            $('[name=' + col_def + colsIndex[0] + ']').toggle() ;
+            if ( $('[name=' + col_def + colsIndex[0] + ']').css('display') == 'none') {
+              for (col in colsIndex) {
+                $('[name=' + col_def + colsIndex[col] + ']').hide() ;
+              }
+            }
+            else {
+              for (col in colsIndex) {
+                $('[name=' + col_def + colsIndex[col] + ']').show() ;
+              }
+            }
+          });
+      ''' % (self.htmlId, idButton, json.dumps(colNumbers), self.htmlId))
 
   def addButtonGrpShow(self, colNumber, groupColNumber, title):
     """
@@ -428,7 +482,7 @@ class TableBase(AresHtml.Html):
     :return:
     """
     idButton = colNumber
-    self.buttons.append("<button id='%s_button_grp_%s' class='btn btn-success' type='button' style='margin-left:5px'>%s</button>" % (self.htmlId, idButton, title))
+    self.buttons.append("<button id='%s_button_grp_%s' class='btn btn-success' type='button' style='margin-left:5px;margin-bottom:10px'>%s</button>" % (self.htmlId, idButton, title))
     self.aresObj.jsOnLoadFnc.add('''
           $('#%s_button_grp_%s').on('click', function (event){
             var pivot_id = %s ;
@@ -449,6 +503,24 @@ class TableBase(AresHtml.Html):
 
     ''' % (self.htmlId, idButton, colNumber, self.htmlId, json.dumps(groupColNumber)))
 
+  def selectableRow(self):
+    """ Change the table to have selectable columns """
+    self.aresObj.jsGlobal.add("%s_bgcolors = {} ;" % self.htmlId)
+    self.aresObj.jsOnLoadFnc.add('''
+          $('#%(htmlId)s tr').on('click', function (event){
+              var trId = $(this).index() ;
+              if( !(trId in %(htmlId)s_bgcolors) ) {
+                %(htmlId)s_bgcolors[trId] = %(htmlId)s_originalBackground ;
+                %(htmlId)s_originalBackground = 'rgb(105, 163, 112)' ;
+                $(this).css( { 'background-color': 'rgb(105, 163, 112)' } ) ;
+              } else
+              {
+                %(htmlId)s_originalBackground = %(htmlId)s_bgcolors[trId];
+                $(this).css( { 'background-color': %(htmlId)s_bgcolors[trId] } );
+                delete %(htmlId)s_bgcolors[trId];
+              }
+          })''' % {'htmlId': self.htmlId})
+
   def __str__(self):
     """  Returns the string representation of a HTML Table """
     self.mouveHover('#BFFCA6', 'black')
@@ -462,31 +534,32 @@ class TableBase(AresHtml.Html):
       if attrCod in self.__rows_attr['ALL']:
         trAttr.append('%s="%s"' % (attrCod, self.__rows_attr['ALL'][attrCod]))
     strTrAttr = " ".join(trAttr)
-    self.aresObj.jsFnc.add('$("#%s > thead > tr > th").tooltip()' % self.htmlId)
+    self.aresObj.jsFnc.add('$("#%s > thead > tr > th").tooltip(); $("#%s > tbody > tr > td").tooltip() ;' % (self.htmlId, self.htmlId))
 
     # Special extra part of some line in the table
-    # for row in self.__rows_attr['rows']:
-    #   attr = self.__rows_attr['rows'][row]
-    #   trRes = []
-    #   if 'css' in attr:
-    #     trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
-    #   for attrCod in ['onmouseover', 'onMouseOut', 'class']:
-    #     # Here we consider those properties as ones that could be propagated to the extra defintiion
-    #     # This will allow in the case of the pivot table to keep the onmouseover event for example
-    #     if attrCod in self.__rows_attr:
-    #       if attrCod in attr:
-    #         attr[attrCod].extend(self.__rows_attr[attrCod])
-    #       else:
-    #         attr[attrCod] = self.__rows_attr[attrCod]
-    #     if attrCod in attr:
-    #       trRes.append('%s="%s"' % (attrCod, " ".join(set(attr[attrCod]))))
-    #   for attrCod in ['data-index', 'name', 'id']:
-    #     if attrCod in attr:
-    #       if attrCod == 'data-index':
-    #         trRes.append('%s=%s' % (attrCod, attr[attrCod]))
-    #       else:
-    #         trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
-    #   trSpecialAttr[row] = " ".join(trRes)
+    trSpecialAttr = {}
+    for row in self.__rows_attr['rows']:
+      attr = self.__rows_attr['rows'][row]
+      trRes = []
+      if 'css' in attr:
+        trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
+      for attrCod in ['onmouseover', 'onMouseOut', 'class']:
+        # Here we consider those properties as ones that could be propagated to the extra defintiion
+        # This will allow in the case of the pivot table to keep the onmouseover event for example
+        if attrCod in self.__rows_attr:
+          if attrCod in attr:
+            attr[attrCod].extend(self.__rows_attr[attrCod])
+          else:
+            attr[attrCod] = self.__rows_attr[attrCod]
+        if attrCod in attr:
+          trRes.append('%s="%s"' % (attrCod, " ".join(set(attr[attrCod]))))
+      for attrCod in ['data-index', 'name', 'id', 'title']:
+        if attrCod in attr:
+          if attrCod == 'data-index':
+            trRes.append('%s=%s' % (attrCod, attr[attrCod]))
+          else:
+            trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
+      trSpecialAttr[row] = " ".join(trRes)
 
     # Build the table
     htmlButtons = []
@@ -495,13 +568,12 @@ class TableBase(AresHtml.Html):
         htmlButtons.append(button)
     html = ["<thead>"]
     for i in range(self.hdrLines):
-      if i == (self.hdrLines -1):
+      if i == (self.hdrLines-1):
         html.append("<tr class='thead-inverse' %s>%s</tr>" % (strTrAttr, "".join([str(th) for th in self.__data[i]])))
       else:
         html.append("<tr %s>%s</tr>" % (strTrAttr, "".join([str(th) for th in self.__data[i]])))
-
     html.append("</thead>")
-    html.append("<tbody>")
+    html.append(self.tbody)
     for i, row in enumerate(self.__data[self.hdrLines:]):
       cells = []
       for j, td in enumerate(row):
@@ -514,10 +586,16 @@ class TableBase(AresHtml.Html):
           url = "%s?%s=%s" % (url, self.recKey(self.header[-1][j]), td.vals)
           td.vals = "<a href='%s' %s target='_blank'>%s</a>" % (url, styleVals, td.vals)
         cells.append(str(td))
-      html.append("<tr %s>%s</tr>" % (strTrAttr, "".join(cells)))
+      if i in trSpecialAttr:
+        html.append("<tr %s %s>%s</tr>" % (strTrAttr, trSpecialAttr[i], "".join(cells)))
+      else:
+        html.append("<tr %s>%s</tr>" % (strTrAttr, "".join(cells)))
     html.append("</tbody>")
     item =  "%s<table %s>%s</table>" % ("".join(htmlButtons), self.strAttr(), "".join(html))
     if self.headerBox is not None:
-      return str(AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references))
+      height = int(self.attr.get('css', {'height': '300px'})['height'].replace("px", ""))
+      container = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
+      container.cssAttr['height'] = "%spx" % (height + 100)
+      return str(container)
 
     return item

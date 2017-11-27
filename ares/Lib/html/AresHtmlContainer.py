@@ -551,7 +551,7 @@ class Vignet(AresHtml.Html):
 
 class AresBox(AresHtml.Html):
   """ Internal object cannot be used directly from ares.py """
-  cssCls = ['panel', 'ares-panel-success']
+  __cssCls = ['panel', 'ares-panel-success']
   references = ['http://astronautweb.co/snippet/font-awesome/']
 
   def __init__(self, htmlId, vals, headerBox, properties=None):
@@ -561,6 +561,7 @@ class AresBox(AresHtml.Html):
     self.headerBox = headerBox
     self.prop = properties
     self.cssAttr = {'margin-top': '10px'}
+    self.cssCls = list(self.__cssCls)
 
   @property
   def htmlId(self):
