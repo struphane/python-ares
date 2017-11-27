@@ -277,7 +277,6 @@ class TableBase(AresHtml.Html):
   reqCss = ['bootstrap', 'jquery']
   reqJs = ['bootstrap', 'jquery']
   dflt = '' # Default value for a cell in the table
-  height = '300px'
 
   def __init__(self, aresObj, headerBox, vals, header, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None, globalSortBy=None):
     """ Instantiate the table object
@@ -299,9 +298,9 @@ class TableBase(AresHtml.Html):
     self.buttons = []
     self.cssPivotRows = {'font-weight': 'bold'}
     self.__rows_attr = {'rows': {}, 'ALL': {}}
-    self.hdrLines = len(header)
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
+    self.hdrLines = len(header)
     self.__data = []
     for headerLine in self.header:
       row = []
@@ -321,7 +320,6 @@ class TableBase(AresHtml.Html):
         cellTd.addAttr('name', "%s_col_%s" % (self.htmlId, i))
         row.append(cellTd)
       self.__data.append(row)
-    self.addAttr('css', {'height': self.height})
 
   def mouveHover(self, backgroundColor, fontColor):
     self.aresObj.jsGlobal.add("%s_originalBackground" % self.htmlId)
@@ -564,7 +562,6 @@ class TableBase(AresHtml.Html):
           td.vals = "<a href='%s' %s target='_blank'>%s</a>" % (url, styleVals, td.vals)
         cells.append(str(td))
       if i in trSpecialAttr:
-        print trSpecialAttr
         html.append("<tr %s %s>%s</tr>" % (strTrAttr, trSpecialAttr[i], "".join(cells)))
       else:
         html.append("<tr %s>%s</tr>" % (strTrAttr, "".join(cells)))
@@ -572,7 +569,7 @@ class TableBase(AresHtml.Html):
     item =  "%s<table %s>%s</table>" % ("".join(htmlButtons), self.strAttr(), "".join(html))
     if self.headerBox is not None:
       container = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
-      container.cssAttr['height'] = "%spx" % (int(self.attr['css']['height'].replace("px", "")) + 100)
+      container.cssAttr['height'] = "%spx" % (int(self.attr.get('css', {'height': '300px'})['height'].replace("px", "")) + 100)
       return str(container)
 
     return item
