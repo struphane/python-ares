@@ -50,6 +50,17 @@ class DataTable(AresHtml.Html):
     :param sortBy: Should be a tuple with (column name, asc / desc, number of items or Nene)
     :return:
     """
+    if dataFilters is not None:
+      recordSet = []
+      for rec in vals:
+        for col, val in dataFilters.items():
+          if not rec[col] in val:
+            break
+
+        else:
+          recordSet.append(rec)
+    else:
+      recordSet = vals
     self.sortBy = sortBy
     self.pivotLevel = 1
     if self.sortBy is not None:
@@ -65,19 +76,7 @@ class DataTable(AresHtml.Html):
     self.theadCssCls = ['thead-inverse']
     self.reqCss = list(self.__reqCss)
     self.reqJs = list(self.__reqJs)
-    self.pivotFilters = {}
-    if dataFilters is not None:
-      recordSet = []
-      for rec in vals:
-        for col, val in dataFilters.items():
-          if not rec[col] in val:
-            break
-
-        else:
-          recordSet.append(rec)
-    else:
-      recordSet = vals
-    self.tableToolTips = {}
+    self.pivotFilters, self.tableToolTips = {}, {}
     super(DataTable, self).__init__(aresObj, recordSet, cssCls, cssAttr)
     self.aresObj.jsGlobal.add(self.htmlId) # table has to be registered as a global variable in js
     self.headerBox = headerBox
