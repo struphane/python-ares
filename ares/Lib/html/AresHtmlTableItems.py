@@ -10,17 +10,19 @@ from ares.Lib import AresHtml
 class Td(AresHtml.Html):
   """ Python class for the TD objects """
 
-  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, sortBy=None, rowspan=1, colspan=1):
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, sortBy=None, rowspan=1, colspan=1, title=None):
     super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.colspan, self.rowspan = rowspan, colspan
+    if title is not None:
+      self.attr['title'] = title
 
   def __str__(self):
     if self.colspan > 1:
       self.attr['colspan'] = self.colspan
     if self.rowspan > 1:
       self.attr['rowspan'] = self.rowspan
-    withId = 'title' in self.attr
-    return '<td %s valign="middle">%s</td>' % (self.strAttr(withId=withId), self.vals)
+    withId = 'id' in self.attr
+    return '<td %s valign="middle">%s</td>' % (self.strAttr(withId), self.vals)
 
   def mouseOver(self, bgcolor, fontColor='#FFFFFF'):
     """ Change the behaviour of the cell """
