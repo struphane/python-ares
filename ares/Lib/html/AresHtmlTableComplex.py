@@ -34,6 +34,7 @@ class TableComplex(AresHtml.Html):
                 'https://api.jquery.com/dblclick/']
   reqCss = ['bootstrap', 'jquery']
   reqJs = ['bootstrap', 'jquery']
+  dflt = '' # Default value for a cell in the table
 
   def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
     """ Create an Simple Table object """
@@ -44,7 +45,7 @@ class TableComplex(AresHtml.Html):
     self.__rows_attr = {'rows': {'ALL': {}}}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
-    self.__data = [[AresHtmlTableItems.Td(aresObj, header['colName'], True) for header in self.header[-1]]]
+    self.__data = [[AresHtmlTableItems.Td(aresObj, header['colName']) for header in self.header[-1]]]
     self.tdCssCls = tdCssCls
     self.tdCssAttr = tdCssAttr
     for val in vals:
