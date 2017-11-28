@@ -113,6 +113,10 @@ class Slider(AresHtml.Html):
     self.hasChangeEvent = True
     self.aresObj.jsOnLoadFnc.add('%s.on("slidechange", function(event, ui) {  $("#%s_val").html(ui.value) ; %s });' % (self.jqId, self.htmlId, jsFnc) )
 
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML object in a python HTML object """
+    return 'parseFloat($("#%s_val").html())' % self.htmlId
 
 class DropZone(AresHtml.Html):
   """
