@@ -35,7 +35,7 @@ login_manager.init_app(app)
 class User(db.Model, UserMixin):
   uid = db.Column(db.Integer, primary_key=True, autoincrement=True)
   email = db.Column(db.String(120), unique=True, nullable=False)
-  team_name = db.Column(db.String(120), db.ForeignKey('team.team_name'), nullable=False)
+  team_id = db.Column(db.Integer, db.ForeignKey('team.team_id'), nullable=False)
   password = db.Column(db.String(80), nullable=False)
   team_confirm = db.Column(db.String(1), default='N')
   datasources = db.relationship('DataSource')

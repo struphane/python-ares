@@ -592,7 +592,7 @@ def userAccount():
     sys.path.append(systemDirectory)
 
   userData = User.query.filter_by(email=current_user.email).first()
-
+  team_def = Team.query.filer_by(team_id=userData.team_id).first()
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
   reportObj.http['REPORT_NAME'] = script_name
@@ -606,7 +606,7 @@ def userAccount():
                                                       session['PWD'], source.salt)})
   reportObj.http['USERDATA'] = {'envs': userData.environments,
                                 'sources': sourceRec,
-                                'team': userData.team_name
+                                'team': team_def.team_name
                                 }
   reportObj.http['USERNAME'] = current_user.email
   mod.report(reportObj)
@@ -1297,7 +1297,8 @@ def aresRegistration():
     if not Team.query.filter_by(team_name=data['team']).first():
       team = Team(data['team'], data['team_email'])
       db.session.add(team)
-    user = User(data['email_addr'], data['team'], data['password'])
+    team_def = Team.query.filter_by(team_name=data['team']).first()
+    user = User(data['email_addr'], team_def.team_id, data['password'])
     db.session.add(user)
     db.session.commit()
     return redirect(url_for('ares.aresLogin', next=url_for('ares.run_report')))
@@ -1317,12 +1318,11 @@ def aresLogin():
     user = User.query.filter_by(email=data['email_addr']).first()
     next = request.args.get('next')
     if user:
-      team_def = Team.query.filter_by(team_name=user.team_name).first()
+      team_def = Team.query.filter_by(team_id=user.team_id).first()
       if user.password == hashlib.sha256(bytes(data['password'].encode('utf-8'))).hexdigest():
         suffix = '' if user.team_confirm == 'Y' else '#TEMP'
-        session['TEAM'] = user.team_name + suffix
-        session['TEAM_ID'] = team_def.team_id
-        print(session['TEAM_ID'])
+        session['TEAM'] = team_def.team_name + suffix
+        session['TEAM_ID'] = user.team_id
         session['PWD'] = data['password']
         for source in user.datasources:
           session[source.source_name.upper()] = (source.source_username, AresUserAuthorization.decrypt(source.source_pwd, session['PWD'], source.salt))
