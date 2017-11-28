@@ -302,7 +302,7 @@ class TableBase(AresHtml.Html):
     self.__rows_attr = {'rows': {}, 'ALL': {}}
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
-    self.hdrLines = len(header)
+    self.hdrLines = len(self.header)
     self.__data = []
     for headerLine in self.header:
       row = []
@@ -599,3 +599,14 @@ class TableBase(AresHtml.Html):
       return str(container)
 
     return item
+
+  def jsCell(self, col, row, val=None):
+    """
+    :param col: The column number starting from 0
+    :param row: The row number starting from 0
+    :return: The javascript code of the component
+    """
+    if val is not None:
+      return "$('#%s tr:nth-child(%s) td:eq(%s)').html(%s)" % (self.htmlId, col+1, row, json.dumps(val))
+
+    return "$('#%s tr:nth-child(%s) td:eq(%s)').html()" % (self.htmlId, col+1, row)
