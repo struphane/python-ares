@@ -23,6 +23,11 @@ https://www.bootply.com/60886#
           {% if downloadEnv %}
             <a  href="{{ url_for('ares.downloadReport', report_name=downloadEnv ) }}" style="top:0px" class="btn"><i class="fa fa-cloud-download" aria-hidden="true">&nbsp;&nbsp;Download</i></a>
           {% endif %}
+
+
+          {% if fileRules %}
+            <a  href="{{ url_for('ares.fileAuthorizations', report_name=report_name ) }}" style="top:0px" class="btn"><i class="fa fa fa-files-o" aria-hidden="true">&nbsp;&nbsp;File Permission</i></a>
+          {% endif %}
       </div>
 
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
