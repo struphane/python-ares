@@ -322,7 +322,7 @@ def run_report(report_name, script_name, user_id):
   cssImport, jsImport = '', ''
   isAuth = True
   reportObj = Ares.Report()
-  adminEnv = False
+  adminEnv, fileRules = False, False
   #TODO Improve this
   # Ensure that all the modules attached to a report have been removed
   # This will be a problem is multiple request at the same time (especially if they take some time
@@ -336,6 +336,7 @@ def run_report(report_name, script_name, user_id):
     # add the folder directory to the python path in order to run the script
     # The underscore folders are internal onces and we do not need to include them to the classpath
     if not report_name.startswith("_"):
+      fileRules = True
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
       for rec in getEnvAdmin(report_name):
         if rec['team_name'] == session['TEAM']:
@@ -490,7 +491,7 @@ def run_report(report_name, script_name, user_id):
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
                          viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
-                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name, adminEnv=adminEnv)
+                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name, adminEnv=adminEnv, fileRules=fileRules)
 
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
@@ -610,6 +611,39 @@ def userAccount():
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
 
+
+@report.route("/<report_name>/fileAuth", methods=['GET'])
+def fileAuthorizations(report_name):
+  """ File Authorization page for the environment """
+
+
+
+  script_name = '_AresFileManagement'  # run the report
+  onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
+  systemDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', script_name)
+  if not systemDirectory in sys.path:
+    sys.path.append(systemDirectory)
+  ajaxPath = os.path.join(systemDirectory, 'ajax')
+  if os.path.exists(ajaxPath) and not ajaxPath in sys.path:
+    sys.path.append(ajaxPath)
+
+
+  reportObj = Ares.Report()
+  reportObj.http = getHttpParams(request)
+  reportObj.reportName = report_name
+  mod = __import__(script_name)  # run the report
+  envName = getattr(mod, 'NAME', '')
+  # Set some environments variables which can be used in the report
+  reportObj.http['FILE'] = script_name
+  reportObj.http['REPORT_NAME'] = report_name
+  reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+  reportObj.http['TEAM'] = session['TEAM']
+  reportObj.http['USERNAME'] = current_user.email
+  mod.report(reportObj)
+  cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
+  return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
+                         jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
+                         name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join([]))
 
 @report.route("/<report_name>/admin", methods=['GET'])
 def adminEnv(report_name):
