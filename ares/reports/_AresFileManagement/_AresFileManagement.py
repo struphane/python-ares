@@ -25,7 +25,7 @@ def getTeamData(team, sqlCon):
 
   return sqlCon.select(files)
 
-def getFilesPermissions(sqlCon, files, team):
+def getFilesPermissions(sqlCon, files):
   """ """
   fileDetails = """ SELECT file_map.disk_name, team_def.team_name, file_auth.temp_owner, file_auth.stt_dt, file_auth.end_dt
                   FROM file_map
@@ -58,10 +58,10 @@ def report(aresObj):
     aresObj.title('File Permissions for: %s' % aresObj.http['TEAM'])
     aresObj.newline()
     aresObj.newline()
-    fileDetails = getFilesPermissions(sqlCon, fileLst, aresObj.http['TEAM'])
+    fileDetails = getFilesPermissions(sqlCon, fileLst)
     for file, details in fileDetails.items():
       nbFiles =  len(details)
-      summaryRecSet.append({'file': aresObj.internalLink(file, '_AddTeamToFile', attrs={'file': file, 'fileDetails': details}, cssCls='btn btn-lnk'), 'nbFiles': nbFiles})
+      summaryRecSet.append({'file': aresObj.internalLink(file, 'AddTeamToFile', attrs={'file': file}, cssCls='btn btn-lnk'), 'nbFiles': nbFiles})
 
     summaryTable = aresObj.simpletable(summaryRecSet, [{'key': 'file', 'colName': 'Files', 'type': 'object'},
                                                        {'key': 'nbFiles', 'colName': 'Nb Users'},
