@@ -36,6 +36,7 @@ from ares.Lib import Ares
 from ares.Lib import AresImports
 from ares.Lib import AresExceptions
 from ares.Lib import AresSql
+import logging
 
 try:
   from Libs import AresUserAuthorization
@@ -445,6 +446,7 @@ def run_report(report_name, script_name, user_id):
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   except Exception as e:
     error = True
+    logging.debug(e)
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
@@ -507,6 +509,7 @@ def ajaxCall(report_name, script):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+      sys.path.append(userDirectory)
       if script == 'SrvSaveToFile' and config.ARES_MODE != 'local':
         queryParams = {'report_name': reportObj.http['reportName'], 'file': reportObj.http['fileName'], 'type': 'file', 'team_name': session['TEAM'], 'username': current_user.email}
         logEventDeployment(os.path.join(userDirectory, reportObj.http['reportName']), queryParams)
@@ -541,6 +544,7 @@ def ajaxCall(report_name, script):
     ajaxMod = getattr(mod, ajaxScript)
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
   except:
+    logging.debug(e)
     content = traceback.format_exc()
     error = True
   finally:
