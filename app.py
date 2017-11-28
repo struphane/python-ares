@@ -12,8 +12,9 @@ from Libs import AresUserAuthorization
 # from system.sqlite.db_config import models
 
 app = Flask(__name__)
-app.config['ROOT_PATH'] = os.path.dirname(os.path.abspath(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = r'sqlite:///%s' % os.path.join(app.config['ROOT_PATH'], 'system', 'sqlite', 'main_sqlite.db')
+app.config['ROOT_PATH'] = '' #os.path.dirname(os.path.abspath(__file__))
+
+app.config['SQLALCHEMY_DATABASE_URI'] = r'sqlite:///%s' % os.path.join(os.path.dirname(os.path.abspath(__file__)), 'system', 'sqlite', 'main_sqlite.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # POSTGRES = {

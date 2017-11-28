@@ -5,7 +5,8 @@
 import os
 
 ARES_FOLDER = 'ares'
-ARES_USERS_LOCATION = 'user_reports'
+ARES_USERS_LOCATION = os.path.join(os.path.dirname(os.path.abspath(__file__), 'user_reports'))
+#USERS_ENV_LOCATION = os.path.dirname(os.path.abspath(__file__)'E:\GitHub\Ares\user_reports'
 ARES_USERS_DELETED_FOLDERS = 'user_deleted_reports'
 ARES_SQLITE_FILES_LOCATION = 'static/sql_config'
 ARES_MODE = 'local'
