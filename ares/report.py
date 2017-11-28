@@ -616,7 +616,11 @@ def userAccount():
 def fileAuthorizations(report_name):
   """ File Authorization page for the environment """
 
-
+  teamLst = Team.query.all()
+  teamRec = {}
+  for team in teamLst:
+    teamStr = "%s#%s" % (team.team_name, team.team_email)
+    teamRec[teamStr] = team.team_id
 
   script_name = '_AresFileManagement'  # run the report
   onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
@@ -638,6 +642,7 @@ def fileAuthorizations(report_name):
   reportObj.http['REPORT_NAME'] = report_name
   reportObj.http['DIRECTORY'] = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
   reportObj.http['TEAM'] = session['TEAM']
+  reportObj.http['REGISTERED_TEAMS'] = teamRec
   reportObj.http['USERNAME'] = current_user.email
   mod.report(reportObj)
   cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()

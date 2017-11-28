@@ -13,8 +13,6 @@ ADD_BESPOKE_USER = """ INSERT INTO env_auth (temp_owner, team_id)
 
 
 def call(aresObj):
-  import pprint
-  pprint.pprint(aresObj.http)
 
   map_role = {'Administrator': 'admin', 'User': 'role'}
 
