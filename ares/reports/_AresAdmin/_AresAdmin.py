@@ -120,7 +120,7 @@ def report(aresObj):
     createdTeams.append((splitKey[0], [splitKey[1]]))
 
 
-  team_modal = aresObj.modal('  Create new team', btnCls=['fa fa-plus fa-5`x btn btn-link'])
+  team_modal = aresObj.modal('  Create new team', btnCls=['fa fa-plus fa-5x btn btn-link'])
   t_name = aresObj.input('Team Name')
   t_email = aresObj.input('Email Address')
   role_modal = aresObj.select(['Administrator', 'User'])

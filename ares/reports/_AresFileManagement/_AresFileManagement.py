@@ -23,7 +23,6 @@ def getTeamData(team, sqlCon):
 
 
 
-  print(files)
   return sqlCon.select(files)
 
 def getFilesPermissions(sqlCon, files, team):
@@ -36,7 +35,6 @@ def getFilesPermissions(sqlCon, files, team):
 
   cache = {}
   for rec in sqlCon.select(fileDetails):
-    print(rec)
     cache.setdefault(rec['disk_name'], []).append({'file': rec['disk_name'],'team': rec['team_name'], 'tmp_owner': rec['temp_owner'], 'stt_dt': rec['stt_dt'], 'end_dt': rec['end_dt']})
 
   return cache
@@ -48,6 +46,8 @@ def report(aresObj):
   fileLst = []
   fileCache = {}
   summaryRecSet, chartRecSet = [], []
+
+
   for rec in getTeamData(aresObj.http['TEAM'], sqlCon):
     chartRecSet.append({'type': rec['type'], 'filename': rec['file_name'], 'file_code': rec['file_code']})
     fileLst.append(rec['file_name'])
@@ -55,21 +55,13 @@ def report(aresObj):
   if not fileLst:
     aresObj.title('No Files allowed for your team !')
   else:
+    aresObj.title('File Permissions for: %s' % aresObj.http['TEAM'])
+    aresObj.newline()
+    aresObj.newline()
     fileDetails = getFilesPermissions(sqlCon, fileLst, aresObj.http['TEAM'])
-    addFilePermission = aresObj.button('', cssCls=['fa fa-plus fa-5`x btn btn-link'])
     for file, details in fileDetails.items():
       nbFiles =  len(details)
-      fileCache.update({'nbFiles': nbFiles, 'userDetails': details})
-      addFilesModal = aresObj.modal(file, btnCls=['btn btn-link'])
-      fileDetailsTable = aresObj.simpletable(fileDetails.get(file, [{'file': '' ,'team': '', 'tmp_owner': '', 'stt_dt': '', 'end_dt': ''}]),
-                                                      [{'key': 'file', 'colName': 'File Name'},
-                                                       {'key': 'team', 'colName': 'Team'},
-                                                       {'key': 'tmp_owner', 'colName': 'Special User'},
-                                                       {'key': 'stt_dt', 'colName': 'Start Date'},
-                                                       {'key': 'end_dt', 'colName': 'End Date'},])
-      aresObj.addTo(addFilesModal, addFilePermission)
-      aresObj.addTo(addFilesModal, fileDetailsTable)
-      summaryRecSet.append({'file': addFilesModal, 'nbFiles': nbFiles, 'userDetails': details})
+      summaryRecSet.append({'file': aresObj.internalLink(file, '_AddTeamToFile', attrs={'file': file, 'fileDetails': details}, cssCls='btn btn-lnk'), 'nbFiles': nbFiles})
 
     summaryTable = aresObj.simpletable(summaryRecSet, [{'key': 'file', 'colName': 'Files', 'type': 'object'},
                                                        {'key': 'nbFiles', 'colName': 'Nb Users'},
