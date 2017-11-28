@@ -99,15 +99,19 @@ class Slider(AresHtml.Html):
   alias = 'slider'
   reqCss = ['bootstrap', 'jquery']
   reqJs = ['bootstrap', 'jquery']
+  hasChangeEvent = False
 
   def __str__(self):
     """ Return the HMTL object of for div """
+    if not self.hasChangeEvent:
+      self.change('')
     self.aresObj.jsOnLoadFnc.add('%s.slider({value: %s});' % (self.jqId, self.vals))
     return '<div style="text-align:center;"><div id="%s_val" style="display:inline-block;">%s</div><div %s></div></div>' % (self.htmlId, self.vals, self.strAttr())
 
-  def slide(self):
+  def change(self, jsFnc):
     """ Action to update the HTML Input text box """
-    self.aresObj.jsOnLoadFnc.add('%s.on("slidechange", function(event, ui) { $("#%s_val").html(ui.value) ; });' % (self.jqId, self.htmlId) )
+    self.hasChangeEvent = True
+    self.aresObj.jsOnLoadFnc.add('%s.on("slidechange", function(event, ui) {  $("#%s_val").html(ui.value) ; %s });' % (self.jqId, self.htmlId, jsFnc) )
 
 
 class DropZone(AresHtml.Html):
