@@ -607,6 +607,6 @@ class TableBase(AresHtml.Html):
     :return: The javascript code of the component
     """
     if val is not None:
-      return "$('#%s tr:nth-child(%s) td:eq(%s)').html(%s)" % (self.htmlId, col+1, row, json.dumps(val))
+      return "$('#%s tr:nth-child(%s) td:eq(%s)').html(%s)" % (self.htmlId, col+1, row, val)
 
     return "$('#%s tr:nth-child(%s) td:eq(%s)').html()" % (self.htmlId, col+1, row)
