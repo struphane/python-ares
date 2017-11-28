@@ -5,7 +5,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
-<title>RiskLab</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+<title>RiskLab
+{% if name %}
+    - {{ name }}
+{% endif %}
+</title>
 
 {{ cssImport|safe }}
 
@@ -19,7 +24,7 @@
     function display(data){
         $('#temp-message').html(data);
         $('#temp-message').show();
-        $('#temp-message').fadeOut( 4000 );
+        $('#temp-message').fadeOut( 10000 );
     }
 
     $(window).scroll(function() {

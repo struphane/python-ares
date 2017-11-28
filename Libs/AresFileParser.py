@@ -18,6 +18,7 @@ import csv
 
 regex = re.compile('[^a-zA-Z0-9_]')
 
+
 class FileParser(object):
   """
   """
@@ -27,7 +28,7 @@ class FileParser(object):
     """ Create a file object """
     self.__inputFile = inFile
     for _ in range(self.hdrLines):
-      self.__inputFile.next()
+      self.__inputFile.readline()
     self.header, self.colCnvFnc, keyMapCol = [], {}, {}
     for i, col in enumerate(self.cols):
       colKey = self.recKey(col)
@@ -62,10 +63,15 @@ class FileParser(object):
     """ Return the header definition """
     fileHeader = []
     for col in cls.cols:
-      if 'key' not in col:
-        fileHeader.append({'colName': col['colName'], 'key': regex.sub('', col['colName'])})
+      row = {}
+      for key in ['dsc', 'colName']:
+        if key in col:
+          row[key] = col[key]
+      if not 'key' in col:
+        row['key'] = regex.sub('', col['colName'])
       else:
-        fileHeader.append({'colName': col['colName'], 'key': col['key']})
+        row['key'] = col['key']
+      fileHeader.append(row)
     return fileHeader
 
   def close(self):
@@ -73,10 +79,38 @@ class FileParser(object):
     if not self.__inputFile.closed:
       self.__inputFile.close()
 
-def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName, folder='outputs'):
+
+class MemFileParser(FileParser):
+  """ Stores the records in an list during the first iteration, and iterates over the list during the next ones """
+  def __init__(self, inFile):
+    super(MemFileParser, self).__init__(inFile)
+    self.inputFileRecSet = []
+
+  def __iter__(self):
+    """ Iterator to return a line """
+    if len(self.inputFileRecSet) == 0:
+      for rec in super(MemFileParser, self).__iter__():
+        self.inputFileRecSet.append(rec)
+        yield rec
+    else:
+      for rec in self.inputFileRecSet:
+        yield rec
+
+
+class FilePivot(FileParser):
+  """ Standard file format for the files used to filter a pivot table from a Datatable """
+  hdrLines = 1
+  delimiter = '#'
+  cols = [{'colName': 'Column ID', 'key': 'COL_ID', 'dsc': 'The column ID in the recordSet'},
+          {'colName': 'Value', 'key': 'COL_VALS', 'dsc': 'values are delimited with a pipe'}]
+
+
+def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName, hdrLines, folder='data'):
   """ Write the file to the dedicated output folder """
   outFile = open(r"%s\%s\%s\%s" % (aresObj.http['DIRECTORY'], reportName, folder, outFileName), "w")
   tmplLine = delimiter.join(["%%(%s)s" % col for col in cols])
+  for header in range(hdrLines):
+    outFile.write("%s\n" % delimiter.join([col for col in cols]))
   for rec in recordSet:
     outFile.write("%s\n" % tmplLine % rec)
   outFile.close()

@@ -4,47 +4,23 @@
 TODO in this module the simple table should be remove
 A decorator will be added to this class to mention to users that going forward it should not be used anymore
 
+#TODO Split the Datatable into 3 tables Table, TablePivot and TableAgg
 """
 
 import json
+import operator
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresJs
 from ares.Lib.html import AresHtmlContainer
-from ares.Lib.html import AresHtmlText
 
 from flask import render_template_string
 from Libs import AresChartsService
 
-class Td(AresHtml.Html):
-  """ Python class for the TD objects """
-  colspan, rowspan = 1, 1
-
-
-  def __init__(self, aresObj, vals, isheader=False, cssCls=None, cssAttr=None):
-    super(Td, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.cssCls = [] if cssCls is None else cssCls
-    self.cssAttr = [] if cssAttr is None else cssCls
-    self.tag = 'th' if isheader else 'td'
-
-  def __str__(self):
-    if self.colspan > 1:
-      self.attr['colspan'] = self.colspan
-    if self.rowspan > 1:
-      self.attr['rowspan'] = self.rowspan
-    withId = 'title' in self.attr
-    return '<%s %s>%s</%s>' % (self.tag, self.strAttr(withId=withId), self.vals, self.tag)
-
-  def mouseOver(self, bgcolor, fontColor='#FFFFFF'):
-    """ Change the behaviour of the cell """
-    self.attr['onMouseOver'] = "this.style.background='%s';this.style.color='%s'" % (bgcolor, fontColor)
-    self.attr['onMouseOut'] = "this.style.background='#FFFFFF';this.style.color='#000000'"
-
 
 class DataTable(AresHtml.Html):
   """ Python wrapper for the Javascript Datatable object """
-  cssCls, alias = ['table', 'table-striped', 'table-sm', 'nowrap'], 'table'
+  __cssCls, alias = ['table', 'table-sm', 'nowrap'], 'table'
   references = ['https://datatables.net/reference/index',
                 'https://datatables.net/reference/option/',
                 'https://datatables.net/reference/option/ajax.data',
@@ -52,7 +28,8 @@ class DataTable(AresHtml.Html):
                 'https://datatables.net/extensions/buttons/examples/initialisation/custom.html',
                 'https://datatables.net/examples/api/multi_filter_select.html',
                 'https://datatables.net/extensions/fixedcolumns/examples/initialisation/size_fluid.html',
-                'https://stackoverflow.com/questions/42569531/span-rows-of-a-table-with-mousedown-and-drag-in-jquery']
+                'https://stackoverflow.com/questions/42569531/span-rows-of-a-table-with-mousedown-and-drag-in-jquery',
+                'https://datatables.net/examples/server_side/row_details.html']
   __reqCss = ['dataTables']
   __reqJs = ['dataTables']
   __callBackWrapper = {
@@ -62,10 +39,17 @@ class DataTable(AresHtml.Html):
       'footerCallback': "function ( row, data, start, end, display ) { %s }",
   }
 
-  def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None):
-    self.theadCssCls = ['thead-inverse']
-    self.reqCss = list(self.__reqCss)
-    self.reqJs = list(self.__reqJs)
+  def __init__(self, aresObj, headerBox, vals, header=None, dataFilters=None, cssCls=None, cssAttr=None, sortBy=None):
+    """
+
+    :param aresObj:
+    :param vals:
+    :param isheader:
+    :param cssCls:
+    :param cssAttr:
+    :param sortBy: Should be a tuple with (column name, asc / desc, number of items or Nene)
+    :return:
+    """
     if dataFilters is not None:
       recordSet = []
       for rec in vals:
@@ -77,6 +61,22 @@ class DataTable(AresHtml.Html):
           recordSet.append(rec)
     else:
       recordSet = vals
+    self.sortBy = sortBy
+    self.pivotLevel = 1
+    if self.sortBy is not None:
+      if self.sortBy[1].lower() == 'desc':
+        sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]))
+      else:
+        sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]), reverse=True)
+      if self.sortBy[2] not in ['', None]:
+        sortedItems = sortedItems[:self.sortBy[2]]
+      vals = sortedItems
+    self.hiddenCols = []
+    self.cssCls = list(self.__cssCls)
+    self.theadCssCls = ['thead-inverse']
+    self.reqCss = list(self.__reqCss)
+    self.reqJs = list(self.__reqJs)
+    self.pivotFilters, self.tableToolTips = {}, {}
     super(DataTable, self).__init__(aresObj, recordSet, cssCls, cssAttr)
     self.aresObj.jsGlobal.add(self.htmlId) # table has to be registered as a global variable in js
     self.headerBox = headerBox
@@ -86,20 +86,24 @@ class DataTable(AresHtml.Html):
       self.header = [header]
     else: # we have a header on several lines, nothing to do
       self.header = header
-    for col in self.header[-1]:
+    for i, col in enumerate(self.header[-1]):
+      if 'dsc' in col:
+        self.addToolTips(i, col['dsc'])
       if 'url' in col:
         # This will only work for static urls (not javascript tranalation for the time being)
         colKey = self.recKey(col)
         if 'report_name' in col['url'].get('cols', {}):
-          self.recordSetHeader.append('''{ data: "%s", title: "%s",
+          self.recordSetHeader.append('''{ data: "%s", title: "%s", className: "%s", visible: %s,
                 render: function (data, type, full, meta) {
                     var url = "run"; var cols = JSON.parse('%s');
                     rowParams = '' ;
                     for (var i in cols) {
-                      rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];
                       if (cols[i] == 'FolderName') {url = url + '/' + full[cols[i]] ; }
+                      else if (cols[i] == 'report_name') {}
+                      else {rowParams = rowParams + '&' + cols[i].trim() + '=' + full[cols[i]];}
                     }
-                    return '<a href="' + url + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), json.dumps(col['url']['cols'])))
+                    return '<a href="' + url + '?' + rowParams.substr(1) + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), col.get("colName", ''),
+                                                                                                          col.get("visible", 'true'), json.dumps(col['url']['cols'])))
         else:
           if not 'report_name' in col['url']:
             col['url']['report_name'] = self.aresObj.http['REPORT_NAME']
@@ -126,14 +130,19 @@ class DataTable(AresHtml.Html):
         # default value for a header definition
         # the className is an optional parameter and it might define a specific class if needed
         if 'className' in col:
-          self.recordSetHeader.append('{ data: "%s", title: "%s", className="%s"}' % (self.recKey(col), col.get("colName"), col["className"]))
+          self.recordSetHeader.append('{ data: "%s", title: "%s", className: "%s", visible: %s}' % (self.recKey(col), col.get("colName"), col["className"], col.get("visible", 'true')))
         else:
-          self.recordSetHeader.append('{ data: "%s", title: "%s"}' % (self.recKey(col), col.get("colName")))
+          self.recordSetHeader.append('{ data: "%s", title: "%s", visible: %s}' % (self.recKey(col), col.get("colName"), col.get("visible", 'true')))
       self.recMap[self.recKey(col)] = col.get("colName")
     self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
     self.option('stateSave', 'true')
+    self.tableUpdates = []
+    self.mapDsc = {}
+    for i, header in enumerate(self.header[-1]):
+      if 'dsc' in header:
+        self.mapDsc[self.recKey(header)] = (i, header['dsc'])
 
   def colReOrdering(self):
     """ Include the column reordering Datatable plugin """
@@ -175,18 +184,36 @@ class DataTable(AresHtml.Html):
     for colId in colsId:
       self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % colId)
 
-  def agg(self, keys, vals, filters=None, digit=0):
+  def agg(self, keys, vals, digit=0, isColStriped=True, colCenter=False):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
     self.noPivot = False
+    if isColStriped:
+      self.addClass('table-striped')
     self.recordSetHeader = []
-    for col in keys:
+    self.tableToolTips = {}
+    colToIndex = {}
+    for i, col in enumerate(keys):
+      colToIndex[col] = i
+      if col in self.mapDsc:
+        self.addToolTips(i+1, self.mapDsc[col][1])
       self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
-    for val in vals:
+    for i, val in enumerate(vals):
+      colToIndex[val] = i + len(keys)
+      if val in self.mapDsc:
+        self.addToolTips(i + len(keys), self.mapDsc[val][1])
       self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), digit))
+    if self.sortBy is not None:
+      self.order(colToIndex[self.sortBy[0]], self.sortBy[1])
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
-    self.__options["ordering"] = 'false'
-    rows = AresChartsService.toAggTable(self.vals, keys, vals, filters)
+    rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
     self.__options['data'] = json.dumps(rows)
+    self.mouveHover('#BFFCA6', 'black')
+    self.option('scrollCollapse', 'false')
+    if colCenter:
+      self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
+    else:
+      for i in range(len(keys)):
+        self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % i)
     if len(rows) < self.__options['pageLength']:
       self.__options['info'] = 'false'
       self.__options['bPaginate'] = 'false'
@@ -196,37 +223,46 @@ class DataTable(AresHtml.Html):
     colNames = keys if colNames is None else colNames
     for i, key in enumerate(keys):
       self.recordSetHeader.append('{ data: "%s", title: "%s", className: "static_col" }' % (key, colNames[i]))
-    rows = json.loads(self.__options['data'])
+    rows = json.loads(self.__options['data']) if 'data' in self.__options else self.vals
     for row in rows:
       for i, key in enumerate(keys):
         row[key] = vals[i]
-    self.__options['data'] = json.dumps(rows)
+    if 'data' in self.__options:
+      self.__options['data'] = json.dumps(rows)
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
 
-  def pivot(self, keys, vals, filters=None, colRenders=None, withUpDown=False, extendTable=False, digit=0):
+  def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0, colCenter=False):
     """ Create the pivot table """
     self.noPivot = False
     self.__options["ordering"] = 'false'
-    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
+    self.pivotLevel = len(keys)
+    self.pivotKeys = keys
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
-    for col in [ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys:
+    self.hiddenCols.extend([ '_id', '_leaf', 'level', '_hasChildren', '_parent'])
+    self.tableToolTips = {}
+    for i, col in enumerate([ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys):
+      if col in self.mapDsc:
+        self.addToolTips(i, self.mapDsc[col][1])
       if colRenders is not None and col in colRenders:
         if 'url' in colRenders[col]:
           # This will only work for static urls (not javascript tranalation for the time being)
           colRenders[col]['url']['report_name'] = self.aresObj.http['REPORT_NAME']
           getParams = ",".join(["%s='%s'"% (key, val) for key, val in colRenders[col]['url'].items()])
           url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % getParams)
-          self.recordSetHeader.append('''{ data: "%s", title: "%s",
-              render: function (data, type, full, meta) {
+          self.recordSetHeader.append('''{ "data": "%s", "title": "%s",
+              "render": function (data, type, full, meta) {
                   var url = "%s"; var cols = JSON.parse('%s'); rowParams = '' ;
                   for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]];}
                   if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
                   else {url = url + '?' + rowParams.substring(1) ;}
                   return '<a href="' + url + '">' + data + '</a>';} }''' % (col, self.recMap.get(col, col), url, json.dumps(colRenders[col]['cols'])))
       else:
-        self.recordSetHeader.append('{ data: "%s", title: "%s" }' % (col, self.recMap.get(col, col)))
-    for col in vals:
+        self.recordSetHeader.append('{ "data": "%s", "title": "%s" }' % (col, self.recMap.get(col, col)))
+    for i, col in enumerate(vals):
+      if col in self.mapDsc:
+        self.addToolTips(i + len(keys), self.mapDsc[col][1])
       if withUpDown:
         self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
           render: function (data, type, full, meta) {
@@ -236,7 +272,7 @@ class DataTable(AresHtml.Html):
             return "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + parseFloat(data).formatMoney(%s, ',', '.') + "</i>" ; } }
         ''' % (col, self.recMap.get(col, col), digit, digit))
       else:
-        self.recordSetHeader.append('''{ data: "%s", title: "%s",
+        self.recordSetHeader.append('''{ data: "%s", title: "%s",  className: 'sum',
           render: function (data, type, full, meta) {
             val = parseFloat(data);
             if (val < 0) {
@@ -253,17 +289,21 @@ class DataTable(AresHtml.Html):
     self.option('paging', 'false')
     self.option('scrollY', "'50vh'")
     self.mouveHover('#BFFCA6', 'black')
-    self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
+    if colCenter:
+      self.callBacks('rowCallback', ''' $('td:eq(0)', row).addClass('left_align') ;''')
+    else:
+      for i in range(len(keys)):
+        self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % i)
     #self.option('order', "[[0, 'asc']]") # default behaviour anyway
     if not extendTable:
       self.callBackCreateRowHideFlag('_leaf', '1')
       self.callBackCreateRowHideFlag('_parent', '0')
       self.callBackCreateRowFlag('_hasChildren', 0, 'details')
       self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
-                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+                                       if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
     else:
       self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); $('td:eq(0)', row).toggleClass('changed');} ;
-                                     if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+                                       if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
     self.click('''
                 var currentTable = %s;
                 var trObj = $(this).closest('tr');
@@ -292,6 +332,20 @@ class DataTable(AresHtml.Html):
 
                }
                ''' % self.htmlId, colIndex=5)
+
+  def addPivotFilter(self, fileCod, fileName):
+    """ Simple function to add filter rules in the pivot logic based on a text file """
+    if not fileName.startswith("filterTable_"):
+      raise Exception("%s should start with the name filterTable_" % fileName)
+
+    self.pivotFilterFileName = fileName
+    self.pivotFilterFileCode = fileCod
+    for rec in self.aresObj.files[fileName]:
+      self.pivotFilters[rec['COL_ID']] = rec['COL_VALS'].split("|")
+
+  def addToolTips(self, col, dsc):
+    """  Function to add a tooltip on the column headers """
+    self.tableToolTips[col] = "$('#%s > thead > tr > th:eq(%s)').attr('title', '%s')" % (self.htmlId, col, dsc)
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
@@ -400,18 +454,21 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$(row).addClass('%s'); }" % (colName, val, cssCls))
 
-  # def callBackSumFooter(self):
-  #   """ """
-  #   self.withFooter = True
-  #   self.callBacks('footerCallback',
-  #                  '''
-  #                     var api = this.api();
-  #                     api.columns('.sum', { page: 'current' } ).every(function () {
-  #                     var sum = this.data().reduce(function (a, b) {
-  #                         var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
-  #                     $(this.footer()).html(sum);
-  #                     } );
-  #                  ''')
+  def callBackSumFooter(self, digit=2):
+    """ """
+    self.withFooter = True
+    self.callBacks('footerCallback',
+                   '''
+                      var api = this.api();
+                      api.columns('.sum', { page: 'current' } ).every(function (el) {
+                          var sum = this.data().reduce(function (a, b) {var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
+                      var result;
+                      var sum = sum / %s ;
+                      if (sum < 0) {result = "<font style='color:red'>" + sum.formatMoney(%s, ',', '.') + "</font>" ;}
+                      result = "<font style='color:green'>" + sum.formatMoney(%s, ',', '.') + "</font>";
+                      $(this.footer()).html(result);
+                      } );
+                   ''' % (self.pivotLevel, digit, digit))
 
   def callBackHeaderColumns(self):
     """  """
@@ -429,6 +486,17 @@ class DataTable(AresHtml.Html):
                             column.data().unique().sort().each( function ( d, j ) {
                               select.append('<option value=' + d+ '>' + d +'</option>' )
                             } );
+                      } );
+                   ''')
+
+  def callBackHeaderColumnsTootips(self):
+    """ To add a header on the datatable headers - in progress """
+    self.__options["ordering"] = 'false'
+    self.callBacks('initComplete',
+                   '''
+                      this.api().columns().every( function (el) {
+                            var column = this;
+                            $('td', this).tooltip( {placement : '', html : true, content: 'youpi'}) ;
                       } );
                    ''')
 
@@ -548,7 +616,7 @@ class DataTable(AresHtml.Html):
     """ Property to get the jquery value of the HTML objec in a python HTML object """
     return "%s.data().toArray()" % self.htmlId
 
-  def dblClickOvr(self):
+  def allowOverride(self):
     """ Override a cell in the datatabble """
     self.aresObj.jsFnc.add('''
         %s.on('dblclick', 'tr td', function () {
@@ -560,7 +628,7 @@ class DataTable(AresHtml.Html):
               blur: function() {
                  $this.text(this.value);
                  if (curValue != $this.text()) {
-                  $this.css({'color': '#b3b300'});
+                  $this.css({'color': '#2807ff'});
                   var cell = %s.cell( $this );
                   cell.data( this.value ).draw();
                  }
@@ -595,19 +663,25 @@ class DataTable(AresHtml.Html):
     self.aresObj.jsFnc.add("%s.on('mouseup', 'td', function () {isMouseDown = false;});" % (self.jqId))
 
   def mouveHover(self, backgroundColor, fontColor):
+    self.aresObj.jsGlobal.add("%s_originalBackground" % self.htmlId)
+    self.aresObj.jsGlobal.add("%s_originalColor" % self.htmlId)
     self.aresObj.jsFnc.add('''
         %s.on( 'mouseover', 'tr', function () {
+            if ($(this).css('background-color') != '%s') {
+              %s_originalBackground = $(this).css('background-color') ;
+              %s_originalColor = $(this).css('color') ;
+            }
             $(this).css('background-color', '%s');
             $(this).css('color', '%s');
         });
-       ''' % (self.jqId, backgroundColor, fontColor) )
+       ''' % (self.jqId, backgroundColor, self.htmlId, self.htmlId, backgroundColor, fontColor) )
 
     self.aresObj.jsFnc.add('''
         %s.on( 'mouseout', 'tr', function () {
-            $(this).css('background-color', 'white');
-            $(this).css('color', 'black');
+            $(this).css('background-color', %s_originalBackground);
+            $(this).css('color', %s_originalColor);
         });
-       ''' % self.jqId)
+       ''' % (self.jqId, self.htmlId, self.htmlId))
 
   def callBackFooterSum(self, colNumber):
     """ Add a footer with a sum on the datatable """
@@ -625,19 +699,57 @@ class DataTable(AresHtml.Html):
 
                       // Total over this page
                       pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
-
+                      pageTotal = pageTotal / %s ; // for the pivot table
                       // Update footer
                       $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
                     }
-                    ''' % json.dumps(colNumber))
+                    ''' % (json.dumps(colNumber), self.pivotLevel))
+
+  def search(self, flag):
+    """ Display or not the search item """
+    self.__options['searching'] = json.dumps(flag)
+
+  def addRows(self, vals=None):
+    """ Add a button to add an entry to the Data Table
+
+    vals - should be a list of dictionaries
+    """
+    if vals is None:
+      self.__options['dom'] = "'Bfrtip'"
+      emptyCol = dict([(self.recKey(col), '') for col in self.header[-1]])
+      self.addButton("{ text: 'Add Row', className: 'btn btn-success', action: function (e, dt, node, config ) {%s.row.add( %s ).draw( false ) ;} }" % (self.htmlId, json.dumps(emptyCol)))
+    else:
+      self.tableUpdates.append("%s.rows.add( %s ).draw( false ).nodes().to$().addClass('static_row')" % (self.htmlId, json.dumps(vals)))
+
+  # def addRow(self, rec, level, hasChild=False):
+  #   """ Add a row """
+  #   if hasChild:
+  #     rec.update({'_hasChildren': 1, '_leaf': level, '_parent': 1})
+  #     rec['cssCls'] = []
+  #     for i, key in enumerate(self.pivotKeys):
+  #       if i < level:
+  #         rec[key] = ''
+  #       elif i == level:
+  #   else:
+  #     rec.update({'_hasChildren': '0', '_leaf': 1, '_parent': 1})
+  #
+  #
+  #   pivotTable.addRows([{'_hasChildren': 0, 'cssCls': ['SelfFundingInstalments', 'SelfFundingInstalmentsYoupi'], 'level': 1,
+  #                      '_leaf': 1, '_parent': 0, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': '', 'ISSUER': 'Youpi', 'Aurelie': ''}])
+  #   pivotTable.addRows([{'_hasChildren': 1, 'cssCls': ['Youpi'], 'level': 0,
+  #                        '_leaf': 0, '_parent': 1, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': 'Youpi', 'ISSUER': '', 'Aurelie': ''}])
+  #   pivotTable.addRows([{'_hasChildren': 0, 'cssCls': ['Youpi', 'YoupiSuper'], 'level': 1,
+  #                        '_leaf': 1, '_parent': 0, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': '', 'ISSUER': 'Super', 'Aurelie': ''}])
 
   def __str__(self):
     """ Return the string representation of a HTML table """
     if self.noPivot:
+      self.addClass('table-striped')
       self.__options['data'] = json.dumps(self.vals)
       if len(self.vals) < self.__options['pageLength']:
         self.__options['info'] = 'false'
         self.__options['paginate'] = 'false'
+        self.__options['searching'] = 'false'
     item = AresItem.Item(None, self.incIndent)
     item.add(0, '<table %s>' % self.strAttr())
     if len(self.header) > 1:
@@ -659,20 +771,94 @@ class DataTable(AresHtml.Html):
       item.add(1, "</thead>")
     else:
       item.add(1, "<thead class='%s' style='white-space: nowrap;'></thead>" % " ".join(self.theadCssCls))
+
     if self.withFooter:
       item.add(1, "<tfoot>")
       item.add(2, "<tr>")
-      for col in self.header[-1]:
-        if col.get("visible", True):
-          item.add(3, "<th>%s</th>" % col.get("colName"))
+      if len(self.header) > 1:
+        for col in self.header[-1]:
+          if col.get("visible", True):
+            item.add(3, "<th>%s</th>" % col.get("colName"))
+      else:
+        for _ in self.recordSetHeader:
+          item.add(2, "<th></th>")
       item.add(2, "</tr>")
       item.add(1, "</tfoot>")
     item.add(1, "<tbody>")
     item.add(1, "</tbody>")
     item.add(0, '</table>')
+    if self.sortBy is not None and self.sortBy[2] not in [None, '']:
+      sortType = 'worst' if self.sortBy[1] == 'desc' else 'top'
+      item.add(0, '<a id="sort_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic;cursor:default"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Display the %s %s data based on %s</a><br/>' % (self.htmlId, sortType, self.sortBy[2], self.sortBy[0]))
+    if self.pivotFilters:
+      item.add(0, '<a id="filter_%s" href="#" style="font-size:10px;text-decoration:none;font-style: italic"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;Static filters applied on the recordSet</a><br/>' % self.htmlId)
+      self.aresObj.jsOnLoadFnc.add('''
+        $('#filter_%s').click(function () {
+            var internalTableId = '%s' ;
+            $("#popup-black-background").show();
+            $("#popup-chart").empty();
+            $("#popup-chart").append('<div class="logo_small">Filter configuration</div>');
+            $("#popup-chart").append('<input type="text" class="form-control" id="filename_' + internalTableId + '" value="%s">');
+            $("#popup-chart").append('<input type="hidden" class="form-control" id="fileCode_' + internalTableId + '" value="%s">');
+
+            var filters = %s;
+            for(key in filters){
+              $("#popup-chart").append('<div style="text-align:left;width:90%%;height:30px;margin-left:5%%;margin-right:5%%;margin-top:10px">' + key + '<input class="form-control" id="filter_new_' + key + '_'+ internalTableId +'" style="width:60%%;display:inline;margin-left:5px;margin-right:5px;height:35px" type="text"><button id="filter_add_'+ key + '_' + internalTableId + '" class="btn btn-success">add</button>&nbsp;<button id="filter_del_'+ key + '_' + internalTableId + '" class="btn btn-danger">remove</button></div>');
+              var selectbox = $('<select name="filter_val_' + internalTableId + '" id="'+ key +'" size="4" style="width:90%%;padding-left:5%%;padding-right:5%%;margin-top:10px">');
+              for (val in filters[key]){
+                selectbox.append($('<option>').text(filters[key][val]).val(filters[key][val]));
+              }
+              $("#popup-chart").append(selectbox);
+              $("#popup-chart").append("<BR>") ;
+
+              $("#filter_add_"+ key + "_" + internalTableId).click({srcInput: '#filter_new_' + key + '_' + internalTableId, selectBox:'#'+ key}, function(event) {
+                  var newItem = $(event.data.srcInput).val();
+                  $(event.data.selectBox).append($('<option>').text(newItem).val(newItem));
+              });
+
+              $("#filter_del_"+ key + "_" + internalTableId).click({selectBox:'#'+ key}, function(event) {
+                  $(event.data.selectBox +" option:selected").remove();
+              });
+            }
+
+            $("#popup-chart").append("<br/><input id='filter_valid_" + internalTableId + "' type='submit' class='btn btn-success' value='Save'><br/><br/>")
+            $("#popup-chart").show();
+
+            $("#popup-black-background").click(function() {
+              $("#popup-black-background").hide();
+              $("#popup-chart").hide();
+            });
+
+            $("#filter_valid_"+ internalTableId).click(function() {
+              var content = [];
+              $("select[name=filter_val_" + internalTableId + "]").each(function (i, el) {
+                var row = [$(el).attr('id')] ;
+                var values = [];
+                $('#' + $(el).attr('id') + ' option').each(function(){
+                  values.push($(this).text());
+                });
+                row.push(values.join("|"));
+                content.push(row.join("#"));
+              });
+
+              $.post("../../ajax/_AresReports/SrvSaveToFile", {fileName: $('#filename_' + internalTableId).val(), fileCode: $('#fileCode_' + internalTableId).val(), reportName: '%s', rows: content.join("\\n"), folder: 'static'}, function(data) {
+                  var res = JSON.parse(data) ;
+                  var data = res.data ;
+                  var status = res.status ;
+                  $("#popup-black-background").hide();
+                  $("#popup-chart").hide();
+                  $("#popup-chart").empty();
+                  display(data);
+              } );
+            });
+
+        });
+      ''' % (self.htmlId, self.htmlId, self.pivotFilterFileName, self.pivotFilterFileCode, json.dumps(self.pivotFilters), self.aresObj.reportName))
 
     if self.headerBox is not None:
       item = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
+      if 'width' in self.attr.get('css', {}):
+        item.cssAttr['width'] = self.attr['css']['width']
 
     # Add the javascript dynamique part to the DataTabe
     options = []
@@ -684,7 +870,14 @@ class DataTable(AresHtml.Html):
           options.append("%s: [%s]" % (key, ",".join(val)))
       else:
         options.append("%s: %s" % (key, val))
-    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ;' % (self.htmlId, self.jqId, ",".join(options)))
+
+    headerToolTips = []
+    if  self.tableToolTips:
+      headerToolTips = []
+      for toolTips in self.tableToolTips.values():
+        headerToolTips.append(toolTips)
+      headerToolTips.append('$("#%s > thead > tr > th").tooltip()' % self.htmlId)
+    self.aresObj.jsFnc.add('%s = %s.DataTable({ %s }) ; %s; %s ;' % (self.htmlId, self.jqId, ",".join(options), ";".join(self.tableUpdates), ";".join(headerToolTips)))
     return str(item)
 
   def recKey(self, col):
@@ -709,236 +902,43 @@ class DataTable(AresHtml.Html):
     htmlObj[0].link("var oTable = $('#%s').dataTable(); oTable.fnDraw(); " % self.htmlId)
     htmlObj[0].allowTableFilter.append(self.htmlId)
 
-  def order(self, colName, typeOrd):
+  def order(self, colIndex, typeOrd):
     """ Set the table order according to a column in the table """
-    self.option(json.dumps([[colName, typeOrd]]))
+    self.option("order", json.dumps([[colIndex, typeOrd]]))
 
 
-class SimpleTable(AresHtml.Html):
-  """ Python wrapper for the table HTML object """
-  cssCls, alias = ['table'], 'table'
-  references = ['https://www.w3schools.com/html/html_tables.asp',
-                'https://www.w3schools.com/css/css_table.asp',
-                'https://api.jquery.com/dblclick/']
-  reqCss = ['bootstrap', 'jquery']
-  reqJs = ['bootstrap', 'jquery']
-  dflt = None
-  formatVals = True
 
-  @AresHtml.deprecated
-  def __init__(self, aresObj, headerBox, vals, header=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None):
-    """ Create an Simple Table object """
-    super(SimpleTable, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.headerBox = headerBox
-    self.header = header
-    self.cssPivotRows = {'font-weight': 'bold'}
-    self.__rows_attr = {'rows': {'ALL': {}}}
-    if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
-      self.header = [header]
-    self.__data = [[Td(aresObj, header['colName'], True) for header in self.header[-1]]]
-    self.tdCssCls = tdCssCls
-    self.tdCssAttr = tdCssAttr
-    for val in vals:
-      row = []
-      for header in self.header[-1]:
-        cellVal = val.get(self.recKey(header), self.dflt)
-        if cellVal is not None:
-          row.append(Td(aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=self.tdCssAttr))
-      self.__data.append(row)
+class DataTablePivot(DataTable):
+  """
 
-  def recKey(self, col):
-    """ Return the record Key taken into accounr th possible user options """
-    return col.get("key", col.get("colName"))
+  """
 
-  def pivot(self, keys, vals, filters=None):
-    """ """
-    mapHeader = dict([(self.recKey(hdr), hdr['colName']) for hdr in self.header[-1]])
-    self.__data = [[Td(self.aresObj, mapHeader[header], True, cssAttr={'background': '#225D32', 'text-align': 'center',
-                                                                       'color': 'white', 'font-weight': 'bold'}) for header in keys + vals]]
-    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters)
-    self.__rows_hidden = {}
-    for i, val in enumerate(rows):
-      if self.formatVals:
-        for keyVal in vals:
-          val[keyVal] = AresHtmlText.UpDown(self.aresObj, val[keyVal], val[keyVal])
-      row, indexCol = [], i+1
-      #
-      if not indexCol in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][indexCol] = {'name': val['_id']}
-      else:
-        self.__rows_attr['rows'][indexCol]['name'] = val['_id']
-      self.__rows_attr['rows'][indexCol]['data-index'] = val['level']
+  def setKeys(self, keys, selected=None):
+    self.chartKeys = [self.header[key] for key in keys]
 
-      if 'class' in self.__rows_attr['rows'][indexCol]:
-        self.__rows_attr['rows'][indexCol]['class'].extend(val['cssCls'])
-      else:
-        self.__rows_attr['rows'][indexCol]['class'] = val['cssCls']
+  def setVals(self, vals, selected=None):
+    self.chartVals = [self.header[val] for val in vals]
 
-      if val.get('_parent', 0) == 0:
-        if 'css' in self.__rows_attr['rows'][indexCol]:
-          self.__rows_attr['rows'][indexCol]['css'].update({'display': 'None'})
-        else:
-          self.__rows_attr['rows'][indexCol]['css'] = {'display': 'None'}
 
-      #
-      if val.get('_hasChildren', 0) == 1:
-        self.__rows_attr['rows'][indexCol]['class'].append('details')
-        if 'css' in self.__rows_attr['rows'][indexCol]:
-          self.__rows_attr['rows'][indexCol]['css'].update(self.cssPivotRows)
-        else:
-          self.__rows_attr['rows'][indexCol]['css'] = self.cssPivotRows
-      for j, header in enumerate(self.header[-1]):
-        cellVal = val.get(self.recKey(header), self.dflt)
-        attrCss = dict(self.tdCssAttr) if self.tdCssAttr is not None else {}
-        if cellVal is not None:
-          if j == 0:
-            attrCss['padding-left'] = '%spx' % (val['level'] * 20)
-          row.append(Td(self.aresObj, cellVal, cssCls=self.tdCssCls, cssAttr=attrCss))
-      self.__data.append(row)
+class DataTableAgg(DataTable):
+  """
 
-    self.aresObj.jsOnLoadFnc.add(
-      '''
-      $( ".details > td:first-child" ).click(function() {
-        var trObj = $(this).closest('tr');
-        var children_data_id = trObj.data('index') + 1;
-        var trName = trObj.attr('name');
-        var isVisible = $(this).hasClass('changed');
-        $(this).toggleClass('changed');
-        $('#%s > tbody  > tr').each(function() {
-          var trId = $(this).data('index');
-          var trHasParent = $(this).hasClass(trName);
-          if (isVisible) {
-            if ((trId >= children_data_id) && trHasParent ) {
-              if ($(this).hasClass('details')){
-                var firstTd = $(this).find('td:first-child');
-                if  (firstTd.hasClass('changed')) {
-                  $(this).find('td:first-child').removeClass('changed');}
-              }
-              $(this).hide() ;
-            }
-         } else {
-            if ((trId == children_data_id) && trHasParent ) {
-              $(this).toggle() ;
-            }
-          }
-          //alert($(this).attr('name'));
-        } );
-      });
-      ''' % self.htmlId)
+  """
 
-  def getCell(self, row, col):
-    """ Returns the underlying cell object """
-    return self.__data[row][col]
+  def setKeys(self, keys, selected=None):
+    self.chartKeys = [self.header[key] for key in keys]
 
-  def addRowsAttr(self, name, value, rowNum=None):
-    """ Set an attribute to the TR HTML object """
-    if rowNum is None:
-      row = self.__rows_attr
-    else:
-      if not rowNum in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][rowNum] = {}
-      row = self.__rows_attr['rows'][rowNum]
+  def setVals(self, vals, selected=None):
+    self.chartVals = [self.header[val] for val in vals]
 
-    if name == 'css': # Section for the Style attributes
-      if not 'css' in row:
-        row['css'] = value
-      else:
-        row['css'].update(value)
-    elif name == 'class': # Section dedicated to manage the CSS classes
-      row['class'].add(value)
-    else: # Section for all the other attributes
-      row[name] = value
 
-  def __str__(self):
-    """  Returns the string representation of a HTML Table """
-    trAttr, trSpecialAttr = [], {}
-    if 'css' in self.__rows_attr:
-      trAttr.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in self.__rows_attr["css"].items()]))
-    for attrCod in ['onmouseover', 'onMouseOut', 'class']:
-      if attrCod in self.__rows_attr:
-        trAttr.append('%s="%s"' %(attrCod, " ".join(self.__rows_attr[attrCod])))
-    for attrCod in ['name', 'id', 'data-index']:
-      if attrCod in self.__rows_attr:
-        trAttr.append('%s="%s"' % (attrCod, self.__rows_attr[attrCod]))
-    strTrAttr = " ".join(trAttr)
+class DataTableHyr(DataTable):
+  """
 
-    # Special extra part of some line in the table
-    for row in self.__rows_attr['rows']:
-      attr = self.__rows_attr['rows'][row]
-      trRes = []
-      if 'css' in attr:
-        trRes.append('style="%s"' % ";".join(["%s:%s" % (key, val) for key, val in attr["css"].items()]))
-      for attrCod in ['onmouseover', 'onMouseOut', 'class']:
-        # Here we consider those properties as ones that could be propagated to the extra defintiion
-        # This will allow in the case of the pivot table to keep the onmouseover event for example
-        if attrCod in self.__rows_attr:
-          if attrCod in attr:
-            attr[attrCod].extend(self.__rows_attr[attrCod])
-          else:
-            attr[attrCod] = self.__rows_attr[attrCod]
-        if attrCod in attr:
-          trRes.append('%s="%s"' % (attrCod, " ".join(set(attr[attrCod]))))
-      for attrCod in ['data-index', 'name', 'id']:
-        if attrCod in attr:
-          if attrCod == 'data-index':
-            trRes.append('%s=%s' % (attrCod, attr[attrCod]))
-          else:
-            trRes.append('%s="%s"' % (attrCod, attr[attrCod]))
-      trSpecialAttr[row] = " ".join(trRes)
+  """
 
-    # Build the table
-    html = ["<thead>"]
-    html.append("<tr %s>%s</tr>" % (trSpecialAttr[0] if 0 in trSpecialAttr else strTrAttr, "".join([str(td) for td in self.__data[0]])))
-    html.append("</thead>")
-    html.append("<tbody>")
-    for i, row in enumerate(self.__data[1:]):
-      html.append("<tr %s>%s</tr>" % (trSpecialAttr[i+1] if i+1 in trSpecialAttr else strTrAttr, "".join([str(td) for td in row])))
-    html.append("</tbody>")
-    item =  "<table %s>%s</table>" % (self.strAttr(), "".join(html))
-    if self.headerBox is not None:
-      return str(AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references))
+  def setKeys(self, keys, selected=None):
+    self.chartKeys = [self.header[key] for key in keys]
 
-    return item
-
-  def cell_dblclick(self, jsFnc):
-    """ Add an event on the cells, $(this).html() will return the selected value """
-    self.aresObj.jsFnc(AresJs.JQueryEvents(self.htmlId, "$('#%s td,th')" % self.htmlId, 'dblclick', jsFnc))
-
-  def row_dblclick(self, jsFnc):
-    """ Add an event on the cells, $(this).html() will return the selected value """
-    self.aresObj.jsFnc(AresJs.JQueryEvents(self.htmlId, "$('#%s tr')" % self.htmlId, 'dblclick', jsFnc))
-
-  def update_cell(self):
-    """ Update a cell in the table """
-    jsFnc = '''
-                var html = '<div id="dialog" title="update value">' ;
-                html = html + '<div class="form-group">';
-                html = html + '<label for="formgroupexampleinput">example label</label>';
-                html = html + '<input id="temp_cell" type="text" class="form-control">';
-                html = html + '</div>';
-                html = html + '<button type="submit" id="temp_submit" class="btn btn-primary">submit</button>' ;
-                html = html + '</div>';
-                $('body').append(html) ;
-                $('#temp_cell').val($(event.target).html());
-                $("#dialog").dialog();
-                // Update the data to the table
-                $( "#temp_submit" ).on( "click", { item: $(event.target) }, function (event){
-                    event.data.item.html($('#temp_cell').val());
-                    $( "#dialog" ).remove();
-                });
-            '''
-    self.aresObj.jsFnc.add(AresJs.JQueryEvents(self.htmlId, "$('#%s td')" % self.htmlId, 'dblclick', jsFnc))
-
-  def cssRowMouseHover(self, bgColor='#BDFFC2', fontColor='black', rowNum=None):
-    if rowNum is None:
-      row = self.__rows_attr
-    else:
-      if not rowNum in self.__rows_attr['rows']:
-        self.__rows_attr['rows'][rowNum] = {}
-      row = self.__rows_attr['rows'][rowNum]
-    row['onmouseover'] = ["this.style.background='%s';this.style.color='%s'" % (bgColor, fontColor)]
-    row['onMouseOut'] = ["this.style.background='#FFFFFF';this.style.color='#000000'"]
-
-  def cssPivotAggRow(self, attr):
-    """  """
-    self.cssPivotRows = attr
+  def setVals(self, vals, selected=None):
+    self.chartVals = [self.header[val] for val in vals]

@@ -16,6 +16,7 @@ Ares documentation is available here:
 from __future__ import print_function
 import os
 import sys
+import time
 import traceback
 
 from ares.Lib import Ares
@@ -31,24 +32,27 @@ def getReport(results, directory, folder, reports, scriptPath):
     if report.endswith(".py"):
       reportModule = __import__(reportName)
       if hasattr(reportModule, 'report'):
+        t0 = time.time()
         print("  > Loading report %s" % report)
         results[reportModule.__name__] = Ares.Report()
         if hasattr(reportModule, 'HTTP_PARAMS'):
           for param in getattr(reportModule, 'HTTP_PARAMS'):
             results[reportModule.__name__].http[param['code']] = param['dflt']
         try :
-          for f in ['static', 'outputs']:
-            for file in os.listdir(os.path.join(directory, reportName, f)):
-              if file in extFiles:
-                inFile = open(os.path.join(directory, reportName, f, file))
-                results[reportModule.__name__].files[file] = extFiles[file]['parser'](inFile)
+          for f in ['static', 'data']:
+            fileDirectory = os.path.join(directory, reportName, f)
+            if os.path.isdir(fileDirectory):
+              for file in os.listdir(fileDirectory):
+                if file in extFiles:
+                  inFile = open(os.path.join(fileDirectory, file))
+                  results[reportModule.__name__].files[file] = extFiles[file]['parser'](inFile)
           results[reportModule.__name__].http['DIRECTORY'] = scriptPath
           results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
           reportModule.report(results[reportModule.__name__])
-        except Exception as e:
+          print("  > Done in %s seconds !" % (time.time() - t0))
+        except:
           print("Error with report %s" % report)
           print(traceback.print_exc())
-          print(e)
       else:
         print("Module ignore %s" % report)
 
@@ -93,9 +97,7 @@ if __name__ == '__main__':
   res = {}
   directoryPath = os.path.join(directory, folder)
   sys.path.append(directoryPath)
-  ajaxPath = os.path.join(directory, folder, 'ajax')
-  if os.path.exists(ajaxPath):
-    sys.path.append(ajaxPath)
+  sys.path.append(os.path.join(directory, 'Libs'))
   getReport(res, directory, folder, scripts, directoryPath)
 
   for report, htmlReport in res.items():

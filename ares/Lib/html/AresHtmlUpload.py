@@ -1,7 +1,6 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresExceptions
 from flask import render_template_string
 
 class FileDeployer(AresHtml.Html):

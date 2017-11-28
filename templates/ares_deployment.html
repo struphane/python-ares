@@ -106,14 +106,15 @@
                 <input id="input_text_env" type="text" style="height:32px;width:100%" class="form-control">
 
             <div style="padding-top:3px" id="div_deployer">
-                <br><input id="input_file" type="file" name="file" />
+                <br><input id="input_file" type="file" name="file"/>
                 <select id="select_file_type" name="File Type" required>
-                   <option value="report">report</option>
-                   <option value="static">static</option>
-                   <option value="outputs">outputs</option>
-                   <option value="styles">styles</option>
-                   <option value="saved">saved</option>
-                   <option value="utils">utils</option>
+                   <option value="report">Report</option>
+                   <option value='ajax'>Ajax</option>
+                   <option value="static">Static</option>
+                   <option value="data">Data</option>
+                   <option value="styles">Styles</option>
+                   <option value="saved">Saved</option>
+                   <option value="utils">Utils</option>
                 </select>
                 <input id="file_code" name="file_code" type="text" style="height:32px;width:15%;margin-left:10px"><label style="padding-left:5px">Mandatory for outputs</label>
             </div>
@@ -128,14 +129,15 @@
 
     function addInputForDeploy(divId){
             var newDiv = document.createElement('div');
-            newDiv.innerHTML = "<br><input id='input_file_" + counter + "' type='file' name='file' />" +
+            newDiv.innerHTML = "<br><input id='input_file_" + counter + "' type='file' name='file'/>" +
              "<select id='select_file_type" + counter + "' name='File Type' required>" +
-             "<option value='report'>report</option>" +
-             "<option value='static'>static</option>" +
-             "<option value='outputs'>outputs</option>" +
-             "<option value='styles'>styles</option>" +
-             "<option value='saved'>saved</option>" +
-             "<option value='utils'>utils</option>" +
+             "<option value='report'>Report</option>" +
+             "<option value='ajax'>Ajax</option>" +
+             "<option value='static'>Static</option>" +
+             "<option value='data'>Data</option>" +
+             "<option value='styles'>Styles</option>" +
+             "<option value='saved'>Saved</option>" +
+             "<option value='utils'>Utils</option>" +
              "</select>" +
              "<input id='file_code' name='file_code'" + counter + " type='text' style='height:32px;width:15%;margin-left:10px'><label style='padding-left:5px'>Mandatory for outputs</label>";
              document.getElementById(divId).appendChild(newDiv);
@@ -157,7 +159,7 @@
                 processData: false,
                 async: false,
                 success: function(data) {
-                    return 'Success!';
+                    confirm('Success!');
                 },
             });
         });

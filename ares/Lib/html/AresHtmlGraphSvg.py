@@ -34,6 +34,10 @@ class Svg(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
+  def dispatch(self, dispatchType, dispatchFnc):
+    """ Add items and the functions in the dispatch methods in the chart """
+    self.dispatch[dispatchType] = dispatchFnc
+
   def changeColor(self, rangeColors):
     """ Change the default colors in the chart """
     self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
@@ -124,6 +128,11 @@ class Svg(AresHtml.Html):
     self.chartKeys = [self.header[key] for key in keys]
     self.selectedChartKey = keys[selected] if selected is not None else keys[0]
 
+  def setKeyOrder(self, xValsList):
+    """ For the order on the abscisse, this can only work with 1 series """
+    self.addChartProp('xAxis', {'tickValues': [i for i in range(len(xValsList))]})
+    self.addChartProp('xAxis', {'tickFormat': "function(d){ return %s[d] }" % json.dumps(xValsList)})
+
   def setVals(self, vals, selected=None):
     """ Set a default value for the graph """
     self.chartVals = [self.header[val] for val in vals]
@@ -205,6 +214,11 @@ class MultiSvg(Svg):
   def setX(self, x):
     """ """
     self.selectedX = self.header[x]
+
+  def setXOrder(self, xValsList):
+    """ For the order on the abscisse """
+    self.addChartProp('xAxis', {'tickValues': [i for i in range(len(xValsList))]})
+    self.addChartProp('xAxis', {'tickFormat': "function(d){ return %s[d] }" % json.dumps(xValsList)})
 
   def setExtVals(self, keys, components):
     """ Link the result to the different components on the page """

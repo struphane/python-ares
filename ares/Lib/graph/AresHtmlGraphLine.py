@@ -14,7 +14,8 @@ regex = re.compile('[^a-zA-Z0-9_]')
 class NvD3Line(AresHtmlGraphSvg.MultiSvg):
   """ NVD3 Line bar Chart python interface """
   alias, chartObject = 'line', 'lineChart'
-  references = ['http://nvd3.org/examples/line.html']
+  references = ['http://nvd3.org/examples/line.html',
+                'https://stackoverflow.com/questions/23727627/nvd3-line-chart-with-string-values-on-x-axis']
   __chartStyle = {
     'margin': '{left: 100}',
     'showLegend': 'true',

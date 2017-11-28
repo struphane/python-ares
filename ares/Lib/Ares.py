@@ -1,3 +1,13 @@
+# TODO: To use it to replace the redondant functions calls
+# TODO: implement a decorator to wrap the current part in the functions
+
+import os
+import sys
+import time
+import inspect
+import collections
+import json
+
 """ Report Interface
 
 This module will be used to produce the final report
@@ -18,16 +28,6 @@ javascript defined in the different classes. It is possible to test the differen
 
 QUESTION: Should we call the html() function in the wrapper or should we let the user call it ?
 """
-# TODO: To use it to replace the redondant functions calls
-# TODO: implement a decorator to wrap the current part in the functions
-
-import os
-import sys
-import time
-import inspect
-import collections
-import json
-
 from importlib import import_module
 from ares.Lib import AresImports
 
@@ -176,6 +176,7 @@ class Report(object):
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
     self.workers = {}
+    self.fileMap = {}
 
   def structure(self):
     return self.content
@@ -277,7 +278,8 @@ class Report(object):
 
   # Radio Section
   def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def select(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def select(self, recordSet, title='Select list', col=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, title, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def selectfiles(self, fileName, title='Select list', cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.fileMap.get(fileName, []), title, None, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
   # Title section
@@ -313,9 +315,6 @@ class Report(object):
   def div(self, value, cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def table(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DataTable'](self, headerBox, values, header, dataFilters, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None): return self.add(aresFactory['SimpleTable'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
-  def tablepivot(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None): return self.add(aresFactory['TablePivot'](self, headerBox, values, header, dataFilters, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def select_group(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectWithGroup'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def container(self, header, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Container'](self, header, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -323,6 +322,17 @@ class Report(object):
   def col(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Col'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def img(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Image'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['IFrame'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
+
+  def table(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTable'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
+
+  # in progress
+  def tablepivot(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTablePivot'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
+  def tableagg(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableAgg'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
+  def tablehyr(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableHyr'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
+
+  def tablebase(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None, globalSortBy=None): return self.add(aresFactory['TableBase'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr, globalSortBy), sys._getframe().f_code.co_name)
+  def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None, globalSortBy=None): return self.add(aresFactory['TableComplex'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
+  def pivot(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None): return self.add(aresFactory['TablePivot'](self, headerBox, values, header, dataFilters, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
   # Modal Section
@@ -351,6 +361,11 @@ class Report(object):
   def boxplot(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3PlotBox'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def spider(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['D3SpiderChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def venn(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Venn'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+
+  # 3D charts
+  def pie3D(self, values): return self.add(aresFactory['Donut3D'](self, values), sys._getframe().f_code.co_name)
+  def vis3DSurface(self, values): return self.add(aresFactory['Vis3DSurfaceChart'](self, values), sys._getframe().f_code.co_name)
 
   # File HTML Section
   # def upload(self, values='', cssCls=None, cssAttr=None): return self.add(aresFactory['UploadFile'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -436,9 +451,9 @@ class Report(object):
   def listDataFrom(self, folder):
     """ List the file available in the folder in the output area """
     folders = []
-    for (path, dirs, files) in os.walk(os.path.join(self.http['DIRECTORY'], 'outputs', folder)):
+    for (path, dirs, files) in os.walk(os.path.join(self.http['DIRECTORY'], 'data', folder)):
       for file in files:
-        fileData =  self.getFileInfo(file, ['outputs', folder])
+        fileData =  self.getFileInfo(file, ['data', folder])
         fileData.update({'folderPath': folder, 'file': file})
         folders.append(fileData)
     return folders

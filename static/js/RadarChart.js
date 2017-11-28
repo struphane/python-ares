@@ -9,7 +9,7 @@
 //http://nbremer.blogspot.nl/2013/09/making-d3-radar-chart-look-bit-better.html
 
 var RadarChart = {
-  draw: function(id, d, options){
+  draw: function(id, d, options, eventClick){
   var cfg = {
 	 radius: 5,
 	 w: 600,
@@ -27,7 +27,7 @@ var RadarChart = {
 	 ExtraWidthY: 100,
 	 color: d3.scale.category10()
 	};
-	
+
 	if('undefined' !== typeof options){
 	  for(var i in options){
 		if('undefined' !== typeof options[i]){
@@ -41,7 +41,7 @@ var RadarChart = {
 	var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
 	var Format = d3.format('%');
 	d3.select(id).select("svg").remove();
-	
+
 	var g = d3.select(id)
 			.append("svg")
 			.attr("width", cfg.w+cfg.ExtraWidthX)
@@ -50,8 +50,27 @@ var RadarChart = {
 			.attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
 			;
 
+    // On Click, we want to add data to the array and chart
+      /*
+      g.on("click", function() {
+          var coords = d3.mouse(this);
+          alert('');
+          // Normally we go from data to pixels, but here we're doing pixels to data
+          var newData= {
+            x: Math.round( xScale.invert(coords[0])),  // Takes the pixel number to convert to number
+            y: Math.round( yScale.invert(coords[1]))
+          };
+
+          dataset.push(newData);   // Push data to our array
+
+          g.selectAll("circle")  // For new circle, go through the update process
+            .data(dataset)
+            .enter()
+            .append("circle")
+        });
+    */
 	var tooltip;
-	
+
 	//Circular segments
 	for(var j=0; j<cfg.levels-1; j++){
 	  var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
@@ -86,7 +105,7 @@ var RadarChart = {
 	   .attr("fill", "#737373")
 	   .text(Format((j+1)*cfg.maxValue/cfg.levels));
 	}
-	
+
 	series = 0;
 
 	var axis = g.selectAll(".axis")
@@ -104,7 +123,8 @@ var RadarChart = {
 		.style("stroke", "grey")
 		.style("stroke-width", "1px");
 
-	axis.append("text")
+    if (typeof eventClick == 'undefined') {
+        axis.append("text")
 		.attr("class", "legend")
 		.text(function(d){return d})
 		.style("font-family", "sans-serif")
@@ -113,9 +133,26 @@ var RadarChart = {
 		.attr("dy", "1.5em")
 		.attr("transform", function(d, i){return "translate(0, -10)"})
 		.attr("x", function(d, i){return cfg.w/2*(1-cfg.factorLegend*Math.sin(i*cfg.radians/total))-60*Math.sin(i*cfg.radians/total);})
-		.attr("y", function(d, i){return cfg.h/2*(1-Math.cos(i*cfg.radians/total))-20*Math.cos(i*cfg.radians/total);});
+		.attr("y", function(d, i){return cfg.h/2*(1-Math.cos(i*cfg.radians/total))-20*Math.cos(i*cfg.radians/total);})
+    }
+    else {
+        var border=1;
+        var bordercolor='black';
 
- 
+        axis.append("text")
+		.attr("class", "legend")
+		.text(function(d){return d})
+		.style("font-family", "sans-serif")
+		.style("font-size", "11px")
+        .attr("class","blue-border")
+		.attr("dy", "1.5em")
+		.attr("transform", function(d, i){return "translate(0, -10)"})
+		.attr("x", function(d, i){return cfg.w/2*(1-cfg.factorLegend*Math.sin(i*cfg.radians/total))-60*Math.sin(i*cfg.radians/total);})
+		.attr("y", function(d, i){return cfg.h/2*(1-Math.cos(i*cfg.radians/total))-20*Math.cos(i*cfg.radians/total);})
+        .on("click", function(e) { eventClick(e);  })
+    ;
+      }
+
 	d.forEach(function(y, x){
 	  dataValues = [];
 	  g.selectAll(".nodes")

@@ -12,8 +12,9 @@ from Libs import AresUserAuthorization
 # from system.sqlite.db_config import models
 
 app = Flask(__name__)
-app.config['ROOT_PATH'] = os.path.dirname(os.path.abspath(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = r'sqlite:///%s' % os.path.join(app.config['ROOT_PATH'], 'system', 'sqlite', 'main_sqlite.db')
+app.config['ROOT_PATH'] = '' #os.path.dirname(os.path.abspath(__file__))
+
+app.config['SQLALCHEMY_DATABASE_URI'] = r'sqlite:///%s' % os.path.join(os.path.dirname(os.path.abspath(__file__)), 'system', 'sqlite', 'main_sqlite.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # POSTGRES = {
@@ -25,7 +26,6 @@ db = SQLAlchemy(app)
 # }
 
 app.config['SECRET_KEY'] = 'K3y2BCh4ng3d'#Change this if you want the app to work
-
 
 
 login_manager = LoginManager()
@@ -65,6 +65,13 @@ class Team(db.Model):
   def __init__(self, team_name, email):
     self.team_name = team_name
     self.team_email = email
+
+  def __repr__(self):
+    return '<Team %r>' % self.team_email
+
+  def get_id(self):
+    """ """
+    return self.team_email
 
 class DataSource(db.Model):
   """ """

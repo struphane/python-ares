@@ -11,6 +11,8 @@ def report(aresObj):
   """ View used only to display the content of a static cache """
 
   aresObj.title("Static configuration View")
+  input = aresObj.input('FileName')
+  input.addVal(aresObj.http['static_file'])
   saveButton = aresObj.savetable("Save Changes")
   aresObj.newline()
   aresObj.newline()
@@ -19,14 +21,14 @@ def report(aresObj):
   sys.path.append(userDirectory)
   module = __import__(aresObj.http['user_script_name'])
   for fileDef in getattr(module, 'FILE_CONFIGS', {}):
-    if fileDef['filename'] == aresObj.http['static_file']:
+    if fileDef['filename'] == aresObj.http['static_code']:
       fileConfig = fileDef['parser']
-      aresObj.files[fileDef['filename']] = fileConfig(open(os.path.join(aresObj.http['DIRECTORY'], aresObj.http['user_report_name'], fileDef['folder'], fileDef['filename'])))
+      aresObj.files[aresObj.http['static_file']] = fileConfig(open(os.path.join(aresObj.http['DIRECTORY'], aresObj.http['user_report_name'], fileDef['folder'], aresObj.http['static_file'])))
       recordSet = []
-      for rec in aresObj.files[fileDef['filename']]:
+      for rec in aresObj.files[aresObj.http['static_file']]:
         recordSet.append(rec)
 
-      table = aresObj.table(recordSet, fileConfig.getHeader())
+      table = aresObj.table(recordSet, fileConfig.getHeader(), headerBox="Static File - %s" % aresObj.http['static_file'], cssAttr={'width': '600px'})
       table.callBackFooterColumns()
 
   sys.path.remove(userDirectory)
@@ -38,8 +40,8 @@ def report(aresObj):
     f.close()
 
   if aresObj.http['file_parser'] != '':
-    table.dblClickOvr()
+    table.allowOverride()
     aresObj.http['REPORT_NAME'] = aresObj.http['user_report_name']
-    saveButton.clickStatic(table, aresObj.http['file_parser'], aresObj.http['static_file'])
+    saveButton.clickStatic(table, aresObj.http['file_parser'], input.val, aresObj.http['static_code'])
   else:
     saveButton.disable = True

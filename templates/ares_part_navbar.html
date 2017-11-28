@@ -11,11 +11,22 @@ https://www.bootply.com/60886#
       <div class="navbar-brand" style="height:45px;">
           <a name="side_change"  href="#"><i class="fa fa-bars fa-2x"></i></a>
           <a  href="#"><strong>RiskLab</strong></a>
+          <!--<a href="#" class="logo_small_grey">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>-->
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <a href="{{ url_for('ares.run_report', report_name=report_name, script_name=script_name, show_params=1  ) }}"  class="btn" style="top:0px;margin-left:3px"><i class="fa fa-wrench" aria-hidden="true"></i>&nbsp;Reset</a>
-          <a href="#"  class="btn btn-outline-success active" style="top:0px"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
+          <a href="{{ url_for('ares.run_report', report_name=report_name, script_name=script_name, show_params=1  ) }}"  class="btn" style="top:0px;margin-left:3px"><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp;Reset</a>
+          <a href="#" class="active_report" style="top:0px"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;{{ name|safe }}</a>
+
+          {% if adminEnv %}
+            <a  href="{{ url_for('ares.adminEnv', report_name=report_name ) }}" style="top:0px" class="btn"><i class="fa fa-wrench" aria-hidden="true">&nbsp;&nbsp;</i>Admin</a>
+          {% endif %}
+
           {% if downloadEnv %}
             <a  href="{{ url_for('ares.downloadReport', report_name=downloadEnv ) }}" style="top:0px" class="btn"><i class="fa fa-cloud-download" aria-hidden="true">&nbsp;&nbsp;Download</i></a>
+          {% endif %}
+
+
+          {% if fileRules %}
+            <a  href="{{ url_for('ares.fileAuthorizations', report_name=report_name ) }}" style="top:0px" class="btn"><i class="fa fa fa-files-o" aria-hidden="true">&nbsp;&nbsp;File Permission</i></a>
           {% endif %}
       </div>
 
@@ -24,7 +35,7 @@ https://www.bootply.com/60886#
 
           {% if htmlStatics %}
           <li class="nav-item dropdown">
-              <a class="btn active" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;height:40px;vertical-align: middle;display:inline-block;text-align:center; padding-top:10px;margin-right:5px">
+              <a class="btn active" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size:14px;color:white;height:40px;vertical-align: middle;display:inline-block;text-align:center; padding-top:10px;margin-right:5px">
                   <i class="fa fa-asterisk" aria-hidden="true"></i>&nbsp;Statics</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlStatics|safe }}</div>
           </li>
@@ -40,7 +51,7 @@ https://www.bootply.com/60886#
 
           {% if htmlArchives %}
           <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">HTML Archives</a>
+              <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size:14px;">HTML Archives</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">{{ htmlArchives|safe }}</div>
           </li>
           {% endif %}
@@ -49,7 +60,7 @@ https://www.bootply.com/60886#
 
         <ul class="navbar-nav">
           <li class="nav-item dropdown" >
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;padding-top:8px">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size:14px;color:white;padding-top:8px">
               Packages
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -80,8 +91,8 @@ https://www.bootply.com/60886#
         </script>
 
         <form class="form-inline my-2 my-md-0">
-          <input class="form-control mr-sm-2" type="text" placeholder="Search">
-          <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px" type="submit">Search</button>
+          <input class="form-control mr-sm-2" type="text" placeholder="Search" style="font-size:12px">
+          <button class="btn btn-outline-success active" style="height: 30px;vertical-align: middle;padding-top:2px;padding-bottom:2px;background-color:#69a370" type="submit">Search</button>
         </form>
       </div>
     </nav>

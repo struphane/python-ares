@@ -62,7 +62,15 @@ JS_IMPORTS = {
   'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.js']},
 
   # Javascript workers
-  'worker': {'req': ['bootstrap', 'jquery'], 'modules': ['ajaxWorker.js']}
+  'worker': {'req': ['bootstrap', 'jquery'], 'modules': ['ajaxWorker.js']},
+
+  # javascript package for the Venn chart
+  'venn': {'req': ['ares', 'd3'], 'modules': ['venn.js']},
+
+  # javascript package for the 3D charts
+  'donut-3d': {'req': [], 'modules': ['d3.donut-3D.js']},
+
+  'vis': {'req': [], 'modules': ['vis.min.js']}
 }
 
 CSS_IMPORTS = {
@@ -82,7 +90,7 @@ CSS_IMPORTS = {
   'bootstrap': {'req': ['font-awesome'], 'modules': ['bootstrap.min.css']},
 
   'font-awesome': {'modules': ['font-awesome.min.css'],
-                   'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css'
+                   #'url': 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css'
                    },
 
   'd3': {'req': ['bootstrap'], 'modules': ['nv.d3.min.css']},
@@ -91,7 +99,9 @@ CSS_IMPORTS = {
 
   'multiselect': {'req': ['jquery', 'bootstrap'], 'modules': ['bootstrap-multiselect.css']},
 
-  'pivot': {'req': [], 'modules': ['pivot.min.css']}
+  'pivot': {'req': [], 'modules': ['pivot.min.css']},
+
+  'vis': {'req': [], 'modules': ['vis.min.css']}
   }
 
 

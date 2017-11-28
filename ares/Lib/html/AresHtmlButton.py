@@ -67,8 +67,8 @@ class Button(AresHtml.Html):
                     $.post("%s", %s, function(data) {
                         var res = JSON.parse(data) ;
                         var data = res.data ;
-                        console.log(data);
                         $.post(data, function(data2) {
+                          var res = JSON.parse(data2);
                           location.reload()
                           });
                         
@@ -99,8 +99,12 @@ class Button(AresHtml.Html):
       self.js('click', jsDef)
 
   def clickWithValid(self, scriptName, attr):
-    """ Click run an Ajax call and print the return message in the ajax service """
+    """ Click run an Ajax call and print the return messa0ge in the ajax service """
     self.click("display(data);", attr, scriptName)
+
+  def clickWithValidAndRefresh(self, scriptName, attr):
+    """ """
+    self.click("display(data);location.reload();", attr, scriptName)
 
   def clickWithValidCloseModal(self, scriptName, modal, attr, subPost=False):
     """ Click run the ajax call, close the modal and returns the message in the ajax service """
@@ -269,14 +273,14 @@ class ButtonSaveTable(AresHtml.Html):
     super(ButtonSaveTable, self).__init__(aresObj, name, cssCls, cssAttr)
     self.awsIcon = awsIcon
 
-  def post(self, evenType, jsDef, dataTable, fileParserClass, fileName, folder):
+  def post(self, evenType, jsDef, dataTable, fileParserClass, fileName, fileCod, folder):
     """ Button Post request """
     url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'_AresReports\', script=\'SrvSaveToFile\') }}''')
     preAjax = AresItem.Item("var %s = %s.html();" % (self.htmlId, self.jqId))
     preAjax.add(0, "%s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing'); " % self.jqId)
     jsDef = '''
               %s
-              $.post("%s", {fileName: '%s', parserModule: '%s', reportName: '%s', datatable: %s, folder: '%s'}, function(data) {
+              $.post("%s", {fileName: %s, parserModule: '%s', reportName: '%s', datatable: %s, static_code: '%s', folder: '%s'}, function(data) {
                   var res = JSON.parse(data) ;
                   var data = res.data ;
                   var status = res.status ;
@@ -284,17 +288,17 @@ class ButtonSaveTable(AresHtml.Html):
                   %s.html(%s);
               } );
             ''' % (preAjax, url,
-                   fileName, fileParserClass, self.aresObj.http['REPORT_NAME'], dataTable.val, folder,
+                   fileName, fileParserClass, self.aresObj.http['REPORT_NAME'], dataTable.val, fileCod, folder,
                    jsDef, self.jqId, self.htmlId)
     self.js(evenType, jsDef, url=url)
 
-  def clickStatic(self, dataTable, fileParserClass, fileName):
+  def clickStatic(self, dataTable, fileParserClass, fileName, fileCod):
     """ Click function to update a file """
-    self.post('click', "display(data);", dataTable, fileParserClass, fileName, 'static')
+    self.post('click', "display(data);", dataTable, fileParserClass, fileName, fileCod, 'static')
 
-  def clickOutputs(self, dataTable, fileParserClass, fileName):
+  def clickOutputs(self, dataTable, fileParserClass, fileName, fileCod):
     """ Click function to update a file """
-    self.post('click', "display(data);", dataTable, fileParserClass, fileName, 'outputs')
+    self.post('click', "display(data);", dataTable, fileParserClass, fileName, fileCod, 'outputs')
 
   def __str__(self):
     """ Return the String representation of HTML button """
