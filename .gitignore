@@ -105,8 +105,12 @@ ENV/
 ### Python template
 # Byte-compiled / optimized / DLL files
 run.py
+<<<<<<< HEAD
 run.py
 user_reports/deploy_test/outputs/test2.txt
 *.db
 *.iml
 *.xml
+=======
+system/sqlite/main_sqlite.db
+>>>>>>> 9d83e9b8aecae4898cd736f29f4c1a85f4c7cb40
