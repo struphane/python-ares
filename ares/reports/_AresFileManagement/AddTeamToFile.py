@@ -41,8 +41,8 @@ def report(aresObj):
   addButton2 = aresObj.button('Add')
   userRow = aresObj.row([input2, addButton2])
 
-  addButton.clickWithValidCloseModal('addFilePermission', addFilePermission, {'team': input, 'type': 'team'})
-  addButton2.clickWithValidCloseModal('addFilePermission', addFilePermission, {'user': input2, 'type': 'user'})
+  addButton.clickWithValidCloseModal('addFilePermission', addFilePermission, {'team': input, 'type': 'team'}, subPost=True)
+  addButton2.clickWithValidCloseModal('addFilePermission', addFilePermission, {'user': input2, 'type': 'user'}, subPost=True)
 
 
   aresObj.addTo(addFilePermission, teamRow)

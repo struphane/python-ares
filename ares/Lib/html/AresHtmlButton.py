@@ -52,7 +52,7 @@ class Button(AresHtml.Html):
 
   def post(self, evenType, scriptName, jsDef, attr, subPost=False):
     """ Button Post request """
-    url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'%s\', script=\'%s\') }}''' % (self.aresObj.http['REPORT_NAME'], scriptName))
+    url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'%s\', script=\'%s\', origin=\'%s\') }}''' % (self.aresObj.http['REPORT_NAME'], scriptName, self.aresObj.http['FILE']))
     data = json.dumps(attr, cls=AresHtml.SetEncoder)
     for stToConv in ['.data().toArray()', '.val()', '.serializeArray()']:
       data = data.replace('%s"' % stToConv, stToConv)
@@ -157,7 +157,7 @@ class ButtonRefresh(AresHtml.Html):
         else:
           pyVars.add("%s='%s'" % (key, val))
     if 'report_name' not in pyVars:
-      pyVars.add("report_name='%s'" % self.aresObj.http['REPORT_NAME'])
+      pyVars.add("report_name='%s', origin='%s'" % (self.aresObj.http['REPORT_NAME'], self.aresObj.http['FILE']))
     if 'script' not in pyVars:
       pyVars.add("script='%s'" % self.ajaxScript)
     if 'file_name' not in pyVars:

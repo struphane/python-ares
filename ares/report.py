@@ -13,6 +13,7 @@ import shutil
 import sqlite3
 import hashlib
 import logging
+import datetime
 from app import User, Team, EnvironmentDesc, DataSource, db
 from functools import wraps
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -1259,6 +1260,32 @@ def createDataSource():
   db.session.add(dataSource)
   db.session.commit()
   return json.dumps('Success'), 200
+
+@report.route('/ares/addFileAuth/<report_name>', methods=['GET', 'POST'])
+def addFileAuth(report_name):
+  db = AresSql.SqliteDB(report_name)
+  recSet = db.select("SELECT file_id FROM file_auth WHERE team_id = %s" % session['TEAM_ID'])
+  fileLst = [rec['file_id'] for rec in recSet]
+  file = request.args['file_id']
+  if file not in fileLst:
+    return "Permission Denied", 401
+
+  tempOwner = request.args.get('temp_owner', '')
+  team_id = request.args.get('team_id', '')
+  stt_dt = request.args.get('stt_dt', datetime.datetime.now().strftime('%Y-%m-%d'))
+  end_dt = request.args.get('end_dt', '3001-01-01')
+
+  if not tempOwner and not team_id:
+    return "Bad Data", 400
+
+  if team_id:
+    db.modify("""INSERT INTO file_auth (file_id, team_id, stt_dt, end_dt) VALUES (%s, %s, '%s', '%s')""" % (file, team_id, stt_dt, end_dt))
+    return "Success", 200
+
+  if tempOwner:
+    db.modify("""INSERT INTO file_auth (file_id, temp_owner, stt_dt, end_dt) VALUES (%s, '%s', '%s', '%s')""" % (file, tempOwner, stt_dt, end_dt))
+    return "Success", 200
+
 
 @report.route('/ares/create_team', methods=['GET', 'POST'])
 def createTeam():
