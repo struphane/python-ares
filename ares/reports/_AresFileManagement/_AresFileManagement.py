@@ -58,6 +58,20 @@ def report(aresObj):
     aresObj.title('File Permissions for: %s' % aresObj.http['TEAM'])
     aresObj.newline()
     aresObj.newline()
+    team_modal = aresObj.modal('  Create new team', btnCls=['fa fa-plus fa-5x btn btn-link'])
+    t_name = aresObj.input('Team Name')
+    t_email = aresObj.input('Email Address')
+    modal_row = aresObj.row([t_name, t_email])
+    modal_submit = aresObj.button('Add')
+    modal_submit.clickWithValidCloseModal('file_createAndAddTeam', team_modal,
+                                          {'team_name': t_name, 'team_email': t_email},
+                                          subPost=True)
+
+    aresObj.addTo(team_modal, aresObj.newline())
+    aresObj.addTo(team_modal, modal_row)
+    aresObj.addTo(team_modal, modal_submit)
+    aresObj.newline()
+    aresObj.newline()
     fileDetails = getFilesPermissions(sqlCon, fileLst)
     for file, details in fileDetails.items():
       nbFiles =  len(details)

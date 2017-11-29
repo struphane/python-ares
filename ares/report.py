@@ -1304,11 +1304,12 @@ def createTeam():
       db.session.commit()
       newTeam = Team.query.filter_by(team_name=request.args['team']).first()
     team_id = newTeam.team_id
+    role = request.args.get('role', 'user')
     dbEnv.modify("""INSERT INTO team_def (team_id, team_name, role) VALUES (%s, '%s', '%s');
                  INSERT INTO env_auth (env_id, team_id)
                  SELECT env_def.env_id, %s
                  FROM env_def
-                 WHERE env_def.env_name = '%s' ;""" % (team_id, request.args['team'], request.args['role'], team_id, request.args['report_name']))
+                 WHERE env_def.env_name = '%s' ;""" % (team_id, request.args['team'], role, team_id, request.args['report_name']))
     return json.dumps('Success'), 200
 
   return json.dumps('Forbidden', 403)
