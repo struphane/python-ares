@@ -71,7 +71,7 @@ class Button(AresHtml.Html):
                           var res = JSON.parse(data2);
                           location.reload()
                           });
-                        
+
                         var status = res.status ;
                         %s
                         %s.html(%s);
@@ -89,6 +89,11 @@ class Button(AresHtml.Html):
                 } );
               ''' % (preAjax, url, data, jsDef, self.jqId, self.htmlId)
     self.js(evenType, jsDef, url=url)
+
+  def loadTo(self, htmlObj, srcContainer):
+    """
+    """
+    self.js('click', "%s.html('%s'); %s" % (srcContainer.jqId, str(htmlObj).replace("\n", ""), htmlObj.jsUpdate()) )
 
   def click(self, jsDef, attr=None, scriptName=None, subPost=False):
     """ Implement the click event on the button object """
