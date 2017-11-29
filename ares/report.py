@@ -547,7 +547,7 @@ def ajaxCall(report_name, script, origin):
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
-  except:
+  except Exception as e:
     logging.debug(e)
     content = traceback.format_exc()
     error = True
@@ -1262,30 +1262,37 @@ def createDataSource():
   db.session.commit()
   return json.dumps('Success'), 200
 
-@report.route('/ares/addFileAuth/<report_name>', methods=['GET', 'POST'])
-def addFileAuth(report_name):
+@report.route('/ares/addFileAuth', methods=['GET', 'POST'])
+def addFileAuth():
+  print(request.args)
+  report_name = request.args['report_name']
   db = AresSql.SqliteDB(report_name)
   recSet = db.select("SELECT file_id FROM file_auth WHERE team_id = %s" % session['TEAM_ID'])
   fileLst = [rec['file_id'] for rec in recSet]
+  print(fileLst)
   file = request.args['file_id']
-  if file not in fileLst:
+  if int(file) not in fileLst:
     return "Permission Denied", 401
-  team_id = request.args.get('team_id', '')
-  team_def = Team.query.filter_by(team_name=request.args.get('team_id', '')).first()
-  if not team_def:
-    return "Team does not exist - create it first", 400
 
+  team_email = request.args.get('team', '')
   tempOwner = request.args.get('temp_owner', '')
+  stt_dt = datetime.datetime.now().strftime('%Y-%m-%d') if request.args.get('stt_dt', '') == '' else  request.args['stt_dt']
+  end_dt = '3001-01-01' if request.args.get('end_dt', '') == '' else request.args['end_dt']
 
-  stt_dt = request.args.get('stt_dt', datetime.datetime.now().strftime('%Y-%m-%d'))
-  end_dt = request.args.get('end_dt', '3001-01-01')
 
-  if not tempOwner and not team_id:
+  if not tempOwner and not team_email:
+    print("Bad Data")
     return "Bad Data", 400
 
-  if team_id:
-    db.modify("""INSERT INTO file_auth (file_id, team_id, stt_dt, end_dt) VALUES (%s, %s, '%s', '%s')""" % (file, team_id, stt_dt, end_dt))
-    return "Success", 200
+  if team_email:
+    team_def = Team.query.filter_by(team_email=team_email).first()
+    if not team_def:
+      print("Team does not exist")
+      return "Team does not exist - create it first", 400
+
+    if team_def.team_id:
+      db.modify("""INSERT INTO file_auth (file_id, team_id, stt_dt, end_dt) VALUES (%s, %s, '%s', '%s')""" % (file, team_def.team_id, stt_dt, end_dt))
+      return "Success", 200
 
   if tempOwner:
     db.modify("""INSERT INTO file_auth (file_id, temp_owner, stt_dt, end_dt) VALUES (%s, '%s', '%s', '%s')""" % (file, tempOwner, stt_dt, end_dt))
