@@ -497,7 +497,8 @@ def run_report(report_name, script_name, user_id):
                          htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name, adminEnv=adminEnv, fileRules=fileRules)
 
 
-@report.route("/ajax/<report_name>/<script>/<origin>", defaults={'origin': None}, methods = ['GET', 'POST'])
+@report.route("/ajax/<report_name>/<script>", defaults={'origin': None}, methods = ['GET', 'POST'])
+@report.route("/ajax/<report_name>/<script>/<origin>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script, origin):
   """ Generic Ajax call """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
@@ -798,7 +799,7 @@ def ajaxCreate():
     queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': reportObj.http['REPORT_NAME']}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
-    env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM'].replace('#TEMP', ''))
+    env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM_ID'])
     db.add(env_dsc)
     db.commit()
     queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'team_name': session['TEAM'], 'username': email_address}
@@ -1269,9 +1270,13 @@ def addFileAuth(report_name):
   file = request.args['file_id']
   if file not in fileLst:
     return "Permission Denied", 401
+  team_id = request.args.get('team_id', '')
+  team_def = Team.query.filter_by(team_name=request.args.get('team_id', '')).first()
+  if not team_def:
+    return "Team does not exist - create it first", 400
 
   tempOwner = request.args.get('temp_owner', '')
-  team_id = request.args.get('team_id', '')
+
   stt_dt = request.args.get('stt_dt', datetime.datetime.now().strftime('%Y-%m-%d'))
   end_dt = request.args.get('end_dt', '3001-01-01')
 

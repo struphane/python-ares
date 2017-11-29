@@ -41,9 +41,9 @@ class User(db.Model, UserMixin):
   datasources = db.relationship('DataSource')
   environments = db.relationship('EnvironmentDesc')
 
-  def __init__(self, email, team, password):
+  def __init__(self, email, team_id, password):
     self.email = email
-    self.team_name = team
+    self.team_id = team_id
     self.password = hashlib.sha256(bytes(password.encode('utf-8'))).hexdigest()
 
   def __repr__(self):
@@ -115,12 +115,12 @@ class EnvironmentDesc(db.Model):
 
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   env_name = db.Column(db.String(20), nullable=False)
-  team_name = db.Column(db.String(120), db.ForeignKey('user.team_name'), nullable=False)
+  team_id = db.Column(db.String(120), db.ForeignKey('user.team_id'), nullable=False)
 
-  def __init__(self, env_name, team_name):
+  def __init__(self, env_name, team_id):
     """ """
     self.env_name = env_name
-    self.team_name = team_name
+    self.team_name = team_id
 
 
 def init_db():

@@ -27,6 +27,5 @@ def call(aresObj):
       team_map[team_email] = (team_id, team_name)
 
     current_team = aresObj.http['team[]']
-    print(ADD_TEAM % (team_map[current_team][0], team_map[current_team][1], map_role[aresObj.http['role']], team_map[current_team][0], aresObj.http['REPORT_NAME']))
     db.modify(ADD_TEAM % (team_map[current_team][0], team_map[current_team][1], map_role[aresObj.http['role']], team_map[current_team][0], aresObj.http['REPORT_NAME']))
   return "Addition completed"
