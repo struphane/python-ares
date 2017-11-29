@@ -24,6 +24,6 @@ class Newline(AresHtml.Html):
 
   def __str__(self):
     """ Return the String representation of a new line tag """
-    return '<br />'
+    return "".join(['<br />' for i in range(self.vals)])
 
 

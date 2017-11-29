@@ -269,7 +269,7 @@ class Report(object):
   def wiki(self, dataSourceName, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Wiki'](self, dataSourceName, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   #
-  def newline(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Newline'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def newline(self, val=1, cssCls=None, cssAttr=None): return self.add(aresFactory['Newline'](self, val, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def hr(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Hr'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Select Section
