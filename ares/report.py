@@ -13,6 +13,7 @@ import shutil
 import sqlite3
 import hashlib
 import logging
+import datetime
 from app import User, Team, EnvironmentDesc, DataSource, db
 from functools import wraps
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -36,6 +37,7 @@ from ares.Lib import Ares
 from ares.Lib import AresImports
 from ares.Lib import AresExceptions
 from ares.Lib import AresSql
+import logging
 
 try:
   from Libs import AresUserAuthorization
@@ -445,6 +447,7 @@ def run_report(report_name, script_name, user_id):
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   except Exception as e:
     error = True
+    logging.debug(e)
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
@@ -494,8 +497,9 @@ def run_report(report_name, script_name, user_id):
                          htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name, adminEnv=adminEnv, fileRules=fileRules)
 
 
-@report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
-def ajaxCall(report_name, script):
+@report.route("/ajax/<report_name>/<script>", defaults={'origin': None}, methods = ['GET', 'POST'])
+@report.route("/ajax/<report_name>/<script>/<origin>", methods = ['GET', 'POST'])
+def ajaxCall(report_name, script, origin):
   """ Generic Ajax call """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   onload, js, error = '', '', False
@@ -507,6 +511,7 @@ def ajaxCall(report_name, script):
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_FOLDER, 'reports', report_name)
       sys.path.append(userDirectory)
       userDirectory = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION)
+      sys.path.append(userDirectory)
       if script == 'SrvSaveToFile' and config.ARES_MODE != 'local':
         queryParams = {'report_name': reportObj.http['reportName'], 'file': reportObj.http['fileName'], 'type': 'file', 'team_name': session['TEAM'], 'username': current_user.email}
         logEventDeployment(os.path.join(userDirectory, reportObj.http['reportName']), queryParams)
@@ -518,29 +523,32 @@ def ajaxCall(report_name, script):
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
     report = __import__(report_name)
-    ALIAS, DISK_NAME = 0, 1
-    for fileConfig in reportObj.fileMap:
-      if fileConfig.get('folder') == 'data':
-        if file[ALIAS] in reportObj.fileMap:
-          raise AresExceptions('You cannot use the same code for a static and an output')
+    if origin:
+      origin = __import__(origin)
+      ALIAS, DISK_NAME = 0, 1
+      for fileConfig in getattr(origin, 'FILE_CONFIGS', []):
+        if fileConfig.get('folder') == 'data':
+          # if fileConfig.get('filename'[ALIAS] in reportObj.fileMap:
+          #   raise AresExceptions('You cannot use the same code for a static and an output')
 
-        queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
-        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
-        for file in files:
-          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-          # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
-      elif fileConfig.get('folder') == 'static':
-        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename'], 'username': current_user.email}
-        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
-        for file in files:
-          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-          reportObj.files[regex.sub('', file[DISK_NAME].strip())] = reportObj.files[file[DISK_NAME]]
+          queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
+          files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
+          for file in files:
+            reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+            # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
+        elif fileConfig.get('folder') == 'static':
+          queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename'], 'username': current_user.email}
+          files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
+          for file in files:
+            reportObj.files[file[ALIAS]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+            reportObj.files[regex.sub('', file[ALIAS].strip())] = reportObj.files[file[ALIAS]]
 
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
-  except:
+  except Exception as e:
+    logging.debug(e)
     content = traceback.format_exc()
     error = True
   finally:
@@ -588,7 +596,7 @@ def userAccount():
     sys.path.append(systemDirectory)
 
   userData = User.query.filter_by(email=current_user.email).first()
-
+  team_def = Team.query.filer_by(team_id=userData.team_id).first()
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
   reportObj.http['REPORT_NAME'] = script_name
@@ -602,7 +610,7 @@ def userAccount():
                                                       session['PWD'], source.salt)})
   reportObj.http['USERDATA'] = {'envs': userData.environments,
                                 'sources': sourceRec,
-                                'team': userData.team_name
+                                'team': team_def.team_name
                                 }
   reportObj.http['USERNAME'] = current_user.email
   mod.report(reportObj)
@@ -791,7 +799,7 @@ def ajaxCreate():
     queryParams = {'team_name': session['TEAM'].replace('#TEMP', ''), 'env_name': reportObj.http['REPORT_NAME']}
     firtsUsrRights = open(os.path.join(SQL_CONFIG, 'create_env.sql')).read()
     executeScriptQuery(os.path.join(dbPath, 'admin.db'), firtsUsrRights, params=queryParams)
-    env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM'].replace('#TEMP', ''))
+    env_dsc = EnvironmentDesc(reportObj.http['REPORT_NAME'], session['TEAM_ID'])
     db.add(env_dsc)
     db.commit()
     queryParams = {'report_name': reportObj.http['REPORT_NAME'], 'file': 'environment', 'type': 'environment', 'team_name': session['TEAM'], 'username': email_address}
@@ -1207,12 +1215,14 @@ def downloadPackage(name):
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % name, as_attachment=True)
 
-@report.route("/download/<report_name>/data/<file_name>", methods = ['GET'])
-def downloadOutputs(report_name, file_name):
+@report.route("/download/<report_name>/data/<file_name>/<file_location>", methods = ['GET'])
+@report.route("/download/<report_name>/data/<file_name>", defaults={'file_location': 'data'}, methods = ['GET'])
+@noCache
+def downloadOutputs(report_name, file_name, file_location):
   """ Download the up to date Ares package """
-  aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'data', file_name)
+  aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file_location, file_name)
   #no need to check for error the normal raise should be fine
-  return send_file(aresoutputFile)
+  return send_file(aresoutputFile, as_attachment=True, mimetype='text/plain')
 
 @report.route("/ares/version", methods = ['GET', 'POST'])
 def getAresFilesVersions():
@@ -1254,6 +1264,43 @@ def createDataSource():
   db.session.commit()
   return json.dumps('Success'), 200
 
+@report.route('/ares/addFileAuth', methods=['GET', 'POST'])
+def addFileAuth():
+  print(request.args)
+  report_name = request.args['report_name']
+  db = AresSql.SqliteDB(report_name)
+  recSet = db.select("SELECT file_id FROM file_auth WHERE team_id = %s" % session['TEAM_ID'])
+  fileLst = [rec['file_id'] for rec in recSet]
+  print(fileLst)
+  file = request.args['file_id']
+  if int(file) not in fileLst:
+    return "Permission Denied", 401
+
+  team_email = request.args.get('team', '')
+  tempOwner = request.args.get('temp_owner', '')
+  stt_dt = datetime.datetime.now().strftime('%Y-%m-%d') if request.args.get('stt_dt', '') == '' else  request.args['stt_dt']
+  end_dt = '3001-01-01' if request.args.get('end_dt', '') == '' else request.args['end_dt']
+
+
+  if not tempOwner and not team_email:
+    print("Bad Data")
+    return "Bad Data", 400
+
+  if team_email:
+    team_def = Team.query.filter_by(team_email=team_email).first()
+    if not team_def:
+      print("Team does not exist")
+      return "Team does not exist - create it first", 400
+
+    if team_def.team_id:
+      db.modify("""INSERT INTO file_auth (file_id, team_id, stt_dt, end_dt) VALUES (%s, %s, '%s', '%s')""" % (file, team_def.team_id, stt_dt, end_dt))
+      return "Success", 200
+
+  if tempOwner:
+    db.modify("""INSERT INTO file_auth (file_id, temp_owner, stt_dt, end_dt) VALUES (%s, '%s', '%s', '%s')""" % (file, tempOwner, stt_dt, end_dt))
+    return "Success", 200
+
+
 @report.route('/ares/create_team', methods=['GET', 'POST'])
 def createTeam():
   """ """
@@ -1266,11 +1313,12 @@ def createTeam():
       db.session.commit()
       newTeam = Team.query.filter_by(team_name=request.args['team']).first()
     team_id = newTeam.team_id
+    role = request.args.get('role', 'user')
     dbEnv.modify("""INSERT INTO team_def (team_id, team_name, role) VALUES (%s, '%s', '%s');
                  INSERT INTO env_auth (env_id, team_id)
                  SELECT env_def.env_id, %s
                  FROM env_def
-                 WHERE env_def.env_name = '%s' ;""" % (team_id, request.args['team'], request.args['role'], team_id, request.args['report_name']))
+                 WHERE env_def.env_name = '%s' ;""" % (team_id, request.args['team'], role, team_id, request.args['report_name']))
     return json.dumps('Success'), 200
 
   return json.dumps('Forbidden', 403)
@@ -1293,7 +1341,8 @@ def aresRegistration():
     if not Team.query.filter_by(team_name=data['team']).first():
       team = Team(data['team'], data['team_email'])
       db.session.add(team)
-    user = User(data['email_addr'], data['team'], data['password'])
+    team_def = Team.query.filter_by(team_name=data['team']).first()
+    user = User(data['email_addr'], team_def.team_id, data['password'])
     db.session.add(user)
     db.session.commit()
     return redirect(url_for('ares.aresLogin', next=url_for('ares.run_report')))
@@ -1313,12 +1362,11 @@ def aresLogin():
     user = User.query.filter_by(email=data['email_addr']).first()
     next = request.args.get('next')
     if user:
-      team_def = Team.query.filter_by(team_name=user.team_name).first()
+      team_def = Team.query.filter_by(team_id=user.team_id).first()
       if user.password == hashlib.sha256(bytes(data['password'].encode('utf-8'))).hexdigest():
         suffix = '' if user.team_confirm == 'Y' else '#TEMP'
-        session['TEAM'] = user.team_name + suffix
-        session['TEAM_ID'] = team_def.team_id
-        print(session['TEAM_ID'])
+        session['TEAM'] = team_def.team_name + suffix
+        session['TEAM_ID'] = user.team_id
         session['PWD'] = data['password']
         for source in user.datasources:
           session[source.source_name.upper()] = (source.source_username, AresUserAuthorization.decrypt(source.source_pwd, session['PWD'], source.salt))
