@@ -85,8 +85,7 @@ def report(aresObj):
   surface.hidden = True
   surface.setDataSet(recordSet)
 
-  venn = aresObj.venn(recordSet, [], mockData=True)
-  venn.hidden = True
+  venn = aresObj.venn(recordSet, [], mockData=True, inReport=False)
 
   div = aresObj.div()
   button = aresObj.button('Click')

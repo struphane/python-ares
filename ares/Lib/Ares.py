@@ -205,10 +205,11 @@ class Report(object):
     """ Return the HTML object """
     return self.htmlItems[itemId]
 
-  def add(self, htmlObj, fncName):
+  def add(self, htmlObj, fncName, inReport=True):
     """ Register the HTML component to the Ares object """
-    self.htmlItems[id(htmlObj)] = htmlObj
-    self.content.append(id(htmlObj))
+    if inReport:
+      self.htmlItems[id(htmlObj)] = htmlObj
+      self.content.append(id(htmlObj))
     return htmlObj
 
   def suppRec(self, recordSet):
@@ -361,7 +362,7 @@ class Report(object):
   def boxplot(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3PlotBox'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def candlestickbar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3CandlestickBarChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
   def spider(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['D3SpiderChart'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
-  def venn(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False): return self.add(aresFactory['NvD3Venn'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name)
+  def venn(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Venn'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
 
   # 3D charts
   def pie3D(self, values): return self.add(aresFactory['Donut3D'](self, values), sys._getframe().f_code.co_name)

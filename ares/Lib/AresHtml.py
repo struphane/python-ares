@@ -184,6 +184,10 @@ class Html(object):
     """ Add a Javascript Event to an HTML object """
     self.aresObj.jsOnLoadFnc.add(AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, url=url))
 
+  def jsUpdate(self):
+    """  Return some special Javascript code to build the HTML object """
+    return ''
+
   def jsFromFile(self, evenType, fileName, variables=None):
     """ Add a Javascript even by loading a file """
     jsFile = open(os.path.join(self.aresObj.http["DIRECTORY"], 'js', fileName))
