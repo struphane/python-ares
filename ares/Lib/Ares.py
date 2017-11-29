@@ -383,6 +383,7 @@ class Report(object):
   def externalLink(self, value, url, cssCls=None, cssAttr=None): return self.add(aresFactory['ExternalLink'](self, self.supp(value), url, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def anchor_download(self, value, **kwargs): return self.add(aresFactory['Download'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
   def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['InternalLink'](self, self.supp(linkValue), script, attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def downloadData(self, value, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DownloadData'](self, value, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Designer objects
   def aresInput(self, cssCls=None, cssAttr=None): return self.add(aresFactory['TextInput'](self, 'Put your text here', cssCls, cssAttr), sys._getframe().f_code.co_name)
