@@ -65,12 +65,12 @@ class DataTable(AresHtml.Html):
     self.pivotLevel = 1
     if self.sortBy is not None:
       if self.sortBy[1].lower() == 'desc':
-        sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]))
+        sortedItems = sorted(recordSet, key=operator.itemgetter(self.sortBy[0]))
       else:
-        sortedItems = sorted(vals, key=operator.itemgetter(self.sortBy[0]), reverse=True)
+        sortedItems = sorted(recordSet, key=operator.itemgetter(self.sortBy[0]), reverse=True)
       if self.sortBy[2] not in ['', None]:
         sortedItems = sortedItems[:self.sortBy[2]]
-      vals = sortedItems
+      recordSet = sortedItems
     self.hiddenCols = []
     self.cssCls = list(self.__cssCls)
     self.theadCssCls = ['thead-inverse']
@@ -904,7 +904,7 @@ class DataTable(AresHtml.Html):
 
   def order(self, colIndex, typeOrd):
     """ Set the table order according to a column in the table """
-    self.option("order", json.dumps([[colIndex, typeOrd]]))
+    self.option("order", json.dumps([[colIndex, {'desc': 'asc', 'asc': 'desc'}.get(typeOrd, typeOrd)]]))
 
 
 
