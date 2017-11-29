@@ -75,6 +75,25 @@ class Download(AresHtml.Html):
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
 
 
+class DownloadData(AresHtml.Html):
+  """
+  """
+  alias, cssCls = 'anchorFiles', ['btn', 'btn-success']
+  references = []
+  reqCss = ['bootstrap', 'font-awesome']
+  reqJs = []
+  file_location = 'data'
+
+  def __init__(self, aresObj, vals, fileName, cssCls=None, cssAttr=None):
+    super(DownloadData, self).__init__(aresObj, vals,  cssCls, cssAttr)
+    self.fileName = fileName
+
+  def __str__(self):
+    """ The HTLM object representation """
+    url = render_template_string('''{{ url_for(\'ares.downloadOutputs\', report_name=\'%s\', file_name=\'%s\', file_location=\'%s\') }}''' % (self.aresObj.reportName, self.fileName, self.file_location))
+    return '<a href="%s" %s>%s</a>' % (url, self.strAttr(), self.vals)
+
+
 class InternalLink(AresHtml.Html):
   """
   Class to link a script to another sub script in a report

@@ -19,16 +19,11 @@ This should work with both Python 2.7 and Python 3.x
 
 import sys
 import os
-import logging
 
 from app import app, init_db
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(BASE_DIR, 'Libs'))
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 app.debug = True
 init_db()

@@ -76,6 +76,7 @@ class Html(object):
   incIndent = 0
   reqJs, reqCss = ['jquery'], ['jquery'] # Jquery is already needed
   references = []
+  hidden = False
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None):
     """ Create an python HTML object """
@@ -277,6 +278,8 @@ class Html(object):
 
   def html(self):
     """ Return the onload, the HTML object and the javascript events """
+    if self.hidden == True:
+      self.addAttr('css', {'display': 'none'})
     strObj = str(self) # The string representation should be the first one to be triggered
     self.graph()
     return self.onLoad(), strObj, self.jsEvents()

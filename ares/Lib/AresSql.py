@@ -26,12 +26,7 @@ class SqliteDB(object):
     result = self.cursor.execute(query)
     header = [col[0] for col in self.cursor.description]
     for res in result:
-      newRes = list(res)
-      if None in newRes:
-        for i, rec in enumerate(newRes):
-          if rec is None:
-            newRes[i] = ''
-      yield dict(zip(header, list(newRes)))
+      yield dict(zip(header, list(res)))
 
   def close(self):
     """ """

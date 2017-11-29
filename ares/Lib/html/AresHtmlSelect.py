@@ -116,7 +116,7 @@ class SelectDropDownAjax(SelectDropDown):
 
   def click(self, htmlObjects):
     """ Call the ajax service and update the corresponding objects on the page """
-    url = render_template_string("{{ url_for( 'ares.ajaxCall', report_name='%s', script='%s', origin=\'%s\') }}" % (self.aresObj.http["REPORT_NAME"], self.script, self.aresObj.http['FILE']))
+    url = render_template_string("{{ url_for( 'ares.ajaxCall', report_name='%s', script='%s' ) }}" % (self.aresObj.http["REPORT_NAME"], self.script))
     self.js('click', '''$.ajax({url: '%s',
           success: function(result){var resultObj = JSON.parse(result);$('#%s').html(resultObj['data']); }});''' % (url, htmlObjects[0].htmlId))
 

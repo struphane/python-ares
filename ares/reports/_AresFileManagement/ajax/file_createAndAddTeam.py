@@ -1,5 +1,0 @@
-from ares.Lib import AresSql
-from flask import url_for
-
-def call(aresObj):
-  return url_for('ares.createTeam', team=aresObj.http['team_name'], team_email=aresObj.http['team_email'], report_name=aresObj.http['REPORT_NAME'])

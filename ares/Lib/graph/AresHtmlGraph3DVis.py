@@ -27,7 +27,7 @@ class Vis3DSurfaceChart(AresHtml.Html):
   def __str__(self):
     """Standard function to return the html representation of a 3d surface chart"""
     return '''
-              <div id="visualization_%s"></div>
+              <div id="visualization_%s" %s></div>
               <script type="text/javascript">
                   // Create and populate a data table.
                   var data = new vis.DataSet();
@@ -60,5 +60,5 @@ class Vis3DSurfaceChart(AresHtml.Html):
               </script>
 
 
-            ''' % (self.htmlId, self.recordSet, self.width, self.height, self.htmlId)
+            ''' % (self.htmlId, self.strAttr(), self.recordSet, self.width, self.height, self.htmlId)
 

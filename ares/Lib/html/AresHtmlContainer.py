@@ -30,6 +30,10 @@ class Div(AresHtml.Html):
     """ Return the Javascript Value """
     return '$("#%s").html()' % self.htmlId
 
+  def replace(self, htmlObj):
+    """ To add a button to hide th """
+
+
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.div("MyDiv")

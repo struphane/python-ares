@@ -92,8 +92,8 @@ class Radio(AresHtml.Html):
 
   def post(self, evenType, scriptName, jsDef, attr):
     """ Button Post request """
-    url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'%s\', script=\'%s\', origin=\'%s\') }}''' % (
-    self.aresObj.http['REPORT_NAME'], scriptName, self.aresObj.http['FILE']))
+    url = render_template_string('''{{ url_for(\'ares.ajaxCall\', report_name=\'%s\', script=\'%s\') }}''' % (
+    self.aresObj.http['REPORT_NAME'], scriptName))
     data = json.dumps(attr, cls=AresHtml.SetEncoder)
     for stToConv in ['.data().toArray()', '.val()', '.serializeArray()']:
       data = data.replace('%s"' % stToConv, stToConv)
