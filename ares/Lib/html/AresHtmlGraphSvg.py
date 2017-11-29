@@ -121,7 +121,10 @@ class Svg(AresHtml.Html):
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
     self.htmlContent.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
-    return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+    if self.headerBox:
+      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+
+    return "\n".join(self.htmlContent)
 
   def setKeys(self, keys, selected=None):
     """ Set a default key for the graph """
@@ -253,7 +256,10 @@ class MultiSvg(Svg):
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
     self.htmlContent.append('<div %s style="height:%spx;"><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height, self.height))
-    return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+    if self.headerBox:
+      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+
+    return "\n".join(self.htmlContent)
 
 
   def graph(self):

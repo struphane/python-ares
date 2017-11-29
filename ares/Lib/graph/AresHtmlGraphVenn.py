@@ -52,10 +52,10 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 2 else {}, internalRef='key_%s' % self.htmlId)
+    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'}, internalRef='key_%s' % self.htmlId)
     categories.select(self.selectedChartKey)
     self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, internalRef='val_%s' % self.htmlId)
+    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'}, internalRef='val_%s' % self.htmlId)
     values.select(self.selectedChartVal)
     self.dynValSelection = values.val # The javascript representation of the radio
 
@@ -65,7 +65,10 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
     self.htmlContent.append(str(categories))
     self.htmlContent.append(str(values))
     self.htmlContent.append('<div %s></div>' % self.strAttr())
-    return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+    if self.headerBox:
+      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+
+    return "\n".join(self.htmlContent)
 
   def jsUpdate(self):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
