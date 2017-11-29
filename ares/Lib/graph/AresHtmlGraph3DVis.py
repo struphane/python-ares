@@ -33,11 +33,9 @@ class Vis3DSurfaceChart(AresHtml.Html):
                   var data = new vis.DataSet();
                   // create some nice looking data with sin/cos
                   var aresDataSet = %s;
-                  var arrayLength = aresDataSet.length; 
-                  console.log(arrayLength);
+                  var arrayLength = aresDataSet.length;
 
                   for (var i =0; i < arrayLength; i++){
-                    console.log(aresDataSet[i]);
                     data.add(aresDataSet[i]);
                       }
                   

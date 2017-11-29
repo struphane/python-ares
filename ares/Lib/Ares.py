@@ -312,7 +312,7 @@ class Report(object):
   def generatePdf(self, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['GeneratePdf'](self, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Containers section
-  def div(self, value, cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def div(self, value='', cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
