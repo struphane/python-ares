@@ -131,7 +131,7 @@ class Html(object):
   # CSS Classes management
   def addClass(self, cssCls):
     """ Change the CSS Style of the HTML object """
-    self.attr['class'].add(cssCls)
+    self.attr['class'].append(cssCls)
 
   def getClass(self):
     """ Return as a string the list of classes """
