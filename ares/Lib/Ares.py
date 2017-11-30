@@ -374,10 +374,10 @@ class Report(object):
   def deployFiles(self, cssCls=None, cssAttr=None): return self.add(aresFactory['FileDeployer'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Anchor section): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def input(self, value='', cssCls=None): return self.add(aresFactory['InputText'](self, value, cssCls), sys._getframe().f_code.co_name)
-  def pwd(self, value='', cssCls=None): return self.add(aresFactory['InputPass'](self, value, cssCls), sys._getframe().f_code.co_name)
-  def inputInt(self, value='', cssCls=None): return self.add(aresFactory['InputInt'](self, value, cssCls), sys._getframe().f_code.co_name)
-  def inputRange(self, value='', cssCls=None): return self.add(aresFactory['InputRange'](self, value, cssCls), sys._getframe().f_code.co_name)
+  def input(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputText'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
+  def pwd(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputPass'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
+  def inputInt(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputInt'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
+  def inputRange(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputRange'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
 
   # Anchor links
   def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)

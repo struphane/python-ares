@@ -22,13 +22,13 @@ class InputText(AresHtml.Html):
   inputType = "text"
   __css = {'width': '100%', 'height': '32px'}
 
+  def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, dflt=''):
+    super(InputText, self).__init__(aresObj, vals,  cssCls, cssAttr)
+    self.value = dflt
+
   def autocomplete(self, values):
     """ Fill the auto completion box with a data source """
     self.js('autocomplete', 'source: %s' % values)
-
-  def addVal(self, dflt):
-    """ Add a default value to this object """
-    self.attr['value'] = dflt
 
   @property
   def val(self):
@@ -38,6 +38,7 @@ class InputText(AresHtml.Html):
   def __str__(self):
     """ Return the String representation of a HTML Input object """
     self.attr['type'] = self.inputType
+    self.attr['value'] = self.value
     item = AresItem.Item('<div class="form-group">', self.incIndent)
     item.add(1, '<label for="%s">%s:</label>' % (self.vals.replace(" ", "").lower(), self.vals))
     item.add(2, '<input %s>' %  self.strAttr())

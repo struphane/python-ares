@@ -30,6 +30,7 @@ class Modal(AresHtml.Html):
   def addVal(self, htmlObj):
     """ Add an HTML object to the modal """
     self.vals.append(htmlObj)
+    return htmlObj
 
   def __str__(self):
     """ Return the String representation of a HTML Modal Object """
@@ -54,6 +55,11 @@ class Modal(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
+  def input(self, label, dflt='', cssCls=None):
+    return self.addVal(self.aresObj.input(label, cssCls=cssCls, dflt=dflt, inReport=False))
+
+  def inputInt(self, label, dflt='', cssCls=None):
+    return self.addVal(self.aresObj.inputInt(label, cssCls=cssCls, dflt=dflt, inReport=False))
 
 
 class FixedModal(AresHtml.Html):
@@ -103,3 +109,5 @@ class DialogValid(AresHtml.Html):
   def toJs(self, parent):
     """ Convert to a Js expression """
     return ".append('%s')" % (parent, self)
+
+
