@@ -33,7 +33,9 @@ def localRuns(scriptName, aresObject):
   sys.path.append(os.path.join(aresObject.http['DIRECTORY'], 'utils'))
 
   mod = __import__(scriptName)
-
+  if hasattr(mod, 'HTTP_PARAMS'):
+    for param in getattr(mod, 'HTTP_PARAMS'):
+      mod.http[param['code']] = param['dflt']
   extFiles = dict([(extFile['filename'], extFile) for extFile in getattr(mod, 'FILE_CONFIGS', {})])
   for f in ['static', 'data']:
     fileDirectory = os.path.join(directory, reportName, f)
