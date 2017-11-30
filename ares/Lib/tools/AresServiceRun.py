@@ -40,8 +40,11 @@ def localRuns(scriptName, aresObject):
     if os.path.isdir(fileDirectory):
       for file in os.listdir(fileDirectory):
         if file in extFiles:
-          inFile = open(os.path.join(fileDirectory, file))
-          aresObject.files[file] = extFiles[file]['parser'](inFile)
+          if extFiles[file].get('type') == 'pandas':
+            aresObject.files[file] = r"%s\%s" % (fileDirectory, file)
+          else:
+            inFile = open(os.path.join(fileDirectory, file))
+            aresObject.files[file] = extFiles[file]['parser'](inFile)
   # Those two lines are just there to test the json conversion on the server side
   stringConversion = json.dumps(mod.call(aresObject))
   data = json.loads(stringConversion)
