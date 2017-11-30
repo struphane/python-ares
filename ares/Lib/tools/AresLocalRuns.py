@@ -45,7 +45,7 @@ def getReport(results, directory, folder, reports, scriptPath):
               for file in os.listdir(fileDirectory):
                 if file in extFiles:
                   if extFiles[file].get('type') == 'pandas':
-                    results[reportModule.__name__].files[file] = r"%s\%s" % (fileDirectory, file)
+                    results[reportModule.__name__].files[file] = os.path.join(fileDirectory, file)
                   else:
                     inFile = open(os.path.join(fileDirectory, file))
                     results[reportModule.__name__].files[file] = extFiles[file]['parser'](inFile)

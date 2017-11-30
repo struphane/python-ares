@@ -534,14 +534,20 @@ def ajaxCall(report_name, script, origin):
           queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
           files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
           for file in files:
-            reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+            if fileConfig.get('type') == 'pandas':
+              reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
+            else:
+              reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
             # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
         elif fileConfig.get('folder') == 'static':
           queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename'], 'username': current_user.email}
           files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
           for file in files:
-            reportObj.files[file[ALIAS]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-            reportObj.files[regex.sub('', file[ALIAS].strip())] = reportObj.files[file[ALIAS]]
+            if fileConfig.get('type') == 'pandas':
+              reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
+            else:
+              reportObj.files[file[ALIAS]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+              reportObj.files[regex.sub('', file[ALIAS].strip())] = reportObj.files[file[ALIAS]]
 
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)

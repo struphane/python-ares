@@ -41,7 +41,7 @@ def localRuns(scriptName, aresObject):
       for file in os.listdir(fileDirectory):
         if file in extFiles:
           if extFiles[file].get('type') == 'pandas':
-            aresObject.files[file] = r"%s\%s" % (fileDirectory, file)
+            aresObject.files[file] = os.path.join(fileDirectory, file)
           else:
             inFile = open(os.path.join(fileDirectory, file))
             aresObject.files[file] = extFiles[file]['parser'](inFile)
