@@ -40,7 +40,7 @@ def getReport(results, directory, folder, reports, scriptPath):
             results[reportModule.__name__].http[param['code']] = param['dflt']
         try :
           for f in ['static', 'data']:
-            fileDirectory = os.path.join(directory, reportName, f)
+            fileDirectory = os.path.join(directory, folder, f)
             if os.path.isdir(fileDirectory):
               for file in os.listdir(fileDirectory):
                 if file in extFiles:
