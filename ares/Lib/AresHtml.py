@@ -86,7 +86,7 @@ class Html(object):
     if cssCls is not None:
       # If the cssCls is defined it will replace the default one
       # We do not want to extend the list of the class
-      self.attr['class'] = list(cssCls)
+      self.attr['class'] = set(cssCls)
     if css is not None:
       # we need to do a copy of the CSS style at this stage
       self.attr['css'] = dict(css)
