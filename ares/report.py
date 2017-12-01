@@ -1230,7 +1230,7 @@ def downloadOutputs(report_name, file_name, file_location):
   """ Download the up to date Ares package """
   aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file_location, file_name)
   #no need to check for error the normal raise should be fine
-  return send_file(aresoutputFile, as_attachment=True, mimetype='text/plain')
+  return send_file(aresoutputFile, as_attachment=True)
 
 @report.route("/ares/version", methods = ['GET', 'POST'])
 def getAresFilesVersions():
