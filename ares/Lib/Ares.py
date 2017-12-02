@@ -310,6 +310,7 @@ class Report(object):
 
   # Data
   def data(self, vals): return AresHtmlData.HtmlData(self, vals)
+  def datadic(self, vals): return AresHtmlData.HtmlDataDic(self, vals)
   def recordset(self, vals): return AresHtmlData.HtmlDataRec(self, vals)
 
   # Generic Action section
