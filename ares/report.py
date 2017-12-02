@@ -433,7 +433,7 @@ def run_report(report_name, script_name, user_id):
       modal = reportObj.modal('Open Report Parameters')
       modal.modal_header = "Report parameters"
       getattr(mod, fnct)(modal)
-      reportObj.internalLink('Run', reportObj.reportName, attrs=modal.httpParams, inReport=False)
+      modal.internalLink('Run', reportObj.reportName, attrs=modal.httpParams)
       reportObj.jsOnLoadFnc.add("%s.modal('show'); " % modal.jqId)
     else:
       getattr(mod, fnct)(reportObj)
