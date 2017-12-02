@@ -372,6 +372,11 @@ def run_report(report_name, script_name, user_id):
     if script_name in sys.modules:
       del sys.modules[script_name]
 
+    inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
+    scriptData = inFile.read()
+    inFile.close()
+
+    print scriptData
     mod = __import__(script_name) # run the report
     if reportObj.http.get('show_params') == '1' and getattr(mod, 'HTTP_PARAMS', []):
       fnct = 'params'
@@ -424,7 +429,14 @@ def run_report(report_name, script_name, user_id):
           if fnct == 'params':
             reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
 
-    getattr(mod, fnct)(reportObj)
+    if fnct == 'params':
+      modal = reportObj.modal('Open Report Parameters')
+      modal.modal_header = "Report parameters"
+      getattr(mod, fnct)(modal)
+      reportObj.internalLink('Run', reportObj.reportName, attrs=modal.httpParams, inReport=False)
+      reportObj.jsOnLoadFnc.add("%s.modal('show'); " % modal.jqId)
+    else:
+      getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
     #  side_bar.append('<h5 style="color:white">&nbsp;<b><i class="fa fa-download" aria-hidden="true">&nbsp;</i>Download</b></h5>')
@@ -494,7 +506,8 @@ def run_report(report_name, script_name, user_id):
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
                          viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
-                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name, adminEnv=adminEnv, fileRules=fileRules)
+                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name,
+                         adminEnv=adminEnv, fileRules=fileRules, scriptData=scriptData)
 
 
 @report.route("/ajax/<report_name>/<script>", defaults={'origin': None}, methods = ['GET', 'POST'])
