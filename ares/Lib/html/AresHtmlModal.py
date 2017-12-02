@@ -20,6 +20,7 @@ class Modal(AresHtml.Html):
   cssCls, alias = ['modal fade'], 'modal'
   modal_header = '' # The title for the modal popup
   reference = 'https://v4-alpha.getbootstrap.com/components/modal/'
+  maxHeight = 450
 
   def __init__(self, aresObj, name, cssCls=None, cssAttr=None, btnCls=None):
     """ Create an python HTML object """
@@ -47,7 +48,7 @@ class Modal(AresHtml.Html):
     #item.add(4, '<button type="button" style="margin-top:10px" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
     #item.add(4, '<div class="modal-title" id="%sTitle">%s</div>' % (self.htmlId, self.modal_header))
     #item.add(3, '</div>')
-    item.add(3, '<div class="modal-body">')
+    item.add(3, '<div class="modal-body" style="overflow-y:scroll;max-height:%spx;margin-bottom:10px">' % self.maxHeight)
     for val in self.vals:
       if hasattr(val, 'incIndent'):
           val.incIndent = 4
