@@ -6,6 +6,7 @@ from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
 
+
 class Modal(AresHtml.Html):
   """
   Python Wrapper to a simple modal view
@@ -22,14 +23,15 @@ class Modal(AresHtml.Html):
     """ Create an python HTML object """
     super(Modal, self).__init__(aresObj, None, cssCls, cssAttr)
     self.name = name
-    self.vals = []
+    self.vals, self.httpParams = [], {}
     if not btnCls:
       btnCls = ['btn btn-primary']
     self.btnCls = btnCls
 
-  def addVal(self, htmlObj):
+  def addVal(self, httpKey, htmlObj):
     """ Add an HTML object to the modal """
     self.vals.append(htmlObj)
+    self.httpParams[httpKey] = htmlObj
     return htmlObj
 
   def __str__(self):
@@ -55,11 +57,14 @@ class Modal(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
-  def input(self, label, dflt='', cssCls=None):
-    return self.addVal(self.aresObj.input(label, cssCls=cssCls, dflt=dflt, inReport=False))
+  def input(self, label, httpKey, dflt='', cssCls=None):
+    return self.addVal(httpKey, self.aresObj.input(label, cssCls=cssCls, dflt=dflt, inReport=False))
 
-  def inputInt(self, label, dflt='', cssCls=None):
-    return self.addVal(self.aresObj.inputInt(label, cssCls=cssCls, dflt=dflt, inReport=False))
+  def inputInt(self, label, httpKey, dflt='', cssCls=None):
+    return self.addVal(httpKey, self.aresObj.inputInt(label, cssCls=cssCls, dflt=dflt, inReport=False))
+
+  def date(self, label='Date', httpKey='date', dflt='', cssCls=None):
+    return self.addVal(httpKey, self.aresObj.date(label, cssCls=cssCls, dflt=dflt, inReport=False))
 
 
 class FixedModal(AresHtml.Html):
