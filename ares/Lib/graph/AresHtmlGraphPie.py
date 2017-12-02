@@ -58,9 +58,10 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
     """ Change the default colors in the chart """
     self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
 
-  def jsUpdate(self):
+  def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     # Dispatch method to add events on the chart (in progress)
+    data = data if data is not None else self.jqData
     dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               d3.select("#%s svg").remove();
@@ -71,9 +72,13 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
               %s ;
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
-                   self.height, self.jqData, # recordSet key
+                   self.height, data, # recordSet key
                    self.getSvg(), self.htmlId,
                    ";".join(dispatchChart), self.htmlId)
+
+  def show(self):
+    return "d3.select('#%s').style('display', 'block')" % (self.htmlId)
+    #return "$('#%(htmlId)s').show() ; d3.select('#%(htmlId)s svg').style('height', '%(height)spx'); nv.utils.windowResize(%(htmlId)s.update); " % {'htmlId': self.htmlId, 'height': self.height}
 
   def click(self, jsFnc):
     """ Add a click even on the chart  """

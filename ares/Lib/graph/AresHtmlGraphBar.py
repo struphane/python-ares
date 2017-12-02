@@ -41,6 +41,13 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
     else:
       self.addChartProp('showLegend', 'false')
 
+  def showValues(self, boolFlag):
+    """ Change the D3 flag to display the legend in the chart """
+    if boolFlag:
+      self.addChartProp('showValues', 'true')
+    else:
+      self.addChartProp('showValues', 'false')
+
   def outSideLabels(self, boolFlag):
     """ Change the flag to display the labels of teh chart outside """
     if boolFlag:
@@ -53,18 +60,32 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
     """ Change the default colors in the chart """
     self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
 
-  def jsUpdate(self):
+  def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     # Dispatch method to add events on the chart (in progress)
-    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
+    data = data if data is not None else self.jqData
+    dispatchChart = ["%s.discretebar.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               d3.select("#%s svg").remove();
               d3.select("#%s").append("svg");
               var %s = nv.models.%s().%s ;
               %s
               d3.select("#%s svg").style("height", '%spx').datum(%s).call(%s);
+              %s ;
               nv.utils.windowResize(%s.update);
             ''' % (self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId, self.height, self.jqData, self.htmlId, self.htmlId)
+                   self.htmlId, self.height, data, self.htmlId,
+                   ";".join(dispatchChart), self.htmlId)
 
 
+  def click(self, jsFnc):
+    """ Add a click even on the chart  """
+    self.dispatch['elementClick'] = jsFnc
+
+  def clickIndex(self):
+    """ Add a click even on the chart  """
+    self.dispatch['elementClick'] = "alert(e.index)"
+
+  def clickPoint(self):
+    """ Add a click even on the chart  """
+    self.dispatch['elementClick'] = "alert(e.data)"
