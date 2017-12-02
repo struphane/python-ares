@@ -83,7 +83,7 @@ class Modal(AresHtml.Html):
     return self.addVal(httpKey, self.aresObj.select(recordSet, title, col=col, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
 
   def selectfiles(self, fileName, title, httpKey, cssCls=None, cssAttr=None):
-    return self.addVal(httpKey, AresHtmlSelect.Select(self, self.aresObj.fileMap.get(fileName, []), title, col=None, cssCls=cssCls, cssAttr=cssAttr))
+    return self.addVal(httpKey, AresHtmlSelect.Select(self.aresObj, self.aresObj.fileMap.get(fileName, []), title, col=None, cssCls=cssCls, cssAttr=cssAttr))
 
 
 class FixedModal(AresHtml.Html):
