@@ -6,6 +6,8 @@ from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
 
+from ares.Lib.html import AresHtmlSelect
+
 
 class Modal(AresHtml.Html):
   """
@@ -58,6 +60,10 @@ class Modal(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
+  # -------------------------------------------------------------------------------------------------------------------
+  #
+  #                             Section dedicated to set the HTMO object for the modal
+  # -------------------------------------------------------------------------------------------------------------------
   def input(self, label, httpKey, dflt='', cssCls=None):
     return self.addVal(httpKey, self.aresObj.input(label, cssCls=cssCls, dflt=dflt, inReport=False))
 
@@ -69,6 +75,15 @@ class Modal(AresHtml.Html):
 
   def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None):
     return self.addVal(None, self.aresObj.internalLink(linkValue, script, attrs=attrs, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
+
+  def radio(self, recordSet, httpKey, col=None, cssCls=None, cssAttr=None):
+    return self.addVal(httpKey, self.aresObj.radio(recordSet, col=col, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
+
+  def select(self, recordSet, title, httpKey, col=None, cssCls=None, cssAttr=None):
+    return self.addVal(httpKey, self.aresObj.select(recordSet, title, col=col, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
+
+  def selectfiles(self, fileName, title, httpKey, cssCls=None, cssAttr=None):
+    return self.addVal(httpKey, AresHtmlSelect.Select(self, self.aresObj.fileMap.get(fileName, []), title, col=None, cssCls=cssCls, cssAttr=cssAttr))
 
 
 class FixedModal(AresHtml.Html):
