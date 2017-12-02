@@ -11,6 +11,39 @@ import json
 from ares.Lib import AresItem
 
 
+class JsData(object):
+
+  def __init__(self, aresObj, data):
+    """ Transform data from Python to Javascript """
+    self.data = data
+    self.aresObj = aresObj
+
+  def store(self, globalVar=True):
+    """ """
+    if globalVar:
+      self.aresObj.jsGlobal.add(" %s = %s " % (self.htmlId, json.dumps(self.data)))
+    return self
+
+  @property
+  def htmlId(self):
+    """ Property to get the HTML ID of a python HTML object """
+    return "%s_%s" % (self.__class__.__name__.lower(), id(self))
+
+  @property
+  def jqId(self):
+    """ """
+    return self.htmlId
+
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML objec in a python HTML object """
+    return self.jqId
+
+  def get(self, val):
+    """ Return the value of a javascript dictionary """
+    return "%s[%s]" % (self.htmlId, val)
+
+
 class JQueryEvents(object):
   """
 

@@ -330,7 +330,6 @@ class NavBar(object):
 
 
 
-
 #------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------
 #
@@ -342,6 +341,7 @@ class NavBar(object):
 class WebStorage(object):
   """ This module should manage local and also session storage
   """
+
 
 class WebSharedWorkers(object):
   """ """

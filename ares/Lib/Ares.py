@@ -30,6 +30,8 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 """
 from importlib import import_module
 from ares.Lib import AresImports
+from ares.Lib import AresJs
+
 
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
@@ -305,6 +307,8 @@ class Report(object):
   # Map
   def map(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Map'](self, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
+  # Data
+  def data(self, vals): return AresJs.JsData(self, vals)
 
   # Generic Action section
   def slider(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Slider'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -313,7 +317,7 @@ class Report(object):
   def generatePdf(self, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['GeneratePdf'](self, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Containers section
-  def div(self, value='', cssCls=None, cssAttr=None, htmlComp=None): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name)
+  def div(self, value='', cssCls=None, cssAttr=None, htmlComp=None, inReport=True): return self.add(aresFactory['Div'](self, value, cssCls, cssAttr, self.supp(htmlComp)), sys._getframe().f_code.co_name, inReport)
   def list(self, values, headerBox=None, cssCls=None, cssAttr=None): return self.add(aresFactory['List'](self, headerBox, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def listbadge(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['ListBadge'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def tabs(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Tabs'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -342,9 +346,9 @@ class Report(object):
 
 
   # Chart section
-  def bar(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Bar'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
-  def pie(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Pie'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
-  def donut(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Donut'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
+  def bar(self, values, header, chartKey=None, chartVal=None, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Bar'](self, headerBox, values, header, chartKey, chartVal, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
+  def pie(self, values, header, chartKey=None, chartVal=None, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Pie'](self, headerBox, values, header, chartKey, chartVal, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
+  def donut(self, values, header, chartKey=None, chartVal=None, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Donut'](self, headerBox, values, header, chartKey, chartVal, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
   def lineCumulative(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3LineCumulative'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
   def line(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Line'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
   def forceDirected(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3ForceDirected'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
