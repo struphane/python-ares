@@ -32,6 +32,7 @@ from importlib import import_module
 from ares.Lib import AresImports
 from ares.Lib import AresJs
 
+from ares.Lib.html import AresHtmlData
 
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
@@ -308,11 +309,12 @@ class Report(object):
   def map(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Map'](self, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Data
-  def data(self, vals): return AresJs.JsData(self, vals)
+  def data(self, vals): return AresHtmlData.HtmlData(self, vals)
+  def recordset(self, vals): return AresHtmlData.HtmlDataRec(self, vals)
 
   # Generic Action section
   def slider(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Slider'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def date(self, label='Date', cssCls=None, cssAttr=None): return self.add(aresFactory['DatePicker'](self, label, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def date(self, label='Date', cssCls=None, cssAttr=None, dflt='', inReport=True): return self.add(aresFactory['DatePicker'](self, label, cssCls, cssAttr, dflt), sys._getframe().f_code.co_name, inReport)
   def textArea(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['TextArea'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def generatePdf(self, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['GeneratePdf'](self, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
@@ -378,16 +380,16 @@ class Report(object):
   def deployFiles(self, cssCls=None, cssAttr=None): return self.add(aresFactory['FileDeployer'](self, '', cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Anchor section): return self.add(aresFactory['ScriptPage'](self, self.supp(value), attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def input(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputText'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
-  def pwd(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputPass'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
-  def inputInt(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputInt'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
-  def inputRange(self, value='', cssCls=None, dflt='', inReport=True): return self.add(aresFactory['InputRange'](self, value, cssCls, dflt=dflt), sys._getframe().f_code.co_name, inReport=True)
+  def input(self, value='', cssCls=None, cssAttr=None, dflt='', inReport=True): return self.add(aresFactory['InputText'](self, value, cssCls, cssAttr, dflt=dflt), sys._getframe().f_code.co_name, inReport=inReport)
+  def pwd(self, value='', cssCls=None, cssAttr=None, dflt='', inReport=True): return self.add(aresFactory['InputPass'](self, value, cssCls, cssAttr, dflt=dflt), sys._getframe().f_code.co_name, inReport=inReport)
+  def inputInt(self, value='', cssCls=None, cssAttr=None, dflt='', inReport=True): return self.add(aresFactory['InputInt'](self, value, cssCls, cssAttr, dflt=dflt), sys._getframe().f_code.co_name, inReport=inReport)
+  def inputRange(self, value='', cssCls=None, cssAttr=None, dflt='', inReport=True): return self.add(aresFactory['InputRange'](self, value, cssCls, cssAttr, dflt=dflt), sys._getframe().f_code.co_name, inReport=inReport)
 
   # Anchor links
   def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
   def externalLink(self, value, url, cssCls=None, cssAttr=None): return self.add(aresFactory['ExternalLink'](self, self.supp(value), url, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def anchor_download(self, value, **kwargs): return self.add(aresFactory['Download'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None): return self.add(aresFactory['InternalLink'](self, self.supp(linkValue), script, attrs, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['InternalLink'](self, self.supp(linkValue), script, attrs, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
   def downloadData(self, value, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DownloadData'](self, value, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Designer objects
