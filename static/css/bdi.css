@@ -38,10 +38,11 @@ div.logo_small {
     background-position: 5px 5px;
     height:40px;
     background-color: #69a370;
-    color: #32603c;
+    font-weight: bold;
+    color: white;
     font-size: 18px;
     text-align: right;
-    padding-right:5px;
+    padding-right:10px;
     padding-top: 6px;
 }
 
