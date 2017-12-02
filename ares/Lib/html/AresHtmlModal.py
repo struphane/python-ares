@@ -31,7 +31,8 @@ class Modal(AresHtml.Html):
   def addVal(self, httpKey, htmlObj):
     """ Add an HTML object to the modal """
     self.vals.append(htmlObj)
-    self.httpParams[httpKey] = htmlObj
+    if httpKey is not None:
+      self.httpParams[httpKey] = htmlObj
     return htmlObj
 
   def __str__(self):
@@ -65,6 +66,9 @@ class Modal(AresHtml.Html):
 
   def date(self, label='Date', httpKey='date', dflt='', cssCls=None):
     return self.addVal(httpKey, self.aresObj.date(label, cssCls=cssCls, dflt=dflt, inReport=False))
+
+  def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None):
+    return self.addVal(None, self.aresObj.internalLink(linkValue, script, attrs=attrs, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
 
 
 class FixedModal(AresHtml.Html):
