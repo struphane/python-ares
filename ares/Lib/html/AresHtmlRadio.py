@@ -8,9 +8,6 @@ from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from flask import render_template_string
 
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
-
 
 class Radio(AresHtml.Html):
   """
@@ -48,12 +45,12 @@ class Radio(AresHtml.Html):
 
   def setDefault(self, value):
     """ Set a selected default value """
-    self.selected = regex.sub('', value.strip())
+    self.selected = AresHtml.Html.cleanData(value)
     self.aresObj.jsGlobal.add("radio_val_%s = '%s';" % (self.htmlId, self.selected))
 
   def select(self, val):
     """ Change the selected value """
-    self.selected = regex.sub('', val.strip())
+    self.selected = AresHtml.Html.cleanData(value)
     self.aresObj.jsGlobal.add("radio_val_%s = '%s'" % (self.htmlId, self.selected))
 
   def __str__(self):
