@@ -4,14 +4,11 @@
 """
 
 import json
-import re
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from flask import render_template_string
 
-
-regex = re.compile('[^a-zA-Z0-9_]')
 
 class SelectDropDown(AresHtml.Html):
   """
@@ -158,7 +155,7 @@ class Select(AresHtml.Html):
   def setDefault(self, value):
     """ Set a selected default value """
     self.selected = value
-    self.aresObj.jsGlobal.add("%s = '%s';" % (self.htmlId, regex.sub('', value.strip())))
+    self.aresObj.jsGlobal.add("%s = '%s';" % (self.htmlId, AresHtml.cleanData(value)))
 
   def __str__(self):
     """ Return the HTML string for a select """
@@ -167,9 +164,9 @@ class Select(AresHtml.Html):
     item.add(1, '<select %s>' % self.strAttr())
     for val in self.vals:
       if val == self.selected:
-        item.add(3, '<option value="%s" selected>%s</option>' % (regex.sub('', val.strip()), val))
+        item.add(3, '<option value="%s" selected>%s</option>' % (AresHtml.cleanData(val), val))
       else:
-        item.add(3, '<option value="%s">%s</option>' % (regex.sub('', val.strip()), val))
+        item.add(3, '<option value="%s">%s</option>' % (AresHtml.cleanData(val), val))
     item.add(1, '</select>')
     item.add(0, '</div>')
     return str(item)
@@ -238,7 +235,6 @@ class SelectMulti(AresHtml.Html):
     super(SelectMulti, self).__init__(aresObj, list(vals), cssCls, cssAttr)
     self.title = title
     self.disableItems = {}
-    # To replace non alphanumeric characters https://stackoverflow.com/questions/20864893/javascript-replace-all-non-alpha-numeric-characters-new-lines-and-multiple-whi
     self.aresObj.jsOnLoadFnc.add('%s.multiselect();' % self.jqId)
     self.allowTableFilter = []
 

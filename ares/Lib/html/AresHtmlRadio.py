@@ -45,12 +45,12 @@ class Radio(AresHtml.Html):
 
   def setDefault(self, value):
     """ Set a selected default value """
-    self.selected = AresHtml.Html.cleanData(value)
+    self.selected = AresHtml.cleanData(value)
     self.aresObj.jsGlobal.add("radio_val_%s = '%s';" % (self.htmlId, self.selected))
 
   def select(self, val):
     """ Change the selected value """
-    self.selected = AresHtml.Html.cleanData(value)
+    self.selected = AresHtml.cleanData(value)
     self.aresObj.jsGlobal.add("radio_val_%s = '%s'" % (self.htmlId, self.selected))
 
   def __str__(self):
