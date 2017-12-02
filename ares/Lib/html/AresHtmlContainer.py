@@ -33,11 +33,13 @@ class Div(AresHtml.Html):
   def replace(self, htmlObj):
     """ To add a button to hide th """
 
-
   @classmethod
   def aresExample(cls, aresObj):
     return aresObj.div("MyDiv")
 
+  def jsUpdate(self, data=''):
+    """ """
+    return '$("#%s").html(%s)' % (self.htmlId, data)
 
 class TextContainer(AresHtml.Html):
   """ Python Wrapper for a simple DIV tag """

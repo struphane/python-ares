@@ -180,6 +180,20 @@ class Select(AresHtml.Html):
     jsFrg.append(jsEvent)
     self.js('change', ";".join(jsFrg))
 
+  def update(self, dicKeys=None, htmlObjs=None, effects=None):
+    """ """
+    data = dicKeys.get('$(this).val()') if dicKeys is not None else ''
+    jsEffects = effects if effects is not None else []
+    objUpdate = []
+    if htmlObjs is not None:
+      for htmlObj in htmlObjs:
+        objUpdate.append(htmlObj.jsUpdate(data))
+    self.aresObj.jsOnLoadFnc.add('''
+      $('#%(htmlId)s').on('change', function (event){
+        %(objUpdt)s ; %(jsEffects)s ;
+      }) ;
+      ''' % {'htmlId': self.htmlId, 'data': data, 'objUpdt': '; '.join(objUpdate), 'jsEffects': ';'.join(jsEffects)})
+
 
 class SelectWithGroup(AresHtml.Html):
   """

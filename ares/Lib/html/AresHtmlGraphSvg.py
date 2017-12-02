@@ -14,7 +14,7 @@ class Svg(AresHtml.Html):
   references = []
   height = 250
 
-  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
+  def __init__(self, aresObj, header, vals, recordSetDef, chartKey=None, chartVal=None, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
@@ -29,6 +29,13 @@ class Svg(AresHtml.Html):
       self.svgProp[key] = val
     if mockData:
       self.processData = self.processDataMock
+    # To add the default key and val if unique
+    if chartKey:
+      self.chartKeys = [self.header[chartKey]]
+      self.selectedChartKey = chartKey
+    if chartVal:
+      self.chartKeys = [self.header[chartVal]]
+      self.selectedChartKey = chartVal
 
   def recKey(self, col):
     """ Return the record Key taken into accounr th possible user options """

@@ -5,6 +5,7 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
+from ares.Lib import AresHtml
 
 
 class InputText(AresHtml.Html):
@@ -34,6 +35,10 @@ class InputText(AresHtml.Html):
   def val(self):
     """ Property to get the jquery value of the HTML objec in a python HTML object """
     return '%s.val()' % self.jqId
+
+  @AresHtml.deprecated
+  def addVal(self, val):
+    self.value = val
 
   def __str__(self):
     """ Return the String representation of a HTML Input object """

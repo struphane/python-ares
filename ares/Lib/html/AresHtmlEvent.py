@@ -105,6 +105,7 @@ class Slider(AresHtml.Html):
     """ Return the HMTL object of for div """
     if not self.hasChangeEvent:
       self.change('')
+    self.jsFormulas = None
     self.aresObj.jsOnLoadFnc.add('%s.slider({value: %s});' % (self.jqId, self.vals))
     return '<div style="text-align:center;"><div id="%s_val" style="display:inline-block;">%s</div><div %s></div></div>' % (self.htmlId, self.vals, self.strAttr())
 
@@ -112,6 +113,25 @@ class Slider(AresHtml.Html):
     """ Action to update the HTML Input text box """
     self.hasChangeEvent = True
     self.aresObj.jsOnLoadFnc.add('%s.on("slidechange", function(event, ui) {  $("#%s_val").html(ui.value) ; %s });' % (self.jqId, self.htmlId, jsFnc) )
+
+  def formulas(self, jsFormulas):
+    """ """
+    self.jsFormulas = jsFormulas
+
+  def update(self, htmlObjs=None, effects=None):
+    """ """
+    jsEffects = effects if effects is not None else []
+    objUpdate = []
+    val = self.jsFormulas if self.jsFormulas is not None else self.val
+    if htmlObjs is not None:
+      for htmlObj in htmlObjs:
+        objUpdate.append(htmlObj.jsUpdate(val))
+    self.aresObj.jsOnLoadFnc.add('''
+      $('#%(htmlId)s').on('slidechange', function (event, ui){
+        %(objUpdt)s ; %(jsEffects)s ;
+      }) ;
+      ''' % {'htmlId': self.htmlId, 'data': val, 'objUpdt': '; '.join(objUpdate), 'jsEffects': ';'.join(jsEffects)})
+
 
   @property
   def val(self):
