@@ -8,6 +8,7 @@ Please make sure that all the CSS information are defined in a CSS class
 Aliases must be unique
 """
 
+import re
 import os
 import json
 import collections
@@ -16,6 +17,7 @@ import functools
 
 from ares.Lib import AresJs
 
+regex = re.compile('[^a-zA-Z0-9_]')
 
 def deprecated(func):
     """This is a decorator which can be used to mark functions
@@ -53,6 +55,10 @@ class SetEncoder(json.JSONEncoder):
        return list(obj)
 
      return json.JSONEncoder.default(self, obj)
+
+def cleanData(value):
+  """ Function to clean the javascript data to allow the use of variables """
+  return regex.sub('', value.strip())
 
 
 class Html(object):
