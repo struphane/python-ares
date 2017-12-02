@@ -371,7 +371,7 @@ class Report(object):
   def venn(self, values, header, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Venn'](self, headerBox, values, header, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
 
   # 3D charts
-  def pie3D(self, values, inReport=True): return self.add(aresFactory['Donut3D'](self, values), sys._getframe().f_code.co_name, inReport)
+  def pie3D(self, values, inReport=True): return self.add(aresFactory['Donut3D'](self, values), sys._getframe().f_code.co_name, inReport=inReport)
   def vis3DSurface(self, values): return self.add(aresFactory['Vis3DSurfaceChart'](self, values), sys._getframe().f_code.co_name)
 
   # File HTML Section
@@ -389,7 +389,7 @@ class Report(object):
   def handleRequest(self, method, params, js="", cssCls=None): return self.add(aresFactory['HandleRequest'](self, method, params, js, cssCls), sys._getframe().f_code.co_name)
   def externalLink(self, value, url, cssCls=None, cssAttr=None): return self.add(aresFactory['ExternalLink'](self, self.supp(value), url, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def anchor_download(self, value, **kwargs): return self.add(aresFactory['Download'](self, self.supp(value), **kwargs), sys._getframe().f_code.co_name)
-  def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['InternalLink'](self, self.supp(linkValue), script, attrs, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
+  def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['InternalLink'](self, self.supp(linkValue), script, attrs, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport=inReport)
   def downloadData(self, value, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['DownloadData'](self, value, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Designer objects
