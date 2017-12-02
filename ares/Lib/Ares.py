@@ -280,10 +280,9 @@ class Report(object):
   def ajaxDropdown(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectDropDownAjax'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def selectmulti(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectMulti'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
-  # Radio Section
-  def radio(self, recordSet, col=None, header=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def select(self, recordSet, title='Select list', col=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, recordSet, title, col, cssCls, cssAttr), sys._getframe().f_code.co_name)
-  def selectfiles(self, fileName, title='Select list', cssCls=None, cssAttr=None): return self.add(aresFactory['Select'](self, self.fileMap.get(fileName, []), title, None, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  # Radio and Select Section
+  def radio(self, recordSet, col=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport=inReport)
+  def select(self, recordSet, title, col=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['Select'](self, recordSet, title, col, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport=inReport)
 
 
   # Title section
