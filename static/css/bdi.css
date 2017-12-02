@@ -1,3 +1,18 @@
+.preformatted {
+    font-family: monospace;
+    white-space: pre;
+}
+
+mark.red {
+    color:#ff0000;
+    background: none;
+}
+
+mark.blue {
+    color:#0000A0;
+    background: none;
+}
+
 table.fixed-header tr {
 width: 100%;
 display: inline-table;
