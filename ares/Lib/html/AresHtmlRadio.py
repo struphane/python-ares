@@ -43,18 +43,16 @@ class Radio(AresHtml.Html):
 
   def __str__(self):
     """ Return a basic HTML radio component """
-    items = AresItem.Item('<div %s class="btn-group" data-toggle="buttons">' % self.strAttr(False))
+    item = ['<div %s class="btn-group" data-toggle="buttons">' % self.strAttr(False)]
     for val in self.vals:
       if self.checked == val:
-        items.add(1, '<label class="btn btn-success active" name="%s">' % self.htmlId)
-        items.add(2, '%s<input type="radio" name="input_%s" value="%s" checked="checked" autocomplete="off">' % (val, self.htmlId, val))
+        item.append('<label class="btn btn-success active" name="%s">' % self.htmlId)
+        item.append('%s<input type="radio" name="input_%s" value="%s" checked="checked" autocomplete="off">' % (val, self.htmlId, val))
       else:
-        items.add(1, '<label class="btn btn-info" name="%s">' % self.htmlId)
-        items.add(2, '%s<input type="radio" name="input_%s" value="%s" autocomplete="off">' % (val, self.htmlId, val))
-      items.add(2, '<span class="awesomeicon fa fa-check">&nbsp;</span>')
-      items.add(1, "</label>")
-    items.add(0, "</div>")
-    return str(items)
+        item.append('<label class="btn btn-info" name="%s">' % self.htmlId)
+        item.append('%s<input type="radio" name="input_%s" value="%s" autocomplete="off">' % (val, self.htmlId, val))
+      item.append('<span class="awesomeicon fa fa-check">&nbsp;</span></label></div>')
+    return "".join(item)
 
   @property
   def jqId(self):
@@ -104,7 +102,7 @@ class Radio(AresHtml.Html):
   def click(self, htmlObjects):
     """ Pure Javascript method to update other components in the page """
     evenType = 'mouseup'
-    jsDef = ["radio_val_%s = $(event.currentTarget).text().trim();" % self.htmlId]
+    jsDef = [] #["radio_val_%s = $(event.currentTarget).text().trim();" % self.htmlId]
     for htmlObject in htmlObjects:
       jsDef.append(htmlObject.jsUpdate())
     self.js(evenType, "\n".join(jsDef))
