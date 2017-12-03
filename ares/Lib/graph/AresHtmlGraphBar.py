@@ -7,8 +7,6 @@ import json
 from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
 
 class NvD3Bar(AresHtmlGraphSvg.Svg):
   """ NVD3 Bar Chart python interface """
@@ -31,8 +29,7 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toBar(self.vals,self.seriesName, self.chartKeys, self.chartVals, extKeys=self.extKeys)
-    for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
+    self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
   def showLegend(self, boolFlag):
     """ Change the D3 flag to display the legend in the chart """
@@ -62,21 +59,16 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
 
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
-    # Dispatch method to add events on the chart (in progress)
     data = data if data is not None else self.jqData
+    # Dispatch method to add events on the chart (in progress)
     dispatchChart = ["%s.discretebar.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
-              d3.select("#%s svg").remove();
-              d3.select("#%s").append("svg");
-              var %s = nv.models.%s().%s ;
-              %s
-              d3.select("#%s svg").style("height", '%spx').datum(%s).call(%s);
-              %s ;
-              nv.utils.windowResize(%s.update);
-            ''' % (self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(),
-                   self.htmlId, self.height, data, self.htmlId,
-                   ";".join(dispatchChart), self.htmlId)
-
+              d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
+              var %(htmlId)s = nv.models.%(chartObject)s().%(chartAttr)s ; %(chartProp)s
+              d3.select("#%(htmlId)s svg").style("height", '%(height)spx').datum(%(data)s).call(%(htmlId)s); %(dispatchChart)s ;
+              nv.utils.windowResize(%(htmlId)s.update);
+            ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(),
+                   'chartProp': self.propToStr(), 'height': self.height, 'data': data, 'dispatchChart': ";".join(dispatchChart)}
 
   def click(self, jsFnc):
     """ Add a click even on the chart  """

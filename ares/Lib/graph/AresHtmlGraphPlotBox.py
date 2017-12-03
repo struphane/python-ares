@@ -9,8 +9,7 @@ from ares.Lib.html import AresHtmlRadio
 from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 from ares.Lib.html import AresHtmlContainer
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
+
 
 class NvD3PlotBox(AresHtmlGraphSvg.Svg):
   """ NVD3 Plot Box python interface """

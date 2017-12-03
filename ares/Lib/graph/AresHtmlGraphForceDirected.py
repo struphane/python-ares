@@ -37,8 +37,7 @@ class NvD3ForceDirected(AresHtmlGraphSvg.Svg):
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toNetwork(self.vals, self.chartKeys)
-    for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, key, json.dumps(vals)))
+    self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
   def processDataMock(self, cat=None, val=None):
     """ Return the json data """

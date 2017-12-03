@@ -9,8 +9,6 @@ from ares.Lib.html import AresHtmlRadio
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlGraphSvg
 
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
 
 class NvD3ParallelCoordinates(AresHtmlGraphSvg.Svg):
   """ NVD3 Venn Chart python interface """
@@ -32,8 +30,7 @@ class NvD3ParallelCoordinates(AresHtmlGraphSvg.Svg):
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toVenn(self.vals, self.chartKeys[0], self.chartKeys[1], self.chartVals, extKeys=self.extKeys)
-    for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
+    self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
   def brushEnd(self):
     """  """
@@ -51,19 +48,13 @@ class NvD3ParallelCoordinates(AresHtmlGraphSvg.Svg):
               chart = nv.models.%s().%s;
               d3.select('#test').datum(mydata()).call(chart);
               nv.utils.windowResize(chart.update);
-
-              // update chart data values randomly
               setInterval(function () { data[0].values.P1 = Math.floor(Math.random() * 100); chart.update();}, 4000);
-
-              // update chart data dimension randomly
               setInterval(function () {
                   var element = {key: "P7", format: d3.format("p"), tooltip: "year",}
                   if (dim.length === 7) {dim.splice(dim.indexOf(element), 1);}
                   else {dim.push(element);}
                   chart.dimensionData(dim);
-                  chart.update();
-              }, 10000);
-
+                  chart.update();}, 10000);
            '''
 
   def __str__(self):
