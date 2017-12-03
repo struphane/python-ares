@@ -109,13 +109,13 @@ class Svg(AresHtml.Html):
 
   def __str__(self):
     """ Return the svg container """
+    self.processData()
     self.categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys],
                                      cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {},
                                      internalRef='key_%s' % self.htmlId, checked=self.selectedChartKey)
     self.values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals],
                                  cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {},
                                  internalRef='val_%s' % self.htmlId, checked=self.selectedChartVal)
-    self.processData()
 
     self.categories.click([self])
     self.values.click([self])
