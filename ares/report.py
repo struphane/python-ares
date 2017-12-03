@@ -282,6 +282,7 @@ def getAuthorizedFiles(fileConfigs, reportObj, report_name, userDirectory, fnct=
   ALIAS, DISK_NAME = 0, 1
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   sqlFileDict = {'data': 'get_file_auth.sql', 'static': 'static_file_map.sql'}
+  fileNameToParser = {}
   for fileConfig in fileConfigs:
     queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.email, 'type': fileConfig.get('folder')}
     files = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
@@ -297,6 +298,7 @@ def getAuthorizedFiles(fileConfigs, reportObj, report_name, userDirectory, fnct=
         fileNameToParser[file[DISK_NAME]] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
       if fnct == 'params' and not ajax:
         reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
+  return fileNameToParser
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
@@ -327,12 +329,11 @@ def aresDeploy():
       cssImports.append(render_template_string("<link rel='stylesheet' href='%s' }}'>" % cssImport))
   return render_template('ares_deployment.html', cssImport='\n'.join(cssImports), jsImport='\n'.join(jsImports))
 
-@report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports', 'user_id': None})
-@report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports', 'user_id': None})
-@report.route("/run/<report_name>", defaults={'script_name': None, 'user_id': None}, methods = ['GET', 'POST'])
-@report.route("/run/<report_name>/<script_name>", defaults={'user_id': None}, methods = ['GET', 'POST'])
-@report.route("/run/<report_name>/<script_name>/<user_id>", methods = ['GET', 'POST'])
-def run_report(report_name, script_name, user_id):
+@report.route("/", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
+@report.route("/index", defaults={'report_name': '_AresReports', 'script_name': '_AresReports'})
+@report.route("/run/<report_name>", defaults={'script_name': None}, methods = ['GET', 'POST'])
+@report.route("/run/<report_name>/<script_name>", methods = ['GET', 'POST'])
+def run_report(report_name, script_name):
   """
   Run the report
 
@@ -423,12 +424,13 @@ def run_report(report_name, script_name, user_id):
             reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
-    getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, report_name, userDirectory, fnct=fnct)
+    fileNameToParser = getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, report_name, userDirectory, fnct=fnct)
     if fnct == 'params':
       modal = reportObj.modal('Open Report Parameters')
       modal.modal_header = "Report parameters"
+      modal.http = reportObj.http
       getattr(mod, fnct)(modal)
-      modal.internalLink('Run', reportObj.reportName, attrs=modal.httpParams)
+      modal.internalLink('Run', script_name, attrs=modal.httpParams)
       reportObj.jsOnLoadFnc.add("%s.modal('show'); " % modal.jqId)
     else:
       getattr(mod, fnct)(reportObj)
