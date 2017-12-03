@@ -125,6 +125,8 @@
             {{ content|safe }}
 
     <!-- END PYTHON CONTENT  -->
+
+    <div id="script" contenteditable="true" class="preformatted">{{ scriptData }}</div>
 </div>
 
 </div>	
@@ -143,7 +145,7 @@
 <div id="popup-info">RRRRR</div>
 <div id="popup-black-background">&nbsp;RR</div>
 
-<div id="script" contenteditable="true" class="preformatted">{{ scriptData }}</div>
+
 </body>
 <footer role="contentinfo" style="text-align: center"><p>
   Open Framework 2017 - <a href="{{ url_for('ares.run_report', report_name='_AresDoc', script_name='_AresDoc') }}">The Lab</a> -
