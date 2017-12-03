@@ -278,7 +278,7 @@ def checkFileExist(dbPath, report_name, file_name):
                 WHERE disk_name = '%s' """ % file_name
   return list(db.select(query))
 
-def getAuthorizedFiles(fileConfigs, reportObj, report_name, fnct=None, ajax=False):
+def getAuthorizedFiles(fileConfigs, reportObj, report_name, userDirectory, fnct=None, ajax=False):
   ALIAS, DISK_NAME = 0, 1
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   sqlFileDict = {'data': 'get_file_auth.sql', 'static': 'static_file_map.sql'}
@@ -424,7 +424,7 @@ def run_report(report_name, script_name, user_id):
             reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
-    getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, report_name, fnct=fnct)
+    getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, report_name, userDirectory, fnct=fnct)
     if fnct == 'params':
       modal = reportObj.modal('Open Report Parameters')
       modal.modal_header = "Report parameters"
@@ -533,7 +533,7 @@ def ajaxCall(report_name, script):
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
-    getAuthorizedFiles(getattr(ajaxMod, 'FILE_CONFIGS', []), reportObj, report_name, ajax=True)
+    getAuthorizedFiles(getattr(ajaxMod, 'FILE_CONFIGS', []), reportObj, report_name, userDirectory, ajax=True)
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
   except Exception as e:
     logging.debug(e)
