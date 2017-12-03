@@ -14,7 +14,7 @@ class Svg(AresHtml.Html):
   references = []
   height = 250
 
-  def __init__(self, aresObj, header, vals, recordSetDef, cssCls=None, cssAttr=None, mockData=False):
+  def __init__(self, aresObj, header, vals, recordSetDef, chartKey=None, chartVal=None, cssCls=None, cssAttr=None, mockData=False):
     """ selectors is a tuple with the category first and the value list second """
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
@@ -22,13 +22,17 @@ class Svg(AresHtml.Html):
     self.headerBox = header
     self.extKeys, self.components = None, []
     self.dispatch, self.htmlContent = {}, []
-    self.recordSetId = id(vals)
     self.header = dict([(self.recKey(col), (self.recKey(col), col.get('type'), col.get('multiplier', 1))) for col in recordSetDef])
-    self.svgProp = {}
-    for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items():
-      self.svgProp[key] = val
+    self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     if mockData:
       self.processData = self.processDataMock
+    # To add the default key and val if unique
+    if chartKey is not None:
+      self.chartKeys = [self.header[chartKey]]
+      self.selectedChartKey = chartKey
+    if chartVal is not None:
+      self.chartVals = [self.header[chartVal]]
+      self.selectedChartVal = chartVal
 
   def recKey(self, col):
     """ Return the record Key taken into accounr th possible user options """
@@ -71,24 +75,21 @@ class Svg(AresHtml.Html):
     """ Convert the list of dictionary attribute to class attributes """
     res = []
     self.resolveProperties(res, self.chartAttrs, None)
-    return "\n.".join(res)
+    return ".".join(res)
 
   def propToStr(self):
     """ Convert the list of dictionary object attributes to proper object attributes """
     res = []
     self.resolveProperties(res, self.chartProps, None)
-    specialProperties = ['%s.%s;' % (self.htmlId, prop) for prop in res]
-    return "\n".join(specialProperties)
+    return "".join(['%s.%s;' % (self.htmlId, prop) for prop in res])
 
   def resolveProperties(self, res, data, prefix):
     """ Convert the dictionary of properties to a flat javascript definition """
     for jsKey, jsVal in data.items():
       if isinstance(jsVal, dict):
-        if prefix is not None:
-          # Deeper sub level in the NVD3 Chart property
+        if prefix is not None: # Deeper sub level in the NVD3 Chart property
           self.resolveProperties(res, jsVal, "%s.%s" % (prefix, jsKey))
-        else:
-          # First sub level of the NVD3 Chart property
+        else: # First sub level of the NVD3 Chart property
           self.resolveProperties(res, jsVal, jsKey)
         continue
 
@@ -102,24 +103,25 @@ class Svg(AresHtml.Html):
     svgProperties = []
     self.resolveProperties(svgProperties, self.svgProp, None)
     if svgProperties:
-      return ".%s" % "\n.".join(svgProperties)
+      return ".%s" % ".".join(svgProperties)
+
     return ''
 
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, internalRef='val_%s' % self.htmlId)
-    values.select(self.selectedChartVal)
-    self.dynValSelection = values.val # The javascript representation of the radio
+    self.categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys],
+                                     cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {},
+                                     internalRef='key_%s' % self.htmlId, checked=self.selectedChartKey)
+    self.values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals],
+                                 cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {},
+                                 internalRef='val_%s' % self.htmlId, checked=self.selectedChartVal)
 
-    categories.click([self])
-    values.click([self])
+    self.categories.click([self])
+    self.values.click([self])
 
-    self.htmlContent.append(str(categories))
-    self.htmlContent.append(str(values))
+    self.htmlContent.append(str(self.categories))
+    self.htmlContent.append(str(self.values))
     self.htmlContent.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
     if self.headerBox:
       return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
@@ -152,23 +154,21 @@ class Svg(AresHtml.Html):
     return '$("#%s svg")' % self.htmlId
 
   @property
-  def jqRecordSet(self):
-    """ Returns the javascript SVG reference """
-    return 'recordSet_%s' % self.recordSetId
-
-  @property
   def jqData(self):
     """ Returns the javascript SVG reference """
     if self.components:
       dataComp = "+ '_' + ".join([comp.val for comp in self.components])
-      return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection, self.dynValSelection)
+      return "data_%s[%s + '_' + %s + '_' + %s]" % (self.htmlId, dataComp, self.categories.val, self.values.val)
 
-    return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
+    return "data_%s[%s + '_' + %s]" % (self.htmlId, self.categories.val, self.values.val)
 
   @property
   def jqSeriesKey(self):
     """ Returns the selected category for the graph """
     return 'serie_%s' % self.htmlId
+
+  def show(self):
+    return "d3.select('#%s').style('display', 'block')" % (self.htmlId)
 
   def graph(self):
     """ Add the Graph definition in the Javascript method """
@@ -199,8 +199,8 @@ class Svg(AresHtml.Html):
     self.selectedChartKey = 'MOCK'
     self.chartVals = [('DATA', None, None)]
     self.selectedChartVal = self.chartVals[0][0]
-    self.aresObj.jsGlobal.add("%s_%s_%s = %s" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
-                                                 open(r"ares\json\%sData.json" % self.alias).read().strip()))
+    self.aresObj.jsGlobal.add("%s = {'%s_%s': %s}" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
+                                                      open(r"ares\json\%sData.json" % self.alias).read().strip()))
 
 class MultiSvg(Svg):
   """

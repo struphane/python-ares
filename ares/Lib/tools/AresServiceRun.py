@@ -30,7 +30,23 @@ def serverRun(scriptName, httpParameters):
 def localRuns(scriptName, aresObject):
   """ To run the test on the server by running locally """
   sys.path.append(os.path.join(aresObject.http['DIRECTORY'], 'ajax'))
+  sys.path.append(os.path.join(aresObject.http['DIRECTORY'], 'utils'))
+
   mod = __import__(scriptName)
+  if hasattr(mod, 'HTTP_PARAMS'):
+    for param in getattr(mod, 'HTTP_PARAMS'):
+      aresObject.http[param['code']] = param['dflt']
+  extFiles = dict([(extFile['filename'], extFile) for extFile in getattr(mod, 'FILE_CONFIGS', {})])
+  for f in ['static', 'data']:
+    fileDirectory = os.path.join(directory, reportName, f)
+    if os.path.isdir(fileDirectory):
+      for file in os.listdir(fileDirectory):
+        if file in extFiles:
+          if extFiles[file].get('type') == 'pandas':
+            aresObject.files[file] = os.path.join(fileDirectory, file)
+          else:
+            inFile = open(os.path.join(fileDirectory, file))
+            aresObject.files[file] = extFiles[file]['parser'](inFile)
   # Those two lines are just there to test the json conversion on the server side
   stringConversion = json.dumps(mod.call(aresObject))
   data = json.loads(stringConversion)
@@ -49,6 +65,7 @@ if __name__ == '__main__':
     for key, val in httpParameters.items():
       aresObj.http[key.upper()] = val
     aresObj.http['DIRECTORY'] = os.path.join(directory, reportName)
+    sys.path.append(aresObj.http['DIRECTORY'])
     aresObj.http['REPORT_NAME'] = reportName
     localRuns(ajaxService.replace(".py", ""), aresObj)
   else:

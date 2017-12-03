@@ -66,7 +66,7 @@ def report(aresObj):
                               {'key': 'Date', 'colName': 'Last Modification'},
                               {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                               {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
-                              {'key': 'delete', 'colName': ''}], 'Scripts per folder')
+                              {'key': 'delete', 'colName': ''}], headerBox='Scripts per folder')
 
   #
   bar.setKeys(['Day'])
@@ -77,7 +77,7 @@ def report(aresObj):
                                   {'key': 'Date', 'colName': 'Last Modification'},
                                   {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
                                   {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
-                                  {'key': 'delete', 'colName': ''}], 'Folder')
+                                  {'key': 'delete', 'colName': ''}], headerBox='Folder')
 
   donut.setKeys(['report_name'])
   donut.setVals(['activity'])

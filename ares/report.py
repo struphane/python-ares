@@ -318,7 +318,7 @@ def run_report(report_name, script_name, user_id):
 
   """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
-  onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
+  onload, jsCharts, side_bar, envName, jsGlobal, scriptData = '', '', [], '', '', ''
   fileNameToParser = {}
   viewScript, downloadEnv = False, False
   cssImport, jsImport = '', ''
@@ -331,6 +331,11 @@ def run_report(report_name, script_name, user_id):
   for reportFolderName in ['utils', 'ajax']:
     if reportFolderName in sys.modules:
       del sys.modules[reportFolderName]
+
+  if os.path.exists(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name)):
+    inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
+    scriptData = inFile.read()
+    inFile.close()
 
   try:
     if script_name is None:
@@ -424,7 +429,14 @@ def run_report(report_name, script_name, user_id):
           if fnct == 'params':
             reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
 
-    getattr(mod, fnct)(reportObj)
+    if fnct == 'params':
+      modal = reportObj.modal('Open Report Parameters')
+      modal.modal_header = "Report parameters"
+      getattr(mod, fnct)(modal)
+      modal.internalLink('Run', reportObj.reportName, attrs=modal.httpParams)
+      reportObj.jsOnLoadFnc.add("%s.modal('show'); " % modal.jqId)
+    else:
+      getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     #if typeDownload in ['BOTH', 'SCRIPT']:
     #  side_bar.append('<h5 style="color:white">&nbsp;<b><i class="fa fa-download" aria-hidden="true">&nbsp;</i>Download</b></h5>')
@@ -446,8 +458,20 @@ def run_report(report_name, script_name, user_id):
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   except Exception as e:
-    error = True
     logging.debug(e)
+    #TODO use the import factory to generate the beloz strings
+    cssImport = ''''<link rel="stylesheet" href="/static/css/font-awesome.min.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/bootstrap.min.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/nv.d3.min.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/bdi.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/bootstrap-simple-sidebar.css" type="text/css"> '''
+    jsImport = '''
+                  <script language="javascript" type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/tether.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/ares.js"></script>
+               '''
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
@@ -483,21 +507,16 @@ def run_report(report_name, script_name, user_id):
             del sys.modules[module]
       for f in reportObj.files.values():
         f.close()
-
-  if not isAuth:
-    return render_template('ares_error.html', content=content)
-
-  if error:
-    return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar=side_bar, jsGlobal=jsGlobal)
-
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
                          viewScript=viewScript, downloadEnv=downloadEnv, htmlStatics="\n".join(htmlStatics),
-                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name, adminEnv=adminEnv, fileRules=fileRules)
+                         htmlConfigs="\n".join(htmlConfigs), report_name=report_name, script_name=script_name,
+                         adminEnv=adminEnv, fileRules=fileRules, scriptData=scriptData)
 
 
-@report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
+@report.route("/ajax/<report_name>/<script>", defaults={'origin': None}, methods = ['GET', 'POST'])
+@report.route("/ajax/<report_name>/<script>/<origin>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script, origin):
   """ Generic Ajax call """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
@@ -521,28 +540,36 @@ def ajaxCall(report_name, script, origin):
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
+    report = __import__(report_name)
+    if origin:
+      origin = __import__(origin)
+      ALIAS, DISK_NAME = 0, 1
+      for fileConfig in getattr(origin, 'FILE_CONFIGS', []):
+        if fileConfig.get('folder') == 'data':
+          # if fileConfig.get('filename'[ALIAS] in reportObj.fileMap:
+          #   raise AresExceptions('You cannot use the same code for a static and an output')
+
+          queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
+          files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
+          for file in files:
+            if fileConfig.get('type') == 'pandas':
+              reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
+            else:
+              reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+            # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
+        elif fileConfig.get('folder') == 'static':
+          queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename'], 'username': current_user.email}
+          files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
+          for file in files:
+            if fileConfig.get('type') == 'pandas':
+              reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
+            else:
+              reportObj.files[file[ALIAS]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+              reportObj.files[regex.sub('', file[ALIAS].strip())] = reportObj.files[file[ALIAS]]
 
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
-    ALIAS, DISK_NAME = 0, 1
-    for fileConfig in getattr(ajaxMod, 'FILE_CONFIGS', []):
-      if fileConfig.get('folder') == 'data':
-        # if fileConfig.get('filename'[ALIAS] in reportObj.fileMap:
-        #   raise AresExceptions('You cannot use the same code for a static and an output')
-
-        queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
-        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
-        for file in files:
-          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-          # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
-      elif fileConfig.get('folder') == 'static':
-        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename'], 'username': current_user.email}
-        files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
-        for file in files:
-          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-          reportObj.files[regex.sub('', file[DISK_NAME].strip())] = reportObj.files[file[DISK_NAME]]
-
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
   except Exception as e:
     logging.debug(e)
@@ -1214,12 +1241,14 @@ def downloadPackage(name):
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % name, as_attachment=True)
 
-@report.route("/download/<report_name>/data/<file_name>", methods = ['GET'])
-def downloadOutputs(report_name, file_name):
+@report.route("/download/<report_name>/data/<file_name>/<file_location>", methods = ['GET'])
+@report.route("/download/<report_name>/data/<file_name>", defaults={'file_location': 'data'}, methods = ['GET'])
+@noCache
+def downloadOutputs(report_name, file_name, file_location):
   """ Download the up to date Ares package """
-  aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'data', file_name)
+  aresoutputFile = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, file_location, file_name)
   #no need to check for error the normal raise should be fine
-  return send_file(aresoutputFile)
+  return send_file(aresoutputFile, as_attachment=True)
 
 @report.route("/ares/version", methods = ['GET', 'POST'])
 def getAresFilesVersions():

@@ -4,6 +4,7 @@ This will be the helper for the Ajax calls
 
 This module require jQuery
 reference website: http://api.jquery.com/jquery.ajax/
+@author: Olivier Nogues
 
 """
 

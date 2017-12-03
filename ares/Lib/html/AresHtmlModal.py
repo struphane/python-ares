@@ -6,6 +6,9 @@ from ares.Lib import AresHtml
 from ares.Lib import AresItem
 from ares.Lib import AresJs
 
+from ares.Lib.html import AresHtmlSelect
+
+
 class Modal(AresHtml.Html):
   """
   Python Wrapper to a simple modal view
@@ -17,19 +20,23 @@ class Modal(AresHtml.Html):
   cssCls, alias = ['modal fade'], 'modal'
   modal_header = '' # The title for the modal popup
   reference = 'https://v4-alpha.getbootstrap.com/components/modal/'
+  maxHeight = 450
 
   def __init__(self, aresObj, name, cssCls=None, cssAttr=None, btnCls=None):
     """ Create an python HTML object """
     super(Modal, self).__init__(aresObj, None, cssCls, cssAttr)
     self.name = name
-    self.vals = []
+    self.vals, self.httpParams = [], {}
     if not btnCls:
       btnCls = ['btn btn-primary']
     self.btnCls = btnCls
 
-  def addVal(self, htmlObj):
+  def addVal(self, httpKey, htmlObj):
     """ Add an HTML object to the modal """
     self.vals.append(htmlObj)
+    if httpKey is not None:
+      self.httpParams[httpKey] = htmlObj
+    return htmlObj
 
   def __str__(self):
     """ Return the String representation of a HTML Modal Object """
@@ -41,7 +48,7 @@ class Modal(AresHtml.Html):
     #item.add(4, '<button type="button" style="margin-top:10px" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
     #item.add(4, '<div class="modal-title" id="%sTitle">%s</div>' % (self.htmlId, self.modal_header))
     #item.add(3, '</div>')
-    item.add(3, '<div class="modal-body">')
+    item.add(3, '<div class="modal-body" style="overflow-y:scroll;max-height:%spx;margin-bottom:10px">' % self.maxHeight)
     for val in self.vals:
       if hasattr(val, 'incIndent'):
           val.incIndent = 4
@@ -54,6 +61,30 @@ class Modal(AresHtml.Html):
     item.add(0, '</div>')
     return str(item)
 
+  # -------------------------------------------------------------------------------------------------------------------
+  #
+  #                             Section dedicated to set the HTMO object for the modal
+  # -------------------------------------------------------------------------------------------------------------------
+  def input(self, label, httpKey, dflt='', cssCls=None):
+    return self.addVal(httpKey, self.aresObj.input(label, cssCls=cssCls, dflt=dflt, inReport=False))
+
+  def inputInt(self, label, httpKey, dflt='', cssCls=None):
+    return self.addVal(httpKey, self.aresObj.inputInt(label, cssCls=cssCls, dflt=dflt, inReport=False))
+
+  def date(self, label='Date', httpKey='date', dflt='', cssCls=None):
+    return self.addVal(httpKey, self.aresObj.date(label, cssCls=cssCls, dflt=dflt, inReport=False))
+
+  def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None):
+    return self.addVal(None, self.aresObj.internalLink(linkValue, script, attrs=attrs, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
+
+  def radio(self, recordSet, httpKey, col=None, cssCls=None, cssAttr=None, checked=None):
+    return self.addVal(httpKey, self.aresObj.radio(recordSet, col=col, cssCls=cssCls, cssAttr=cssAttr, checked=checked, inReport=False))
+
+  def select(self, recordSet, title, httpKey, col=None, cssCls=None, cssAttr=None, selected=None):
+    return self.addVal(httpKey, self.aresObj.select(recordSet, title, col=col, cssCls=cssCls, cssAttr=cssAttr, selected=selected, inReport=False))
+
+  def selectfiles(self, fileName, title, httpKey, cssCls=None, cssAttr=None, selected=None):
+    return self.addVal(httpKey, AresHtmlSelect.Select(self.aresObj, self.aresObj.fileMap.get(fileName, []), title, col=None, cssCls=cssCls, cssAttr=cssAttr, selected=selected))
 
 
 class FixedModal(AresHtml.Html):
@@ -103,3 +134,5 @@ class DialogValid(AresHtml.Html):
   def toJs(self, parent):
     """ Convert to a Js expression """
     return ".append('%s')" % (parent, self)
+
+

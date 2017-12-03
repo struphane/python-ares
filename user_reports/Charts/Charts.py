@@ -73,7 +73,6 @@ def report(aresObj):
 
 
   title = aresObj.title("Volatility surface example")
-  title.hidden = True
   # Example of DropDown selection
   #   - parameter 1: the title to be displayed in the object
   #   - parameter 2: the content of the dropdown (the items should be tuple (Name, hyperlink)
@@ -81,9 +80,12 @@ def report(aresObj):
   aresObj.newline()
   aresObj.newline()
   surface = aresObj.vis3DSurface(recordSet)
-
-  surface.hidden = True
   surface.setDataSet(recordSet)
 
-  venn = aresObj.venn(recordSet, [], mockData=True)
-  #venn.hidden = True
+  div = aresObj.div()
+
+  for graph in ['venn', 'pie', 'bar', 'donut', 'lineCumulative', 'line', 'stackedArea', 'stackedAreaWithFocus',
+                'multiBar', 'lineChartFocus', 'horizBar', 'scatter', 'sparklineplus']:
+    varGraph = getattr(aresObj, graph)(recordSet, [], mockData=True, inReport=False)
+    aresObj.button(graph).loadTo(varGraph, div)
+

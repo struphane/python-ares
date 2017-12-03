@@ -10,9 +10,6 @@ from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 from ares.Lib.html import AresHtmlContainer
 
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
-
 
 class NvD3CandlestickBarChart(AresHtmlGraphSvg.Svg):
   """ NVD3 Candle Chart Stick bar Chart python interface """
@@ -43,19 +40,17 @@ class NvD3CandlestickBarChart(AresHtmlGraphSvg.Svg):
   def processData(self):
       """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
       recordSet = AresChartsService.toCandleStick(self.vals, self.chartKeys, *self.chartVals)
-      for key, vals in recordSet.items():
-        self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
+      self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
-  def jsUpdate(self):
+  def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
-    # Dispatch method to add events on the chart (in progress)
-    dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
+    data = data if data is not None else self.jqData
     return '''
-              var %s = nv.models.%s().%s ;
-              d3.select("#%s svg").datum(%s)%s.call(%s);
-              nv.utils.windowResize(%s.update);
-            ''' % (self.htmlId, self.chartObject, self.attrToStr(),
-                   self.htmlId, self.jqData, self.getSvg(), self.htmlId, self.htmlId)
+              var %(htmlId)s = nv.models.%(chartObject)s().%(chartAttr)s ;
+              d3.select("#%(htmlId)s svg").datum(%(data)s)%(svgProp)s.call(%(htmlId)s);
+              nv.utils.windowResize(%(htmlId)s.update);
+            ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(),
+                   'data': data, 'svgProp': self.getSvg()}
 
   def __str__(self):
     """ Return the svg container """

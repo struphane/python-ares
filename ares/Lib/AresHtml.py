@@ -8,6 +8,7 @@ Please make sure that all the CSS information are defined in a CSS class
 Aliases must be unique
 """
 
+import re
 import os
 import json
 import collections
@@ -16,6 +17,7 @@ import functools
 
 from ares.Lib import AresJs
 
+regex = re.compile('[^a-zA-Z0-9_]')
 
 def deprecated(func):
     """This is a decorator which can be used to mark functions
@@ -54,6 +56,10 @@ class SetEncoder(json.JSONEncoder):
 
      return json.JSONEncoder.default(self, obj)
 
+def cleanData(value):
+  """ Function to clean the javascript data to allow the use of variables """
+  return regex.sub('', value.strip())
+
 
 class Html(object):
   """
@@ -72,7 +78,7 @@ class Html(object):
 
   """
   alias, jsEvent = None, None
-  cssCls, __css, reference = None, None, None
+  cssCls, __css = None, None
   incIndent = 0
   reqJs, reqCss = ['jquery'], ['jquery'] # Jquery is already needed
   references = []
@@ -86,7 +92,7 @@ class Html(object):
     if cssCls is not None:
       # If the cssCls is defined it will replace the default one
       # We do not want to extend the list of the class
-      self.attr['class'] = list(cssCls)
+      self.attr['class'] = set(cssCls)
     if css is not None:
       # we need to do a copy of the CSS style at this stage
       self.attr['css'] = dict(css)
@@ -183,6 +189,10 @@ class Html(object):
   def js(self, evenType, jsDef, url=None):
     """ Add a Javascript Event to an HTML object """
     self.aresObj.jsOnLoadFnc.add(AresJs.JQueryEvents(self.htmlId, self.jqId, evenType, jsDef, url=url))
+
+  def jsUpdate(self):
+    """  Return some special Javascript code to build the HTML object """
+    return ''
 
   def jsFromFile(self, evenType, fileName, variables=None):
     """ Add a Javascript even by loading a file """
@@ -326,7 +336,6 @@ class NavBar(object):
 
 
 
-
 #------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------
 #
@@ -338,6 +347,7 @@ class NavBar(object):
 class WebStorage(object):
   """ This module should manage local and also session storage
   """
+
 
 class WebSharedWorkers(object):
   """ """

@@ -40,12 +40,15 @@ def getReport(results, directory, folder, reports, scriptPath):
             results[reportModule.__name__].http[param['code']] = param['dflt']
         try :
           for f in ['static', 'data']:
-            fileDirectory = os.path.join(directory, reportName, f)
+            fileDirectory = os.path.join(directory, folder, f)
             if os.path.isdir(fileDirectory):
               for file in os.listdir(fileDirectory):
                 if file in extFiles:
-                  inFile = open(os.path.join(fileDirectory, file))
-                  results[reportModule.__name__].files[file] = extFiles[file]['parser'](inFile)
+                  if extFiles[file].get('type') == 'pandas':
+                    results[reportModule.__name__].files[file] = os.path.join(fileDirectory, file)
+                  else:
+                    inFile = open(os.path.join(fileDirectory, file))
+                    results[reportModule.__name__].files[file] = extFiles[file]['parser'](inFile)
           results[reportModule.__name__].http['DIRECTORY'] = scriptPath
           results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
           reportModule.report(results[reportModule.__name__])

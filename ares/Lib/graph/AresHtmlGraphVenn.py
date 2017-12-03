@@ -9,8 +9,6 @@ from ares.Lib.html import AresHtmlRadio
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlGraphSvg
 
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
 
 class NvD3Venn(AresHtmlGraphSvg.Svg):
   """ NVD3 Venn Chart python interface """
@@ -33,8 +31,7 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toVenn(self.vals, self.chartKeys[0], self.chartKeys[1], self.chartVals, extKeys=self.extKeys)
-    for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
+    self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
   def setKeys(self, keys, selected=None):
     """ Set a default key for the graph """

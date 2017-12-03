@@ -473,6 +473,15 @@ class TableBase(AresHtml.Html):
           });
       ''' % (self.htmlId, idButton, json.dumps(colNumbers), self.htmlId))
 
+  def addButtonRow(self):
+    """ Add a row """
+    self.buttons.append(
+      "<button id='%s_button_add' class='btn btn-success' type='button' style='margin-left:5px;margin-bottom:10px'>Add row</button>" % (
+      self.htmlId))
+    self.aresObj.jsOnLoadFnc.add(''' 
+      
+      ''')
+
   def addButtonGrpShow(self, colNumber, groupColNumber, title):
     """
 
@@ -503,11 +512,19 @@ class TableBase(AresHtml.Html):
 
     ''' % (self.htmlId, idButton, colNumber, self.htmlId, json.dumps(groupColNumber)))
 
-  def selectableRow(self):
+  def selectableRow(self, nRows=1):
     """ Change the table to have selectable columns """
     self.aresObj.jsGlobal.add("%s_bgcolors = {} ;" % self.htmlId)
     self.aresObj.jsOnLoadFnc.add('''
           $('#%(htmlId)s tr').on('click', function (event){
+          
+              if ( ( Object.keys( %(htmlId)s_bgcolors ).length ) >= %(nRows)s ) {
+                for ( var key in %(htmlId)s_bgcolors ) {
+                  $('#%(htmlId)s tr:nth-child(' + (parseInt(key)+1) + ')').css( { 'background-color': %(htmlId)s_bgcolors[key] } );
+                } ;
+                %(htmlId)s_bgcolors = {} ;
+              }
+              
               var trId = $(this).index() ;
               if( !(trId in %(htmlId)s_bgcolors) ) {
                 %(htmlId)s_bgcolors[trId] = %(htmlId)s_originalBackground ;
@@ -519,7 +536,7 @@ class TableBase(AresHtml.Html):
                 $(this).css( { 'background-color': %(htmlId)s_bgcolors[trId] } );
                 delete %(htmlId)s_bgcolors[trId];
               }
-          })''' % {'htmlId': self.htmlId})
+          })''' % {'htmlId': self.htmlId, 'nRows': nRows})
 
   def __str__(self):
     """  Returns the string representation of a HTML Table """
@@ -593,7 +610,7 @@ class TableBase(AresHtml.Html):
     html.append("</tbody>")
     item =  "%s<table %s>%s</table>" % ("".join(htmlButtons), self.strAttr(), "".join(html))
     if self.headerBox is not None:
-      height = int(self.attr.get('css', {'height': '300px'})['height'].replace("px", ""))
+      height = int(self.attr.get('css', {'height': '300px'}).get('height', '300px').replace("px", ""))
       container = AresHtmlContainer.AresBox(self.htmlId, item, self.headerBox, properties=self.references)
       container.cssAttr['height'] = "%spx" % (height + 100)
       return str(container)
