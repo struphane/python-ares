@@ -278,14 +278,15 @@ def checkFileExist(dbPath, report_name, file_name):
                 WHERE disk_name = '%s' """ % file_name
   return list(db.select(query))
 
-def getAuthorizedFiles(fileConfigs, reportObj, fnct=None, ajax=False):
+def getAuthorizedFiles(fileConfigs, reportObj, report_name, fnct=None, ajax=False):
   ALIAS, DISK_NAME = 0, 1
+  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   sqlFileDict = {'data': 'get_file_auth.sql', 'static': 'static_file_map.sql'}
   for fileConfig in fileConfigs:
     if fileConfig.get('folder') == 'data':
-      queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.emai, 'type': fileConfig.get('folder')}
+      queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.email, 'type': fileConfig.get('folder')}
       files = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
-        open(os.path.join(SQL_CONFIG, sqlFileDict.get(fileConfig.get('folder'))).read(), params=queryFileAuthPrm))
+        open(os.path.join(SQL_CONFIG, sqlFileDict.get(fileConfig.get('folder')))).read(), params=queryFileAuthPrm)
       for file in files:
         if fileConfig.get('parser', None):
           reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
@@ -412,7 +413,7 @@ def run_report(report_name, script_name, user_id):
             reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
-    getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, fnct=fnct)
+    getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, report_name, fnct=fnct)
     if fnct == 'params':
       modal = reportObj.modal('Open Report Parameters')
       modal.modal_header = "Report parameters"
@@ -422,9 +423,6 @@ def run_report(report_name, script_name, user_id):
     else:
       getattr(mod, fnct)(reportObj)
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
-    #if typeDownload in ['BOTH', 'SCRIPT']:
-    #  side_bar.append('<h5 style="color:white">&nbsp;<b><i class="fa fa-download" aria-hidden="true">&nbsp;</i>Download</b></h5>')
-    #  side_bar.append(render_template_string('<li><a href="{{ url_for(\'ares.downloadFiles\', report_name=\'%s\', script=\'%s.py\') }}" >Python script</a></li>' % (report_name, script_name)))
     if typeDownload == 'BOTH':
       downloadEnv = report_name
     report = __import__(report_name) # run the report
@@ -443,7 +441,7 @@ def run_report(report_name, script_name, user_id):
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   except Exception as e:
     logging.debug(e)
-    #TODO use the import factory to generate the beloz strings
+    #TODO use the import factory to generate the below strings
     cssImport = ''''<link rel="stylesheet" href="/static/css/font-awesome.min.css" type="text/css">
                     <link rel="stylesheet" href="/static/css/bootstrap.min.css" type="text/css">
                     <link rel="stylesheet" href="/static/css/nv.d3.min.css" type="text/css">
@@ -502,9 +500,7 @@ def run_report(report_name, script_name, user_id):
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script, origin):
   """ Generic Ajax call """
-  SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   onload, js, error = '', '', False
-  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
   try:
     reportObj = Ares.Report()
     reportObj.http = getHttpParams(request)
@@ -526,7 +522,7 @@ def ajaxCall(report_name, script, origin):
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
-    getAuthorizedFiles(getattr(ajaxMod, 'FILE_CONFIGS', []), reportObj, ajax=True)
+    getAuthorizedFiles(getattr(ajaxMod, 'FILE_CONFIGS', []), reportObj, report_name, ajax=True)
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
   except Exception as e:
     logging.debug(e)
