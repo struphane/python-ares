@@ -318,7 +318,7 @@ def run_report(report_name, script_name, user_id):
 
   """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
-  onload, jsCharts, error, side_bar, envName, jsGlobal = '', '', False, [], '', ''
+  onload, jsCharts, side_bar, envName, jsGlobal, scriptData = '', '', [], '', '', ''
   fileNameToParser = {}
   viewScript, downloadEnv = False, False
   cssImport, jsImport = '', ''
@@ -331,6 +331,11 @@ def run_report(report_name, script_name, user_id):
   for reportFolderName in ['utils', 'ajax']:
     if reportFolderName in sys.modules:
       del sys.modules[reportFolderName]
+
+  if os.path.exists(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name)):
+    inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
+    scriptData = inFile.read()
+    inFile.close()
 
   try:
     if script_name is None:
@@ -372,11 +377,6 @@ def run_report(report_name, script_name, user_id):
     if script_name in sys.modules:
       del sys.modules[script_name]
 
-    inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
-    scriptData = inFile.read()
-    inFile.close()
-
-    print scriptData
     mod = __import__(script_name) # run the report
     if reportObj.http.get('show_params') == '1' and getattr(mod, 'HTTP_PARAMS', []):
       fnct = 'params'
@@ -458,7 +458,6 @@ def run_report(report_name, script_name, user_id):
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   except Exception as e:
-    error = True
     logging.debug(e)
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
@@ -496,12 +495,7 @@ def run_report(report_name, script_name, user_id):
       for f in reportObj.files.values():
         f.close()
 
-  if not isAuth:
-    return render_template('ares_error.html', content=content)
-
-  if error:
-    return render_template('ares_error.html', cssImport=cssImport, jsImport=jsImport, jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar=side_bar, jsGlobal=jsGlobal)
-
+  # TODO Fix the display in case of script error
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
