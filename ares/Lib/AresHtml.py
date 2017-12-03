@@ -78,7 +78,7 @@ class Html(object):
 
   """
   alias, jsEvent = None, None
-  cssCls, __css, reference = None, None, None
+  cssCls, __css = None, None
   incIndent = 0
   reqJs, reqCss = ['jquery'], ['jquery'] # Jquery is already needed
   references = []
