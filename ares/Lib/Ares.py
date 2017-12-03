@@ -281,8 +281,8 @@ class Report(object):
   def selectmulti(self, title, values, cssCls=None, cssAttr=None): return self.add(aresFactory['SelectMulti'](self, title, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Radio and Select Section
-  def radio(self, recordSet, col=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport=inReport)
-  def select(self, recordSet, title, col=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['Select'](self, recordSet, title, col, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport=inReport)
+  def radio(self, recordSet, col=None, cssCls=None, cssAttr=None, checked=None, inReport=True): return self.add(aresFactory['Radio'](self, recordSet, col, cssCls=cssCls, cssAttr=cssAttr, checked=checked), sys._getframe().f_code.co_name, inReport=inReport)
+  def select(self, recordSet, title, col=None, cssCls=None, cssAttr=None, selected=None, inReport=True): return self.add(aresFactory['Select'](self, recordSet, title, col, cssCls=cssCls, cssAttr=cssAttr, selected=selected), sys._getframe().f_code.co_name, inReport=inReport)
 
 
   # Title section
@@ -308,9 +308,9 @@ class Report(object):
   def map(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Map'](self, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   # Data
-  def data(self, vals): return AresHtmlData.HtmlData(self, vals)
-  def datadic(self, vals): return AresHtmlData.HtmlDataDic(self, vals)
-  def recordset(self, vals): return AresHtmlData.HtmlDataRec(self, vals)
+  def data(self, vals): return self.add(AresHtmlData.HtmlData(self, vals), sys._getframe().f_code.co_name)
+  def datadic(self, vals): return self.add(AresHtmlData.HtmlDataDic(self, vals), sys._getframe().f_code.co_name)
+  def recordset(self, vals): return self.add(AresHtmlData.HtmlDataRec(self, vals), sys._getframe().f_code.co_name)
 
   # Generic Action section
   def slider(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Slider'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
