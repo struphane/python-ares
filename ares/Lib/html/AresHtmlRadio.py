@@ -51,7 +51,8 @@ class Radio(AresHtml.Html):
       else:
         item.append('<label class="btn btn-info" name="%s">' % self.htmlId)
         item.append('%s<input type="radio" name="input_%s" value="%s" autocomplete="off">' % (val, self.htmlId, val))
-      item.append('<span class="awesomeicon fa fa-check">&nbsp;</span></label></div>')
+      item.append('<span class="awesomeicon fa fa-check">&nbsp;</span></label>')
+    item.append('</div>')
     return "".join(item)
 
   @property
