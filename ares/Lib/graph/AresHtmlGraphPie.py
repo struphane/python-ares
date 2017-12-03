@@ -37,25 +37,6 @@ class NvD3Pie(AresHtmlGraphSvg.Svg):
     recordSet = AresChartsService.toPie(self.vals, self.chartKeys, self.chartVals, extKeys=self.extKeys)
     self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
-  def showLegend(self, boolFlag):
-    """ Change the D3 flag to display the legend in the chart """
-    if boolFlag:
-      self.addChartProp('showLegend', 'true')
-    else:
-      self.addChartProp('showLegend', 'false')
-
-  def outSideLabels(self, boolFlag):
-    """ Change the flag to display the labels of teh chart outside """
-    if boolFlag:
-      self.addChartProp('showLabels', 'true')
-      self.addChartProp('labelsOutside', 'true')
-    else:
-      self.addChartProp('labelsOutside', 'false')
-
-  def changeColor(self, rangeColors):
-    """ Change the default colors in the chart """
-    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
-
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     # Dispatch method to add events on the chart (in progress)

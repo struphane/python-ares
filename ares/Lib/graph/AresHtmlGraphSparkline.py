@@ -5,11 +5,11 @@
 
 import json
 from Libs import AresChartsService
-from ares.Lib.html import AresHtmlGraphSvg
+from ares.Lib.html import AresHtmlGraphSvgMulti
 import re
 regex = re.compile('[^a-zA-Z0-9_]')
 
-class NvD3SparkLinePlus(AresHtmlGraphSvg.MultiSvg):
+class NvD3SparkLinePlus(AresHtmlGraphSvgMulti.MultiSvg):
   """ NVD3 Spark Plus Line Chart python interface """
   alias, chartObject = 'sparklineplus', 'sparklinePlus'
   references = ['http://nvd3.org/examples/line.html']
