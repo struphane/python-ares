@@ -77,14 +77,14 @@ class Modal(AresHtml.Html):
   def internalLink(self, linkValue, script, attrs=None, cssCls=None, cssAttr=None):
     return self.addVal(None, self.aresObj.internalLink(linkValue, script, attrs=attrs, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
 
-  def radio(self, recordSet, httpKey, col=None, cssCls=None, cssAttr=None):
-    return self.addVal(httpKey, self.aresObj.radio(recordSet, col=col, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
+  def radio(self, recordSet, httpKey, col=None, cssCls=None, cssAttr=None, checked=None):
+    return self.addVal(httpKey, self.aresObj.radio(recordSet, col=col, cssCls=cssCls, cssAttr=cssAttr, checked=checked, inReport=False))
 
-  def select(self, recordSet, title, httpKey, col=None, cssCls=None, cssAttr=None):
-    return self.addVal(httpKey, self.aresObj.select(recordSet, title, col=col, cssCls=cssCls, cssAttr=cssAttr, inReport=False))
+  def select(self, recordSet, title, httpKey, col=None, cssCls=None, cssAttr=None, selected=None):
+    return self.addVal(httpKey, self.aresObj.select(recordSet, title, col=col, cssCls=cssCls, cssAttr=cssAttr, selected=selected, inReport=False))
 
-  def selectfiles(self, fileName, title, httpKey, cssCls=None, cssAttr=None):
-    return self.addVal(httpKey, AresHtmlSelect.Select(self.aresObj, self.aresObj.fileMap.get(fileName, []), title, col=None, cssCls=cssCls, cssAttr=cssAttr))
+  def selectfiles(self, fileName, title, httpKey, cssCls=None, cssAttr=None, selected=None):
+    return self.addVal(httpKey, AresHtmlSelect.Select(self.aresObj, self.aresObj.fileMap.get(fileName, []), title, col=None, cssCls=cssCls, cssAttr=cssAttr, selected=selected))
 
 
 class FixedModal(AresHtml.Html):
