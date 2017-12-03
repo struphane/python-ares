@@ -76,16 +76,17 @@ def report(aresObj):
   # Example of DropDown selection
   #   - parameter 1: the title to be displayed in the object
   #   - parameter 2: the content of the dropdown (the items should be tuple (Name, hyperlink)
-  aresObj.newline()
-  aresObj.newline()
-  aresObj.newline()
-  surface = aresObj.vis3DSurface(recordSet)
-  surface.setDataSet(recordSet)
+  #aresObj.newline(3)
+  #surface = aresObj.vis3DSurface(recordSet)
+  #surface.setDataSet(recordSet)
 
   div = aresObj.div()
-
-  for graph in ['venn', 'pie', 'bar', 'donut', 'lineCumulative', 'line', 'stackedArea', 'stackedAreaWithFocus',
-                'multiBar', 'lineChartFocus', 'horizBar', 'scatter', 'sparklineplus']:
+  print div
+  #for graph in ['venn', 'pie', 'bar', 'donut', 'lineCumulative', 'line', 'stackedArea', 'stackedAreaWithFocus',
+  #              'multiBar', 'lineChartFocus', 'horizBar', 'scatter', 'sparklineplus']:
+  for graph in ['pie', 'donut', 'bar', 'pie3D', 'candlestickbar', 'forceDirected', 'venn', 'wordcloud', 'multiBar',
+                'comboLineBar', 'horizBar', 'line', 'lineCumulative', 'lineChartFocus', 'scatter',
+                'spider', 'stackedArea', 'stackedAreaWithFocus']:
     varGraph = getattr(aresObj, graph)(recordSet, [], mockData=True, inReport=False)
     aresObj.button(graph).loadTo(varGraph, div)
 

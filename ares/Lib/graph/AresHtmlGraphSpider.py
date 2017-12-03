@@ -6,14 +6,12 @@
 
 import json
 from Libs import AresChartsService
-from ares.Lib.html import AresHtmlGraphSvg
+from ares.Lib.html import AresHtmlGraphSvgMulti
 from ares.Lib.html import AresHtmlRadio
 from ares.Lib.html import AresHtmlContainer
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
 
 
-class D3SpiderChart(AresHtmlGraphSvg.MultiSvg):
+class D3SpiderChart(AresHtmlGraphSvgMulti.MultiSvg):
   """ NVD3 Spider Chart python interface """
   alias, chartObject = 'spider', 'multiBarChart'
   references = ['http://bl.ocks.org/nbremer/6506614',
@@ -28,11 +26,11 @@ class D3SpiderChart(AresHtmlGraphSvg.MultiSvg):
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toSpider(self.vals, self.chartKeys, self.selectedX , self.chartVals, extKeys=self.extKeys)
-    for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
+    self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
-  def jsUpdate(self):
+  def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    data = data if data is not None else self.jqData
     return '''
               var colorscale = d3.scale.category10();
               var data = %s ;
@@ -61,21 +59,23 @@ class D3SpiderChart(AresHtmlGraphSvg.MultiSvg):
                 .attr("y", function(d, i){ return i * 20 + 9;}).attr("font-size", "11px")
                 .attr("fill", "#737373").text(function(d) { return d; });
 
-            ''' % (self.jqData, self.width, self.height-55, self.htmlId)
+            ''' % (data, self.width, self.height-55, self.htmlId)
 
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {})
-    values.select(self.selectedChartVal)
-    self.dynValSelection = values.val # The javascript representation of the radio
-    categories.click([self])
-    values.click([self])
+    self.categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys],
+                                          cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, checked=self.selectedChartKey)
+    self.values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals],
+                                      cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, checked=self.selectedChartVal)
 
-    self.htmlContent.append(str(categories))
-    self.htmlContent.append(str(values))
+    self.categories.click([self])
+    self.values.click([self])
+
+    self.htmlContent.append(str(self.categories))
+    self.htmlContent.append(str(self.values))
     self.htmlContent.append('<div id="body"><div %s></div></div>' % self.strAttr())
-    return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+    if self.headerBox:
+      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+
+    return "\n".join(self.htmlContent)

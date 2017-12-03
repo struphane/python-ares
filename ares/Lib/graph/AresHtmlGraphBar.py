@@ -31,32 +31,6 @@ class NvD3Bar(AresHtmlGraphSvg.Svg):
     recordSet = AresChartsService.toBar(self.vals,self.seriesName, self.chartKeys, self.chartVals, extKeys=self.extKeys)
     self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
-  def showLegend(self, boolFlag):
-    """ Change the D3 flag to display the legend in the chart """
-    if boolFlag:
-      self.addChartProp('showLegend', 'true')
-    else:
-      self.addChartProp('showLegend', 'false')
-
-  def showValues(self, boolFlag):
-    """ Change the D3 flag to display the legend in the chart """
-    if boolFlag:
-      self.addChartProp('showValues', 'true')
-    else:
-      self.addChartProp('showValues', 'false')
-
-  def outSideLabels(self, boolFlag):
-    """ Change the flag to display the labels of teh chart outside """
-    if boolFlag:
-      self.addChartProp('showLabels', 'true')
-      self.addChartProp('labelsOutside', 'true')
-    else:
-      self.addChartProp('labelsOutside', 'false')
-
-  def changeColor(self, rangeColors):
-    """ Change the default colors in the chart """
-    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
-
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     data = data if data is not None else self.jqData
