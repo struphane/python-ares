@@ -114,6 +114,22 @@
             }
         });
 
+        $('#saveScript').click(function () {
+            $.ajax({
+                type: 'POST',
+                url: "/reports/editScript",
+                data:  String($('#script_wrapper').html()),
+                contentType: false,
+                dataType : 'html',
+                cache: false,
+                processData: false,
+                async: false,
+                success: function(data) {
+                    confirm('Success!');
+                },
+            });
+        });
+
         $.ajaxSetup({
             beforeSend:function(){
                 // show image here
@@ -138,7 +154,6 @@
 <div id="page-content-wrapper">
     <!-- PYTHON CONTENT  -->
             {{ content|safe }}
-
     <!-- END PYTHON CONTENT  -->
     {% if scriptData %}
         <br>
@@ -147,7 +162,13 @@
         <button id="showScript" type="submit" style="border:none; background-color:transparent">
             <img src="{{ url_for('static', filename='images/python-logo.png') }}"/>
         </button>
-        <div id="script_wrapper" contenteditable="true" class="preformatted">{{ scriptData|safe  }}</div>
+        <button id="saveScript" type="submit" style="color:white; border:none; background-color:#68a26f;float: right;">
+            SAVE
+        </button>
+
+        <br>
+        <br>
+        <div id="script_wrapper" contenteditable="true" class="preformatted">{{ scriptData|safe }}</div>
     {% endif %}
 </div>
 
