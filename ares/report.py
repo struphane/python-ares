@@ -1210,7 +1210,7 @@ def downloadPackage(name):
 @report.route("/editScript", methods = ['POST'])
 def editScript():
   """ """
-  scriptDtls = request.environ['HTTP_REFERER'].split('/')
+  scriptDtls = request.environ['HTTP_REFERER'].split('?')[0].split('/')
   script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-2], "%s.py" % scriptDtls[-1]), 'w')
   scriptData = request.data.decode('utf-8').replace('<mark class="blue">', '').replace('</mark>', '')
   for line in scriptData.split('\n'):
