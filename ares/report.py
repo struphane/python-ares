@@ -278,6 +278,26 @@ def checkFileExist(dbPath, report_name, file_name):
                 WHERE disk_name = '%s' """ % file_name
   return list(db.select(query))
 
+def getAuthorizedFiles(fileConfigs, reportObj, fnct=None, ajax=False):
+  ALIAS, DISK_NAME = 0, 1
+  sqlFileDict = {'data': 'get_file_auth.sql', 'static': 'static_file_map.sql'}
+  for fileConfig in fileConfigs:
+    if fileConfig.get('folder') == 'data':
+      queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.emai, 'type': fileConfig.get('folder')}
+      files = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
+        open(os.path.join(SQL_CONFIG, sqlFileDict.get(fileConfig.get('folder'))).read(), params=queryFileAuthPrm))
+      for file in files:
+        if fileConfig.get('parser', None):
+          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+        elif fileConfig.get('type') == 'pandas':
+          reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
+        else:
+          reportObj.files[file[DISK_NAME]] = open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME]))
+        if not ajax:
+          fileNameToParser[file[DISK_NAME]] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
+        if fnct == 'params' and not ajax:
+          reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
+
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
 #
@@ -392,43 +412,7 @@ def run_report(report_name, script_name, user_id):
             reportObj.http[param['code']] = param['dflt']
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
-    ALIAS, DISK_NAME = 0, 1
-    for fileConfig in getattr(mod, 'FILE_CONFIGS', []):
-      if fileConfig.get('folder') == 'data':
-        if fileConfig['filename'] in reportObj.fileMap:
-          raise AresExceptions('You cannot use the same code for a static and an output')
-
-        queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.email}
-        files = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
-                                   open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
-        for file in files:
-          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-          reportObj.files[regex.sub('', file[DISK_NAME].strip())] = reportObj.files[file[1]]
-          fileNameToParser[file[DISK_NAME]] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
-          if 'names' in fileConfig:
-            for name in fileConfig['names']:
-              fileNameToParser[name] = "%s.%s" % (
-                fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
-          if fnct == 'params':
-            reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
-      elif fileConfig.get('folder') == 'static':
-        if fileConfig['filename'] in reportObj.fileMap:
-          raise AresExceptions('You cannot use the same code for a static and an output')
-
-        queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename']}
-        staticFiles = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
-                                         open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
-        for file in staticFiles:
-          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-          reportObj.files[regex.sub('', file[DISK_NAME].strip())] = reportObj.files[file[DISK_NAME]]
-          fileNameToParser[file[DISK_NAME]] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
-          if 'names' in fileConfig:
-            for name in fileConfig['names']:
-              fileNameToParser[name] = "%s.%s" % (
-              fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
-          if fnct == 'params':
-            reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
-
+    getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, fnct=fnct)
     if fnct == 'params':
       modal = reportObj.modal('Open Report Parameters')
       modal.modal_header = "Report parameters"
@@ -515,8 +499,7 @@ def run_report(report_name, script_name, user_id):
                          adminEnv=adminEnv, fileRules=fileRules, scriptData=scriptData)
 
 
-@report.route("/ajax/<report_name>/<script>", defaults={'origin': None}, methods = ['GET', 'POST'])
-@report.route("/ajax/<report_name>/<script>/<origin>", methods = ['GET', 'POST'])
+@report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
 def ajaxCall(report_name, script, origin):
   """ Generic Ajax call """
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
@@ -540,36 +523,10 @@ def ajaxCall(report_name, script, origin):
     reportObj.http['REPORT_NAME'] = report_name
     reportObj.http['DIRECTORY'] = userDirectory
     reportObj.reportName = report_name
-    report = __import__(report_name)
-    if origin:
-      origin = __import__(origin)
-      ALIAS, DISK_NAME = 0, 1
-      for fileConfig in getattr(origin, 'FILE_CONFIGS', []):
-        if fileConfig.get('folder') == 'data':
-          # if fileConfig.get('filename'[ALIAS] in reportObj.fileMap:
-          #   raise AresExceptions('You cannot use the same code for a static and an output')
-
-          queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename']}
-          files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'get_file_auth.sql')).read(), params=queryFileAuthPrm)
-          for file in files:
-            if fileConfig.get('type') == 'pandas':
-              reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
-            else:
-              reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-            # reportObj.http.setdefault('FILE_MAP', {}).setdefault(file['alias'], []).append(file['disk_name'])
-        elif fileConfig.get('folder') == 'static':
-          queryFileMapPrm = {'type': fileConfig.get('folder'), 'file_cod': fileConfig['filename'], 'username': current_user.email}
-          files = executeSelectQuery(dbPath, open(os.path.join(SQL_CONFIG, 'static_file_map.sql')).read(), params=queryFileMapPrm)
-          for file in files:
-            if fileConfig.get('type') == 'pandas':
-              reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
-            else:
-              reportObj.files[file[ALIAS]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-              reportObj.files[regex.sub('', file[ALIAS].strip())] = reportObj.files[file[ALIAS]]
-
     ajaxScript = script.replace(".py", "")
     mod = __import__("ajax.%s" % ajaxScript)
     ajaxMod = getattr(mod, ajaxScript)
+    getAuthorizedFiles(getattr(ajaxMod, 'FILE_CONFIGS', []), reportObj, ajax=True)
     result = {'status': 'Success', "data": ajaxMod.call(reportObj)}
   except Exception as e:
     logging.debug(e)
