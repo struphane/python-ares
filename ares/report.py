@@ -283,21 +283,20 @@ def getAuthorizedFiles(fileConfigs, reportObj, report_name, userDirectory, fnct=
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   sqlFileDict = {'data': 'get_file_auth.sql', 'static': 'static_file_map.sql'}
   for fileConfig in fileConfigs:
-    if fileConfig.get('folder') == 'data':
-      queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.email, 'type': fileConfig.get('folder')}
-      files = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
-        open(os.path.join(SQL_CONFIG, sqlFileDict.get(fileConfig.get('folder')))).read(), params=queryFileAuthPrm)
-      for file in files:
-        if fileConfig.get('parser', None):
-          reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
-        elif fileConfig.get('type') == 'pandas':
-          reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
-        else:
-          reportObj.files[file[DISK_NAME]] = open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME]))
-        if not ajax:
-          fileNameToParser[file[DISK_NAME]] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
-        if fnct == 'params' and not ajax:
-          reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
+    queryFileAuthPrm = {'team': session['TEAM'], 'file_cod': fileConfig['filename'], 'username': current_user.email, 'type': fileConfig.get('folder')}
+    files = executeSelectQuery(os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db'),
+      open(os.path.join(SQL_CONFIG, sqlFileDict.get(fileConfig.get('folder')))).read(), params=queryFileAuthPrm)
+    for file in files:
+      if fileConfig.get('parser', None):
+        reportObj.files[file[DISK_NAME]] = fileConfig['parser'](open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])))
+      elif fileConfig.get('type') == 'pandas':
+        reportObj.files[file[DISK_NAME]] = os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME])
+      else:
+        reportObj.files[file[DISK_NAME]] = open(os.path.join(userDirectory, fileConfig['folder'], file[DISK_NAME]))
+      if not ajax:
+        fileNameToParser[file[DISK_NAME]] = "%s.%s" % (fileConfig['parser'].__module__.split(".")[-1], fileConfig['parser'].__name__)
+      if fnct == 'params' and not ajax:
+        reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
 
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
