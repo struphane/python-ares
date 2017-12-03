@@ -147,7 +147,7 @@
         <button id="showScript" type="submit" style="border:none; background-color:transparent">
             <img src="{{ url_for('static', filename='images/python-logo.png') }}"/>
         </button>
-        <div id="script_wrapper" contenteditable="true" class="preformatted">{{ scriptData }}</div>
+        <div id="script_wrapper" contenteditable="true" class="preformatted">{{ scriptData|safe  }}</div>
     {% endif %}
 </div>
 

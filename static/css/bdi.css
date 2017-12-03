@@ -1,6 +1,9 @@
 .preformatted {
     font-family: monospace;
     white-space: pre;
+    background-color: #f4f4f4;
+    border: 1px solid black;
+    padding: 10x;
 }
 
 mark.red {
@@ -594,6 +597,7 @@ tr.nodetails td:first-child:before {
     top: 10px;
     height: 90%;
     overflow : auto;
+    max-height: 500px;
 }
 
 #popup-chart {

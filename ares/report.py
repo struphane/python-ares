@@ -15,7 +15,7 @@ import hashlib
 import logging
 import datetime
 from app import User, Team, EnvironmentDesc, DataSource, db
-from functools import wraps
+from functools import wraps, reduce
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import redirect, url_for, session, current_app, Blueprint, render_template, request, send_from_directory, send_file, make_response, render_template_string
 from click import echo
@@ -355,7 +355,18 @@ def run_report(report_name, script_name, user_id):
 
   if os.path.exists(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name)):
     inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
-    scriptData = inFile.read()
+    pyKeywords = ['False', 'class', 'finally', 'is', 'return', 'None', 'continue',
+                  'for','lambda','try','True','def','from','nonlocal','while','and',
+                  'del','global','not','with','as','elif','if','or','yield','assert',
+                  'else','import','pass','break','except','in','raise']
+    scriptData = []
+    for line in inFile:
+      tempData = line
+      for word in pyKeywords:
+        tempData = re.sub(r'\b(%s)\b' % word, '<mark class="blue">%s</mark>' % word, tempData)      # print(tempData)
+      scriptData.append(tempData)
+    scriptData = '\n'.join(scriptData)
+    # scriptData = inFile.read()
     inFile.close()
 
   try:
