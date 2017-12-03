@@ -6,8 +6,6 @@
 import json
 from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
-import re
-regex = re.compile('[^a-zA-Z0-9_]')
 
 
 class WordCloud(AresHtmlGraphSvg.Svg):
@@ -19,11 +17,11 @@ class WordCloud(AresHtmlGraphSvg.Svg):
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
     recordSet = AresChartsService.toWordCloud(self.vals, self.chartKeys, self.chartVals, extKeys=self.extKeys)
-    for key, vals in recordSet.items():
-      self.aresObj.jsGlobal.add("%s_%s = %s ;" % (self.htmlId, regex.sub('', key.strip()), json.dumps(vals)))
+    self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
 
-  def jsUpdate(self):
+  def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
+    data = data if data is not None else self.jqData
     return '''
               d3.select("#%s svg g").remove();
 
@@ -52,5 +50,5 @@ class WordCloud(AresHtmlGraphSvg.Svg):
                       .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";  })
                       .text(function(d) { return d.text; });
               };
-            ''' % (self.htmlId, self.width, self.height, self.jqData, self.htmlId, self.htmlId, self.htmlId)
+            ''' % (self.htmlId, self.width, self.height, data, self.htmlId, self.htmlId, self.htmlId)
 

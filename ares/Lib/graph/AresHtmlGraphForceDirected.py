@@ -4,14 +4,11 @@
 """
 
 import json
-import re
 
 from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlRadio
-
-regex = re.compile('[^a-zA-Z0-9_]')
 
 
 class NvD3ForceDirected(AresHtmlGraphSvg.Svg):
@@ -32,7 +29,7 @@ class NvD3ForceDirected(AresHtmlGraphSvg.Svg):
 
   # Required CSS and JS modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
-  reqJs = ['jquery', 'd3']
+  reqJs = ['d3']
 
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
@@ -41,10 +38,9 @@ class NvD3ForceDirected(AresHtmlGraphSvg.Svg):
 
   def processDataMock(self, cat=None, val=None):
     """ Return the json data """
-    self.chartKeys = ['MOCK']
+    self.chartKeys = [('MOCK', None, None)]
     self.selectedChartKey = 'MOCK'
-    self.aresObj.jsGlobal.add("%s_%s = %s" % (self.htmlId, self.selectedChartKey,
-                                                 open(r"ares\json\%sData.json" % self.alias).read().strip()))
+    self.aresObj.jsGlobal.add("data_%s = {'%s': %s}" % (self.htmlId, self.selectedChartKey, open(r"ares\json\%sData.json" % self.alias).read().strip()))
 
   def setKeys(self, keys, selected=None):
     raise Exception("For Network chart please use the function - setGrpKeys")
@@ -59,31 +55,32 @@ class NvD3ForceDirected(AresHtmlGraphSvg.Svg):
     """ Returns the javascript SVG reference """
     if self.components:
       dataComp = "+ '_' + ".join([comp.val for comp in self.components])
-      return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection)
+      return "data_%s[%s + '_' + %s]" % (self.htmlId, dataComp, self.categories.val)
 
-    return "eval('%s_' + %s )" % (self.htmlId, self.dynKeySelection)
+    return "data_%s[%s]" % (self.htmlId, self.categories.val)
 
-  def jsUpdate(self):
+  def jsUpdate(self, data=None):
     """ Add the Graph definition in the Javascript method """
+    data = data if data is not None else self.jqData
     return '''
-              d3.select("#%s svg").remove();
-              d3.select("#%s").append("svg");
-              var %s = nv.models.%s().%s ;
-              %s
-              d3.select("#%s svg").style("height", '%spx').datum(%s)%s.call(%s);
-              nv.utils.windowResize(%s.update);
-          ''' % (self.htmlId, self.htmlId, self.htmlId, self.chartObject, self.attrToStr(), self.propToStr(), self.htmlId,
-                   self.height, self.jqData, # recordSet key
-                   self.getSvg(), self.htmlId, self.htmlId)
+              d3.select("#%(htmlId)s svg").remove();
+              d3.select("#%(htmlId)s").append("svg");
+              var %(htmlId)s = nv.models.%(chartObject)s().%(chartAttr)s ; %(chartProp)s
+              d3.select("#%(htmlId)s svg").style("height", '%(height)spx').datum(%(data)s)%(svgProp)s.call(%(htmlId)s);
+              nv.utils.windowResize(%(htmlId)s.update);
+          ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(),
+                 'chartProp': self.propToStr(), 'height': self.height, 'data': data, 'svgProp': self.getSvg()}
 
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, "_".join(self.chartKeys[0]), cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, internalRef='key_%s' % self.htmlId)
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    categories.click([self])
+    self.categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {},
+                                          internalRef='key_%s' % self.htmlId, checked=self.selectedChartKey)
+    self.categories.click([self])
 
-    self.htmlContent.append(str(categories))
+    self.htmlContent.append(str(self.categories))
     self.htmlContent.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
-    return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+    if self.headerBox:
+      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+
+    return "\n".join(self.htmlContent)

@@ -1,4 +1,6 @@
-"""
+""" Generic underlying module for the D3 charts
+@author: Olivier Nogues
+
 """
 
 import json
@@ -11,7 +13,6 @@ class Svg(AresHtml.Html):
 
   """
   __css = {'width': '95%', 'height': '100%'}
-  references = []
   height = 250
 
   def __init__(self, aresObj, header, vals, recordSetDef, chartKey=None, chartVal=None, cssCls=None, cssAttr=None, mockData=False):
@@ -20,12 +21,12 @@ class Svg(AresHtml.Html):
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
     super(Svg, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.headerBox = header
-    self.extKeys, self.components = None, []
-    self.dispatch, self.htmlContent = {}, []
+    self.extKeys, self.dispatch, self.htmlContent, self.components = None, {}, [], []
     self.header = dict([(self.recKey(col), (self.recKey(col), col.get('type'), col.get('multiplier', 1))) for col in recordSetDef])
     self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     if mockData:
       self.processData = self.processDataMock
+
     # To add the default key and val if unique
     if chartKey is not None:
       self.chartKeys = [self.header[chartKey]]
@@ -38,14 +39,11 @@ class Svg(AresHtml.Html):
     """ Return the record Key taken into accounr th possible user options """
     return col.get("key", col.get("colName"))
 
-  def dispatch(self, dispatchType, dispatchFnc):
-    """ Add items and the functions in the dispatch methods in the chart """
-    self.dispatch[dispatchType] = dispatchFnc
 
-  def changeColor(self, rangeColors):
-    """ Change the default colors in the chart """
-    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
-
+  # --------------------------------------------------------------------------------------------------------------
+  #
+  #                                   CHARTS ATTRIBUTES AND PROPERTIES
+  # --------------------------------------------------------------------------------------------------------------
   def addChartAttr(self, attrs):
     """ Change the object chart properties """
     self.chartAttrs.update(attrs)
@@ -107,6 +105,10 @@ class Svg(AresHtml.Html):
 
     return ''
 
+  # --------------------------------------------------------------------------------------------------------------
+  #
+  #                                     SETTER AND GETTER FOR THE CHARTS
+  # --------------------------------------------------------------------------------------------------------------
   def __str__(self):
     """ Return the svg container """
     self.processData()
@@ -167,6 +169,39 @@ class Svg(AresHtml.Html):
     """ Returns the selected category for the graph """
     return 'serie_%s' % self.htmlId
 
+  # --------------------------------------------------------------------------------------------------------------
+  #
+  # --------------------------------------------------------------------------------------------------------------
+  def dispatch(self, dispatchType, dispatchFnc):
+    """ Add items and the functions in the dispatch methods in the chart """
+    self.dispatch[dispatchType] = dispatchFnc
+
+  def changeColor(self, rangeColors):
+    """ Change the default colors in the chart """
+    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
+
+  def showLegend(self, boolFlag):
+    """ Change the D3 flag to display the legend in the chart """
+    if boolFlag:
+      self.addChartProp('showLegend', 'true')
+    else:
+      self.addChartProp('showLegend', 'false')
+
+  def showValues(self, boolFlag):
+    """ Change the D3 flag to display the legend in the chart """
+    if boolFlag:
+      self.addChartProp('showValues', 'true')
+    else:
+      self.addChartProp('showValues', 'false')
+
+  def outSideLabels(self, boolFlag):
+    """ Change the flag to display the labels of teh chart outside """
+    if boolFlag:
+      self.addChartProp('showLabels', 'true')
+      self.addChartProp('labelsOutside', 'true')
+    else:
+      self.addChartProp('labelsOutside', 'false')
+
   def show(self):
     return "d3.select('#%s').style('display', 'block')" % (self.htmlId)
 
@@ -199,73 +234,7 @@ class Svg(AresHtml.Html):
     self.selectedChartKey = 'MOCK'
     self.chartVals = [('DATA', None, None)]
     self.selectedChartVal = self.chartVals[0][0]
-    self.aresObj.jsGlobal.add("%s = {'%s_%s': %s}" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
+    self.aresObj.jsGlobal.add("data_%s = {'%s_%s': %s}" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
                                                       open(r"ares\json\%sData.json" % self.alias).read().strip()))
 
-class MultiSvg(Svg):
-  """
-  """
 
-  def setSeries(self, series, selected=None):
-    """ """
-    self.setKeys(series, selected)
-
-  def setY(self, series, selected=None):
-    """ """
-    self.setVals(series, selected)
-
-  def setX(self, x):
-    """ """
-    self.selectedX = self.header[x]
-
-  def setXOrder(self, xValsList):
-    """ For the order on the abscisse """
-    self.addChartProp('xAxis', {'tickValues': [i for i in range(len(xValsList))]})
-    self.addChartProp('xAxis', {'tickFormat': "function(d){ return %s[d] }" % json.dumps(xValsList)})
-
-  def setExtVals(self, keys, components):
-    """ Link the result to the different components on the page """
-    self.extKeys = keys
-    self.components = components
-
-  def xAxisAsDate(self):
-    """ Force the x axis to be a date """
-    self.addChartProp('xAxis', {'tickFormat': "function(d) { return d3.time.format('%Y/%m/%d')(new Date(d)) }"})
-
-  @property
-  def jqData(self):
-    """ Returns the javascript SVG reference """
-    if self.components:
-      dataComp = "+ '_' + ".join([comp.val for comp in self.components])
-      return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection, self.dynValSelection)
-
-    return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
-
-  def __str__(self):
-    """ Return the svg container """
-    self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {})
-    values.select(self.selectedChartVal)
-    self.dynValSelection = values.val # The javascript representation of the radio
-    categories.click([self])
-    values.click([self])
-
-    self.htmlContent.append(str(categories))
-    self.htmlContent.append(str(values))
-    self.htmlContent.append('<div %s style="height:%spx;"><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height, self.height))
-    if self.headerBox:
-      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
-
-    return "\n".join(self.htmlContent)
-
-
-  def graph(self):
-    """ Add the Graph definition in the Javascript method """
-    chartAttributes = []
-    self.resolveProperties(chartAttributes, self.chartAttrs, None)
-    self.aresObj.jsGraphs.append(self.jsUpdate())
-    for comp in self.components:
-      comp.link(self.jsUpdate())
