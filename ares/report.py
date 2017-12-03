@@ -459,6 +459,19 @@ def run_report(report_name, script_name, user_id):
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   except Exception as e:
     logging.debug(e)
+    #TODO use the import factory to generate the beloz strings
+    cssImport = ''''<link rel="stylesheet" href="/static/css/font-awesome.min.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/bootstrap.min.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/nv.d3.min.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/bdi.css" type="text/css">
+                    <link rel="stylesheet" href="/static/css/bootstrap-simple-sidebar.css" type="text/css"> '''
+    jsImport = '''
+                  <script language="javascript" type="text/javascript" src="/static/js/jquery-3.2.1.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/tether.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+                  <script language="javascript" type="text/javascript" src="/static/js/ares.js"></script>
+               '''
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   finally:
@@ -494,8 +507,6 @@ def run_report(report_name, script_name, user_id):
             del sys.modules[module]
       for f in reportObj.files.values():
         f.close()
-
-  # TODO Fix the display in case of script error
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
