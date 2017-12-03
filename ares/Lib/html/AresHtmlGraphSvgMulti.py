@@ -4,6 +4,9 @@
 """
 
 import json
+from ares.Lib import AresHtml
+from ares.Lib.html import AresHtmlContainer
+from ares.Lib.html import AresHtmlRadio
 from ares.Lib.html import AresHtmlGraphSvg
 
 class MultiSvg(AresHtmlGraphSvg.Svg):
@@ -36,29 +39,18 @@ class MultiSvg(AresHtmlGraphSvg.Svg):
     """ Force the x axis to be a date """
     self.addChartProp('xAxis', {'tickFormat': "function(d) { return d3.time.format('%Y/%m/%d')(new Date(d)) }"})
 
-  @property
-  def jqData(self):
-    """ Returns the javascript SVG reference """
-    if self.components:
-      dataComp = "+ '_' + ".join([comp.val for comp in self.components])
-      return "eval('%s_' + %s + '_' + %s + '_' + %s)" % (self.htmlId, dataComp, self.dynKeySelection, self.dynValSelection)
-
-    return "eval('%s_' + %s + '_' + %s)" % (self.htmlId, self.dynKeySelection, self.dynValSelection)
-
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {})
-    values.select(self.selectedChartVal)
-    self.dynValSelection = values.val # The javascript representation of the radio
-    categories.click([self])
-    values.click([self])
+    self.categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys],
+                                          cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, checked=self.selectedChartKey)
+    self.values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals],
+                                      cssAttr={'display': 'None'} if len(self.chartVals) == 1 else {}, checked=self.selectedChartVal)
+    self.categories.click([self])
+    self.values.click([self])
 
-    self.htmlContent.append(str(categories))
-    self.htmlContent.append(str(values))
+    self.htmlContent.append(str(self.categories))
+    self.htmlContent.append(str(self.values))
     self.htmlContent.append('<div %s style="height:%spx;"><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height, self.height))
     if self.headerBox:
       return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
