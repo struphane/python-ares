@@ -371,6 +371,10 @@ ul.tick li:before {
     padding: 0;
 }
 
+#script_wrapper {
+    padding: 20px;
+}
+
 a.top-slide {
     background-color: #7bb062;
     height: 48px;

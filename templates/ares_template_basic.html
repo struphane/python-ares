@@ -78,6 +78,9 @@
 
     $(document).ready(function() {
 
+        $('#script_wrapper').hide();
+        localStorage.setItem("scriptCode", 'false');
+
         $('a[name="side_change"]').click(function () {
             $("#wrapper").toggleClass("toggled");
             localStorage.setItem("wrapper", $("#wrapper").hasClass("toggled"));
@@ -97,6 +100,18 @@
             // document.documentElement.outerHTML
             console.log($("head").html());
             //console.log($('#page-content-wrapper').html());
+        });
+
+        $('#showScript').click(function () {
+            if (localStorage.getItem("scriptCode") == 'false'){
+                $("#script_wrapper").show();
+                localStorage.setItem("scriptCode", 'true');
+            }
+
+            else {
+                $('#script_wrapper').hide();
+                localStorage.setItem("scriptCode", 'false');
+            }
         });
 
         $.ajaxSetup({
@@ -125,8 +140,13 @@
             {{ content|safe }}
 
     <!-- END PYTHON CONTENT  -->
-
-    <div id="script" contenteditable="true" class="preformatted">{{ scriptData }}</div>
+    <br>
+    <br>
+    <br>
+    <button id="showScript" type="submit" style="border:none; background-color:transparent">
+        <img src="{{ url_for('static', filename='images/python-logo.png') }}"/>
+    </button>
+    <div id="script_wrapper" contenteditable="true" class="preformatted">{{ scriptData }}</div>
 </div>
 
 </div>	
