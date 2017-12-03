@@ -50,6 +50,7 @@
     Those are specific to the template on the server and they should not be shared
     -->
     <script>
+
     function ZoomIn(divId, chartId) {
         var newStyleProps = {
             'position':'fixed',
@@ -76,10 +77,28 @@
 
     };
 
+
     $(document).ready(function() {
 
+        var checkChangeInput;
+
         $('#script_wrapper').hide();
+        $('#changeNotif').hide();
         localStorage.setItem("scriptCode", 'false');
+        localStorage.setItem("originalCode", $('#script_wrapper').html());
+
+        var checkForChange = function() {
+
+            if ($('#script_wrapper').html() != localStorage.getItem("originalCode")) {
+                 window.clearInterval(checkChangeInput);
+                $('#changeNotif').show();
+            }
+            else {
+                $('#changeNotif').hide();
+            }
+        };
+
+        checkChangeInput = window.setInterval(checkForChange, 10000);
 
         $('a[name="side_change"]').click(function () {
             $("#wrapper").toggleClass("toggled");
@@ -166,8 +185,11 @@
         <button id="saveScript" type="submit" style="color:white; border:none; background-color:#68a26f;float: right;">
             SAVE
         </button>
-
         <br>
+        <br>
+        <div id="changeNotif" class="alert alert-warning">
+          <strong>Warning!</strong> Unsaved changes to the Python Code.
+        </div>
         <br>
         <div id="script_wrapper" contenteditable="true" class="preformatted">{{ scriptData|safe }}</div>
     {% endif %}
