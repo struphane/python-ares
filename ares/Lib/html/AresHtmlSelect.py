@@ -138,8 +138,8 @@ class Select(AresHtml.Html):
   reqCss = ['bootstrap', 'font-awesome']
   reqJs = ['bootstrap', 'jquery']
 
-  def __init__(self, aresObj, recordSet, title, col=None, cssCls=None, cssAttr=None):
-    """ Instanciate the object and store the selected item """
+  def __init__(self, aresObj, recordSet, title, col=None, cssCls=None, cssAttr=None, selected=None):
+    """ Instantiate the object and store the selected item """
     if col is not None:
       vals = set([])
       for rec in recordSet:
@@ -148,14 +148,8 @@ class Select(AresHtml.Html):
     else:
       vals = set(recordSet)
     super(Select, self).__init__(aresObj, vals, cssCls, cssAttr)
-    self.jsFrg = ["%s = $(this).val().trim(); " % self.htmlId]
     self.title = title
-    self.selected = None
-
-  def setDefault(self, value):
-    """ Set a selected default value """
-    self.selected = value
-    self.aresObj.jsGlobal.add("%s = '%s';" % (self.htmlId, AresHtml.cleanData(value)))
+    self.selected = selected
 
   def __str__(self):
     """ Return the HTML string for a select """
@@ -177,18 +171,25 @@ class Select(AresHtml.Html):
     jsFrg.append(jsEvent)
     self.js('change', ";".join(jsFrg))
 
+  @property
+  def val(self):
+    """ Property to get the jquery value of the HTML objec in a python HTML object """
+    return "$('#%s option:checked').val()" % self.htmlId
+
+  def change(self, fnc):
+    self.aresObj.jsOnLoadFnc.add('''
+      $('#%(htmlId)s').on('change', function (event){ %(fnc)s }) ''' % {'htmlId': self.htmlId, 'fnc': fnc} )
+
   def update(self, dicKeys=None, htmlObjs=None, effects=None):
     """ """
-    data = dicKeys.get('$(this).val()') if dicKeys is not None else ''
+    data = dicKeys.get(self.val) if dicKeys is not None else ''
     jsEffects = effects if effects is not None else []
     objUpdate = []
     if htmlObjs is not None:
       for htmlObj in htmlObjs:
         objUpdate.append(htmlObj.jsUpdate(data))
     self.aresObj.jsOnLoadFnc.add('''
-      $('#%(htmlId)s').on('change', function (event){
-        %(objUpdt)s ; %(jsEffects)s ;
-      }) ;
+      $('#%(htmlId)s').on('change', function (event){ %(objUpdt)s ; %(jsEffects)s ;}) ;
       ''' % {'htmlId': self.htmlId, 'data': data, 'objUpdt': '; '.join(objUpdate), 'jsEffects': ';'.join(jsEffects)})
 
 
