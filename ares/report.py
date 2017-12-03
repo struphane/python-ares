@@ -365,7 +365,7 @@ def run_report(report_name, script_name, user_id):
       for word in pyKeywords:
         tempData = re.sub(r'\b(%s)\b' % word, '<mark class="blue">%s</mark>' % word, tempData)      # print(tempData)
       scriptData.append(tempData)
-    scriptData = '\n'.join(scriptData)
+    scriptData = ''.join(scriptData)
     # scriptData = inFile.read()
     inFile.close()
 
@@ -509,7 +509,7 @@ def run_report(report_name, script_name, user_id):
 
 
 @report.route("/ajax/<report_name>/<script>", methods = ['GET', 'POST'])
-def ajaxCall(report_name, script, origin):
+def ajaxCall(report_name, script):
   """ Generic Ajax call """
   onload, js, error = '', '', False
   try:
@@ -1204,6 +1204,18 @@ def downloadPackage(name):
 
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % name, as_attachment=True)
+
+
+@report.route("/editScript", methods = ['POST'])
+def editScript():
+  """ """
+  scriptDtls = request.environ['HTTP_REFERER'].split('/')
+  script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-2], "%s.py" % scriptDtls[-1]), 'w')
+  scriptData = request.data.decode('utf-8').replace('<mark class="blue">', '').replace('</mark>', '')
+  for line in scriptData.split('\n'):
+    script.write('%s\n' % line)
+  script.close()
+  return 'OK'
 
 @report.route("/download/<report_name>/data/<file_name>/<file_location>", methods = ['GET'])
 @report.route("/download/<report_name>/data/<file_name>", defaults={'file_location': 'data'}, methods = ['GET'])
