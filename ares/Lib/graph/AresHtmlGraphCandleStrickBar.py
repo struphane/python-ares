@@ -30,12 +30,7 @@ class NvD3CandlestickBarChart(AresHtmlGraphSvg.Svg):
   @property
   def jqData(self):
     """ Returns the javascript SVG reference """
-    return "eval('%s_' + %s + '_FIXED')" % (self.htmlId, self.dynKeySelection)
-
-  def setVals(self, openCol, highCol, lowCol, closeCol, volumeCol, adjustedCol):
-    """ Set a default value for the graph """
-    self.chartVals = [openCol, highCol, lowCol, closeCol, volumeCol, adjustedCol]
-    self.selectedChartVal = 'FIXED'
+    return "data_%s[ %s + '_FIXED']" % (self.htmlId, self.categories.val)
 
   def processData(self):
       """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
@@ -55,20 +50,19 @@ class NvD3CandlestickBarChart(AresHtmlGraphSvg.Svg):
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {})
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    self.dynValSelection = 'FIXED' # The javascript representation of the radio
-    categories.click([self])
-    self.htmlContent.append(str(categories))
+    self.categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _ in self.chartKeys], cssAttr={'display': 'None'} if len(self.chartKeys) == 1 else {}, checked=self.selectedChartKey)
+    self.categories.click([self])
+
+    self.htmlContent.append(str(self.categories))
     self.htmlContent.append('<div %s><svg style="width:100%%;height:400px;"></svg></div>' % self.strAttr())
-    return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+    if self.headerBox:
+      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+
+    return "\n".join(self.htmlContent)
 
   def processDataMock(self):
     """ Return the json data """
     self.chartKeys = [('MOCK', None)]
     self.selectedChartKey = 'MOCK'
-    self.chartVals = [('FIXED', None)]
-    self.selectedChartVal = self.chartVals[0][0]
-    self.aresObj.jsGlobal.add("%s_%s_%s = %s" % (self.htmlId, self.selectedChartKey, self.selectedChartVal,
-                                                 open(r"ares\json\%sData.json" % self.alias).read().strip()))
+    self.aresObj.jsGlobal.add("data_%s = {'%s': %s}" % (self.htmlId, self.selectedChartKey,
+                                                        open(r"ares\json\%sData.json" % self.alias).read().strip()))

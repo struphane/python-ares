@@ -22,6 +22,7 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
 
   __chartProp = {
   }
+
   height = 200
 
   # Required modules
@@ -49,27 +50,26 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
   def __str__(self):
     """ Return the svg container """
     self.processData()
-    categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'}, internalRef='key_%s' % self.htmlId)
-    categories.select(self.selectedChartKey)
-    self.dynKeySelection = categories.val # The javascript representation of the radio
-    values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'}, internalRef='val_%s' % self.htmlId)
-    values.select(self.selectedChartVal)
-    self.dynValSelection = values.val # The javascript representation of the radio
+    self.categories = AresHtmlRadio.Radio(self.aresObj, [key for key, _, _ in self.chartKeys], cssAttr={'display': 'None'}, internalRef='key_%s' % self.htmlId,
+                                     checked=self.selectedChartKey)
+    self.values = AresHtmlRadio.Radio(self.aresObj, [val for val, _, _ in self.chartVals], cssAttr={'display': 'None'}, internalRef='val_%s' % self.htmlId,
+                                 checked=self.selectedChartVal)
 
-    categories.click([self])
-    values.click([self])
+    self.categories.click([self])
+    self.values.click([self])
 
-    self.htmlContent.append(str(categories))
-    self.htmlContent.append(str(values))
+    self.htmlContent.append(str(self.categories))
+    self.htmlContent.append(str(self.values))
     self.htmlContent.append('<div %s></div>' % self.strAttr())
     if self.headerBox:
       return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
 
     return "\n".join(self.htmlContent)
 
-  def jsUpdate(self):
+  def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     # Dispatch method to add events on the chart (in progress)
+    data = data if data is not None else self.jqData
     return '''
               var chartId = '%s' ;
               var %s = venn.VennDiagram().%s ;
@@ -124,7 +124,7 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
                           .style("stroke-opacity", 0);
                   });
             ''' % (self.htmlId, self.htmlId, self.attrToStr(), self.propToStr(),
-                   self.height, self.jqData, # recordSet key
+                   self.height, data, # recordSet key
                    self.getSvg(), self.htmlId, self.htmlId)
 
 
