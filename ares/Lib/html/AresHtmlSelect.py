@@ -158,9 +158,9 @@ class Select(AresHtml.Html):
     item.add(1, '<select %s>' % self.strAttr())
     for val in self.vals:
       if val == self.selected:
-        item.add(3, '<option value="%s" selected>%s</option>' % (AresHtml.cleanData(val), val))
+        item.add(3, '<option value="%s" selected>%s</option>' % (val, val))
       else:
-        item.add(3, '<option value="%s">%s</option>' % (AresHtml.cleanData(val), val))
+        item.add(3, '<option value="%s">%s</option>' % (val, val))
     item.add(1, '</select>')
     item.add(0, '</div>')
     return str(item)
