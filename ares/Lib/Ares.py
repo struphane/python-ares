@@ -313,7 +313,7 @@ class Report(object):
   def recordset(self, vals): return self.add(AresHtmlData.HtmlDataRec(self, vals), sys._getframe().f_code.co_name)
 
   # Generic Action section
-  def slider(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Slider'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def slider(self, value, title=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Slider'](self, value, title, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def date(self, label='Date', cssCls=None, cssAttr=None, dflt='', inReport=True): return self.add(aresFactory['DatePicker'](self, label, cssCls, cssAttr, dflt), sys._getframe().f_code.co_name, inReport)
   def textArea(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['TextArea'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def generatePdf(self, fileName=None, cssCls=None, cssAttr=None): return self.add(aresFactory['GeneratePdf'](self, fileName, cssCls, cssAttr), sys._getframe().f_code.co_name)
