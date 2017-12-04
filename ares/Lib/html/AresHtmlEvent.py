@@ -101,12 +101,19 @@ class Slider(AresHtml.Html):
   reqJs = ['bootstrap', 'jquery']
   hasChangeEvent = False
 
+  def __init__(self, aresObj, vals, title=None, cssCls=None, cssAttr=None):
+    super(Slider, self).__init__(aresObj, vals, cssCls=cssCls, cssAttr=cssAttr)
+    self.title = title
+
   def __str__(self):
     """ Return the HMTL object of for div """
     if not self.hasChangeEvent:
       self.change('')
     self.jsFormulas = None
     self.aresObj.jsOnLoadFnc.add('%s.slider({value: %s});' % (self.jqId, self.vals))
+    if self.title is not None:
+      return '<div class="form-group"><label>%s:</label><div style="text-align:center;"><div id="%s_val" style="display:inline-block;">%s</div><div %s></div></div></div>' % (self.title, self.htmlId, self.vals, self.strAttr())
+
     return '<div style="text-align:center;"><div id="%s_val" style="display:inline-block;">%s</div><div %s></div></div>' % (self.htmlId, self.vals, self.strAttr())
 
   def change(self, jsFnc):
@@ -136,7 +143,8 @@ class Slider(AresHtml.Html):
   @property
   def val(self):
     """ Property to get the jquery value of the HTML object in a python HTML object """
-    return 'parseFloat($("#%s_val").html())' % self.htmlId
+    return "parseFloat($('#%s_val').html())" % self.htmlId
+
 
 class DropZone(AresHtml.Html):
   """
