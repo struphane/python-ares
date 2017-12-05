@@ -95,7 +95,7 @@ class DatePicker(AresHtml.Html):
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, dflt='', htmllId=None):
     super(DatePicker, self).__init__(aresObj, vals,  cssCls, cssAttr)
     if dflt == '':
-      cobDate = datetime.datetime.today()
+      cobDate = datetime.datetime.today() - datetime.timedelta(days=1)
       while cobDate.weekday() in [5, 6]:
         cobDate = cobDate - datetime.timedelta(days=1)
       self.value = cobDate.strftime('%Y-%m-%d')
