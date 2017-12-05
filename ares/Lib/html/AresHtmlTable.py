@@ -418,18 +418,28 @@ class DataTable(AresHtml.Html):
       else { $('td', row).eq(%s).html( val.formatMoney(%s, ',', '.') ).css('color', 'green') } 
       ''' % (dstColIndex, dstColIndex, digit, dstColIndex, digit))
 
-  def callBackCreateUrl(self, dstColIndex):
+  def callBackCreateUrl(self, dstColIndex, scriptName):
     """ """
+    url = render_template_string('''{{ url_for('ares.run_report', report_name='%s', script_name='%s') }}''' % (self.aresObj.reportName, scriptName))
     self.callBacks('createdRow', ''' 
       var content = $('td', row).eq(%s).html() ;
-      $('td', row).eq(%s).html("<a href='#'>" + content + "</a>")
-      ''' % (dstColIndex, dstColIndex))
+      $('td', row).eq(%s).html("<a href='%s?%s="+ content +"'>" + content + "</a>")
+      ''' % (dstColIndex, dstColIndex, url, self.recKey(self.header[-1][dstColIndex])))
 
   def callBackCreateSlider(self, dstColIndex):
-    """ """
+    """ Add a slider object in the cell """
+    self.callBacks('createdRow', ''' 
+      var rowValue = parseFloat( $('td', row).eq(%s).html() ) ; 
+      $('td', row).eq(%s).html( "<div id='%s_slider_" + index + "'>"+ rowValue + "</div>" )
+      $( function() { var rowValue = parseFloat( $( "#%s_slider_" + index ).html() ) ; $( "#%s_slider_" + index ).slider( {value: rowValue} ); } );
+      ''' % (dstColIndex, dstColIndex, self.htmlId, self.htmlId, self.htmlId))
+   #self.aresObj.jsOnLoadFnc.add('$( function() { $( "#%s" ).slider(); } );')
+
+  def callBackCreateButton(self, dstColIndex):
+    """ Add a button to the data table cell """
     self.callBacks('createdRow', ''' 
       var content = parseFloat( $('td', row).eq(%s).html() ) ;
-      $('td', row).eq(%s).html( "<div name='slider'>" + content + "</div>" )
+      $('td', row).eq(%s).html( "<button class='btn'>" + content + "</button>" )
       ''' % (dstColIndex, dstColIndex))
     self.aresObj.jsOnLoadFnc.add('$( function() { $( "[name=slider]" ).slider(); } );')
 
