@@ -163,6 +163,7 @@ class Select(AresHtml.Html):
         item.add(3, '<option value="%s">%s</option>' % (val, val))
     item.add(1, '</select>')
     item.add(0, '</div>')
+    self.jsOnLoad.add('var data_%s = %s;' % (self.htmlId, json.dumps(list(self.vals))))
     return str(item)
 
   def link(self, jsEvent):
@@ -170,6 +171,11 @@ class Select(AresHtml.Html):
     jsFrg = list(self.jsFrg)
     jsFrg.append(jsEvent)
     self.js('change', ";".join(jsFrg))
+
+  @property
+  def jqData(self):
+    """ """
+    return """data_%s""" % self.htmlId
 
   @property
   def val(self):
@@ -191,6 +197,24 @@ class Select(AresHtml.Html):
     self.aresObj.jsOnLoadFnc.add('''
       $('#%(htmlId)s').on('change', function (event){ %(objUpdt)s ; %(jsEffects)s ;}) ;
       ''' % {'htmlId': self.htmlId, 'data': data, 'objUpdt': '; '.join(objUpdate), 'jsEffects': ';'.join(jsEffects)})
+
+  def jsUpdate(self, data=None):
+    """ """
+    myData = data if data is not None else self.jqData
+
+    """in order to work with the same kind of record set as the charts I will only take the first element of the list
+     this will be the val for the select """
+    return """ 
+      %(jqData)s = %(data)s; 
+      $('#%(htmlId)s').empty();
+      var val;
+      
+      for (var i = 0; i < %(jqData)s.length; i++) {
+        val = %(jqData)s[i][0];
+        $('#%(htmlId)s').append($('<option></option>').attr("value", val).text(val));
+      }
+    """ % {'htmlId': self.htmlId, 'data': myData, 'jqData': self.jqData}
+
 
 
 class SelectWithGroup(AresHtml.Html):
