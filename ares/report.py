@@ -1107,9 +1107,9 @@ def downloadReport(report_name):
 
         folder = path.replace("%s" % libPath, "")
         if pyFile in ['__init__.py', 'AresFileParser.py', 'AresChartsService.py']:
-          zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s\%s" % (folder, pyFile))
+          zf.write(os.path.join(folder, libPath, pyFile), r"Libs\%s\%s" % (folder, pyFile))
         elif not path.endswith('Ares\Libs'):
-          zf.write(os.path.join(libPath, path, pyFile), r"Libs\%s\%s" % (folder, pyFile))
+          zf.write(os.path.join(folder, libPath, pyFile), r"Libs\%s\%s" % (folder, pyFile))
 
   logDownloadParam = {'email': current_user.email, 'team': session['TEAM'], 'report_name': report_name}
   executeScriptQuery(dbPath, open(os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION, 'log_download.sql')).read(), params=logDownloadParam)
