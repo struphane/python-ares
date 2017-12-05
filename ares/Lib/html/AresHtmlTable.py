@@ -406,6 +406,33 @@ class DataTable(AresHtml.Html):
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
 
+  def callBackCreateCellNumber(self, dstColIndex, digit=2):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow', "$('td', row).eq(%s).html( parseFloat( $('td', row).eq(%s).html()).formatMoney(%s, ',', '.'))" % (dstColIndex, dstColIndex, digit))
+
+  def callBackCreateCellNumberColor(self, dstColIndex, digit=2):
+    """  Change the cell according to a float threshold """
+    self.callBacks('createdRow', '''
+      var val = parseFloat($('td', row).eq(%s).html()) ;
+      if (val > 0) { $('td', row).eq(%s).html( val.formatMoney(%s, ',', '.') ).css('color', 'green') }
+      else { $('td', row).eq(%s).html( val.formatMoney(%s, ',', '.') ).css('color', 'green') } 
+      ''' % (dstColIndex, dstColIndex, digit, dstColIndex, digit))
+
+  def callBackCreateUrl(self, dstColIndex):
+    """ """
+    self.callBacks('createdRow', ''' 
+      var content = $('td', row).eq(%s).html() ;
+      $('td', row).eq(%s).html("<a href='#'>" + content + "</a>")
+      ''' % (dstColIndex, dstColIndex))
+
+  def callBackCreateSlider(self, dstColIndex):
+    """ """
+    self.callBacks('createdRow', ''' 
+      var content = parseFloat( $('td', row).eq(%s).html() ) ;
+      $('td', row).eq(%s).html( "<div name='slider'>" + content + "</div>" )
+      ''' % (dstColIndex, dstColIndex))
+    self.aresObj.jsOnLoadFnc.add('$( function() { $( "[name=slider]" ).slider(); } );')
+
   def callBackNumHeatMap(self, colName, dstColIndex):
     """  Change the cell according to a float threshold """
     self.callBacks('createdRow',
