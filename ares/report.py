@@ -860,8 +860,9 @@ def createEnv(environment):
 
     for dir in DIR_LIST:
       os.makedirs(os.path.join(scriptPath, dir))
-      initFile = open(os.path.join(scriptPath, dir, '__init__.py'), 'w')
-      initFile.close()
+      if dir not in ['data', 'static']:
+        initFile = open(os.path.join(scriptPath, dir, '__init__.py'), 'w')
+        initFile.close()
     return "New environment created: %s" % scriptName
 
   return "Existing Environment"
