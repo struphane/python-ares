@@ -122,7 +122,7 @@ class InternalLink(AresHtml.Html):
     if len(self.getData) < 3:
       return '<a href="%s" %s>%s</a>' % (url, self.strAttr(), self.vals)
 
-    data = json.dumps(self.getData, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()')
+    data = json.dumps(self.getData, cls=AresHtml.SetEncoder).replace('"$(', '$(').replace('.val()"', '.val()').replace('.html())"', '.html())').replace('"parseFloat', 'parseFloat')
     jsDef = '''
                 %s.html('<i class=\"fa fa-spinner fa-spin\"></i> Processing');
                 %s.addClass('disabled');

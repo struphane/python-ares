@@ -7,6 +7,7 @@ from ares.Lib import AresItem
 from ares.Lib import AresJs
 
 from ares.Lib.html import AresHtmlSelect
+from ares.Lib.html import AresHtmlEvent
 
 
 class Modal(AresHtml.Html):
@@ -85,6 +86,9 @@ class Modal(AresHtml.Html):
 
   def selectfiles(self, fileName, title, httpKey, cssCls=None, cssAttr=None, selected=None):
     return self.addVal(httpKey, AresHtmlSelect.Select(self.aresObj, self.aresObj.fileMap.get(fileName, []), title, col=None, cssCls=cssCls, cssAttr=cssAttr, selected=selected))
+
+  def slider(self, value, title, httpKey, cssCls=None, cssAttr=None):
+    return self.addVal(httpKey, AresHtmlEvent.Slider(self.aresObj, value, title, cssCls=cssCls, cssAttr=cssAttr))
 
 
 class FixedModal(AresHtml.Html):

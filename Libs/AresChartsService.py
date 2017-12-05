@@ -41,7 +41,10 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
     for key, format, _ in keysWithFormat:
       if format is not None: # If there is a timestamp format defined
         # Python uses seconds in the timestamp whereas javascript uses the mili seconds
-        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
+        if isinstance(format, str):
+          mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
+        else:
+          mapFnc = lambda dt, dtFmt: format(dt)
       else:
         mapFnc = lambda dt, dtFmt: str(dt)
       for rec in recordSet:
@@ -60,7 +63,10 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
     for key, format, _ in keysWithFormat:
       if format is not None: # If there is a timestamp format defined
         # Python uses seconds in the timestamp whereas javascript uses the mili seconds
-        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
+        if isinstance(format, str):
+          mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
+        else:
+          mapFnc = lambda dt, dtFmt: format(dt)
       else:
         mapFnc = lambda dt, dtFmt: str(dt)
       for rec in recordSet:
