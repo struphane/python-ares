@@ -353,21 +353,6 @@ def run_report(report_name, script_name):
     if reportFolderName in sys.modules:
       del sys.modules[reportFolderName]
 
-  if os.path.exists(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name)):
-    inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
-    pyKeywords = ['False', 'class', 'finally', 'is', 'return', 'None', 'continue',
-                  'for','lambda','try','True','def','from','nonlocal','while','and',
-                  'del','global','not','with','as','elif','if','or','yield','assert',
-                  'else','import','pass','break','except','in','raise', 'self']
-    scriptData = []
-    for line in inFile:
-      tempData = line
-      for word in pyKeywords:
-        tempData = re.sub(r'\b(%s)\b' % word, '<mark class="blue">%s</mark>' % word, tempData)      # print(tempData)
-      scriptData.append(tempData)
-    scriptData = ''.join(scriptData)
-    # scriptData = inFile.read()
-    inFile.close()
 
   try:
     if script_name is None:
@@ -385,6 +370,22 @@ def run_report(report_name, script_name):
       else:
         if getTempAdmin(report_name, current_user.email):
           adminEnv = True
+
+      if os.path.exists(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name)):
+        inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
+        pyKeywords = ['False', 'class', 'finally', 'is', 'return', 'None', 'continue',
+                      'for', 'lambda', 'try', 'True', 'def', 'from', 'nonlocal', 'while', 'and',
+                      'del', 'global', 'not', 'with', 'as', 'elif', 'if', 'or', 'yield', 'assert',
+                      'else', 'import', 'pass', 'break', 'except', 'in', 'raise', 'self']
+        scriptData = []
+        for line in inFile:
+          tempData = line
+          for word in pyKeywords:
+            tempData = re.sub(r'\b(%s)\b' % word, '<mark class="blue">%s</mark>' % word, tempData)
+          scriptData.append(tempData)
+        scriptData = ''.join(scriptData)
+        inFile.close()
+
 
       if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
@@ -1213,7 +1214,10 @@ def downloadPackage(name):
 def editScript():
   """ """
   scriptDtls = request.environ['HTTP_REFERER'].split('?')[0].split('/')
-  script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-2], "%s.py" % scriptDtls[-1]), 'w')
+  if scriptDtls[-2] == 'run':
+    script = open(os.path.join(config.ARES_USERS_LOCATION, "%s.py" % scriptDtls[-1]), 'w')
+  else:
+    script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-2], "%s.py" % scriptDtls[-1]), 'w')
   scriptData = request.data.decode('utf-8').replace('<mark class="blue">', '').replace('</mark>', '')
   for line in scriptData.split('\n'):
     script.write('%s\n' % line)
