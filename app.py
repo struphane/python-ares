@@ -8,7 +8,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, UserMixin
 import config
 import hashlib
-from Libs import AresUserAuthorization
 # from system.sqlite.db_config import models
 
 app = Flask(__name__)
