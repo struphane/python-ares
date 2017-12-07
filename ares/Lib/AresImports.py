@@ -13,7 +13,7 @@ JS_IMPORTS = {
   'dataTables': {'req': ['jquery', 'bootstrap'],
                  'modules': ['jquery.dataTables.min.js', 'dataTables.buttons.min.js',
                              'dataTables.responsive.min.js',
-                             'dataTables.fixedColumns.min.js']},
+                             'dataTables.fixedColumns.min.js', 'dataTables.fixedHeader.min.js']},
 
   # Datatable data export
   'dataTables-export': {'req': ['dataTables'], 'modules': ['jszip.min.js', 'buttons.colVis.min.js',
@@ -76,7 +76,7 @@ JS_IMPORTS = {
 CSS_IMPORTS = {
   'jquery': {'modules': ['jquery-ui.css']},
 
-  'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css']},
+  'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css', 'fixedHeader.dataTables.min.css']},
 
   # Datatable export module
   'dataTables-export': {'req': ['dataTables'], 'modules': ['buttons.dataTables.min.css', 'buttons.bootstrap4.min.css']},
