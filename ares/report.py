@@ -443,7 +443,7 @@ def run_report(report_name, script_name):
     envName = getattr(report, 'NAME', '')
     side_bar.append('<div style="color:white; margin-top:10px;font-size:16px;height:20px"><b>&nbsp;Dashboard</b></div>')
     for categories, links in getattr(report, 'SHORTCUTS', []):
-      side_bar.append('<div style="color:white;font-size:14px;height:20px;"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></div>' % categories)
+      side_bar.append('<div style="color:white;font-size:14px;height:20px;margin-top:10px"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></div>' % categories)
       for name, scriptName in links:
         side_bar.append(render_template_string('<li><a style="height:20px;white-space: nowrap;vertical-align: middle;padding-top:1px" href="{{ url_for(\'ares.run_report\', report_name=\'%s\', script_name=\'%s\') }}">%s</a></li>' % (report_name, scriptName.replace(".py", ""), name)))
     cssImport, jsImport, onload, content, jsCharts, jsGlobal = reportObj.html()
@@ -1079,13 +1079,13 @@ def downloadJsonFiles(jsonFile):
 @report.route("/download/<report_name>/package", methods = ['GET', 'POST'])
 def downloadReport(report_name):
   """ Return in a Zip archive the full python package """
-  dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
+  dbPath = os.path.join(config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
   memory_file = io.BytesIO()
   with zipfile.ZipFile(memory_file, 'w') as zf:
-    reportPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name)
+    reportPath = os.path.join(config.ARES_USERS_LOCATION, report_name)
     for (path, dirs, files) in os.walk(reportPath):
       for pyFile in  files:
-        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
+        if Ares.isExcluded(current_app.config['SERVER_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % reportPath, "")
@@ -1097,13 +1097,13 @@ def downloadReport(report_name):
           zf.write(os.path.join(reportPath, path, pyFile), r"%s\%s\%s" % (report_name, folder, pyFile))
 
     # Add all the external libraries
-    libPath = os.path.join(current_app.config['ROOT_PATH'], 'Libs')
+    libPath = os.path.join(current_app.config['SERVER_PATH'], 'Libs')
     for (path, dirs, files) in os.walk(libPath):
       if '.svn' in path:
         continue
 
       for pyFile in  files:
-        if Ares.isExcluded(current_app.config['ROOT_PATH'], file=pyFile):
+        if Ares.isExcluded(current_app.config['SERVER_PATH'], file=pyFile):
           continue
 
         folder = path.replace("%s" % libPath, "")
@@ -1113,7 +1113,7 @@ def downloadReport(report_name):
           zf.write(os.path.join(folder, libPath, pyFile), r"Libs\%s\%s" % (folder, pyFile))
 
   logDownloadParam = {'email': current_user.email, 'team': session['TEAM'], 'report_name': report_name}
-  executeScriptQuery(dbPath, open(os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION, 'log_download.sql')).read(), params=logDownloadParam)
+  executeScriptQuery(dbPath, open(os.path.join(current_app.config['SERVER_PATH'], config.ARES_SQLITE_FILES_LOCATION, 'log_download.sql')).read(), params=logDownloadParam)
   memory_file.seek(0)
   return send_file(memory_file, attachment_filename='%s.zip' % report_name, as_attachment=True)
 
