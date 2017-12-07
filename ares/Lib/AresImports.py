@@ -15,6 +15,9 @@ JS_IMPORTS = {
                              'dataTables.responsive.min.js',
                              'dataTables.fixedColumns.min.js']},
 
+  # Datatable fixed column
+  'dataTables-fixedColumns': {'req': ['dataTables'], 'modules': ['dataTables.fixedColumns.min.js']},
+
   # Datatable Fixed header
   'dataTables-fixedHeader': {'req': ['dataTables'], 'modules': ['dataTables.fixedHeader.min.js']},
 
@@ -81,8 +84,11 @@ CSS_IMPORTS = {
 
   'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css']},
 
+  # Datatable fixed column
+  'dataTables-fixedColumns': {'req': ['dataTables'], 'modules': ['fixedColumns.bootstrap4.min.css']},
+
   # Datatable fixed header
-  'dataTables-fixedHeader': {'req': ['dataTables'], 'modules': ['buttons.dataTables.min.css', 'fixedHeader.dataTables.min.css']},
+  'dataTables-fixedHeader': {'req': ['dataTables'], 'modules': ['fixedHeader.bootstrap4.min.css']},
 
   # Datatable export module
   'dataTables-export': {'req': ['dataTables'], 'modules': ['buttons.dataTables.min.css', 'buttons.bootstrap4.min.css']},
