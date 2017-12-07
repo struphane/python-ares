@@ -139,6 +139,10 @@ class Slider(AresHtml.Html):
       }) ;
       ''' % {'htmlId': self.htmlId, 'data': val, 'objUpdt': '; '.join(objUpdate), 'jsEffects': ';'.join(jsEffects)})
 
+  def jsUpdate(self, data=None):
+    """ Change the value of the Slider component """
+    val = data if data is not None else self.jqData
+    return """ %s.slider('value', %s); """ % (self.jqId, val)
 
   @property
   def val(self):
