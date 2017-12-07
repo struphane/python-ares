@@ -778,6 +778,13 @@ class DataTable(AresHtml.Html):
   #   pivotTable.addRows([{'_hasChildren': 0, 'cssCls': ['Youpi', 'YoupiSuper'], 'level': 1,
   #                        '_leaf': 1, '_parent': 0, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': '', 'ISSUER': 'Super', 'Aurelie': ''}])
 
+  def fixedHeader(self):
+    """ Set the header to be fixed """
+    self.aresObj.jsImports.add('dataTables-fixedHeader')
+    self.aresObj.cssImport.add('dataTables-fixedHeader')
+    self.option('fixedHeader', "{ headerOffset: 50 }")
+
+
   def __str__(self):
     """ Return the string representation of a HTML table """
     if self.noPivot:
@@ -942,7 +949,6 @@ class DataTable(AresHtml.Html):
   def order(self, colIndex, typeOrd):
     """ Set the table order according to a column in the table """
     self.option("order", json.dumps([[colIndex, {'desc': 'asc', 'asc': 'desc'}.get(typeOrd, typeOrd)]]))
-
 
 
 class DataTablePivot(DataTable):
