@@ -784,6 +784,11 @@ class DataTable(AresHtml.Html):
     self.aresObj.cssImport.add('dataTables-fixedHeader')
     self.option('fixedHeader', "{ headerOffset: 50 }")
 
+  def fixedColumns(self, lenCols=1):
+    """ Set some columns on the left to be fixed """
+    self.aresObj.jsImports.add('dataTables-fixedColumns')
+    self.aresObj.cssImport.add('dataTables-fixedColumns')
+    self.option('fixedColumns', "{ leftColumns: 2 }")
 
   def __str__(self):
     """ Return the string representation of a HTML table """
