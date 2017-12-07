@@ -144,6 +144,18 @@ class DataTable(AresHtml.Html):
       if 'dsc' in header:
         self.mapDsc[self.recKey(header)] = (i, header['dsc'])
 
+  def fixedHeader(self):
+    """ Set the header to be fixed """
+    self.aresObj.jsImports.add('dataTables-fixedHeader')
+    self.aresObj.cssImport.add('dataTables-fixedHeader')
+    self.option('fixedHeader', "{ headerOffset: 50 }")
+
+  def fixedColumns(self, lenCols=1):
+    """ Set some columns on the left to be fixed """
+    self.aresObj.jsImports.add('dataTables-fixedColumns')
+    self.aresObj.cssImport.add('dataTables-fixedColumns')
+    self.option('fixedColumns', "{ leftColumns: 2 }")
+
   def colReOrdering(self):
     """ Include the column reordering Datatable plugin """
     self.aresObj.cssImport.add('dataTables-col-order')
@@ -418,13 +430,24 @@ class DataTable(AresHtml.Html):
       else { $('td', row).eq(%s).html( val.formatMoney(%s, ',', '.') ).css('color', 'green') } 
       ''' % (dstColIndex, dstColIndex, digit, dstColIndex, digit))
 
-  def callBackCreateUrl(self, dstColIndex, scriptName):
+  def callBackCreateUrl(self, dstColIndex, scriptName, extraCols=None):
     """ """
     url = render_template_string('''{{ url_for('ares.run_report', report_name='%s', script_name='%s') }}''' % (self.aresObj.reportName, scriptName))
-    self.callBacks('createdRow', ''' 
+    self.callBacks('createdRow', '''
       var content = $('td', row).eq(%s).html() ;
-      $('td', row).eq(%s).html("<a href='%s?%s="+ content +"'>" + content + "</a>")
-      ''' % (dstColIndex, dstColIndex, url, self.recKey(self.header[-1][dstColIndex])))
+      var extraCols = %s ;
+      var header = %s ;
+      var colsVar = [] ;
+      var contentUrl = content;
+      if (extraCols != null) {
+        for (var item in extraCols) {
+          var colNum = extraCols[item] ;
+          colsVar.push(header[colNum].key + "=" + $('td', row).eq(colNum).html())
+        } ;
+        contentUrl = content + "&" + colsVar.join('&') ;
+      }
+      $('td', row).eq(%s).html("<a href='%s?%s="+ contentUrl + "'>" + content + "</a>")
+      ''' % (dstColIndex, json.dumps(extraCols), self.header[-1], json.dumps(dstColIndex), url, self.recKey(self.header[-1][dstColIndex])))
 
   def callBackCreateSlider(self, dstColIndex):
     """ Add a slider object in the cell """
@@ -777,18 +800,6 @@ class DataTable(AresHtml.Html):
   #                        '_leaf': 0, '_parent': 1, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': 'Youpi', 'ISSUER': '', 'Aurelie': ''}])
   #   pivotTable.addRows([{'_hasChildren': 0, 'cssCls': ['Youpi', 'YoupiSuper'], 'level': 1,
   #                        '_leaf': 1, '_parent': 0, 'TTTT': 0, '_id': 'SelfFundingInstalmentsWESTPAC', 'TYPE': '', 'ISSUER': 'Super', 'Aurelie': ''}])
-
-  def fixedHeader(self):
-    """ Set the header to be fixed """
-    self.aresObj.jsImports.add('dataTables-fixedHeader')
-    self.aresObj.cssImport.add('dataTables-fixedHeader')
-    self.option('fixedHeader', "{ headerOffset: 50 }")
-
-  def fixedColumns(self, lenCols=1):
-    """ Set some columns on the left to be fixed """
-    self.aresObj.jsImports.add('dataTables-fixedColumns')
-    self.aresObj.cssImport.add('dataTables-fixedColumns')
-    self.option('fixedColumns', "{ leftColumns: 2 }")
 
   def __str__(self):
     """ Return the string representation of a HTML table """
