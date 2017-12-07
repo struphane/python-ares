@@ -434,7 +434,7 @@ class DataTable(AresHtml.Html):
         else { $('td', row).eq(%s).html( val.formatMoney(%s, ',', '.') ).css('color', 'red') }
         ''' % (dstColIndex, dstColIndex, digit, dstColIndex, digit))
 
-  def callBackCreateUrl(self, dstColIndex, scriptName, extraCols=None):
+  def callBackCreateUrl(self, dstColIndex, scriptName, extraCols=None, fixedParams=None):
     """
 
     :param dstColIndex: The index of the main column with the hyperlink
@@ -443,21 +443,19 @@ class DataTable(AresHtml.Html):
     :return:
     """
     url = render_template_string('''{{ url_for('ares.run_report', report_name='%s', script_name='%s') }}''' % (self.aresObj.reportName, scriptName))
+    xtraParams = ''
+    if fixedParams is not None:
+      xtraParams = "&%s" % "&".join(fixedParams)
     self.callBacks('createdRow', '''
       var content = $('td', row).eq(%s).html() ;
-      var extraCols = %s ;
-      var header = %s ;
-      var colsVar = [] ;
-      var contentUrl = content;
+      var extraCols = %s ; var header = %s ; var colsVar = [] ; var contentUrl = content;
       if (extraCols != null) {
         for (var item in extraCols) {
-          var colNum = extraCols[item] ;
-          colsVar.push(header[colNum].key + "=" + $('td', row).eq(colNum).html())
-        } ;
-        contentUrl = content + "&" + colsVar.join('&') ;
-      }
+          var colNum = extraCols[item]; colsVar.push(header[colNum].key + "=" + $('td', row).eq(colNum).html())} ;
+        contentUrl = content + "&" + colsVar.join('&') ;}
+      contentUrl = contentUrl + '%s' ;
       $('td', row).eq(%s).html("<a href='%s?%s="+ contentUrl + "'>" + content + "</a>")
-      ''' % (dstColIndex, json.dumps(extraCols), self.header[-1], json.dumps(dstColIndex), url, self.recKey(self.header[-1][dstColIndex])))
+      ''' % (dstColIndex, json.dumps(extraCols), json.dumps(self.header[-1]), xtraParams, dstColIndex, url, self.recKey(self.header[-1][dstColIndex])))
 
   def callBackCreateSlider(self, dstColIndex):
     """ Add a slider object in the cell """
@@ -695,6 +693,8 @@ class DataTable(AresHtml.Html):
           var $input = $('<input>', {
               value: $this.text(),
               type: 'text',
+              width: '100%%',
+              height: '25px',
               blur: function() {
                  $this.text(this.value);
                  if (curValue != $this.text()) {

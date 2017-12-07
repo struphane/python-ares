@@ -146,7 +146,7 @@ class Select(AresHtml.Html):
         if col in rec:
           vals.add(rec[col])
     else:
-      vals = set(recordSet)
+      vals = recordSet
     super(Select, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.title = title
     self.selected = selected
