@@ -431,7 +431,13 @@ class DataTable(AresHtml.Html):
       ''' % (dstColIndex, dstColIndex, digit, dstColIndex, digit))
 
   def callBackCreateUrl(self, dstColIndex, scriptName, extraCols=None):
-    """ """
+    """
+
+    :param dstColIndex: The index of the main column with the hyperlink
+    :param scriptName: The script name to be called
+    :param extraCols: The list wiht the extra columns to be added to the URL
+    :return:
+    """
     url = render_template_string('''{{ url_for('ares.run_report', report_name='%s', script_name='%s') }}''' % (self.aresObj.reportName, scriptName))
     self.callBacks('createdRow', '''
       var content = $('td', row).eq(%s).html() ;
