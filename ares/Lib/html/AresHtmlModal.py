@@ -90,6 +90,11 @@ class Modal(AresHtml.Html):
   def slider(self, value, title, httpKey, cssCls=None, cssAttr=None):
     return self.addVal(httpKey, AresHtmlEvent.Slider(self.aresObj, value, title, cssCls=cssCls, cssAttr=cssAttr))
 
+  def pwd(self, label, httpKey, dflt='', cssCls=None):
+    return self.addVal(httpKey, self.aresObj.pwd(label, cssCls=cssCls, dflt=dflt, inReport=False))
+
+  def button(self, value, httpKey, cssCls=None, cssAttr=None, awsIcon=None):
+    return self.addVal(httpKey, self.aresObj.button(value, cssCls=None, cssAttr=None, awsIcon=None))
 
 class FixedModal(AresHtml.Html):
   """
