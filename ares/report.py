@@ -587,7 +587,7 @@ def userAccount():
     sys.path.append(systemDirectory)
 
   userData = User.query.filter_by(email=current_user.email).first()
-  team_def = Team.query.filer_by(team_id=userData.team_id).first()
+  team_def = Team.query.filter_by(team_id=userData.team_id).first()
   reportObj = Ares.Report()
   reportObj.http = getHttpParams(request)
   reportObj.http['REPORT_NAME'] = script_name
