@@ -94,7 +94,7 @@ class Modal(AresHtml.Html):
     return self.addVal(httpKey, self.aresObj.pwd(label, cssCls=cssCls, dflt=dflt, inReport=False))
 
   def button(self, value, httpKey, cssCls=None, cssAttr=None, awsIcon=None):
-    return self.addVal(httpKey, self.aresObj.button(value, cssCls=None, cssAttr=None, awsIcon=None))
+    return self.addVal(httpKey, self.aresObj.button(value, cssCls=None, cssAttr=None, awsIcon=None, inReport=False))
 
 class FixedModal(AresHtml.Html):
   """
