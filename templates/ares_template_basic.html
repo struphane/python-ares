@@ -82,8 +82,6 @@
 
         var checkChangeInput;
 
-        $('#script_wrapper').hide();
-        $('#changeNotif').hide();
         localStorage.setItem("scriptCode", 'false');
         localStorage.setItem("originalCode", $('#script_wrapper').html());
 
@@ -187,7 +185,7 @@
         </button>
         <br>
         <br>
-        <div id="changeNotif" class="alert alert-warning">
+        <div id="changeNotif" class="alert alert-warning" style="display:none">
           <strong>Warning!</strong> Unsaved changes to the Python Code.
         </div>
         <br>
