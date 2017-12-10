@@ -2,7 +2,7 @@
 
 """
 
-import collections
+from Libs import OrderedSet
 from flask import render_template_string
 
 JS_IMPORTS = {
@@ -12,8 +12,7 @@ JS_IMPORTS = {
   # Javascript packages to handle DataTables
   'dataTables': {'req': ['jquery', 'bootstrap'],
                  'modules': ['jquery.dataTables.min.js', 'dataTables.buttons.min.js',
-                             'dataTables.responsive.min.js',
-                             'dataTables.fixedColumns.min.js']},
+                             'dataTables.responsive.min.js',]},
 
   # Datatable fixed column
   'dataTables-fixedColumns': {'req': ['dataTables'], 'modules': ['dataTables.fixedColumns.min.js']},
@@ -34,6 +33,9 @@ JS_IMPORTS = {
   # Datatable column reordering modules
   'dataTables-select': {'req': ['dataTables'],
                            'modules': ['dataTables.select.min.js']},
+
+  # Cross Filter module for Data transformation
+  'crossfilter': {'req': ['jquery'], 'modules': ['crossfilter.js']},
 
   # Datatable pivot
   'pivot': {'req': ['d3'], 'modules': ['pivot.min.js', 'd3_renderers.min.js']},
@@ -91,7 +93,7 @@ CSS_IMPORTS = {
   'dataTables-fixedHeader': {'req': ['dataTables'], 'modules': ['fixedHeader.bootstrap4.min.css']},
 
   # Datatable export module
-  'dataTables-export': {'req': ['dataTables'], 'modules': ['buttons.dataTables.min.css', 'buttons.bootstrap4.min.css']},
+  'dataTables-export': {'req': ['dataTables'], 'modules': ['buttons.bootstrap4.min.css']},
 
   # Datatable column ordering
   'dataTables-col-order': {'req': ['dataTables'], 'modules': ['colReorder.bootstrap4.min.css']},
@@ -117,64 +119,6 @@ CSS_IMPORTS = {
   }
 
 
-class OrderedSet(collections.MutableSet):
-
-    def __init__(self, iterable=None):
-        self.end = end = []
-        end += [None, end, end]         # sentinel node for doubly linked list
-        self.map = {}                   # key --> [key, prev, next]
-        if iterable is not None:
-            self |= iterable
-
-    def __len__(self):
-        return len(self.map)
-
-    def __contains__(self, key):
-        return key in self.map
-
-    def add(self, key):
-        if key not in self.map:
-            end = self.end
-            curr = end[1]
-            curr[2] = end[1] = self.map[key] = [key, curr, end]
-
-    def discard(self, key):
-        if key in self.map:
-            key, prev, next = self.map.pop(key)
-            prev[2] = next
-            next[1] = prev
-
-    def __iter__(self):
-        end = self.end
-        curr = end[2]
-        while curr is not end:
-            yield curr[0]
-            curr = curr[2]
-
-    def __reversed__(self):
-        end = self.end
-        curr = end[1]
-        while curr is not end:
-            yield curr[0]
-            curr = curr[1]
-
-    def pop(self, last=True):
-        if not self:
-            raise KeyError('set is empty')
-        key = self.end[1][0] if last else self.end[2][0]
-        self.discard(key)
-        return key
-
-    def __repr__(self):
-        if not self:
-            return '%s()' % (self.__class__.__name__,)
-        return '%s(%r)' % (self.__class__.__name__, list(self))
-
-    def __eq__(self, other):
-        if isinstance(other, OrderedSet):
-            return len(self) == len(other) and list(self) == list(other)
-        return set(self) == set(other)
-
 
 class ImportManager(object):
   """
@@ -184,13 +128,13 @@ class ImportManager(object):
     self.jsImports, self.cssImports = {}, {}
     for folder, importDic, importType in [('js', self.jsImports, JS_IMPORTS), ('css', self.cssImports, CSS_IMPORTS)]:
       for alias, definition in importType.items():
-        main = OrderedSet()
+        main = OrderedSet.OrderedSet()
         for mod in definition['modules']:
           if 'url' in definition:
             main.add("%s/%s" % (definition['url'], mod))
           else:
             main.add("{{ url_for(\'static\',filename=\'%s/%s\') }}" % (folder, mod))
-        modules = OrderedSet()
+        modules = OrderedSet.OrderedSet()
         self.getModules(modules, alias, folder, importType)
         importDic[alias] = {'main': main, 'dep': modules}
 
