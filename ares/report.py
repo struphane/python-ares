@@ -410,6 +410,7 @@ def run_report(report_name, script_name):
     if script_name in sys.modules:
       del sys.modules[script_name]
 
+    # Import dedicated to the script to be displayed
     mod = __import__(script_name) # run the report
     if reportObj.http.get('show_params') == '1' and getattr(mod, 'HTTP_PARAMS', []):
       fnct = 'params'
@@ -426,6 +427,7 @@ def run_report(report_name, script_name):
     # Set some environments variables which can be used in the report
     reportObj.http.update( {'FILE': script_name, 'REPORT_NAME': report_name, 'DIRECTORY': userDirectory} )
     fileNameToParser = getAuthorizedFiles(getattr(mod, 'FILE_CONFIGS', []), reportObj, report_name, userDirectory, fnct=fnct)
+    modal = None
     if fnct == 'params':
       modal = reportObj.modal('Open Report Parameters')
       modal.modal_header = "Report parameters"
@@ -439,8 +441,24 @@ def run_report(report_name, script_name):
     typeDownload = getattr(mod, 'DOWNLOAD', 'BOTH')
     if typeDownload == 'BOTH':
       downloadEnv = report_name
+
+    # Import the main report name
+    # This import is used to retrieve global information
     report = __import__(report_name) # run the report
     envName = getattr(report, 'NAME', '')
+    if hasattr(report, 'envParams'):
+      # Special function to add some global parameters
+      # This should avoid the popup to be redefined in each sub report
+      propParams = reportObj.parameters('Parameters')
+      for param in getattr(mod, 'HTTP_PARAMS', []):
+        if param['code'] in reportObj.http:
+          propParams.httpParams[param['code']] = reportObj.http[param['code']]
+      getattr(report, 'envParams')(propParams)
+      if modal is not None:
+        propParams.httpParams = modal.httpParams.update(propParams.httpParams)
+      propParams.internalLink('Update Parameters', script_name, attrs=propParams.httpParams)
+      side_bar.append(str(propParams))
+
     side_bar.append('<div style="color:white; margin-top:10px;font-size:16px;height:20px"><b>&nbsp;Dashboard</b></div>')
     for categories, links in getattr(report, 'SHORTCUTS', []):
       side_bar.append('<div style="color:white;font-size:14px;height:20px;margin-top:10px"><b>&nbsp;&nbsp;&nbsp;&nbsp;%s</b></div>' % categories)
