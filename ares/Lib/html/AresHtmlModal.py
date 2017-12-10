@@ -4,7 +4,6 @@
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
-from ares.Lib import AresJs
 
 from ares.Lib.html import AresHtmlSelect
 from ares.Lib.html import AresHtmlEvent
@@ -32,6 +31,7 @@ class Modal(AresHtml.Html):
       btnCls = ['btn btn-primary']
     self.btnCls = btnCls
 
+  @AresHtml.deprecated
   def addVal(self, httpKey, htmlObj):
     """ Add an HTML object to the modal """
     self.vals.append(htmlObj)
@@ -46,9 +46,6 @@ class Modal(AresHtml.Html):
     item.add(1, '<div class="modal-dialog">')
     item.add(2, '<div class="modal-content">')
     item.add(3, '<div class="logo_small" id="%sTitle">%s</div>' % (self.htmlId, self.modal_header))
-    #item.add(4, '<button type="button" style="margin-top:10px" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
-    #item.add(4, '<div class="modal-title" id="%sTitle">%s</div>' % (self.htmlId, self.modal_header))
-    #item.add(3, '</div>')
     item.add(3, '<div class="modal-body" style="overflow-y:scroll;max-height:%spx;margin-bottom:10px">' % self.maxHeight)
     for val in self.vals:
       if hasattr(val, 'incIndent'):
@@ -90,11 +87,23 @@ class Modal(AresHtml.Html):
   def slider(self, value, title, httpKey, cssCls=None, cssAttr=None):
     return self.addVal(httpKey, AresHtmlEvent.Slider(self.aresObj, value, title, cssCls=cssCls, cssAttr=cssAttr))
 
-  def pwd(self, label, httpKey, dflt='', cssCls=None):
-    return self.addVal(httpKey, self.aresObj.pwd(label, cssCls=cssCls, dflt=dflt, inReport=False))
 
-  def button(self, value, httpKey, cssCls=None, cssAttr=None, awsIcon=None):
-    return self.addVal(httpKey, self.aresObj.button(value, cssCls=None, cssAttr=None, awsIcon=None, inReport=False))
+class EnvParameters(Modal):
+  """ Python wrapper for the different parameters """
+
+  def __str__(self):
+    """ Return the String representation of a HTML Modal Object """
+    item = ['<div style="color:white; margin-top:10px;font-size:16px;height:20px"><b>&nbsp;%s</b></div><div style="padding:5px;color:white;font-size:12px;">' % self.name]
+    for val in self.vals:
+      item.append(str(val))
+    item.append("</div>")
+    return "".join(item)
+
+  def date(self, label='Date', httpKey='date', dflt=''):
+    dateObj = self.aresObj.date(label, cssCls=['datepicker'], dflt=dflt, inReport=False)
+    self.aresObj.jsOnLoadFnc.add("$( function() {%s.datepicker({dateFormat: 'yy-mm-dd'} ).datepicker('setDate', '%s'); } );" % (dateObj.jqId, dateObj.value))
+    return self.addVal(httpKey, dateObj)
+
 
 class FixedModal(AresHtml.Html):
   """
@@ -143,5 +152,6 @@ class DialogValid(AresHtml.Html):
   def toJs(self, parent):
     """ Convert to a Js expression """
     return ".append('%s')" % (parent, self)
+
 
 
