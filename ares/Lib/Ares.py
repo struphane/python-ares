@@ -32,6 +32,7 @@ from importlib import import_module
 from ares.Lib import AresImports
 from ares.Lib import AresJs
 
+from Libs import OrderedSet
 from ares.Lib.html import AresHtmlData
 
 def jsonDefault(obj):
@@ -174,8 +175,8 @@ class Report(object):
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
     #
-    self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, set(), set()
-    self.jsGraphs, self.jsFnc, self.files = [], set(), {}
+    self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, OrderedSet.OrderedSet(), OrderedSet.OrderedSet()
+    self.jsGraphs, self.jsFnc, self.files = [], OrderedSet.OrderedSet(), {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
     self.workers = {}
@@ -297,7 +298,7 @@ class Report(object):
   def remove(self, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, '', cssCls, cssAttr, 'remove'), sys._getframe().f_code.co_name)
   def download(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonDownload'](self, value, self.http['REPORT_NAME'], cssCls, cssAttr, 'download'), sys._getframe().f_code.co_name)
   def downloadAll(self, value='', cssCls=None, cssAttr=None): return self.add(aresFactory['ButtonDownloadEnv'](self, value, self.http['REPORT_NAME'], cssCls, cssAttr, 'suitcase'), sys._getframe().f_code.co_name)
-  def button(self, value, cssCls=None, cssAttr=None, awsIcon=None, inReport=True): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, awsIcon), sys._getframe().f_code.co_name, inReport)
+  def button(self, value, cssCls=None, cssAttr=None, awsIcon=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, awsIcon), sys._getframe().f_code.co_name)
   def savetable(self, name, cssCls=None, cssAttr=None, awsIcon=None): return self.add(aresFactory['ButtonSaveTable'](self, name, cssCls, cssAttr, awsIcon), sys._getframe().f_code.co_name)
   def ok(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Button'](self, value, cssCls, cssAttr, 'check-square-o'), sys._getframe().f_code.co_name)
 
@@ -310,7 +311,7 @@ class Report(object):
   # Data
   def data(self, vals): return self.add(AresHtmlData.HtmlData(self, vals), sys._getframe().f_code.co_name)
   def datadic(self, vals): return self.add(AresHtmlData.HtmlDataDic(self, vals), sys._getframe().f_code.co_name)
-  def recordset(self, vals): return self.add(AresHtmlData.HtmlDataRec(self, vals), sys._getframe().f_code.co_name)
+  def crossFilterData(self, vals, header): return self.add(AresHtmlData.HtmlDataCrossFilter(self, vals, header), sys._getframe().f_code.co_name, inReport=False)
 
   # Generic Action section
   def slider(self, value, title=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Slider'](self, value, title, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -345,7 +346,11 @@ class Report(object):
   # Modal Section
   def modal(self, values, cssCls=None, cssAttr=None, btnCls=None): return self.add(aresFactory['Modal'](self, self.supp(values), cssCls, cssAttr, btnCls), sys._getframe().f_code.co_name)
   def fixedModal(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['FixedModal'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def parameters(self, values, cssCls=None, cssAttr=None, inReport=False): return self.add(aresFactory['EnvParameters'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
 
+  # Cross Filter Chart section
+  def xbar(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Bar'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
+  def xpie(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Pie'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
 
   # Chart section
   def bar(self, values, header, chartKey=None, chartVal=None, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Bar'](self, headerBox, values, header, chartKey, chartVal, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
