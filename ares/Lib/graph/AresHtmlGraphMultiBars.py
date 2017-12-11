@@ -18,6 +18,7 @@ class NvD3MultiBars(AresHtmlGraphSvgMulti.MultiSvg):
                   'rotateLabels': '0',
                   'showControls': 'true',
                   'groupSpacing': '0.1',
+                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
                   }
 
   __chartProp = {

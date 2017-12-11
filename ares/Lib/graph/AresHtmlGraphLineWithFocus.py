@@ -14,7 +14,8 @@ class NvD3LineWithFocus(AresHtmlGraphSvgMulti.MultiSvg):
   references = ['http://nvd3.org/examples/lineWithFocus.html']
   __chartStyle = {
       'x': "function(d) { return d[0]; }",
-      'y': "function(d) { return d[1]; }"
+      'y': "function(d) { return d[1]; }",
+      'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
   }
 
   __chartProp = {

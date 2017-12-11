@@ -19,6 +19,7 @@ class NvD3LineCumulative(AresHtmlGraphSvgMulti.MultiSvg):
     'y': 'function(d) { return d[1]/100 }',
     'color': 'd3.scale.category10().range()',
     'useInteractiveGuideline': 'true',
+    'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
   }
 
   __chartProp = {

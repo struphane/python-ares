@@ -17,7 +17,7 @@ class NvD3ScatterPlusLineChart(AresHtmlGraphSvgMulti.MultiSvg):
                   'duration': '300',
                   'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
-                  'color': 'd3.scale.category10().range()',
+                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
   }
 
   __chartProp = {

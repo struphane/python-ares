@@ -17,6 +17,7 @@ class NvD3Donut(AresHtmlGraphSvg.Svg):
                   'labelType': '"percent"',
                   'donut': 'true',
                   'donutRatio': 0.35,
+                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvg.Svg.colorCharts),
                   'x': "function(d) { return d[0]; }",
                   'y': "function(d) { return d[1]; }"}
 
@@ -32,25 +33,6 @@ class NvD3Donut(AresHtmlGraphSvg.Svg):
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
-
-  def showLegend(self, boolFlag):
-    """ Change the D3 flag to display the legend in the chart """
-    if boolFlag:
-      self.addChartProp('showLegend', 'true')
-    else:
-      self.addChartProp('showLegend', 'false')
-
-  def outSideLabels(self, boolFlag):
-    """ Change the flag to display the labels of teh chart outside """
-    if boolFlag:
-      self.addChartProp('showLabels', 'true')
-      self.addChartProp('labelsOutside', 'true')
-    else:
-      self.addChartProp('labelsOutside', 'false')
-
-  def changeColor(self, rangeColors):
-    """ Change the default colors in the chart """
-    self.addChartProp('color', 'd3.scale.ordinal().range(%s).range()' % json.dumps(rangeColors))
 
   def processData(self):
     """ produce the different recordSet with the level of clicks defined in teh vals and set functions """

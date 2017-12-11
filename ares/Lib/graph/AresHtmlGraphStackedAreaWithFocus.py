@@ -15,6 +15,7 @@ class NvD3StackedAreaWithFocus(AresHtmlGraphSvgMulti.MultiSvg):
   __chartStyle = {'useInteractiveGuideline': 'true',
                   'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
+                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
                   'controlLabels': '{stacked: "Stacked"}',
                   'duration': 'true',
                   'showControls': '300',

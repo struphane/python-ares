@@ -16,6 +16,7 @@ class NvD3StackedArea(AresHtmlGraphSvgMulti.MultiSvg):
                   'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
                   'useInteractiveGuideline': 'true',
+                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
                   'rightAlignYAxis': 'true',
                   'showControls': 'true',
                   'clipEdge': 'true',

@@ -71,11 +71,11 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
     # Dispatch method to add events on the chart (in progress)
     data = data if data is not None else self.jqData
     return '''
-              var chartId = '%s' ;
-              var %s = venn.VennDiagram().%s ;
-              %s
-              d3.select("#" + chartId).style("height", '%spx').datum(%s)%s.call(%s);
-              nv.utils.windowResize(%s.update);
+              var chartId = '%(htmlId)s' ;
+              var %(htmlId)s = venn.VennDiagram(%(colorCharts)s).%(chartAttr)s ;
+              %(chartProp)s
+              d3.select("#" + chartId).style("height", '%(height)spx').datum(%(data)s)%(svgProp)s.call(%(htmlId)s);
+              nv.utils.windowResize(%(htmlId)s.update);
 
               var tooltip = d3.select("body").append("div").attr("class", "venntooltip");
 
@@ -123,8 +123,7 @@ class NvD3Venn(AresHtmlGraphSvg.Svg):
                           .style("fill-opacity", d.sets.length == 1 ? .25 : .0)
                           .style("stroke-opacity", 0);
                   });
-            ''' % (self.htmlId, self.htmlId, self.attrToStr(), self.propToStr(),
-                   self.height, data, # recordSet key
-                   self.getSvg(), self.htmlId, self.htmlId)
+            ''' % {'htmlId': self.htmlId, 'chartAttr': self.attrToStr(), 'chartProp': self.propToStr(),
+                   'height': self.height, 'data': data, 'svgProp': self.getSvg(), 'colorCharts': json.dumps(self.colorCharts)}
 
 

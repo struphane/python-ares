@@ -16,6 +16,7 @@ class NvD3HorizontalBars(AresHtmlGraphSvgMulti.MultiSvg):
   __chartStyle = {'x': 'function(d) { return d[0] }',
                   'y': 'function(d) { return d[1] }',
                   'margin': '{top: 30, right: 20, bottom: 50, left: 175}',
+                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
                   'showValues': 'true',
                   'showControls': 'true'
   }
