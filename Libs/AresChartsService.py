@@ -41,10 +41,7 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
     for key, format, _ in keysWithFormat:
       if format is not None: # If there is a timestamp format defined
         # Python uses seconds in the timestamp whereas javascript uses the mili seconds
-        if isinstance(format, str):
-          mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
-        else:
-          mapFnc = lambda dt, dtFmt: format(dt)
+        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
       else:
         mapFnc = lambda dt, dtFmt: str(dt)
       for rec in recordSet:
@@ -56,17 +53,14 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
       result = [{'key': seriesName, 'values': []}]
       sortedDt = sorted(aggVals.keys())
       for dataKey in sortedDt:
-        result[0]['values'].append([dataKey, aggVals[dataKey]])
+        result[0]['values'].append({ 'key': dataKey,  'value': aggVals[dataKey] })
       resultSets["_".join(key)] = result
   else:
     data = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(float)))
     for key, format, _ in keysWithFormat:
       if format is not None: # If there is a timestamp format defined
         # Python uses seconds in the timestamp whereas javascript uses the mili seconds
-        if isinstance(format, str):
-          mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
-        else:
-          mapFnc = lambda dt, dtFmt: format(dt)
+        mapFnc = lambda dt, dtFmt: int(datetime.datetime.strptime(dt, dtFmt).timestamp()) * 1000
       else:
         mapFnc = lambda dt, dtFmt: str(dt)
       for rec in recordSet:
@@ -79,7 +73,7 @@ def to2DCharts(recordSet, seriesName, keysWithFormat, valsWithFormat, extKeys=No
         result = [{'key': seriesName, 'values': []}]
         sortedDt = sorted(aggVals.keys())
         for dataKey in sortedDt:
-          result[0]['values'].append([dataKey, aggVals[dataKey]])
+          result[0]['values'].append( { 'key': dataKey, 'value': aggVals[dataKey] } )
         resultSets["%s_%s" %(extKeys, "_".join(key))] = result
   return resultSets
 
@@ -426,7 +420,6 @@ def toAggTable(recordSet, keys, vals, removeZero=True, filters=None):
     result.append(row)
   return result
 
-
 def toVenn(recordSet, col1, col2, vals, extKeys=None):
   """
   Simple Venn chart based on two columns
@@ -446,6 +439,8 @@ def toVenn(recordSet, col1, col2, vals, extKeys=None):
   for cat, value in tmpResults.items():
     result.append({'sets': cat, 'size': int(value)},)
   return {'%s_%s_%s' % (col1, col2, vals[0][0]): result}
+
+
 
 if __name__ == '__main__':
   recordSet = [{'cpty': 'BNPPAR', 'ptf' : 11, 'prd': 'Trs', 'value': 10},
