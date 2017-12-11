@@ -8,11 +8,14 @@ from ares.Lib import AresHtml
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlRadio
 
+
 class Svg(AresHtml.Html):
   """
 
   """
   __css = {'width': '95%', 'height': '100%'}
+  colorCharts = ['#e5f2e5', '#cce5cc', '#b2d8b2', '#99cc99', '#fbf7f', '#66b266', '#4ca64c', '#329932', '#198c19', '#008000',
+                 '#007300', '#007300', '#006600', '#005900', '#004c00', '#004000', '#003300', '#002600']
 
   height = 250
 
@@ -246,6 +249,8 @@ class XSvg(AresHtml.Html):
 
   """
   __css = {'width': '95%', 'height': '100%'}
+  colorCharts = ['#e5f2e5', '#cce5cc', '#b2d8b2', '#99cc99', '#fbf7f', '#66b266', '#4ca64c', '#329932', '#198c19', '#008000',
+                 '#007300', '#007300', '#006600', '#005900', '#004c00', '#004000', '#003300', '#002600']
 
   height = 250
 
@@ -253,11 +258,12 @@ class XSvg(AresHtml.Html):
     """ selectors is a tuple with the category first and the value list second """
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
-    super(Svg, self).__init__(aresObj, crossFilter, cssCls, cssAttr)
+    super(XSvg, self).__init__(aresObj, crossFilter, cssCls, cssAttr)
     self.extKeys, self.dispatch, self.htmlContent, self.components = None, {}, [], []
     self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     self.headerBox = headerBox
     crossFilter.links.add(self.htmlId)
+
   # --------------------------------------------------------------------------------------------------------------
   #
   #                                   CHARTS ATTRIBUTES AND PROPERTIES
@@ -326,6 +332,11 @@ class XSvg(AresHtml.Html):
   @property
   def jqData(self):
     return self.vals.data()
+
+  @property
+  def xDimensions(self):
+    return self.vals.dimension()
+
   # --------------------------------------------------------------------------------------------------------------
   #
   #                                     SETTER AND GETTER FOR THE CHARTS
@@ -415,4 +426,3 @@ class XSvg(AresHtml.Html):
   def xAxisLabel(self, value):
     """ Add a label the the y axis """
     self.addChartProp('xAxis', {'axisLabel': "'%s'" % value})
-

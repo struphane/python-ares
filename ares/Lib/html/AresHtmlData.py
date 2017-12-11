@@ -1,5 +1,4 @@
-""" Module dedicated to register the data on the javascript part but also to display fiilters on the HTML layers to
-interact with it.
+""" Module dedicated to register the data on the javascript part but also to display fiilters on the HTML layers to interact with it.
 @author: Olivier Nogues
 
 """
@@ -68,20 +67,31 @@ class CrossFilterGroup(object):
     """
     self.aresObj = aresObj
     self.links, self.filters = set(), set()
-    self.filterId = filter.htmlId
+    self.filterId, self.filterRules = filter.htmlId, []
     self.htmlId = "%s_%s_%s" % (filter.htmlId, key, val)
     self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId}
-    self.aresObj.jsGlobal.add(" %(htmlId)s_dim = %(filterId)s.dimension( function(d) {return d['%(key)s'] ;} )" % self.jsVar)
-    self.aresObj.jsGlobal.add(" %(htmlId)s = %(htmlId)s_dim.group().reduceSum( function(d) { return +d['%(val)s'] ; } )" % self.jsVar)
+    #self.aresObj.jsGlobal.add(" %(htmlId)s_dim = %(filterId)s.dimension( function(d) {if (d['type'] == 'visa'){ return d['%(key)s'] ;} } )" % self.jsVar)
 
-  def filter(self, htmlObj):
+  def filter(self, col, htmlObj):
     """
 
     .filter( function (d) { var val = %s; if (val == 'all') {return true} else {return d.key == val }; } )
     :return:
     """
     self.filters.add(htmlObj)
+    self.filterRules.append("if ( (d['%s'] == %s) || (%s == 'all') ){ %%s }" % (col, htmlObj.val, htmlObj.val))
 
+  def dimension(self):
+    """
+
+    :return:
+    """
+    allRules = '%s'
+    for rule in self.filterRules:
+      allRules %= rule
+    self.jsVar['fncFilter'] = allRules % "return d['%(key)s'] ;" % self.jsVar
+    self.jsVar['dimFilter'] = "%(filterId)s.dimension( function(d) { %(fncFilter)s } )" % self.jsVar
+    return "%(htmlId)s = %(dimFilter)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } )" % self.jsVar
 
   def data(self):
     """
@@ -89,8 +99,8 @@ class CrossFilterGroup(object):
     :return:
     """
     data = ["%s.top(Infinity)" % self.htmlId]
-    for filter in self.filters:
-      data.append("filter( function (d) { var val = %s; if (val == 'all') {return true} else {return d.key == val }; } )" % filter.val)
+    #for filter in self.filters:
+    #  data.append("filter( function (d) { var val = %s; if (val == 'all') {return true} else {return d.key == val }; } )" % filter.val)
     return ".".join(data)
 
 
@@ -105,7 +115,7 @@ class HtmlDataCrossFilter(object):
     for js in self.reqJs:
       self.aresObj.jsImports.add(js)
     self.recordSet = data
-    self.links, self.filters, self.grps = set(), set(), collections.defaultdict(list)
+    self.links, self.filters, self.grps = set(), set(), set()
     self.aresObj.jsGlobal.add(" %s = crossfilter(%s)" % (self.htmlId, json.dumps(self.recordSet)))
 
   @property
@@ -120,15 +130,15 @@ class HtmlDataCrossFilter(object):
     :return:
     """
     groupOjb = CrossFilterGroup(self.aresObj, self, key, val)
-    self.grps[key].append(groupOjb)
+    self.grps.add(groupOjb)
     return groupOjb
 
-  def addFilter(self, col, cssCls=None, cssAttr=None):
+  def addFilter(self, col, title, cssCls=None, cssAttr=None):
     """ Add a filter to the dictionary """
     filVals = sorted(list(set([rec[col] for rec in self.recordSet])))
-    filerObj = self.aresObj.select(['all'] + filVals, 'Youpi', cssCls=cssCls, cssAttr=cssAttr)
-    for grp in self.grps[col]:
-      grp.filter(filerObj)
+    filerObj = self.aresObj.select(['all'] + filVals, title, cssCls=cssCls, cssAttr=cssAttr)
+    for grp in self.grps:
+      grp.filter(col, filerObj)
     self.filters.add(filerObj)
     return filerObj
 

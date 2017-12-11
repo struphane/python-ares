@@ -4,7 +4,6 @@
 """
 
 import json
-from ares.Lib import AresHtml
 from ares.Lib.html import AresHtmlContainer
 from ares.Lib.html import AresHtmlRadio
 from ares.Lib.html import AresHtmlGraphSvg
