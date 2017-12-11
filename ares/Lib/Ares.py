@@ -30,7 +30,7 @@ QUESTION: Should we call the html() function in the wrapper or should we let the
 """
 from importlib import import_module
 from ares.Lib import AresImports
-from ares.Lib import AresJs
+from ares.Lib import AresHtml
 
 from Libs import OrderedSet
 from ares.Lib.html import AresHtmlData
@@ -331,15 +331,18 @@ class Report(object):
   def img(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['Image'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
   def iframe(self, values, cssCls=None, cssAttr=None): return self.add(aresFactory['IFrame'](self, self.supp(values), cssCls, cssAttr), sys._getframe().f_code.co_name)
 
+  # DataTable sections
   def table(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTable'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
-
-  # in progress
   def tablepivot(self, values, header, keys, vals, headerBox=None, extendTable=False, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTablePivot'](self, headerBox, values, header, keys, vals, extendTable, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
   def tableagg(self, values, header, keys, vals, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableAgg'](self, headerBox, values, header, keys, vals, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
-  def tablehyr(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableHyr'](self, headerBox, values, header, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
+  def tablehyr(self, values, header, keys, vals, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None, globalSortBy=None): return self.add(aresFactory['DataTableHyr'](self, headerBox, values, header, keys, vals, dataFilters, cssCls, cssAttr, globalSortBy), sys._getframe().f_code.co_name)
 
+  @AresHtml.deprecated
   def tablebase(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None, globalSortBy=None): return self.add(aresFactory['TableBase'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr, globalSortBy), sys._getframe().f_code.co_name)
+  @AresHtml.deprecated
   def simpletable(self, values, header, headerBox=None, cssCls=None, cssAttr=None, tdCssCls=None, tdCssAttr=None, globalSortBy=None): return self.add(aresFactory['TableComplex'](self, headerBox, self.suppRec(values), header, cssCls, cssAttr, tdCssCls, tdCssAttr), sys._getframe().f_code.co_name)
+
+
   def pivot(self, values, header, headerBox=None, dataFilters=None, cssCls=None, cssAttr=None): return self.add(aresFactory['TablePivot'](self, headerBox, values, header, dataFilters, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
 
