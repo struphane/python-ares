@@ -616,9 +616,28 @@ class DataTable(AresHtml.Html):
 
   def buttonExport(self):
     """ Add common data export """
-    self.__options['dom'] = "'Bfrtip'"
+    self.__options['dom'] = "'Bfrtip'" # (B)utton (f)iltering
     for button, name in [('copyHtml5', 'copy'), ('csvHtml5', 'csv'), ('excelHtml5', 'excel')]:
       self.addButton("{extend: '%s', text: '%s', className: 'btn btn-success btn-xs'}" % (button, name))
+
+  def buttonGroups(self, grpName, colIdWithLabels):
+    """
+     This function will allow you to show / hide group of columns in the data table
+
+     :param grpName: The name of the main button
+     :param colIdWithLabels:  The list of sub buttons with the (id column impacts, Button name)
+     :return:
+    """
+    btnGrp = []
+    for bId, bName in colIdWithLabels:
+      if isinstance(bId, list):
+        cols = []
+        for i in bId:
+          cols.append("dt.column( %s ).visible( ! dt.column( %s ).visible() ) " % (i, i))
+        btnGrp.append("{extend: 'colvisGroup', className: 'btn btn-success', action: function ( e, dt, node, config ) { %s }, text: '%s'}" % (";".join(cols), bName))
+      else:
+        btnGrp.append("{extend: 'colvisGroup', className: 'btn btn-success', action: function ( e, dt, node, config ) {dt.column( %s ).visible( ! dt.column( %s ).visible() );}, text: '%s'}" % (bId, bId, bName))
+    self.addButton("{extend: 'collection', text: 'Test', className: 'btn btn-success btn-xs', 'buttons': [%s] }" % ",".join(btnGrp))
 
   def buttonSumSelection(self):
     """ Add sum on selected items """
@@ -651,10 +670,9 @@ class DataTable(AresHtml.Html):
     """ """
     self.aresObj.jsFnc.add(
       '''%s.on('click', 'tr td', function() {
-            var table = %s ;
-            var cell = table.cell(this).node() ;
-            if ( $(cell).hasClass('blue-border') ) { $(cell).removeClass('blue-border'); }
-            else { $(cell).addClass('blue-border'); } } );''' % (self.jqId, self.htmlId))
+        var table = %s ; var cell = table.cell(this).node() ;
+        if ( $(cell).hasClass('blue-border') ) { $(cell).removeClass('blue-border'); }
+        else { $(cell).addClass('blue-border'); } } );''' % (self.jqId, self.htmlId))
 
   def contextMenu(self, contextMenu, attrList=None):
     """
@@ -1072,6 +1090,26 @@ class DataTablePivot(DataTable):
                ''' % self.htmlId, colIndex=5)
     self.noPivot = False
 
+  def buttonGroups(self, grpName, colIdWithLabels):
+    """
+     This function will allow you to show / hide group of columns in the data table
+
+     :param grpName: The name of the main button
+     :param colIdWithLabels:  The list of sub buttons with the (id column impacts, Button name)
+     :return:
+    """
+    pivotLen = 5
+    btnGrp = []
+    for bId, bName in colIdWithLabels:
+      if isinstance(bId, list):
+        cols = []
+        for i in bId:
+          cols.append("dt.column( %s ).visible( ! dt.column( %s ).visible() ) " % (i + pivotLen, i + pivotLen))
+        btnGrp.append("{extend: 'colvisGroup', className: 'btn btn-success', action: function ( e, dt, node, config ) { %s }, text: '%s'}" % (";".join(cols), bName))
+      else:
+        btnGrp.append("{extend: 'colvisGroup', className: 'btn btn-success', action: function ( e, dt, node, config ) {dt.column( %s ).visible( ! dt.column( %s ).visible() );}, text: '%s'}" % (bId + pivotLen, bId + pivotLen, bName))
+    self.addButton("{extend: 'collection', text: 'Test', className: 'btn btn-success btn-xs', 'buttons': [%s] }" % ",".join(btnGrp))
+
   def callBackSumFooter(self, digit=2):
     """ """
     self.withFooter = True
@@ -1285,4 +1323,41 @@ class DataTableHyr(DataTable):
   def callBackColorLevel(self, level, background='#69a370', font='white'):
     """  Change the color of row for a given level """
     self.callBacks('createdRow', "if(data.level == %s) { $(row).css({'background': '%s', 'color': '%s'})}" % (level, background, font))
+
+  def buttonGroups(self, grpName, colIdWithLabels):
+    """
+    This function will allow you to show / hide group of columns in the data table
+
+    :param grpName: The name of the main button
+    :param colIdWithLabels:  The list of sub buttons with the (id column impacts, Button name)
+    :return:
+    """
+    pivotLen = 4
+    btnGrp = []
+    for bId, bName in colIdWithLabels:
+      if isinstance(bId, list):
+        cols = []
+        for i in bId:
+          cols.append("dt.column( %s ).visible( ! dt.column( %s ).visible() ) " % (i + pivotLen, i + pivotLen))
+        btnGrp.append("{extend: 'colvisGroup', className: 'btn btn-success',title: 'RRR', action: function ( e, dt, node, config ) { %s }, text: '%s'}" % (";".join(cols), bName))
+      else:
+        btnGrp.append("{extend: 'colvisGroup', className: 'btn btn-success', action: function ( e, dt, node, config ) {dt.column( %s ).visible( ! dt.column( %s ).visible() );}, text: '%s'}" % (bId + pivotLen, bId + pivotLen, bName))
+    self.addButton("{extend: 'collection', text: '%s', className: 'btn btn-success btn-xs', 'buttons': [%s] }" % (grpName, ",".join(btnGrp)))
+
+  def showLevels(self, level):
+    """
+    :param level:
+    :return:
+    """
+    self.addButton('''{ text: 'Add Row', className: 'btn btn-success',
+                        action: function (e, dt, node, config ) {
+                          dt.rows().every( function ( index ) {
+                            var row = dt.row( index );
+                            var tr = $(row).closest('tr')
+                            if (row.data().level == %(level)s) { $('tr', row).css('display', 'block').draw(false) ; }
+                            else {}
+                          });
+                        %(htmlId)s.draw();
+                        }
+                      }''' % {'htmlId': self.htmlId, 'level': level})
 
