@@ -9,6 +9,7 @@ A decorator will be added to this class to mention to users that going forward i
 
 import json
 import operator
+import collections
 
 from ares.Lib import AresHtml
 from ares.Lib import AresItem
@@ -62,7 +63,6 @@ class DataTable(AresHtml.Html):
     else:
       recordSet = vals
     self.sortBy = sortBy
-    self.pivotLevel = 1
     if self.sortBy is not None:
       if self.sortBy[1].lower() == 'desc':
         sortedItems = sorted(recordSet, key=operator.itemgetter(self.sortBy[0]))
@@ -144,6 +144,9 @@ class DataTable(AresHtml.Html):
       if 'dsc' in header:
         self.mapDsc[self.recKey(header)] = (i, header['dsc'])
 
+  def tableOption(self, val):
+    return self.__options[val]
+
   def fixedHeader(self):
     """ Set the header to be fixed """
     self.aresObj.jsImports.add('dataTables-fixedHeader')
@@ -196,9 +199,9 @@ class DataTable(AresHtml.Html):
     for colId in colsId:
       self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % colId)
 
+  @AresHtml.deprecated
   def agg(self, keys, vals, digit=0, isColStriped=True, colCenter=False):
     """ Simple data aggregation, no need in this function to store the result and the different levels """
-    self.noPivot = False
     if isColStriped:
       self.addClass('table-striped')
     self.recordSetHeader = []
@@ -243,6 +246,7 @@ class DataTable(AresHtml.Html):
       self.__options['data'] = json.dumps(rows)
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
 
+  @AresHtml.deprecated
   def pivot(self, keys, vals, colRenders=None, withUpDown=False, extendTable=False, digit=0, colCenter=False):
     """ Create the pivot table """
     self.noPivot = False
@@ -252,7 +256,7 @@ class DataTable(AresHtml.Html):
     self.pivotKeys = keys
     self.__options['data'] = json.dumps(rows)
     self.recordSetHeader = []
-    self.hiddenCols.extend([ '_id', '_leaf', 'level', '_hasChildren', '_parent'])
+    # self.hiddenCols.extend([ '_id', '_leaf', 'level', '_hasChildren', '_parent'])
     self.tableToolTips = {}
     for i, col in enumerate([ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys):
       if col in self.mapDsc:
@@ -361,7 +365,7 @@ class DataTable(AresHtml.Html):
 
   def option(self, keyOption, value):
     """ Add the different options to the datatable """
-    if keyOption in ['data', 'ajax', 'buttons', 'columnDefs']:
+    if keyOption in ['ajax', 'buttons', 'columnDefs']:
       raise Exception("%s should be added using the dedicated function" % keyOption)
 
     self.__options[keyOption] = value
@@ -371,7 +375,11 @@ class DataTable(AresHtml.Html):
     self.__options['columnDefs'] = json.dumps(columnDefList)
 
   def hideColumns(self, colIndices):
-    self.__options['columnDefs'] = "[{ 'visible': false, 'targets': [%s], 'searchable': false, 'className': 'dt_right'}]" % ",".join([str(i) for i in colIndices])
+    """
+    :param colIndices: The list of indices to be hidden
+    :return:
+    """
+    self.hiddenCols.extend(colIndices)
 
   def ajax(self, jsDic):
     """ Add the Ajax feature to load the data from an ajax service """
@@ -394,10 +402,6 @@ class DataTable(AresHtml.Html):
   def callBackHideHeader(self):
     """ Callback to hide the table header """
     self.callBacks('initComplete', "$('#%s thead').find('tr:last').hide();" % self.htmlId)
-
-  def callBackTreeStructure(self):
-    """ Callback to hide the table header """
-    self.callBacks('initComplete', "alert('%s');" % self.htmlId)
 
   #--------------------------------------------------------------------------------------------------------------
   #
@@ -531,12 +535,11 @@ class DataTable(AresHtml.Html):
                       api.columns('.sum', { page: 'current' } ).every(function (el) {
                           var sum = this.data().reduce(function (a, b) {var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
                       var result;
-                      var sum = sum / %s ;
                       if (sum < 0) {result = "<font style='color:red'>" + sum.formatMoney(%s, ',', '.') + "</font>" ;}
                       result = "<font style='color:green'>" + sum.formatMoney(%s, ',', '.') + "</font>";
                       $(this.footer()).html(result);
                       } );
-                   ''' % (self.pivotLevel, digit, digit))
+                   ''' % (digit, digit))
 
   def callBackHeaderColumns(self):
     """  """
@@ -572,6 +575,14 @@ class DataTable(AresHtml.Html):
     """ Row Call back wrapper to change the background color """
     self.callBacks('rowCallback',
                    "if (data['%s'] == '%s') {$(row).css('background-color', '%s'); }" % (colName, value, bgColor))
+
+  def callBackColLeftAlign(self, dstColIndices):
+    """
+    :param dstColIndices: The list of column numbera which should be left align in the table
+    :return:
+    """
+    for colIndex in dstColIndices:
+      self.callBacks('rowCallback', ''' $('td:eq(%s)', row).addClass('left_align') ;''' % colIndex)
 
   #--------------------------------------------------------------------------------------------------------------
   #
@@ -769,11 +780,10 @@ class DataTable(AresHtml.Html):
 
                       // Total over this page
                       pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
-                      pageTotal = pageTotal / %s ; // for the pivot table
                       // Update footer
                       $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
                     }
-                    ''' % (json.dumps(colNumber), self.pivotLevel))
+                    ''' % json.dumps(colNumber))
 
   def search(self, flag):
     """ Display or not the search item """
@@ -813,6 +823,8 @@ class DataTable(AresHtml.Html):
 
   def __str__(self):
     """ Return the string representation of a HTML table """
+    if self.hiddenCols:
+      self.__options['columnDefs'] = "[{ 'visible': false, 'targets': %s, 'searchable': false, 'className': 'dt_right'}]" % json.dumps(self.hiddenCols)
     if self.noPivot:
       self.addClass('table-striped')
       self.__options['data'] = json.dumps(self.vals)
@@ -981,24 +993,180 @@ class DataTablePivot(DataTable):
   """
 
   """
+  __cssCls, alias = ['table', 'table-sm', 'nowrap'], 'tablepivot'
+  __reqCss, __reqJs = ['dataTables'], ['dataTables']
+  __callBackWrapper = {
+      'initComplete': "function(settings, json) { %s }",
+      'createdRow': "function ( row, data, index ) { %s }",
+      'rowCallback': "function ( row, data, index ) { %s }",
+      'footerCallback': "function ( row, data, start, end, display ) { %s }"}
 
-  def setKeys(self, keys, selected=None):
-    self.chartKeys = [self.header[key] for key in keys]
+  def __init__(self, aresObj, headerBox, recordSet, header, keys, vals, extendTable=False, dataFilters=None, cssCls=None, cssAttr=None, sortBy=None):
+    """
 
-  def setVals(self, vals, selected=None):
-    self.chartVals = [self.header[val] for val in vals]
+    :param aresObj: The unique object with all the report details
+    :param vals: The recordSet
+    :param isheader: The definition of the header
+    :param cssCls: The CSS classes to be used when the HTNL table will be built
+    :param cssAttr: The CSS attributes to be used during the table definition
+    :param sortBy: Should be a tuple with (column name, asc / desc, number of items or Nene)
+    :return:
+    """
+    super(DataTablePivot, self).__init__(aresObj, headerBox, recordSet, header, dataFilters, cssCls, cssAttr, sortBy)
+    self.option("ordering", 'false')
+    rows = AresChartsService.toPivotTable(self.vals, keys, vals, filters=self.pivotFilters)
+    self.pivotLevel = len(keys)
+    self.pivotKeys = keys
+    self.option('data', json.dumps(rows))
+    self.recordSetHeader, self.tableToolTips = [], {}
+    for i, col in enumerate([ '_id', '_leaf', 'level', '_hasChildren', '_parent'] + keys):
+      if col in self.mapDsc:
+        self.addToolTips(i, self.mapDsc[col][1])
+      row = {'data': col, 'title': self.recMap.get(col, col)}
+      if 'className' in col:
+        row['className'] = col['className']
+      if 'visible' in col:
+        row['visible'] = col['visible']
+      self.recordSetHeader.append(json.dumps(row))
+    for i, col in enumerate(vals):
+      # return "<font style='color:red'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ;
+      if col in self.mapDsc:
+        self.addToolTips(i + len(keys), self.mapDsc[col][1])
+      className = 'sum'
+      if 'className' in col:
+        className = "%s %s" % (className, col['className'])
+      self.recordSetHeader.append("{ data: '%s', title: '%s',  className: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) } " % (col, self.recMap.get(col, col), className, 2))
+    if len(rows) < self.tableOption('pageLength'):
+      self.option('info', 'false')
+      self.option('paginate', 'false')
+      self.option('searching', 'false')
+    self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    self.hideColumns([0, 1, 2, 3, 4])
+    self.option('scrollCollapse', 'false')
+    self.option('paging', 'false')
+    self.option('scrollY', "'50vh'")
+    self.mouveHover('#BFFCA6', 'black')
+    self.callBackColLeftAlign(range(len(keys)))
+    if not extendTable:
+      self.callBackCreateRowHideFlag('_leaf', '1')
+      self.callBackCreateRowHideFlag('_parent', '0')
+      self.callBackCreateRowFlag('_hasChildren', 0, 'details')
+      self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); } ;
+                                       if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+    else:
+      self.callBacks('rowCallback', '''if ( parseFloat(data['_hasChildren']) > 0 ) {$(row).addClass('details'); $('td:eq(0)', row).toggleClass('changed');} ;
+                                       if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}''')
+    self.click('''
+                var currentTable = %s;
+                var trObj = $(this).closest('tr'); var trName = $('td:eq(0)', trObj).html();
+                var trId = currentTable.row(trObj).data()._id; var trLevel = currentTable.row(trObj).data().level + 1;
+                if (!$(this).hasClass('changed')) {
+                  $(this).toggleClass('changed'); var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    if ( trLevel == currentTable.row(nextTr.index()).data().level ) {nextTr.show();}
+                    nextTr = $(nextTr).next();}}
+               else {
+                  $(this).toggleClass('changed'); var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    nextTr.hide(); $('td:eq(0)', nextTr).removeClass('changed'); nextTr = $(nextTr).next();}}
+               ''' % self.htmlId, colIndex=5)
+    self.noPivot = False
+
+  def callBackSumFooter(self, digit=2):
+    """ """
+    self.withFooter = True
+    self.callBacks('footerCallback',
+                   '''
+                      var api = this.api();
+                      api.columns('.sum', { page: 'current' } ).every(function (el) {
+                          var sum = this.data().reduce(function (a, b) {var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
+                      var result;
+                      var sum = sum / %s ;
+                      if (sum < 0) {result = "<font style='color:red'>" + sum.formatMoney(%s, ',', '.') + "</font>" ;}
+                      result = "<font style='color:green'>" + sum.formatMoney(%s, ',', '.') + "</font>";
+                      $(this.footer()).html(result);
+                      } );
+                   ''' % (self.pivotLevel, digit, digit))
+
+  def callBackFooterSum(self, colNumber):
+    """ Add a footer with a sum on the datatable """
+    self.withFooter = True
+    self.callBacks('footerCallback',
+                   '''
+                    var api = this.api(), data;
+                    var colNumber = %s;
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {return typeof i === 'string' ?i.replace(/[\$,]/g, '')*1 :typeof i === 'number' ?i : 0;};
+
+                    for (i in colNumber) {
+                      // Total over all pages
+                      total = api.column( colNumber[i] ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+
+                      // Total over this page
+                      pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+                      pageTotal = pageTotal / %s ; // for the pivot table
+                      // Update footer
+                      $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
+                    }
+                    ''' % (json.dumps(colNumber), self.pivotLevel))
+
+  def callBackColorLevel(self, level, background='#69a370', font='white'):
+    """  Change the color of row for a given level """
+    self.callBacks('createdRow', "if(data.level == %s) { $(row).css({'background': '%s', 'color': '%s'})}" % (level, background, font))
 
 
 class DataTableAgg(DataTable):
   """
 
   """
+  __cssCls, alias = ['table', 'table-sm', 'nowrap'], 'tableagg'
+  __reqCss, __reqJs = ['dataTables'], ['dataTables']
+  __callBackWrapper = {
+      'initComplete': "function(settings, json) { %s }",
+      'createdRow': "function ( row, data, index ) { %s }",
+      'rowCallback': "function ( row, data, index ) { %s }",
+      'footerCallback': "function ( row, data, start, end, display ) { %s }"}
 
-  def setKeys(self, keys, selected=None):
-    self.chartKeys = [self.header[key] for key in keys]
+  def __init__(self, aresObj, headerBox, recordSet, header, keys, vals, dataFilters=None, cssCls=None, cssAttr=None, sortBy=None):
+    """ Python wrapper to define the Aggregated HTML table
 
-  def setVals(self, vals, selected=None):
-    self.chartVals = [self.header[val] for val in vals]
+    :param aresObj: The unique object with all the report details
+    :param vals: The recordSet
+    :param isheader: The definition of the header
+    :param cssCls: The CSS classes to be used when the HTNL table will be built
+    :param cssAttr: The CSS attributes to be used during the table definition
+    :param sortBy: Should be a tuple with (column name, asc / desc, number of items or Nene)
+    :return:
+    """
+    super(DataTableAgg, self).__init__(aresObj, headerBox, recordSet, header, dataFilters, cssCls, cssAttr, sortBy)
+    self.addClass('table-striped')
+    self.recordSetHeader, self.tableToolTips, colToIndex = [], {}, {}
+    for i, col in enumerate(keys):
+      colToIndex[col] = i
+      if col in self.mapDsc:
+        self.addToolTips(i+1, self.mapDsc[col][1])
+      row = {'data': col, 'title': self.recMap.get(col, col)}
+      if 'className' in col:
+        row['className'] = col['className']
+      if 'visible' in col:
+        row['visible'] = col['visible']
+      self.recordSetHeader.append(json.dumps(row))
+    for i, val in enumerate(vals):
+      colToIndex[val] = i + len(keys)
+      if val in self.mapDsc:
+        self.addToolTips(i + len(keys), self.mapDsc[val][1])
+      self.recordSetHeader.append("{ data: '%s', className: 'sum', title: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) }" % (val, self.recMap.get(val, val), 2))
+    if self.sortBy is not None:
+      self.order(colToIndex[self.sortBy[0]], self.sortBy[1])
+    self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    rows = AresChartsService.toAggTable(self.vals, keys, vals, filters=self.pivotFilters)
+    self.option('data', json.dumps(rows))
+    self.mouveHover('#BFFCA6', 'black')
+    self.option('scrollCollapse', 'false')
+    self.callBackColLeftAlign(range(len(keys)))
+    if len(rows) < self.tableOption('pageLength'):
+      self.option('info', 'false')
+      self.option('bPaginate', 'false')
 
 
 class DataTableHyr(DataTable):
@@ -1006,8 +1174,115 @@ class DataTableHyr(DataTable):
 
   """
 
-  def setKeys(self, keys, selected=None):
-    self.chartKeys = [self.header[key] for key in keys]
+  def __init__(self, aresObj, headerBox, recordSet, header, keys, vals, extendTable=False, dataFilters=None, cssCls=None, cssAttr=None, sortBy=None):
+    """
 
-  def setVals(self, vals, selected=None):
-    self.chartVals = [self.header[val] for val in vals]
+    :param aresObj: The unique object with all the report details
+    :param vals: The recordSet
+    :param isheader: The definition of the header
+    :param cssCls: The CSS classes to be used when the HTNL table will be built
+    :param cssAttr: The CSS attributes to be used during the table definition
+    :param sortBy: Should be a tuple with (column name, asc / desc, number of items or Nene)
+    :return:
+    """
+    super(DataTableHyr, self).__init__(aresObj, headerBox, recordSet, header, dataFilters, cssCls, cssAttr, sortBy)
+    self.option("ordering", 'false')
+    self.pivotLevel = len(keys)
+    self.pivotKeys = keys
+    self.recordSetHeader, self.tableToolTips = [], {}
+    self.option('data', json.dumps(recordSet))
+    for i, col in enumerate([ '_id', '_leaf', 'level', '_parent'] + keys):
+      if col in self.mapDsc:
+        self.addToolTips(i, self.mapDsc[col][1])
+      row = {'data': col, 'title': self.recMap.get(col, col)}
+      if 'className' in col:
+        row['className'] = col['className']
+      if 'visible' in col:
+        row['visible'] = col['visible']
+      self.recordSetHeader.append(json.dumps(row))
+    for i, col in enumerate(vals):
+      # return "<font style='color:red'>" + parseFloat(data).formatMoney(%s, ',', '.') + "</font>" ;
+      if col in self.mapDsc:
+        self.addToolTips(i + len(keys), self.mapDsc[col][1])
+      className = 'sum'
+      if 'className' in col:
+        className = "%s %s" % (className, col['className'])
+      self.recordSetHeader.append("{ data: '%s', title: '%s',  className: '%s', render: $.fn.dataTable.render.number( ',', '.', %s ) } " % (col, self.recMap.get(col, col), className, 2))
+    if len(recordSet) < self.tableOption('pageLength'):
+      self.option('info', 'false')
+      self.option('paginate', 'false')
+      self.option('searching', 'false')
+    self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
+    self.hideColumns([0, 1, 2, 3])
+    self.option('scrollCollapse', 'false')
+    self.option('paging', 'false')
+    self.option('scrollY', "'50vh'")
+    self.mouveHover('#BFFCA6', 'black')
+    self.callBackColLeftAlign(range(len(keys)))
+    if not extendTable:
+      self.callBackHideRowLeaf()
+      self.callBacks('rowCallback', "if ( !data['_leaf'] ) {$(row).addClass('details'); } ; if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}")
+    else:
+      self.callBacks('rowCallback', "if ( !data['_leaf'] ) {$(row).addClass('details'); $('td:eq(0)', row).toggleClass('changed');} ;if ( data.level > 0) {$('td:eq(0)', $(row)).css('padding-left', 25 * data.level + 'px') ;}")
+    self.click('''
+                var currentTable = %s;
+                var trObj = $(this).closest('tr'); var trName = $('td:eq(0)', trObj).html();
+                var trId = currentTable.row(trObj).data()._id; var trLevel = currentTable.row(trObj).data().level + 1;
+                if (!$(this).hasClass('changed')) {
+                  $(this).toggleClass('changed'); var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    if ( trLevel == currentTable.row(nextTr.index()).data().level ) {nextTr.show();}
+                    nextTr = $(nextTr).next();}}
+               else {
+                  $(this).toggleClass('changed'); var nextTr = $(trObj).next();
+                  while( currentTable.row(nextTr.index()).data()._id.startsWith(trId) ) {
+                    nextTr.hide(); $('td:eq(0)', nextTr).removeClass('changed'); nextTr = $(nextTr).next();}}
+               ''' % self.htmlId, colIndex=4)
+    self.noPivot = False
+
+  def callBackHideRowLeaf(self):
+    """  Change the row according to tag """
+    self.callBacks('createdRow', "if ( ((data['_leaf']) && (data['level'] != 0)) || ((!data['_leaf']) && (data['level'] != 0))) {$(row).hide(); }")
+
+  def callBackSumFooter(self, digit=2):
+    """ """
+    self.withFooter = True
+    self.callBacks('footerCallback',
+                   '''
+                      var api = this.api();
+                      api.columns('.sum', { page: 'current' } ).every(function (el) {
+                          var sum = this.data().reduce(function (a, b) {var x = parseFloat(a) || 0; var y = parseFloat(b) || 0;return x + y; }, 0);
+                      var result;
+                      var sum = sum / %s ;
+                      if (sum < 0) {result = "<font style='color:red'>" + sum.formatMoney(%s, ',', '.') + "</font>" ;}
+                      result = "<font style='color:green'>" + sum.formatMoney(%s, ',', '.') + "</font>";
+                      $(this.footer()).html(result);
+                      } );
+                   ''' % (self.pivotLevel, digit, digit))
+
+  def callBackFooterSum(self, colNumber):
+    """ Add a footer with a sum on the datatable """
+    self.withFooter = True
+    self.callBacks('footerCallback',
+                   '''
+                    var api = this.api(), data;
+                    var colNumber = %s;
+                    // Remove the formatting to get integer data for summation
+                    var intVal = function (i) {return typeof i === 'string' ?i.replace(/[\$,]/g, '')*1 :typeof i === 'number' ?i : 0;};
+
+                    for (i in colNumber) {
+                      // Total over all pages
+                      total = api.column( colNumber[i] ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+
+                      // Total over this page
+                      pageTotal = api.column( colNumber[i], { page: 'current'} ).data().reduce( function (a, b) {return intVal(a) + intVal(b);}, 0 );
+                      pageTotal = pageTotal / %s ; // for the pivot table
+                      // Update footer
+                      $( api.column( colNumber[i] ).footer() ).html('$' + pageTotal + ' ( $'+ total +' total)');
+                    }
+                    ''' % (json.dumps(colNumber), self.pivotLevel))
+
+  def callBackColorLevel(self, level, background='#69a370', font='white'):
+    """  Change the color of row for a given level """
+    self.callBacks('createdRow', "if(data.level == %s) { $(row).css({'background': '%s', 'color': '%s'})}" % (level, background, font))
+
