@@ -84,7 +84,7 @@ JS_IMPORTS = {
 CSS_IMPORTS = {
   'jquery': {'modules': ['jquery-ui.css']},
 
-  'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css']},
+  'dataTables': {'req': ['bootstrap'], 'modules': ['jquery.dataTables.min.css', 'responsive.dataTables.min.css', 'buttons.dataTables.min.css']},
 
   # Datatable fixed column
   'dataTables-fixedColumns': {'req': ['dataTables'], 'modules': ['fixedColumns.bootstrap4.min.css']},
