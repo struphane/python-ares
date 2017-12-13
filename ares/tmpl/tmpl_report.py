@@ -15,9 +15,8 @@ FILE_CONFIGS = [] # All the static and output files configurationa
 
 HTTP_PARAMS = [] # If you want to use the param method to set parameter before running hte report
 
-import random
 
-#def params(aresObj):
+#def params(modalObj):
 #  """ Optional param method to be run before the report method to set parameter """
 
 
