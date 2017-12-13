@@ -1,25 +1,10 @@
 """ [SCRIPT COMMENT]
 
->>>> Important variables / functions
-
-In the python layer
-    aresObj.http['FILE'] is the current file
-    aresObj.http['REPORT_NAME'] is the current report environment name
-    aresObj.http['DIRECTORY'] is the report location
-
-     def readFile(self, file, subfolders=None):
-     def createFile(self, file, subfolders=None, checkFileExist=True):
-     def getFolders(self):
-     def getFiles(self, subfolders):
-
-
-In the javascript layer
-    display(data) to return the result in a notification modal popup
-    preloader() to show a loading page
 
 """
 
-
+TEAM = '' # Report's team
+DSC = '' # Report Short description
 NAME = 'Report' # The Report Name in the left menu
 # The Shortcuts should be defined as below
 # [(Cateogry Name, [List of the script in the root directory])]
