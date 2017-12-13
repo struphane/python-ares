@@ -324,7 +324,7 @@ def syntaxEditor(inFile):
         finishComment = True
         tempData = '<mark class="green">%s</mark>' % tempData
       else:
-        tempData = '<mark class="green">%s\n' % tempData.strip()
+        tempData = '<mark class="green">%s' % tempData
       scriptData.append(tempData)
       continue
 
