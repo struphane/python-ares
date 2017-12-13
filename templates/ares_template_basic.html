@@ -135,7 +135,7 @@
             $.ajax({
                 type: 'POST',
                 url: "/reports/editScript",
-                data:  String($('#script_wrapper').html()),
+                data:  document.querySelector('[contenteditable]').innerText,
                 contentType: false,
                 dataType : 'html',
                 cache: false,
@@ -189,7 +189,7 @@
           <strong>Warning!</strong> Unsaved changes to the Python Code.
         </div>
         <br>
-        <div id="script_wrapper" contenteditable="true" class="preformatted" style="display:none">{{ scriptData|safe }}</div>
+        <div id="script_wrapper" contenteditable="true" class="preformatted" style="display:none; white-space: pre">{{ scriptData|safe }}</div>
     {% endif %}
 </div>
 

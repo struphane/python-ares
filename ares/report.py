@@ -1233,7 +1233,7 @@ def editScript():
   """ """
   scriptDtls = request.environ['HTTP_REFERER'].split('?')[0].split('/')
   if scriptDtls[-2] == 'run':
-    script = open(os.path.join(config.ARES_USERS_LOCATION, "%s.py" % scriptDtls[-1]), 'w')
+    script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-1], "%s.py" % scriptDtls[-1]), 'w')
   else:
     script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-2], "%s.py" % scriptDtls[-1]), 'w')
   scriptData = request.data.decode('utf-8').replace('<mark class="blue">', '').replace('</mark>', '')
