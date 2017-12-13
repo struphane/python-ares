@@ -1278,9 +1278,13 @@ def editScript():
     script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-1], "%s.py" % scriptDtls[-1]), 'w')
   else:
     script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-2], "%s.py" % scriptDtls[-1]), 'w')
-  for line in request.data.decode('utf-8').split('\n'):
-    script.write('%s\n' % line)
-  script.close()
+  try:
+    for line in request.data.decode('utf-8').split('\n'):
+      script.write('%s\n' % line)
+  except Exception as e:
+    logging.debug(e)
+  finally:
+    script.close()
   return 'OK'
 
 @report.route("/download/<report_name>/data/<file_name>/<file_location>", methods = ['GET'])
@@ -1334,12 +1338,10 @@ def createDataSource():
 
 @report.route('/ares/addFileAuth', methods=['GET', 'POST'])
 def addFileAuth():
-  print(request.args)
   report_name = request.args['report_name']
   db = AresSql.SqliteDB(report_name)
   recSet = db.select("SELECT file_id FROM file_auth WHERE team_id = %s" % session['TEAM_ID'])
   fileLst = [rec['file_id'] for rec in recSet]
-  print(fileLst)
   file = request.args['file_id']
   if int(file) not in fileLst:
     return "Permission Denied", 401
