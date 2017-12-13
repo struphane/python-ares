@@ -300,6 +300,59 @@ def getAuthorizedFiles(fileConfigs, reportObj, report_name, userDirectory, fnct=
         reportObj.fileMap.setdefault(file[ALIAS], []).append(file[DISK_NAME])
   return fileNameToParser
 
+
+def syntaxEditor(inFile):
+  pyKeywords = ['False', 'class', 'finally', 'is', 'return', 'None', 'continue',
+                'for', 'lambda', 'try', 'True', 'def', 'from', 'nonlocal', 'while', 'and',
+                'del', 'global', 'not', 'with', 'as', 'elif', 'if', 'or', 'yield', 'assert',
+                'else', 'import', 'pass', 'break', 'except', 'in', 'raise', 'self']
+  scriptData = []
+  finishComment = True
+  quoteType = None
+  for line in inFile:
+    tempData = line
+    if tempData.strip().startswith('#'):
+      tempData = '<mark class="green">%s</mark>' % tempData
+      scriptData.append(tempData)
+      continue
+
+    elif (tempData.strip().startswith("'''") or tempData.strip().startswith('"""')) and finishComment:
+      quoteType = tempData.strip()[:3]
+      finishComment = False
+      countQuote = len(tempData.strip().split(quoteType))
+      if tempData.endswith("'''") or tempData.strip().endswith('"""') and countQuote > 2:
+        finishComment = True
+        tempData = '<mark class="green">%s</mark>' % tempData
+      else:
+        tempData = '<mark class="green">%s\n' % tempData.strip()
+      scriptData.append(tempData)
+      continue
+
+    elif not finishComment:
+      if tempData.strip().startswith("'''") or tempData.strip().startswith('"""'):
+        tempData = '%s</mark>' % tempData
+        finishComment = True
+      scriptData.append(tempData)
+      continue
+
+    elif tempData.endswith("'''") or tempData.strip().endswith('"""'):
+      tempData = '%s</mark>' % tempData
+      finishComment = True
+      scriptData.append(tempData)
+      continue
+
+    if '#' in tempData:
+      code, comment = tempData.split('#')
+      comment = '%s</mark>' % comment
+    else:
+      code, comment = tempData, ''
+    for word in pyKeywords:
+      code = re.sub(r'\b(%s)\b' % word, '<mark class="blue">%s</mark>' % word, code)
+
+    tempData = '<mark class="green">#'.join([code, comment]) if comment else code
+    scriptData.append(tempData)
+  scriptData = ''.join(scriptData)
+  return scriptData
 # ------------------------------------------------------------------------------------------------------------
 # Section dedicated to run the reports on the servers
 #
@@ -373,19 +426,8 @@ def run_report(report_name, script_name):
 
       if os.path.exists(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name)):
         inFile = open(os.path.join(config.ARES_USERS_LOCATION, report_name, "%s.py" % script_name))
-        pyKeywords = ['False', 'class', 'finally', 'is', 'return', 'None', 'continue',
-                      'for', 'lambda', 'try', 'True', 'def', 'from', 'nonlocal', 'while', 'and',
-                      'del', 'global', 'not', 'with', 'as', 'elif', 'if', 'or', 'yield', 'assert',
-                      'else', 'import', 'pass', 'break', 'except', 'in', 'raise', 'self']
-        scriptData = []
-        for line in inFile:
-          tempData = line
-          for word in pyKeywords:
-            tempData = re.sub(r'\b(%s)\b' % word, '<mark class="blue">%s</mark>' % word, tempData)
-          scriptData.append(tempData)
-        scriptData = ''.join(scriptData)
+        scriptData = syntaxEditor(inFile)
         inFile.close()
-
 
       if  script_name != report_name and config.ARES_MODE.upper() != 'LOCAL':
         dbPath = os.path.join(current_app.config['ROOT_PATH'], config.ARES_USERS_LOCATION, report_name, 'db', 'admin.db')
@@ -880,7 +922,7 @@ def createEnv(environment):
 
     for dir in DIR_LIST:
       os.makedirs(os.path.join(scriptPath, dir))
-      if dir not in ['data', 'static']:
+      if dir in ['utils', 'ajax']:
         initFile = open(os.path.join(scriptPath, dir, '__init__.py'), 'w')
         initFile.close()
     return "New environment created: %s" % scriptName
@@ -1236,8 +1278,7 @@ def editScript():
     script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-1], "%s.py" % scriptDtls[-1]), 'w')
   else:
     script = open(os.path.join(config.ARES_USERS_LOCATION, scriptDtls[-2], "%s.py" % scriptDtls[-1]), 'w')
-  scriptData = request.data.decode('utf-8').replace('<mark class="blue">', '').replace('</mark>', '')
-  for line in scriptData.split('\n'):
+  for line in request.data.decode('utf-8').split('\n'):
     script.write('%s\n' % line)
   script.close()
   return 'OK'

@@ -17,6 +17,12 @@ mark.blue {
     background: none;
 }
 
+mark.green {
+    color:#68a26f;
+    font-weight: italic;
+    background: none;
+}
+
 table.fixed-header tr {
 width: 100%;
 display: inline-table;
