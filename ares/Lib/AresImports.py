@@ -115,7 +115,11 @@ CSS_IMPORTS = {
 
   'pivot': {'req': [], 'modules': ['pivot.min.css']},
 
-  'vis': {'req': [], 'modules': ['vis.min.css']}
+  'vis': {'req': [], 'modules': ['vis.min.css']},
+
+  # Jquery UI for some special components
+  # https://jqueryui.com/
+  'jquery-ui': {'req': [], 'modules': ['jquery-ui.css']}
   }
 
 
