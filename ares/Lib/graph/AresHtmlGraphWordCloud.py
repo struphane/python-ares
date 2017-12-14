@@ -40,7 +40,7 @@ class XWordCloud(AresHtmlGraphSvg.XSvg):
                 d3.select("#%(htmlId)s svg") // Refer to the chart variable
                   .append("g").attr("transform", "translate(150,150)").selectAll("text")
                   .data(words).enter().append("text").style("font-size", function(d) { return d.size + "px"; })
-                  .style("font-family", "Impact").style("fill", function(d, i) {  return d3.scale.category20()(i); })
+                  .style("font-family", "Impact").style("fill", function(d, i) {  return %(color)s[i]; })
                   .attr("text-anchor", "middle")
                   .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
                   .text(function(d) { return d.text; });
@@ -56,5 +56,5 @@ class XWordCloud(AresHtmlGraphSvg.XSvg):
                       .text(function(d) { return d.key; });
               };
             ''' % {'htmlId': self.htmlId, 'width': self.width, 'height': self.height, 'data': data['data'], 'chartDimension': data['vars'],
-                   'factor': self.factor}
+                   'factor': self.factor, 'color': json.dumps(AresHtmlGraphSvg.XSvg.colorCharts)}
 
