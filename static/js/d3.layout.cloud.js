@@ -178,7 +178,7 @@
   }
 
   function cloudText(d) {
-    return d.text;
+    return d.key;
   }
 
   function cloudFont() {
