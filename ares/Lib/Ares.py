@@ -354,6 +354,7 @@ class Report(object):
   # Cross Filter Chart section
   def xbar(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Bar'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
   def xpie(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Pie'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
+  def xdonut(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Donut'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
 
   # Chart section
   def bar(self, values, header, chartKey=None, chartVal=None, headerBox=None, cssCls=None, cssAttr=None, mockData=False, inReport=True): return self.add(aresFactory['NvD3Bar'](self, headerBox, values, header, chartKey, chartVal, cssCls, cssAttr, mockData), sys._getframe().f_code.co_name, inReport)
@@ -526,7 +527,8 @@ class Report(object):
     # Section dedicated to the javascript for all the charts
     importMng = AresImports.ImportManager()
     if self.jsGraphs:
-      jsGraphs.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
+      jsGraphs.append("$(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
+      #jsGraphs.append("nv.addGraph(function() {\n %s \n});" % "\n\n".join(self.jsGraphs))
 
     cssImports = importMng.cssResolve(self.cssImport, self.cssLocalImports)
     jsImports = importMng.jsResolve(self.jsImports, self.jsLocalImports)
