@@ -8,47 +8,53 @@ from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 
 
-class WordCloud(AresHtmlGraphSvg.Svg):
+class XWordCloud(AresHtmlGraphSvg.XSvg):
   """ NVD3 Word Cloud Chart python interface """
   alias, reqJs = 'wordcloud', ['cloud']
   references = ['https://www.jasondavies.com/wordcloud/']
   width = 600
+  factor = 1
 
-  def processData(self):
-    """ produce the different recordSet with the level of clicks defined in teh vals and set functions """
-    recordSet = AresChartsService.toWordCloud(self.vals, self.chartKeys, self.chartVals, extKeys=self.extKeys)
-    self.aresObj.jsGlobal.add("data_%s = %s" % (self.htmlId, json.dumps(recordSet)))
+  def scaling(self, factor):
+    """ Rescale the values to have fit the page
+
+    :param factor: The scaling factor > 1
+    :return:
+    """
+    self.factor = factor
 
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     data = data if data is not None else self.jqData
     return '''
-              d3.select("#%s svg g").remove();
+              %(chartDimension)s ;
+              d3.select("#%(htmlId)s svg g").remove();
 
-              d3.layout.cloud().size([%s, %s])
-              .words(%s) // Refer to the data variable
+              d3.layout.cloud().size([%(width)s, %(height)s])
+              .words(%(data)s) // Refer to the data variable
               .rotate(function() { return ~~(Math.random() * 2) * 90; })
-              .font("Impact").fontSize(function(d) { return d.size; })
-              .on("end", draw_new_%s).start();
+              .font("Impact").fontSize(function(d) { return d.value / %(factor)s; })
+              .on("end", draw_new_%(htmlId)s).start();
 
-              function draw_new_%s(words) {
-                d3.select("#%s svg") // Refer to the chart variable
+              function draw_new_%(htmlId)s(words) {
+                d3.select("#%(htmlId)s svg") // Refer to the chart variable
                   .append("g").attr("transform", "translate(150,150)").selectAll("text")
                   .data(words).enter().append("text").style("font-size", function(d) { return d.size + "px"; })
                   .style("font-family", "Impact").style("fill", function(d, i) {  return d3.scale.category20()(i); })
                   .attr("text-anchor", "middle")
                   .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
-                  .text(function(d) {  return d.text; });
+                  .text(function(d) { return d.text; });
               } ;
 
               function drawCloudUpdate(words, jsGraphRef){
                  jsGraphRef
                     .selectAll("g").attr("transform", "translate(150,150)")
                     .selectAll("text").data(words).enter().append("text")
-                      .style("font-size", function(d) { return d.size + "px"; }).style("font-family", "Impact")
+                      .style("font-size", function(d) { return d.value + "px"; }).style("font-family", "Impact")
                       .style("fill", function(d, i) { return fill(i); })
                       .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";  })
-                      .text(function(d) { return d.text; });
+                      .text(function(d) { return d.key; });
               };
-            ''' % (self.htmlId, self.width, self.height, data, self.htmlId, self.htmlId, self.htmlId)
+            ''' % {'htmlId': self.htmlId, 'width': self.width, 'height': self.height, 'data': data['data'], 'chartDimension': data['vars'],
+                   'factor': self.factor}
 
