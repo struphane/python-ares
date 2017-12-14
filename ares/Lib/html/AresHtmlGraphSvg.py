@@ -263,6 +263,7 @@ class XSvg(AresHtml.Html):
     self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     self.headerBox = headerBox
     crossFilter.links.add(self.htmlId)
+    crossFilter.xFilter.charts.add(self)
 
   # --------------------------------------------------------------------------------------------------------------
   #
@@ -345,7 +346,9 @@ class XSvg(AresHtml.Html):
     """ Return the svg container """
     crossFilterGrp = self.vals
     for filter in crossFilterGrp.filters:
-      filter.change(self.jsUpdate())
+      for chart in crossFilterGrp.xFilter.charts:
+        # Update all the charts linked to a given recordSet
+        filter.change(chart.jsUpdate())
     self.htmlContent.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
     if self.headerBox:
       return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))

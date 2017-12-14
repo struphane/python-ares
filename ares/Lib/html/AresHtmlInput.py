@@ -24,6 +24,7 @@ class InputText(AresHtml.Html):
   reqJs = ['bootstrap']
   inputType = "text"
   __css = {'width': '100%', 'height': '32px'}
+  references = ['https://jqueryui.com/autocomplete/']
 
   def __init__(self, aresObj, vals, cssCls=None, cssAttr=None, dflt='', htmllId=None):
     super(InputText, self).__init__(aresObj, vals,  cssCls, cssAttr)
@@ -33,6 +34,7 @@ class InputText(AresHtml.Html):
 
   def autocomplete(self, values):
     """ Fill the auto completion box with a data source """
+    self.aresObj.cssImport.add('jquery-ui')
     self.js('autocomplete', 'source: %s' % values)
 
   @property
@@ -53,6 +55,10 @@ class InputText(AresHtml.Html):
     item.add(2, '<input %s>' %  self.strAttr())
     item.add(0, '</div>')
     return str(item)
+
+  def change(self, fnc):
+    self.aresObj.jsOnLoadFnc.add('''
+      $('#%(htmlId)s').on('keypress', function (event){ if(event.which === 13){ if( $('#%(htmlId)s').val() == '') { $('#%(htmlId)s').val( '%(value)s' )}; %(fnc)s } }) ''' % {'htmlId': self.htmlId, 'value': self.value, 'fnc': fnc} )
 
 
 class InputPass(InputText):
