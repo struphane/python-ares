@@ -88,9 +88,13 @@ class XNvD3Bar(AresHtmlGraphSvg.XSvg):
     dispatchChart = ["%s.discretebar.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
               %(chartDimension)s ;
+              var chartData = [{key: '', values: [] } ];
+              %(data)s.forEach(function(entry) {
+                chartData[0].values.push({key: entry.key, value: entry.value})
+              });
               d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
               var %(htmlId)s = nv.models.%(chartObject)s().%(chartAttr)s ; %(chartProp)s
-              d3.select("#%(htmlId)s svg").style("height", '%(height)spx').datum([{key: '', values: %(data)s} ]).call(%(htmlId)s); %(dispatchChart)s ;
+              d3.select("#%(htmlId)s svg").style("height", '%(height)spx').datum(chartData).call(%(htmlId)s); %(dispatchChart)s ;
               nv.utils.windowResize(%(htmlId)s.update);
             ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(), 'chartDimension': data['vars'],
                    'chartProp': self.propToStr(), 'height': self.height, 'data': data['data'], 'dispatchChart': ";".join(dispatchChart)}
