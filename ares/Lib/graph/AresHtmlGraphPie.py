@@ -77,22 +77,27 @@ class XNvD3Pie(AresHtmlGraphSvg.XSvg):
   # Required modules
   reqCss = ['bootstrap', 'font-awesome', 'd3']
   reqJs = ['d3']
+  clickJsFnc = None
 
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     # Dispatch method to add events on the chart (in progress)
     data = data if data is not None else self.jqData
+    if self.clickJsFnc is None:
+      self.clickJsFnc = 'alert(e.data.key);'
+
+    #self.click()
     dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
-              %(xdimension)s ;
+              %(chartDimension)s ;
               d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
               var %(htmlId)s = nv.models.%(chartObject)s().%(chartAttr)s ; %(chartProp)s
               d3.select("#%(htmlId)s svg").style("height", '%(height)spx').datum(%(data)s)%(svgProp)s.call(%(htmlId)s); %(dispatchChart)s ;
               nv.utils.windowResize(%(htmlId)s.update);
-            ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(), 'xdimension': self.xDimensions,
-                   'chartProp': self.propToStr(), 'height': self.height, 'data': data, 'svgProp': self.getSvg(),
+            ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(), 'chartDimension': data['vars'],
+                   'chartProp': self.propToStr(), 'height': self.height, 'data': data['data'], 'svgProp': self.getSvg(),
                    'dispatchChart': ";".join(dispatchChart)}
 
-  def click(self, jsFnc):
+  def click(self):
     """ Add a click even on the chart  """
-    self.dispatch['elementClick'] = jsFnc
+    self.dispatch['elementClick'] = self.clickJsFnc

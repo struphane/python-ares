@@ -76,32 +76,26 @@ class XNvD3Bar(AresHtmlGraphSvg.XSvg):
     #'yAxis': {'tickFormat': "d3.format('.02f')"}, # 'axisLabel': "'Voltage (v)'"
   }
 
+  clickJsFnc = None
+
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     data = data if data is not None else self.jqData
-    # Dispatch method to add events on the chart (in progress)
-    # //d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
-    # //var %(htmlId)s = nv.models.%(chartObject)s().%(chartAttr)s ; %(chartProp)s
-    # //d3.select("#%(htmlId)s svg").style("height", '%(height)spx').datum([{key: '', values: %(data)s} ]).call(%(htmlId)s); %(dispatchChart)s ;
-    # //nv.utils.windowResize(%(htmlId)s.update);
+    if self.clickJsFnc is None:
+      self.clickJsFnc = 'alert(e.data.key);'
+
+    #self.click()
     dispatchChart = ["%s.discretebar.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
     return '''
-              %(xdimension)s ;
+              %(chartDimension)s ;
               d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
               var %(htmlId)s = nv.models.%(chartObject)s().%(chartAttr)s ; %(chartProp)s
               d3.select("#%(htmlId)s svg").style("height", '%(height)spx').datum([{key: '', values: %(data)s} ]).call(%(htmlId)s); %(dispatchChart)s ;
               nv.utils.windowResize(%(htmlId)s.update);
-            ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(), 'xdimension': self.xDimensions,
-                   'chartProp': self.propToStr(), 'height': self.height, 'data': data, 'dispatchChart': ";".join(dispatchChart)}
+            ''' % {'htmlId': self.htmlId, 'chartObject': self.chartObject, 'chartAttr': self.attrToStr(), 'chartDimension': data['vars'],
+                   'chartProp': self.propToStr(), 'height': self.height, 'data': data['data'], 'dispatchChart': ";".join(dispatchChart)}
 
-  def click(self, jsFnc):
+  def click(self):
     """ Add a click even on the chart  """
-    self.dispatch['elementClick'] = jsFnc
+    self.dispatch['elementClick'] = self.clickJsFnc
 
-  def clickIndex(self):
-    """ Add a click even on the chart  """
-    self.dispatch['elementClick'] = "alert(e.index)"
-
-  def clickPoint(self):
-    """ Add a click even on the chart  """
-    self.dispatch['elementClick'] = "alert(e.data)"
