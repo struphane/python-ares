@@ -4,7 +4,6 @@
 """
 
 import json
-from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 
 
