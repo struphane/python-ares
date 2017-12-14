@@ -61,12 +61,12 @@ class XNvD3HorizontalBars(AresHtmlGraphSvg.XSvg):
   __chartProp = {
           #'yAxis': {'tickFormat': "d3.format(',.2f')"}
   }
-
+  reqCss = ['bootstrap', 'font-awesome', 'd3']
+  reqJs = ['d3']
   clickJsFnc = None
-  
+
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
-    data = data if data is not None else self.jqData
     if self.clickJsFnc is None:
       self.clickJsFnc = 'alert(e.data.key);'
 
