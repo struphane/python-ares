@@ -254,16 +254,16 @@ class XSvg(AresHtml.Html):
 
   height = 250
 
-  def __init__(self, aresObj, headerBox, crossFilter, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, headerBox, crossFilterGrp, cssCls=None, cssAttr=None):
     """ selectors is a tuple with the category first and the value list second """
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
-    super(XSvg, self).__init__(aresObj, crossFilter, cssCls, cssAttr)
+    super(XSvg, self).__init__(aresObj, crossFilterGrp, cssCls, cssAttr)
     self.extKeys, self.dispatch, self.htmlContent, self.components = None, {}, [], []
     self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     self.headerBox = headerBox
-    crossFilter.links.add(self.htmlId)
-    crossFilter.xFilter.charts.add(self)
+    crossFilterGrp.links.add(self.htmlId)
+    crossFilterGrp.xFilter.charts.add(self)
 
   # --------------------------------------------------------------------------------------------------------------
   #
