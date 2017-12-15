@@ -60,7 +60,7 @@ class CrossFilterGroup(object):
 
   """
 
-  def __init__(self, aresObj, filter, key, val):
+  def __init__(self, aresObj, filter, key, val, top):
     """
 
     :return:
@@ -74,7 +74,7 @@ class CrossFilterGroup(object):
       # This dimension is never used in the process to aggregate results
       # It is an internal dimension to be able to filter on the recordSet
       self.htmlId = "%s_%s" % (filter.htmlId, key)
-    self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId}
+    self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId, 'top': top}
 
   def filter(self, col, htmlObj, val=None):
     """
@@ -118,7 +118,7 @@ class CrossFilterGroup(object):
 
     :return:
     """
-    return "%(htmlId)s_dim.top(Infinity)" %  self.jsVar
+    return "%(htmlId)s_dim.top(%(top)s)" %  self.jsVar
 
   def data(self):
     """
@@ -140,7 +140,7 @@ class CrossFilterGroup(object):
       self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {xData.push(p)} else { xData.push( {key: p.key, value: 0 }) ; } } );" % self.jsVar)
       return {'vars': ";".join(self.jsVar['vars']), 'data': 'xData'}
 
-    return {'vars': ";".join(self.jsVar['vars']), 'data': "%s.top(Infinity)" % self.dimension()}
+    return {'vars': ";".join(self.jsVar['vars']), 'data': "%s.top(%s)" % (self.dimension(), self.jsVar['top'])}
 
 
 class HtmlDataCrossFilter(object):
@@ -169,14 +169,14 @@ class HtmlDataCrossFilter(object):
     """ Property to get the HTML ID of a python HTML object """
     return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
-  def group(self, colGrp, valGrp):
+  def group(self, colGrp, valGrp, top='Infinity'):
     """ CrossFilter grouping function
 
     :param colGrp: The key in the recordset used as key to aggregate the data
     :param valGrp: The key in the recordset used as val to aggregate the data
     :return:
     """
-    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp)
+    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp, top)
     self.grps[colGrp] = groupOjb # Store the different group attached to a crossFilter python wrapper object
     return groupOjb
 
