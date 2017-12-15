@@ -438,6 +438,16 @@ class DataTable(AresHtml.Html):
         else { $('td', row).eq(%s).html( val.formatMoney(%s, ',', '.') ).css('color', 'red') }
         ''' % (dstColIndex, dstColIndex, digit, dstColIndex, digit))
 
+  def callBackCreateCellNumberUpDown(self, dstColIndices, digit=2):
+    """  Change the cell according to a float threshold """
+    dstColIndices = [dstColIndices] if not isinstance(dstColIndices, list) else dstColIndices
+    for dstColIndex in dstColIndices:
+      self.callBacks('createdRow', '''
+        var val = parseFloat($('td', row).eq(%s).html()) ;
+        if (val > 0) { $('td', row).eq(%s).html( "<i class='fa fa-arrow-up' aria-hidden='true' style='color:green'>&nbsp;" + val.formatMoney(%s, ',', '.') + "</i>") }
+        else { $('td', row).eq(%s).html( "<i class='fa fa-arrow-down' aria-hidden='true' style='color:red'>&nbsp;" + val.formatMoney(%s, ',', '.') + "</i>") }
+        ''' % (dstColIndex, dstColIndex, digit, dstColIndex, digit))
+
   def callBackCreateUrl(self, dstColIndex, scriptName, extraCols=None, fixedParams=None):
     """
 
