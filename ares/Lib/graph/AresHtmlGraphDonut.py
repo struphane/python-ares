@@ -94,6 +94,7 @@ class XNvD3Donut(AresHtmlGraphSvg.XSvg):
 
     #self.click()
     dispatchChart = ["%s.pie.dispatch.on('%s', function(e) { %s ;})" % (self.htmlId, displathKey, jsFnc) for displathKey, jsFnc in self.dispatch.items()]
+    #dispatchChart.append("%s.legend.dispatch.on('stateChange.pie', function(d){ d.disabled ; alert(%s.legend); } )" % (self.htmlId, self.htmlId))
     return '''
               %(chartDimension)s ;
               d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
