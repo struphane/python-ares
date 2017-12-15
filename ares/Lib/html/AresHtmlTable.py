@@ -480,6 +480,15 @@ class DataTable(AresHtml.Html):
       ''' % (dstColIndex, dstColIndex, self.htmlId, self.htmlId, self.htmlId))
    #self.aresObj.jsOnLoadFnc.add('$( function() { $( "#%s" ).slider(); } );')
 
+  def callBackCreateProgressBar(self, dstColIndex, height=10):
+    """ Add a slider object in the cell """
+    self.aresObj.cssImport.add('jquery-ui')
+    self.callBacks('createdRow', '''
+      var rowValue = parseFloat( $('td', row).eq(%(colIndex)s).html() ) ;
+      $('td', row).eq(%(colIndex)s).html( "<div id='%(htmlId)s_slider_" + index + "' data-last-value='" + rowValue + "' title='" + rowValue + "%%' style='color:#198c19'></div>" )
+      $( function() { var rowValue = parseFloat( $( "#%(htmlId)s_slider_" + index ).data('lastValue') ); $( "#%(htmlId)s_slider_" + index ).height(%(height)s).tooltip().progressbar( {value: rowValue} ) ; } );
+      ''' % {'htmlId': self.htmlId, 'colIndex': dstColIndex, 'height': height})
+
   def callBackCreateButton(self, dstColIndex):
     """ Add a button to the data table cell """
     self.callBacks('createdRow', ''' 
