@@ -56,7 +56,9 @@ def report(aresObj):
   for i in range(50):
     cpty = chr(int(random.uniform(65, 90)))
     maturity = maturity_map.get(random.randint(0,3))
+    deal_stk = 0
     for y in range(2000):
+      deal_stk += 1
       if y * random.randint(0, 100) > 4000:
         break
 
@@ -71,29 +73,37 @@ def report(aresObj):
                         'country': cty_map.get(random.randint(1, 124)),
                         'type': cpty_type_map.get(random.randint(0, 5)),
                         'rtg': i % 23})
-    cptyRecSet.append({'cpty': cpty, 'maturity': maturity, 'rtg': i % 23})
+    cptyRecSet.append({'cpty': cpty, 'maturity': maturity, 'rtg': i % 23, 'nbDeals': deal_stk})
 
-  # xFilterDeal = aresObj.crossFilterData(dealRecordSet, [{'colName': 'cpty', 'key': 'cpty'},
-  #                                     {'colName': 'deal', 'key': 'deal'},
-  #                                     {'colName': 'cash_in', 'key': 'cash_in'},
-  #                                     {'colName': 'cash_out', 'key': 'cash_out'},
-  #                                     {'colName': 'RNFB', 'key': 'RNFB'},
-  #                                     {'colName': 'maturity', 'key': 'maturity'},
-  #                                     {'colName': 'business_line', 'key': 'business_line'},
-  #                                     {'colName': 'liquidity', 'key': 'liquidity'},
-  #                                     {'colName': 'country', 'key': 'country'},
-  #                                     {'colName': 'type', 'key': 'type'},
-  #                                     {'colName': 'rtg', 'key': 'rtg'},])
+  xFilterDeal = aresObj.crossFilterData(dealRecordSet, [{'colName': 'cpty', 'key': 'cpty'},
+                                      {'colName': 'deal', 'key': 'deal'},
+                                      {'colName': 'cash_in', 'key': 'cash_in'},
+                                      {'colName': 'cash_out', 'key': 'cash_out'},
+                                      {'colName': 'RNFB', 'key': 'RNFB'},
+                                      {'colName': 'maturity', 'key': 'maturity'},
+                                      {'colName': 'business_line', 'key': 'business_line'},
+                                      {'colName': 'liquidity', 'key': 'liquidity'},
+                                      {'colName': 'country', 'key': 'country'},
+                                      {'colName': 'type', 'key': 'type'},
+                                      {'colName': 'rtg', 'key': 'rtg'},])
 
 
   xFilterCpty = aresObj.crossFilterData(cptyRecSet, [{'colName': 'cpty', 'key': 'cpty'},
                                       {'colName': 'maturity', 'key': 'maturity'},
                                       {'colName': 'rtg', 'key': 'rtg'},])
+
+
   import pprint
-  pprint.pprint(cptyRecSet)
-  scatterData = xFilterCpty.group('maturity', 'rtg')
-  xFilterCpty.addFilter('cpty', 'Filter On Counterparty')
-  xFilterCpty.display(scatterData)
+  pprint.pprint(dealRecordSet)
+  # scatterData = xFilterCpty.group('maturity', 'rtg')
+  group1 = xFilterDeal.group('maturiy', 'RNFB')
+  group2 = xFilterDeal.group('maturiy', 'cash_out')
+  # group3 = xFilterDeal.group('maturiy', 'cash_out')
+  # group4 = xFilterDeal.group('maturiy', 'cash_out')
+  # group5 = xFilterDeal.group('maturiy', 'cash_out')
+  # group6 = xFilterDeal.group('maturiy', 'cash_out')
+
+  xFilterDeal.addFilter('cpty', 'Filter On Counterparty')
   aresObj.newline()
   aresObj.select(['Cpty Type', 'Issuer', 'Country'], 'Select Criteria')
   aresObj.newline()
@@ -101,7 +111,19 @@ def report(aresObj):
 
   aresObj.title('Top 50 Counterparties')
 
+
+  aresObj.title('RNFB')
+  xbarRnfb = aresObj.xbar(group1)
+  xpieRnfb = aresObj.xpie(group1)
+  aresObj.row([xbarRnfb, xpieRnfb])
+
+  aresObj.newline()
+  aresObj.title('Cash Out')
+  xbarCash = aresObj.xbar(group2)
+  xpieCash = aresObj.xpie(group2)
+  aresObj.row([xbarCash, xpieCash])
+
   aresObj.newline()
 
-  scatter = aresObj.xscatter(scatterData)
-  scatter.mapxAxes(list(maturity_map.values()))
+  # scatter = aresObj.xscatter(scatterData)
+  # scatter.mapxAxes(list(maturity_map.values()))
