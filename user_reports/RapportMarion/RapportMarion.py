@@ -55,40 +55,45 @@ def report(aresObj):
   dealRecordSet, cptyRecSet = [], []
   for i in range(50):
     cpty = chr(int(random.uniform(65, 90)))
-    cptyRecSet.append({'cpty': cpty, })
+    maturity = maturity_map.get(random.randint(0,3))
     for y in range(2000):
       if y * random.randint(0, 100) > 4000:
         break
 
-      recordSet.append({'cpty': cpty,
+      dealRecordSet.append({'cpty': cpty,
                         'deal': y,
                         'cash_in': random.randint(1000, 1000000),
                         'cash_out': -1 * random.randint(1000, 1000000),
                         'RNFB': random.randint(100, 5000000),
-                        'maturity': maturity_map.get(random.randint(0,3)),
+                        'maturity': maturity,
                         'business_line': bl_map.get(random.randint(0,2)),
                         'liquidity': liquidity_map.get(random.randint(0,2)),
                         'country': cty_map.get(random.randint(1, 124)),
                         'type': cpty_type_map.get(random.randint(0, 5)),
                         'rtg': i % 23})
+    cptyRecSet.append({'cpty': cpty, 'maturity': maturity, 'rtg': i % 23})
 
-  xFilter = aresObj.crossFilterData(recordSet, [{'colName': 'cpty', 'key': 'cpty'},
-                                      {'colName': 'deal', 'key': 'deal'},
-                                      {'colName': 'cash_in', 'key': 'cash_in'},
-                                      {'colName': 'cash_out', 'key': 'cash_out'},
-                                      {'colName': 'RNFB', 'key': 'RNFB'},
+  # xFilterDeal = aresObj.crossFilterData(dealRecordSet, [{'colName': 'cpty', 'key': 'cpty'},
+  #                                     {'colName': 'deal', 'key': 'deal'},
+  #                                     {'colName': 'cash_in', 'key': 'cash_in'},
+  #                                     {'colName': 'cash_out', 'key': 'cash_out'},
+  #                                     {'colName': 'RNFB', 'key': 'RNFB'},
+  #                                     {'colName': 'maturity', 'key': 'maturity'},
+  #                                     {'colName': 'business_line', 'key': 'business_line'},
+  #                                     {'colName': 'liquidity', 'key': 'liquidity'},
+  #                                     {'colName': 'country', 'key': 'country'},
+  #                                     {'colName': 'type', 'key': 'type'},
+  #                                     {'colName': 'rtg', 'key': 'rtg'},])
+
+
+  xFilterCpty = aresObj.crossFilterData(cptyRecSet, [{'colName': 'cpty', 'key': 'cpty'},
                                       {'colName': 'maturity', 'key': 'maturity'},
-                                      {'colName': 'business_line', 'key': 'business_line'},
-                                      {'colName': 'liquidity', 'key': 'liquidity'},
-                                      {'colName': 'country', 'key': 'country'},
-                                      {'colName': 'type', 'key': 'type'},
                                       {'colName': 'rtg', 'key': 'rtg'},])
-
   import pprint
-  pprint.pprint(recordSet)
-  scatterData = xFilter.group('maturity', 'rtg')
-  xFilter.addFilter('cpty', 'Filter On Counterparty')
-  xFilter.display(scatterData)
+  pprint.pprint(cptyRecSet)
+  scatterData = xFilterCpty.group('maturity', 'rtg')
+  xFilterCpty.addFilter('cpty', 'Filter On Counterparty')
+  xFilterCpty.display(scatterData)
   aresObj.newline()
   aresObj.select(['Cpty Type', 'Issuer', 'Country'], 'Select Criteria')
   aresObj.newline()
@@ -98,4 +103,5 @@ def report(aresObj):
 
   aresObj.newline()
 
-  aresObj.xscatter(scatterData)
+  scatter = aresObj.xscatter(scatterData)
+  scatter.mapxAxes(list(maturity_map.values()))
