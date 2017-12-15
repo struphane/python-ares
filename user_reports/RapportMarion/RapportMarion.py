@@ -52,13 +52,15 @@ def report(aresObj):
              118: 'Vanuatu',119: 'Vatican',120: 'Venezuela',121: 'Vietnam',122: 'Wallis and Futuna',123: 'Western Sahara',
              124: 'Yemen',125: 'Zambia',126: 'Zimbabwe'}
 
-  recordSet = []
+  dealRecordSet, cptyRecSet = [], []
   for i in range(50):
+    cpty = chr(int(random.uniform(65, 90)))
+    cptyRecSet.append({'cpty': cpty, })
     for y in range(2000):
       if y * random.randint(0, 100) > 4000:
         break
 
-      recordSet.append({'cpty': chr(int(random.uniform(65, 90))),
+      recordSet.append({'cpty': cpty,
                         'deal': y,
                         'cash_in': random.randint(1000, 1000000),
                         'cash_out': -1 * random.randint(1000, 1000000),
@@ -68,7 +70,7 @@ def report(aresObj):
                         'liquidity': liquidity_map.get(random.randint(0,2)),
                         'country': cty_map.get(random.randint(1, 124)),
                         'type': cpty_type_map.get(random.randint(0, 5)),
-                        'rtg': random.randint(1, 23)})
+                        'rtg': i % 23})
 
   xFilter = aresObj.crossFilterData(recordSet, [{'colName': 'cpty', 'key': 'cpty'},
                                       {'colName': 'deal', 'key': 'deal'},
