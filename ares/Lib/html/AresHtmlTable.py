@@ -407,6 +407,15 @@ class DataTable(AresHtml.Html):
     """ Callback to hide the table header """
     self.callBacks('initComplete', "$('#%s thead').find('tr:last').hide();" % self.htmlId)
 
+  def callBackColWidth(self, oclIndex, width):
+    """ Change the width of a column in the table
+
+    :param oclIndex: The column index in the table
+    :param width: The new width in pixel
+    :return:
+    """
+    self.callBacks('initComplete', "$('#%s thead th:eq(%s)').css('width', '%spx');" % (self.htmlId, oclIndex, width))
+
   #--------------------------------------------------------------------------------------------------------------
   #
   #   Dedicated to wrap the section createdRow
