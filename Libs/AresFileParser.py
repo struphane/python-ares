@@ -64,7 +64,7 @@ class FileParser(object):
     fileHeader = []
     for col in cls.cols:
       row = {}
-      for key in ['dsc', 'colName']:
+      for key in ['dsc', 'colName', 'withAge']:
         if key in col:
           row[key] = col[key]
       if not 'key' in col:
