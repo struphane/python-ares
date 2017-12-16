@@ -174,13 +174,14 @@ class Report(object):
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
+
     #
     self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, OrderedSet.OrderedSet(), OrderedSet.OrderedSet()
     self.jsGraphs, self.jsFnc, self.files = [], OrderedSet.OrderedSet(), {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
-    self.workers = {}
-    self.fileMap = {}
+    self.workers, self.fileMap = {}, {}
+    self.ageReference = 'red'
 
   def structure(self):
     return self.content
@@ -416,6 +417,13 @@ class Report(object):
   # HTML5 objects
   def webworker(self, htmlObj, jsFile): return self.add(aresFactory['WebWorker'](self, htmlObj, jsFile), sys._getframe().f_code.co_name)
 
+  def changeColorAge(self, colorType):
+    """ Function the define the color nuances to be used for the ageing
+
+    :param colorType:
+    :return:
+    """
+    self.ageReference = colorType
 
   def changeSiteColor(self, bgColor, fontColor):
     """ To change from Ares the color of the nav bar and side bar """
