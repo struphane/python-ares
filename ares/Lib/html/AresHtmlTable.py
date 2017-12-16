@@ -434,7 +434,7 @@ class DataTable(AresHtml.Html):
     :return:
     """
     self.callBacks('createdRow',
-                   "if (data['%s_age'] > 0) { $('td', row).eq(%s).css('background', %s[data['%s_age']]) }" % (colKey, colIndex, self.getAgeColor(), colKey))
+                   "if (data['%s_age'] > 0) { $('td', row).eq(%s).css({'background': %s[Math.min(data['%s_age'], 15)], 'border': '1px solid %s'}) }" % (colKey, colIndex, self.getAgeColor(), colKey, self.aresObj.ageReference))
 
   def callBackCreateCellNumber(self, dstColIndices, digit=2):
     """  Change the cell according to a float threshold """
