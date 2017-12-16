@@ -82,6 +82,7 @@ class DataTable(AresHtml.Html):
     self.headerBox = headerBox
     self.dataFilters = dataFilters
     self.recordSetHeader, self.jsMenu, self.recMap = [], [], {}
+    self.__options = {'pageLength': 50} # The object with all the underlying table options
     if header is not None and not isinstance(header[0], list): # we haven one line of header, we convert it to a list of one header
       self.header = [header]
     else: # we have a header on several lines, nothing to do
@@ -89,6 +90,10 @@ class DataTable(AresHtml.Html):
     for i, col in enumerate(self.header[-1]):
       if 'dsc' in col:
         self.addToolTips(i, col['dsc'])
+      if 'withAge' in col:
+        self.callBackCellAge(self.recKey(col), i)
+
+
       if 'url' in col:
         # This will only work for static urls (not javascript tranalation for the time being)
         colKey = self.recKey(col)
@@ -134,7 +139,6 @@ class DataTable(AresHtml.Html):
         else:
           self.recordSetHeader.append('{ data: "%s", title: "%s", visible: %s}' % (self.recKey(col), col.get("colName"), col.get("visible", 'true')))
       self.recMap[self.recKey(col)] = col.get("colName")
-    self.__options = {'pageLength': 50} # The object with all the underlying table options
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
     self.option('stateSave', 'true')
@@ -421,6 +425,16 @@ class DataTable(AresHtml.Html):
     """  Change the cell according to a float threshold """
     self.callBacks('createdRow',
                    "if ( parseFloat(data['%s']) > %s ) {$('td', row).eq(%s).addClass('%s'); }" % (colName, threshold, dstColIndex, cssCls))
+
+  def callBackCellAge(self, colKey, colIndex):
+    """ Change the color of the cell in relation to the age associated to it
+
+    :param colKey: The column key in the recordSet
+    :param colIndex: The column index
+    :return:
+    """
+    self.callBacks('createdRow',
+                   "if (data['%s_age'] > 0) { $('td', row).eq(%s).css('background', %s[data['%s_age']]) }" % (colKey, colIndex, self.getAgeColor(), colKey))
 
   def callBackCreateCellNumber(self, dstColIndices, digit=2):
     """  Change the cell according to a float threshold """
