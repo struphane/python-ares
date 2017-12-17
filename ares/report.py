@@ -1428,7 +1428,6 @@ def aresLogin():
     return render_template('ares_login_page.html', cssImport=special_css, jsImport=jsImport)
 
   if request.method == 'POST':
-    print(request.args)
     data = request.form
     user = User.query.filter_by(email=data['email_addr']).first()
     next = request.args.get('next')
