@@ -15,6 +15,7 @@ Please do not use this module directly in your production code.
 
 import re
 import csv
+import os
 
 regex = re.compile('[^a-zA-Z0-9_]')
 
@@ -28,7 +29,7 @@ class FileParser(object):
     """ Create a file object """
     self.__inputFile = inFile
     for _ in range(self.hdrLines):
-      self.__inputFile.readline()
+      next(self.__inputFile)
     self.header, self.colCnvFnc, keyMapCol = [], {}, {}
     for i, col in enumerate(self.cols):
       colKey = self.recKey(col)
@@ -48,15 +49,13 @@ class FileParser(object):
 
   def __iter__(self):
     """ Iterator to return a line """
-    for line in self.__inputFile:
-      reader  = csv.reader([line], skipinitialspace=True, delimiter=self.delimiter)
-      for row in reader:
-        rec = dict(zip(self.header, row))
-        for i, transFnc in self.colCnvFnc.items():
-          rec[self.header[i]] = transFnc(row[i])
-        for i, name in self.vHeader:
-          rec[name] = self.vColCnvFnc[i][1](*[rec[col] for col in self.vColCnvFnc[i][0]])
-        yield rec
+    for row in csv.reader(self.__inputFile, skipinitialspace=True, delimiter=self.delimiter):
+      rec = dict(zip(self.header, row))
+      for i, transFnc in self.colCnvFnc.items():
+        rec[self.header[i]] = transFnc(row[i])
+      for i, name in self.vHeader:
+        rec[name] = self.vColCnvFnc[i][1](*[rec[col] for col in self.vColCnvFnc[i][0]])
+      yield rec
 
   @classmethod
   def getHeader(cls):
@@ -88,7 +87,7 @@ class MemFileParser(FileParser):
 
   def __iter__(self):
     """ Iterator to return a line """
-    if len(self.inputFileRecSet) == 0:
+    if not self.inputFileRecSet:
       for rec in super(MemFileParser, self).__iter__():
         self.inputFileRecSet.append(rec)
         yield rec
@@ -107,10 +106,9 @@ class FilePivot(FileParser):
 
 def saveFile(aresObj, reportName, recordSet, cols, delimiter, outFileName, hdrLines, folder='data'):
   """ Write the file to the dedicated output folder """
-  outFile = open(r"%s\%s\%s\%s" % (aresObj.http['DIRECTORY'], reportName, folder, outFileName), "w")
-  tmplLine = delimiter.join(["%%(%s)s" % col for col in cols])
-  for header in range(hdrLines):
-    outFile.write("%s\n" % delimiter.join([col for col in cols]))
-  for rec in recordSet:
-    outFile.write("%s\n" % tmplLine % rec)
-  outFile.close()
+  tmplLine = "%s\n" % delimiter.join("%%(%s)s" % col for col in cols)
+  with open(os.path.join(aresObj.http['DIRECTORY'], reportName, folder, outFileName), "w") as outFile:
+    for header in range(hdrLines):
+      outFile.write("%s\n" % delimiter.join(col for col in cols))
+    for rec in recordSet:
+      outFile.write(tmplLine % rec)
