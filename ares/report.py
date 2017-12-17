@@ -890,7 +890,7 @@ def createEnv(environment):
   This service will create the environment and also add an emtpy report.
   The log file will be produce and the zip archive with the history will be defined
   """
-  DIR_LIST = ['data', 'ajax', 'static', 'styles', 'saved', 'utils']
+  DIR_LIST = ['data', 'ajax', 'static', 'styles', 'saved', 'utils', 'snapshot']
   email_addr = session['user_id']
   SQL_CONFIG = os.path.join(current_app.config['ROOT_PATH'], config.ARES_SQLITE_FILES_LOCATION)
   reportObj = Ares.Report()
@@ -1428,6 +1428,7 @@ def aresLogin():
     return render_template('ares_login_page.html', cssImport=special_css, jsImport=jsImport)
 
   if request.method == 'POST':
+    print(request.args)
     data = request.form
     user = User.query.filter_by(email=data['email_addr']).first()
     next = request.args.get('next')
