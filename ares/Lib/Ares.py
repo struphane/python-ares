@@ -1,3 +1,8 @@
+""" Advanced Reporting Suite interface
+@author: Olivier Nogues
+
+"""
+
 # TODO: To use it to replace the redondant functions calls
 # TODO: implement a decorator to wrap the current part in the functions
 
@@ -34,6 +39,7 @@ from ares.Lib import AresHtml
 
 from Libs import OrderedSet
 from ares.Lib.html import AresHtmlData
+from ares.Lib.html import AresHtmlAlert
 
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
@@ -174,13 +180,14 @@ class Report(object):
     self.htmlItems, self.jsOnLoad, self.http = {}, [], {}
     self.notifications = collections.defaultdict(list)
     self.interruptReport = (False, None)
+
     #
     self.jsRegistered, self.jsGlobal, self.jsOnLoadFnc = {}, OrderedSet.OrderedSet(), OrderedSet.OrderedSet()
     self.jsGraphs, self.jsFnc, self.files = [], OrderedSet.OrderedSet(), {}
     self.jsImports, self.cssImport = set(['ares']), set(['ares'])
     self.jsLocalImports, self.cssLocalImports = set(), set()
-    self.workers = {}
-    self.fileMap = {}
+    self.workers, self.fileMap = {}, {}
+    self.ageReference = 'red'
 
   def structure(self):
     return self.content
@@ -189,14 +196,22 @@ class Report(object):
     self.showNavMenu = True
     self.navBarContent.update({'width': width, 'cssCls': cssCls})
 
-  def addNotification(self, notifType, title, value, cssCls=None, backgroundColor=None, closeButton=True):
-    """ Add a user notfication to the report """
+  def notification(self, notifType, title, value, cssCls=None, backgroundColor=None, closeButton=True):
+    """
+
+    :param notifType: The type of notification, possible values are ('SUCCESS', 'INFO', 'WARNING', 'DANGER'). DANGER will stop the script
+    :param title: The title of your Notification box
+    :param value:
+    :param cssCls:
+    :param backgroundColor:
+    :param closeButton:
+    :return:
+    """
     notif = notifType.upper()
     if not notif in self.definedNotif:
       raise Exception("Notification Type should belong to one of the above category")
 
-    alertCls = getattr(AresHtmlAlert, self.definedNotif[notif])
-    alertObj = alertCls(self.countItems, title, value, self.countNotif, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
+    alertObj = getattr(AresHtmlAlert, self.definedNotif[notif])(self, title, value, self.countNotif, cssCls=cssCls, backgroundColor=backgroundColor, closeButton=closeButton)
     self.htmlItems[id(alertObj)] = alertObj
     self.content.append(id(alertObj))
     if notif == 'DANGER':
@@ -352,8 +367,10 @@ class Report(object):
   def parameters(self, values, cssCls=None, cssAttr=None, inReport=False): return self.add(aresFactory['EnvParameters'](self, values, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
 
   # Cross Filter Chart section
-  def xbar(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Bar'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
-  def xpie(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Pie'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
+  def xbar(self, singleSeries=None, multiSeries=None, headerBox=None, chartDesc=None, cssCls=None, cssAttr=None, inReport=True):
+    return self.add(aresFactory['XNvD3Bar'](self, headerBox, singleSeries=singleSeries, multiSeries=multiSeries, chartDesc=chartDesc, cssCls=cssCls, cssAttr=cssAttr), sys._getframe().f_code.co_name, inReport)
+  def xpie(self, singleSeries=None, multiSeries=None, headerBox=None, chartDesc=None, cssCls=None, cssAttr=None, inReport=True):
+    return self.add(aresFactory['XNvD3Pie'](self, headerBox, singleSeries=singleSeries, multiSeries=multiSeries, chartDesc=chartDesc, cssCls=cssCls, cssAttr=cssAttr), sys._getframe().f_code.co_name, inReport)
   def xmeter(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Meter'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
   def xdonut(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Donut'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
   def xhbar(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3HorizontalBars'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
@@ -416,6 +433,13 @@ class Report(object):
   # HTML5 objects
   def webworker(self, htmlObj, jsFile): return self.add(aresFactory['WebWorker'](self, htmlObj, jsFile), sys._getframe().f_code.co_name)
 
+  def changeColorAge(self, colorType):
+    """ Function the define the color nuances to be used for the ageing
+
+    :param colorType:
+    :return:
+    """
+    self.ageReference = colorType
 
   def changeSiteColor(self, bgColor, fontColor):
     """ To change from Ares the color of the nav bar and side bar """
