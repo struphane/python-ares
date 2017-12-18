@@ -133,6 +133,8 @@ with app.app_context():
   login_manager.login_view = 'ares.aresLogin'
   from ares.report import report
   app.register_blueprint(report)
+  from ares.administration import admin
+  app.register_blueprint(admin)
 
 from saturn.saturn import saturn
 app.register_blueprint(saturn)
