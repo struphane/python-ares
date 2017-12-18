@@ -13,6 +13,7 @@ from ares.Lib.html import AresHtmlInput
 class HtmlData(AresHtml.Html):
   """ Base class to store the data """
 
+  @AresHtml.deprecated
   def __init__(self, aresObj, data):
     """ Transform data from Python to Javascript """
     super(HtmlData, self).__init__(aresObj, data)
@@ -46,6 +47,7 @@ class HtmlData(AresHtml.Html):
 class HtmlDataDic(HtmlData):
   """ Special object to manage recordSet """
 
+  @AresHtml.deprecated
   def addFilter(self, key, value, label, cssCls=None, cssAttr=None):
     """ Add a filter to the dictionary """
     AresHtmlInput.InputText(self.aresObj, value, cssCls=cssCls, cssAttr=cssAttr, htmllId="filter_%s_%s" % (self.htmlId, key))
@@ -58,9 +60,10 @@ class HtmlDataDic(HtmlData):
 class CrossFilterGroup(object):
   """
 
+  #TODO add reduceCount function
   """
 
-  def __init__(self, aresObj, filter, key, val, top):
+  def __init__(self, aresObj, filter, key, val, top=None, bottom=None, grpName=None):
     """
 
     :return:
@@ -74,7 +77,9 @@ class CrossFilterGroup(object):
       # This dimension is never used in the process to aggregate results
       # It is an internal dimension to be able to filter on the recordSet
       self.htmlId = "%s_%s" % (filter.htmlId, key)
-    self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId, 'top': top}
+    if grpName is None:
+      grpName = self.htmlId
+    self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId, 'top': top, 'grpName': grpName, 'bottom': bottom}
 
   def filter(self, col, htmlObj, val=None):
     """
@@ -118,7 +123,11 @@ class CrossFilterGroup(object):
 
     :return:
     """
-    return "%(htmlId)s_dim.top(%(top)s)" %  self.jsVar
+    if self.jsVar['top'] is not None:
+      return "%(htmlId)s_dim.top(%(top)s)" %  self.jsVar
+
+    if self.jsVar['bottom'] is not None:
+      return "%(htmlId)s_dim.bottom(%(bottom)s)" %  self.jsVar
 
   def data(self):
     """
@@ -131,23 +140,36 @@ class CrossFilterGroup(object):
       if col != self.jsVar['key']:
         self.jsVar['vars'].append(filter.removeFilters())
         self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } ).top(Infinity)" % filter.jsVar)
-        self.jsVar['vars'].append("xData = []")
-        self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {xData.push(p)} else { xData.push( {key: p.key, value: 0 }) ; } } )" % filter.jsVar)
+        self.jsVar['vars'].append("%s_xdata = []" % filter.htmlId)
+        self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {%(htmlId)s_xdata.push(p)} else { %(htmlId)s_xdata.push( {key: p.key, value: 0 }) ; } } )" % filter.jsVar)
     if 'filter' in self.jsVar:
       self.jsVar['vars'].append(self.removeFilters())
       self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } ).top(Infinity) ;" % self.jsVar)
-      self.jsVar['vars'].append("xData = []")
-      self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {xData.push(p)} else { xData.push( {key: p.key, value: 0 }) ; } } );" % self.jsVar)
-      return {'vars': ";".join(self.jsVar['vars']), 'data': 'xData'}
+      self.jsVar['vars'].append("%s_xdata = []" % self.htmlId)
+      self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {%(htmlId)s_xdata.push(p)} else { %(htmlId)s_xdata.push( {key: p.key, value: 0 }) ; } } );" % self.jsVar)
+      return {'vars': ";".join(self.jsVar['vars']), 'data': '%s_xdata' % self.htmlId}
 
-    return {'vars': ";".join(self.jsVar['vars']), 'data': "%s.top(%s)" % (self.dimension(), self.jsVar['top'])}
+    if self.jsVar['top'] is not None:
+      return {'vars': ";".join(self.jsVar['vars']), 'data': "%s.top(%s)" % (self.dimension(), self.jsVar['top'])}
+
+    if self.jsVar['bottom'] is not None:
+      return {'vars': ";".join(self.jsVar['vars']), 'data': "%s.bottom(%s)" % (self.dimension(), self.jsVar['bottom'])}
+
+  def size(self):
+    """ Wrapper function to the size cross filter function
+
+    :return: Add a button to display an alert with the size of the recordsets
+    """
+    self.aresObj.jsOnLoadFnc.add('''var $input = $("<input type='button' class='btn' id='%(htmlId)s_button' value='Group Size %(key)s %(val)s' />"); $input.appendTo($('#page-content-wrapper'));''' % self.jsVar)
+    self.aresObj.jsOnLoadFnc.add(''' $('#%s_button').on('click',function(){ alert(%s.size()) ; }); ''' % (self.jsVar['htmlId'],  self.dimension()))
 
 
 class HtmlDataCrossFilter(object):
   """ Special object to manage recordSet """
   reqJs = ['crossfilter']
   references = ['http://dc-js.github.io/dc.js/examples/download-table.html',
-                'https://stackoverflow.com/questions/33102032/crossfilter-group-a-filtered-dimension']
+                'https://stackoverflow.com/questions/33102032/crossfilter-group-a-filtered-dimension',
+                'https://github.com/square/crossfilter/wiki/API-Reference']
 
   def __init__(self, aresObj, recordSet, header):
     """ Instantiate the Cross Filter object
@@ -164,19 +186,37 @@ class HtmlDataCrossFilter(object):
     self.links, self.filters, self.grps, self.charts = set(), {}, {}, set()
     self.aresObj.jsGlobal.add(" %s = crossfilter(%s)" % (self.htmlId, json.dumps(self.recordSet)))
 
+  def add(self, recordSet):
+    """ Cross filter wrapper to the add function
+
+    :param recordSet: The recordSet to be added to the main one
+    :return:
+    """
+    self.aresObj.jsOnLoadFnc.add("%s.add(%s)" % (self.htmlId , json.dumps(recordSet)))
+
+  def size(self):
+    """ Wrapper function to the size cross filter function
+
+    :return: Add a button to display an alert with the size of the recordsets
+    """
+    self.aresObj.jsOnLoadFnc.add('''var $input = $("<input type='button' class='btn' id='%s_button' value='get Size' />"); $input.appendTo($('#page-content-wrapper'));''' % self.htmlId)
+    self.aresObj.jsOnLoadFnc.add(''' $('#%s_button').on('click',function(){ alert(%s.size()) ; }); ''' % (self.htmlId, self.htmlId))
+
   @property
   def htmlId(self):
     """ Property to get the HTML ID of a python HTML object """
     return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
-  def group(self, colGrp, valGrp, top='Infinity'):
+  def group(self, colGrp, valGrp, top='Infinity', grpName=None):
     """ CrossFilter grouping function
 
     :param colGrp: The key in the recordset used as key to aggregate the data
     :param valGrp: The key in the recordset used as val to aggregate the data
     :return:
     """
-    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp, top)
+    if grpName is None:
+      grpName = 'Series %s per %s' % (colGrp, valGrp)
+    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp, top, grpName=grpName)
     self.grps[colGrp] = groupOjb # Store the different group attached to a crossFilter python wrapper object
     return groupOjb
 
@@ -228,6 +268,6 @@ class HtmlDataCrossFilter(object):
     :param dimension: The python dimension object
     :return:
     """
-    self.aresObj.jsOnLoadFnc.add('''var $input = $("<input type='button' id='%s_button' value='new button' />"); $input.appendTo($('#page-content-wrapper'));''' % self.htmlId)
+    self.aresObj.jsOnLoadFnc.add('''var $input = $("<input type='button' class='btn' id='%s_button' value='new button' />"); $input.appendTo($('#page-content-wrapper'));''' % self.htmlId)
     self.aresObj.jsOnLoadFnc.add(''' $('#%s_button').on('click',function(){ %s; alert(%s.toSource()) ; }); ''' % (self.htmlId, dimension.data()['vars'], dimension.data()['data']))
 
