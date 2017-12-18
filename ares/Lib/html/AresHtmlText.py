@@ -263,15 +263,16 @@ class TextWithBorder(AresHtml.Html):
   def __init__(self, aresObj, vals, title, cssCls=None, cssAttr=None):
     super(TextWithBorder, self).__init__(aresObj, vals, cssCls, cssAttr)
     self.title = title
+    self.attr.setdefault('css', {}).update({'margin-topm': '20px'})
 
   def __str__(self):
     """  String representation of the HTML object """
     if self.width is None:
-      item = ['<div style="margin-top:20px" %s>' % self.strAttr()]
-    else:
-      item = ['<div style="width:%spx;margin-top:20px" %s>' % (self.width, self.strAttr())]
-    item.append('<fieldset style="5px;border:1px solid %s;padding:5px">' % self.colorBorder)
-    item.append('<legend style="font-weight:bold;color:%s;width:auto">%s</legend>%s</fieldset>' % (self.coloTitle, self.title, self.vals))
+      self.attr.setdefault('css', {}).update({'width': '%spx' % self.width})
+
+    item = ['<div %s>' % self.strAttr()]
+    item.append('<fieldset style="5px;border:1px solid %s;padding:5px;font-size:12px">' % self.colorBorder)
+    item.append('<legend style="font-weight:bold;color:%s;width:auto;font-size:14px">%s</legend>%s</fieldset>' % (self.coloTitle, self.title, self.vals))
     item.append('</div>')
     return "".join(item)
 

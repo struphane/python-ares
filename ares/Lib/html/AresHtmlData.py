@@ -140,14 +140,14 @@ class CrossFilterGroup(object):
       if col != self.jsVar['key']:
         self.jsVar['vars'].append(filter.removeFilters())
         self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } ).top(Infinity)" % filter.jsVar)
-        self.jsVar['vars'].append("xData = []")
-        self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {xData.push(p)} else { xData.push( {key: p.key, value: 0 }) ; } } )" % filter.jsVar)
+        self.jsVar['vars'].append("%s_xdata = []" % filter.htmlId)
+        self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {%(htmlId)s_xdata.push(p)} else { %(htmlId)s_xdata.push( {key: p.key, value: 0 }) ; } } )" % filter.jsVar)
     if 'filter' in self.jsVar:
       self.jsVar['vars'].append(self.removeFilters())
       self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } ).top(Infinity) ;" % self.jsVar)
-      self.jsVar['vars'].append("xData = []")
-      self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {xData.push(p)} else { xData.push( {key: p.key, value: 0 }) ; } } );" % self.jsVar)
-      return {'vars': ";".join(self.jsVar['vars']), 'data': 'xData'}
+      self.jsVar['vars'].append("%s_xdata = []" % self.htmlId)
+      self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {%(htmlId)s_xdata.push(p)} else { %(htmlId)s_xdata.push( {key: p.key, value: 0 }) ; } } );" % self.jsVar)
+      return {'vars': ";".join(self.jsVar['vars']), 'data': '%s_xdata' % self.htmlId}
 
     if self.jsVar['top'] is not None:
       return {'vars': ";".join(self.jsVar['vars']), 'data': "%s.top(%s)" % (self.dimension(), self.jsVar['top'])}
@@ -207,14 +207,16 @@ class HtmlDataCrossFilter(object):
     """ Property to get the HTML ID of a python HTML object """
     return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
-  def group(self, colGrp, valGrp, top='Infinity'):
+  def group(self, colGrp, valGrp, top='Infinity', grpName=None):
     """ CrossFilter grouping function
 
     :param colGrp: The key in the recordset used as key to aggregate the data
     :param valGrp: The key in the recordset used as val to aggregate the data
     :return:
     """
-    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp, top)
+    if grpName is None:
+      grpName = 'Series %s per %s' % (colGrp, valGrp)
+    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp, top, grpName=grpName)
     self.grps[colGrp] = groupOjb # Store the different group attached to a crossFilter python wrapper object
     return groupOjb
 
