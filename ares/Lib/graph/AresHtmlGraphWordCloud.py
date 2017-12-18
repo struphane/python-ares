@@ -22,16 +22,27 @@ class XWordCloud(AresHtmlGraphSvg.XSvg):
     """
     self.factor = factor
 
+  def autoscale(self):
+    """ Rescale the values in order to get something not to big for the div size
+
+    :return:
+    """
+    vals = []
+    for rec in self.seriesGrps[0].xFilter.recordSet:
+      vals.append(rec[self.seriesGrps[0].jsVar['val']])
+    self.factor = max(vals) / 100.0
+
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
-    data = data if data is not None else self.jqData
+    data = data if data is not None else self.getData()
+    self.delChartAttr(['color'])
     return '''
               %(chartDimension)s ;
+              d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
+              d3.select("#%(htmlId)s svg").style("height",'%(height)spx').style("width",'100%%').style("border",'1px solid black')
               d3.select("#%(htmlId)s svg g").remove();
-
               d3.layout.cloud().size([%(width)s, %(height)s])
-              .words(%(data)s) // Refer to the data variable
-              .rotate(function() { return ~~(Math.random() * 2) * 90; })
+              .words(%(data)s).rotate(function() { return ~~(Math.random() * 2) * 90; })
               .font("Impact").fontSize(function(d) { return d.value / %(factor)s; })
               .on("end", draw_new_%(htmlId)s).start();
 
@@ -55,5 +66,5 @@ class XWordCloud(AresHtmlGraphSvg.XSvg):
                       .text(function(d) { return d.key; });
               };
             ''' % {'htmlId': self.htmlId, 'width': self.width, 'height': self.height, 'data': data['data'], 'chartDimension': data['vars'],
-                   'factor': self.factor, 'color': json.dumps(AresHtmlGraphSvg.XSvg.colorCharts)}
+                   'factor': self.factor, 'color': json.dumps(self.getColorRange()[::-1])}
 
