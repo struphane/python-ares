@@ -253,6 +253,29 @@ class TextInput(AresHtml.Html):
     return str(items)
 
 
+class TextWithBorder(AresHtml.Html):
+  """ Python Wrapper to the HTML Block qutoe Bootstrap object """
+  alias, cssCls = 'textborder', ''
+  references = []
+  colorBorder, coloTitle = 'green', 'green'
+  width = None
+
+  def __init__(self, aresObj, vals, title, cssCls=None, cssAttr=None):
+    super(TextWithBorder, self).__init__(aresObj, vals, cssCls, cssAttr)
+    self.title = title
+
+  def __str__(self):
+    """  String representation of the HTML object """
+    if self.width is None:
+      item = ['<div style="margin-top:20px" %s>' % self.strAttr()]
+    else:
+      item = ['<div style="width:%spx;margin-top:20px" %s>' % (self.width, self.strAttr())]
+    item.append('<fieldset style="5px;border:2px solid %s;padding:5px">' % self.colorBorder)
+    item.append('<legend style="font-weight:bold;color:%s;width:auto">%s</legend>%s</fieldset>' % (self.coloTitle, self.title, self.vals))
+    item.append('</div>')
+    return "".join(item)
+
+
 class DataSource(AresHtml.Html):
   """ special HTML object in charge of changing properties when double clicked """
   alias = 'aresDataSource'
