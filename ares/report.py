@@ -1297,6 +1297,13 @@ def downloadOutputs(report_name, file_name, file_location):
   #no need to check for error the normal raise should be fine
   return send_file(aresoutputFile, as_attachment=True)
 
+@report.route("/download/in-memory", methods = ['POST'])
+@noCache
+def downloadMemory():
+  """ Download the up to date Ares package """
+  archive = ''
+  return send_file(archive, as_attachment=True)
+
 @report.route("/ares/version", methods = ['GET', 'POST'])
 def getAresFilesVersions():
   """ Return the files, the version and the size """
