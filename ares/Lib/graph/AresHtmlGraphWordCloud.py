@@ -11,7 +11,7 @@ class XWordCloud(AresHtmlGraphSvg.XSvg):
   """ NVD3 Word Cloud Chart python interface """
   alias, reqJs = 'wordcloud', ['cloud']
   references = ['https://www.jasondavies.com/wordcloud/']
-  width = 600
+  width = 900
   factor = 1
 
   def scaling(self, factor):
@@ -39,9 +39,9 @@ class XWordCloud(AresHtmlGraphSvg.XSvg):
     return '''
               %(chartDimension)s ;
               d3.select("#%(htmlId)s svg").remove(); d3.select("#%(htmlId)s").append("svg");
-              d3.select("#%(htmlId)s svg").style("height",'%(height)spx').style("width",'100%%').style("border",'1px solid black')
+              d3.select("#%(htmlId)s svg").style("height",'%(height)spx').style("width",'%(width)spx')
               d3.select("#%(htmlId)s svg g").remove();
-              d3.layout.cloud().size([%(width)s, %(height)s])
+              d3.layout.cloud().size([%(width)s+200, %(height)s])
               .words(%(data)s).rotate(function() { return ~~(Math.random() * 2) * 90; })
               .font("Impact").fontSize(function(d) { return d.value / %(factor)s; })
               .on("end", draw_new_%(htmlId)s).start();
