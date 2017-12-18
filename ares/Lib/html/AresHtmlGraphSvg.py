@@ -252,68 +252,117 @@ class XSvg(AresHtml.Html):
   colorCharts = ['#e5f2e5', '#cce5cc', '#b2d8b2', '#99cc99', '#fbf7f', '#66b266', '#4ca64c', '#329932', '#198c19', '#008000',
                  '#007300', '#007300', '#006600', '#005900', '#004c00', '#004000', '#003300', '#002600']
 
-  height = 250
+  height = 300
+  multiSeries = False
 
-  def __init__(self, aresObj, headerBox, crossFilterGrp, cssCls=None, cssAttr=None):
+  def __init__(self, aresObj, headerBox, singleSeries=None, multiSeries=None, chartDesc=None, cssCls=None, cssAttr=None):
     """ selectors is a tuple with the category first and the value list second """
+    if singleSeries is None and multiSeries is None:
+      raise Exception("At list one of the series parameter singleSeries or multiSeries should be defined")
+
+    if singleSeries is not None and multiSeries is not None:
+      raise Exception("MultiSeries and SingleSeries cannot be both defined!")
+
+    if singleSeries is not None:
+      # We always consider the series to be a list (even if the component does not display multi series)
+      # If it is the case then the series will be selectable
+      self.seriesGrps = [singleSeries]
+    else:
+      self.seriesGrps = multiSeries
+
+    self.chartDesc = chartDesc # Must be an HTML item
+    if self.chartDesc is not None:
+      del aresObj.content[aresObj.content.index(id(self.chartDesc))]
+
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
-    super(XSvg, self).__init__(aresObj, crossFilterGrp, cssCls, cssAttr)
+    super(XSvg, self).__init__(aresObj, None, cssCls, cssAttr) # Do not define a value
     self.extKeys, self.dispatch, self.htmlContent, self.components = None, {}, [], []
     self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     self.headerBox = headerBox
-    crossFilterGrp.links.add(self.htmlId)
-    crossFilterGrp.xFilter.charts.add(self)
+    for seriesGrp in self.seriesGrps:
+      seriesGrp.links.add(self.htmlId)
+      seriesGrp.xFilter.charts.add(self)
 
   # --------------------------------------------------------------------------------------------------------------
   #
   #                                   CHARTS ATTRIBUTES AND PROPERTIES
   # --------------------------------------------------------------------------------------------------------------
   def addChartAttr(self, attrs):
-    """ Change the object chart properties """
+    """ Function to add some charts properties
+
+    :param attrs: The properties to be added to the cJs chart definition eg: {'showValues': "'true'"}
+    :return: Add the property to the chartAttrs dictionary
+    """
     self.chartAttrs.update(attrs)
 
   def delChartAttr(self, attrsList):
-    """ Change the object chart properties """
+    """ Remove a list of chart attributes (for the example the default ones can be removed here)
+
+    :param attrsList: This is the python list with all the Javascript chart attributes
+    :return: Remove the value from the chartAttrs dictionary
+    """
     for attr in attrsList:
       if attr in self.chartAttrs:
         del self.chartAttrs[attr]
 
   def addChartProp(self, key, attrs):
-    """ Change the object chart properties """
+    """ Add a chart property to the javascript definition
+
+    A chart property is more granular than a chart attribute. Basically it is a second level with potential function in it
+    :param key: The property key, for example xAxis
+    :param attrs: The attributes, for example {'tickFormat': "d3.format(',r')"}
+    :return: Add the property to the chartProps dictionary
+    """
     if key not in self.chartProps:
       self.chartProps[key] = attrs
     else:
       self.chartProps[key].update(attrs)
 
-  def delChartProp(self, attrs):
-    """ Change the object chart properties """
-    self.chartProps.update(attrs)
+  def delChartProp(self, propList):
+    """ Fully remove all the properties attached to a define list of key
+
+    :param propList: The list of properties
+    :return: Remove the property definition to chartProps dictionary
+    """
+    for prop in propList:
+      if prop in self.chartProps:
+        del self.chartProps[prop]
 
   def addSvgProp(self, attr):
-    """ Change the object SVG properties """
+    """ Add attributes to the SVG HTML component
+
+    :param attr: The attributes dictionary
+    :return: Add the attributes to the underlying svgProp dictionary
+    """
     self.svgProp.update(attr)
 
   def attrToStr(self):
     """ Convert the list of dictionary attribute to class attributes """
     res = []
-    self.resolveProperties(res, self.chartAttrs, None)
+    self.__resolveProperties(res, self.chartAttrs, None)
     return ".".join(res)
 
   def propToStr(self):
     """ Convert the list of dictionary object attributes to proper object attributes """
     res = []
-    self.resolveProperties(res, self.chartProps, None)
+    self.__resolveProperties(res, self.chartProps, None)
     return "".join(['%s.%s;' % (self.htmlId, prop) for prop in res])
 
-  def resolveProperties(self, res, data, prefix):
-    """ Convert the dictionary of properties to a flat javascript definition """
+  def __resolveProperties(self, res, data, prefix):
+    """ Resolve the data attributes and properties dictionaries and convert this in a list of strings to be concatenated
+
+    :param res: The main list with all the properties resolved
+    :param data: The data dictionary with the properties
+    :param prefix: The prefix to be added, if there a nested level of properties in the construct
+    :return:
+    """
     for jsKey, jsVal in data.items():
       if isinstance(jsVal, dict):
         if prefix is not None: # Deeper sub level in the NVD3 Chart property
-          self.resolveProperties(res, jsVal, "%s.%s" % (prefix, jsKey))
+          self.__resolveProperties(res, jsVal, "%s.%s" % (prefix, jsKey))
         else: # First sub level of the NVD3 Chart property
-          self.resolveProperties(res, jsVal, jsKey)
+          self.__resolveProperties(res, jsVal, jsKey)
         continue
 
       if prefix is not None:
@@ -324,7 +373,7 @@ class XSvg(AresHtml.Html):
   def getSvg(self):
     """ Return the SVG properties as a string """
     svgProperties = []
-    self.resolveProperties(svgProperties, self.svgProp, None)
+    self.__resolveProperties(svgProperties, self.svgProp, None)
     if svgProperties:
       return ".%s" % ".".join(svgProperties)
 
@@ -332,28 +381,57 @@ class XSvg(AresHtml.Html):
 
   @property
   def jqData(self):
+    series = []
+    for seriesGrp in self.seriesGrps:
+      series.append(seriesGrp.data()['data'])
     return self.vals.data()
+
+  def getData(self):
+    series, varSeries, grpNames = [], [], []
+    for seriesGrp in self.seriesGrps:
+      series.append(seriesGrp.data()['data'])
+      varSeries.append(seriesGrp.data()['vars'])
+      grpNames.append(seriesGrp.jsVar['grpName'])
+    if not self.multiSeries:
+      return {'data': series[0], 'vars': ";".join(varSeries), 'seriesNames': grpNames}
+
+    return {'data': series, 'vars': ";".join(varSeries), 'seriesNames': json.dumps(grpNames)}
 
   @property
   def xDimensions(self):
+
     return self.vals.dimension()
 
-  # --------------------------------------------------------------------------------------------------------------
-  #
-  #                                     SETTER AND GETTER FOR THE CHARTS
-  # --------------------------------------------------------------------------------------------------------------
   def __str__(self):
     """ Return the svg container """
-    crossFilterGrp = self.vals
-    for filter in crossFilterGrp.filters:
-      for chart in crossFilterGrp.xFilter.charts:
-        # Update all the charts linked to a given recordSet
-        filter.change(chart.jsUpdate())
-    self.htmlContent.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
-    if self.headerBox:
-      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(self.htmlContent), self.headerBox, properties=self.references))
+    for seriesGrp in self.seriesGrps:
+      for filter in seriesGrp.filters:
+        for chart in seriesGrp.xFilter.charts:
+          # Update all the charts linked to a given recordSet
+          filter.change(chart.jsUpdate())
 
-    return "\n".join(self.htmlContent)
+    items = []
+    if self.chartDesc is not None:
+      self.chartDesc.attr.setdefault('css', {}).update({'margin-bottom': '10px'})
+      items.append(str(self.chartDesc))
+
+    if not self.multiSeries and len(self.seriesGrps) > 1:
+      # The type of chart cannot handle multiple series so the different other groups will be display in a
+      # list with all the group names
+      items.append('<div class="list-group" style="float:left;height:%spx;width:25%%;margin-top:5px">' % self.height)
+      for i, seriesGrp in enumerate(self.seriesGrps):
+        if i == 0:
+          items.append('<button  type="button" class="list-group-item list-group-item-action list-group-item-success">%s</button>' % seriesGrp.jsVar['grpName'])
+        else:
+          items.append('<button  type="button" class="list-group-item list-group-item-action">%s</button>' % seriesGrp.jsVar['grpName'])
+      items.append('</div>')
+      self.attr.setdefault('css', {}).update({'float': 'right', 'width': '74%'})
+    items.append('<div %s><svg style="width:100%%;height:%spx;"></svg></div>' % (self.strAttr(), self.height))
+
+    if self.headerBox:
+      return str(AresHtmlContainer.AresBox(self.htmlId, "\n".join(items), self.headerBox, properties=self.references))
+
+    return "\n".join(items)
 
   def mapxAxes(self, xValsList):
     """
@@ -410,7 +488,7 @@ class XSvg(AresHtml.Html):
   def graph(self):
     """ Add the Graph definition in the Javascript method """
     chartAttributes = []
-    self.resolveProperties(chartAttributes, self.chartAttrs, None)
+    self.__resolveProperties(chartAttributes, self.chartAttrs, None)
     self.aresObj.jsGraphs.append(self.jsUpdate(None))
     for comp in self.components:
       comp.link(self.jsUpdate())
