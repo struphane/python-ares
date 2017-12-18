@@ -49,7 +49,7 @@ def report(aresObj):
                     'FolderFiles': len(aresObj.getFiles([folder])), 'activity': folderEvents[folder]['count'],
                     'show_params': '1',
                     'creationDate': folderEvents[folder]['data'].get('FOLDER CREATION', '')})
-
+  xFilerContent = aresObj.crossFilterData(content, [])
   # Create a new report # 'Existing Reports',
   tableComp = aresObj.table(content, [{'key': 'FolderName', 'colName': 'Folder Name'},
                                       {'key': 'show_params', 'colName': 'Show Params', 'visible': 'false'},
@@ -59,27 +59,6 @@ def report(aresObj):
                                       {'key': 'Date', 'colName': 'Last Modification'},
                                       {'key': 'Size', 'colName': 'Size in Ko'}], 'Existing Reports')
 
-  #tableComp.filters(['Folder Name'])
-  bar = aresObj.bar(content, [{'key': 'report_name', 'colName': 'Folder Name'},
-                              {'key': 'Day', 'colName': 'Last Modification'},
-                              {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number'},
-                              {'key': 'Date', 'colName': 'Last Modification'},
-                              {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
-                              {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
-                              {'key': 'delete', 'colName': ''}], headerBox='Scripts per folder')
-
-  #
-  bar.setKeys(['Day'])
-  bar.setVals(['Size'])
-
-  donut = aresObj.donut(content, [{'key': 'report_name', 'colName': 'Folder Name', 'selected': True},
-                                  {'key': 'FolderFiles', 'colName': 'Count Files', 'type': 'number', 'selected': True},
-                                  {'key': 'Date', 'colName': 'Last Modification'},
-                                  {'key': 'Size', 'colName': 'Size in Ko', 'type': 'number'},
-                                  {'key': 'activity', 'colName': 'Activity', 'type': 'number'},
-                                  {'key': 'delete', 'colName': ''}], headerBox='Folder')
-
-  donut.setKeys(['report_name'])
-  donut.setVals(['activity'])
-
-  aresObj.row([bar, donut])
+  groupDayPerSize = xFilerContent.group('Day', 'Size')
+  bar = aresObj.xbar(groupDayPerSize)
+  aresObj.row([tableComp, bar])
