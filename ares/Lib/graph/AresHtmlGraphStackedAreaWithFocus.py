@@ -3,8 +3,6 @@
 
 """
 
-import json
-from ares.Lib.html import AresHtmlGraphSvgMulti
 from ares.Lib.html import AresHtmlGraphSvg
 
 
@@ -14,7 +12,6 @@ class XNvD3StackedAreaWithFocus(AresHtmlGraphSvg.XSvg):
   __chartStyle = {'useInteractiveGuideline': 'true',
                   'x': 'function(d) { return d.label }',
                   'y': 'function(d) { return d.value }',
-                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts),
                   'controlLabels': '{stacked: "Stacked"}',
                   'duration': 'true',
                   'showControls': '300',

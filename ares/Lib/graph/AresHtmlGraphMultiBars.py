@@ -3,10 +3,6 @@
 
 """
 
-import json
-
-from Libs import AresChartsService
-from ares.Lib.html import AresHtmlGraphSvgMulti
 from ares.Lib.html import AresHtmlGraphSvg
 
 
@@ -22,7 +18,6 @@ class XNvD3MultiBars(AresHtmlGraphSvg.XSvg):
                   'rotateLabels': '0',
                   'showControls': 'true',
                   'groupSpacing': '0.1',
-                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvg.XSvg.colorCharts),
                   }
 
   __chartProp = {

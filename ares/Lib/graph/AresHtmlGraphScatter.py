@@ -3,8 +3,6 @@
 
 """
 
-import json
-from ares.Lib.html import AresHtmlGraphSvgMulti
 from ares.Lib.html import AresHtmlGraphSvg
 
 
@@ -16,7 +14,6 @@ class XNvD3ScatterChart(AresHtmlGraphSvg.XSvg):
                   'showDistY': 'true',
                   'x': 'function(d) { return d.label }',
                   'y': 'function(d) { return d.value }',
-                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvgMulti.MultiSvg.colorCharts[5:]),
   }
 
   __chartProp = {

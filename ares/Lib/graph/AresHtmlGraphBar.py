@@ -3,8 +3,6 @@
 
 """
 
-import json
-from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 
 
@@ -14,7 +12,6 @@ class XNvD3Bar(AresHtmlGraphSvg.XSvg):
   references = ['http://nvd3.org/examples/discreteBar.html']
   __chartStyle = {'showValues': 'true',
                   'staggerLabels': 'true',
-                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvg.Svg.colorCharts),
                   'x': "function(d) { return d.key; }",
                   'y': "function(d) { return d.value; }"}
   # Required external modules (javascript and CSS

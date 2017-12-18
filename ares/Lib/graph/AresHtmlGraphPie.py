@@ -3,8 +3,6 @@
 
 """
 
-import json
-from Libs import AresChartsService
 from ares.Lib.html import AresHtmlGraphSvg
 
 
@@ -16,7 +14,6 @@ class XNvD3Pie(AresHtmlGraphSvg.XSvg):
                 'http://bl.ocks.org/enjalot/1203641',
                 'https://stackoverflow.com/questions/16191542/how-to-customize-color-in-pie-chart-of-nvd3']
   __chartStyle = {'showLabels': 'true',
-                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvg.Svg.colorCharts),
                   'x': "function(d) { return d.key; }",
                   'y': "function(d) { return d.value; }"}
 
@@ -69,7 +66,6 @@ class XNvD3Donut(AresHtmlGraphSvg.XSvg):
                   'labelType': '"percent"',
                   'donut': 'true',
                   'donutRatio': 0.35,
-                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvg.Svg.colorCharts),
                   'x': "function(d) { return d.key; }",
                   'y': "function(d) { return d.value; }"}
 
@@ -119,7 +115,6 @@ class XNvD3Meter(AresHtmlGraphSvg.XSvg):
   __chartStyle = {'showLabels': 'false',
                   'donut': 'true',
                   'growOnHover': 'false',
-                  'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(AresHtmlGraphSvg.Svg.colorCharts),
                   'x': "function(d) { return d.key; }",
                   'y': "function(d) { return d.value; }"}
 
