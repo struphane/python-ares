@@ -145,6 +145,10 @@ class Html(object):
     """ Set the color for the age """
     return self.__ageColors[self.aresObj.ageReference]
 
+  def getColorRange(self):
+    """ Set the color for the age """
+    return self.__ageColors[self.aresObj.colorBase]
+
   # CSS Classes management
   def addClass(self, cssCls):
     """ Change the CSS Style of the HTML object """
