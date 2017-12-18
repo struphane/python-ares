@@ -379,7 +379,8 @@ class Report(object):
   def xpie(self, singleSeries=None, multiSeries=None, headerBox=None, chartDesc=None, cssCls=None, cssAttr=None, inReport=True):
     return self.add(aresFactory['XNvD3Pie'](self, headerBox, singleSeries=singleSeries, multiSeries=multiSeries, chartDesc=chartDesc, cssCls=cssCls, cssAttr=cssAttr), sys._getframe().f_code.co_name, inReport)
   def xmeter(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Meter'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
-  def xdonut(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Donut'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
+  def xdonut(self, singleSeries=None, multiSeries=None, headerBox=None, chartDesc=None, cssCls=None, cssAttr=None, inReport=True):
+    return self.add(aresFactory['XNvD3Donut'](self, headerBox, singleSeries=singleSeries, multiSeries=multiSeries, chartDesc=chartDesc, cssCls=cssCls, cssAttr=cssAttr), sys._getframe().f_code.co_name, inReport)
   def xhbar(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3HorizontalBars'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
   def xscatter(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3ScatterChart'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
   def xarea(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3StackedAreaWithFocus'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
