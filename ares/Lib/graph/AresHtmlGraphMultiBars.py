@@ -34,6 +34,15 @@ class XNvD3MultiBars(AresHtmlGraphSvg.XSvg):
   clickJsFnc = None
   multiSeries = True
 
+  def xtimstamps(self):
+    """
+
+    :return:
+    """
+    self.addChartAttr({'reduceXTicks': 'false'})
+    self.delChartProp(['xAxis'])
+    self.addChartProp('xAxis', {'ticks(5).tickFormat': "function(d) { return d3.time.format('%x')(new Date(d)) }"})
+
   def jsUpdate(self, data=None):
     """ Javascript function to build and update the chart based on js variables stored as globals to your report  """
     if self.clickJsFnc is None:
