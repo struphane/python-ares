@@ -270,7 +270,7 @@ class TextWithBorder(AresHtml.Html):
       item = ['<div style="margin-top:20px" %s>' % self.strAttr()]
     else:
       item = ['<div style="width:%spx;margin-top:20px" %s>' % (self.width, self.strAttr())]
-    item.append('<fieldset style="5px;border:2px solid %s;padding:5px">' % self.colorBorder)
+    item.append('<fieldset style="5px;border:1px solid %s;padding:5px">' % self.colorBorder)
     item.append('<legend style="font-weight:bold;color:%s;width:auto">%s</legend>%s</fieldset>' % (self.coloTitle, self.title, self.vals))
     item.append('</div>')
     return "".join(item)
