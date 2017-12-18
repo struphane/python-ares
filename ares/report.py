@@ -562,7 +562,8 @@ def run_report(report_name, script_name):
           if systemDirectory in str(ss):
             del sys.modules[module]
       for f in reportObj.files.values():
-        f.close()
+        if hasattr(f, 'close'):
+          f.close()
   return render_template('ares_template_basic.html', cssImport=cssImport, jsImport=jsImport,
                          jsOnload=onload, content=content, jsGraphs=jsCharts, side_bar="\n".join(side_bar),
                          name=envName, jsGlobal=jsGlobal, htmlArchives="\n".join(htmlArchives),
