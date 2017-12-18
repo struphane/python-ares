@@ -249,9 +249,6 @@ class XSvg(AresHtml.Html):
 
   """
   __css = {'width': '95%', 'height': '100%'}
-  colorCharts = ['#e5f2e5', '#cce5cc', '#b2d8b2', '#99cc99', '#fbf7f', '#66b266', '#4ca64c', '#329932', '#198c19', '#008000',
-                 '#007300', '#007300', '#006600', '#005900', '#004c00', '#004000', '#003300', '#002600']
-
   height = 300
   multiSeries = False
 
@@ -277,6 +274,7 @@ class XSvg(AresHtml.Html):
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
     super(XSvg, self).__init__(aresObj, None, cssCls, cssAttr) # Do not define a value
+    self.addChartAttr({'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(self.getColorRange()[1:])})
     self.extKeys, self.dispatch, self.htmlContent, self.components = None, {}, [], []
     self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     self.headerBox = headerBox

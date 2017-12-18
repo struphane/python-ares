@@ -93,51 +93,12 @@ class DataTable(AresHtml.Html):
       if 'withAge' in col:
         self.callBackCellAge(self.recKey(col), i)
 
-
-      if 'url' in col:
-        # This will only work for static urls (not javascript tranalation for the time being)
-        colKey = self.recKey(col)
-        if 'report_name' in col['url'].get('cols', {}):
-          self.recordSetHeader.append('''{ data: "%s", title: "%s", className: "%s", visible: %s,
-                render: function (data, type, full, meta) {
-                    var url = "run"; var cols = JSON.parse('%s');
-                    rowParams = '' ;
-                    for (var i in cols) {
-                      if (cols[i] == 'FolderName') {url = url + '/' + full[cols[i]] ; }
-                      else if (cols[i] == 'report_name') {}
-                      else {rowParams = rowParams + '&' + cols[i].trim() + '=' + full[cols[i]];}
-                    }
-                    return '<a href="' + url + '?' + rowParams.substr(1) + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), col.get("colName", ''),
-                                                                                                          col.get("visible", 'true'), json.dumps(col['url']['cols'])))
-        else:
-          if not 'report_name' in col['url']:
-            col['url']['report_name'] = self.aresObj.http['REPORT_NAME']
-          url = render_template_string('''{{ url_for(\'ares.run_report\', %s) }}''' % ",".join(["%s='%s'"% (key, val) for key, val in col['url'].items()]))
-          if 'cols' in col['url']:
-            self.recordSetHeader.append('''{ data: "%s", title: "%s",
-                render: function (data, type, full, meta) {
-                    var url = "%s"; var cols = JSON.parse('%s');
-                    rowParams = '' ;
-                    for (var i in cols) {rowParams = rowParams + '&' + cols[i] + '=' + full[cols[i]]; }
-                    if (url.indexOf("?") !== -1) {url = url + '&' + rowParams.substring(1) ;}
-                    else {url = url + '?' + rowParams.substring(1) ;}
-                    return '<a href="' + url + '">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url, json.dumps(col['url']['cols'])))
-          else:
-            self.recordSetHeader.append('''{ data: "%s", title: "%s", render: function (data, type, full, meta) {return '<a href="%s">' + data + '</a>';} }''' % (colKey, self.recMap.get(colKey, colKey), url))
-      #elif hasattr(self.aresObj, col.get('aresFnc', '')):
-        # This part should use existing Python object to then be included to the Javascript Data Table object
-        # The idea is to try as much as possible to have only one definition of the HTML components
-        #colKey = self.recKey(col)
-        #htmlObj = getattr(self.aresObj, col['aresFnc'])("{value: '+ data + '}")
-        #self.recordSetHeader.append(
-        #  ''' { data: "%s", title: "%s", render: function (data, type, full, meta) {'%s'} } ''' % (colKey, self.recMap.get(colKey, colKey), htmlObj) )
+      # default value for a header definition
+      # the className is an optional parameter and it might define a specific class if needed
+      if 'className' in col:
+        self.recordSetHeader.append('{ data: "%s", title: "%s", className: "%s", visible: %s}' % (self.recKey(col), col.get("colName"), col["className"], col.get("visible", 'true')))
       else:
-        # default value for a header definition
-        # the className is an optional parameter and it might define a specific class if needed
-        if 'className' in col:
-          self.recordSetHeader.append('{ data: "%s", title: "%s", className: "%s", visible: %s}' % (self.recKey(col), col.get("colName"), col["className"], col.get("visible", 'true')))
-        else:
-          self.recordSetHeader.append('{ data: "%s", title: "%s", visible: %s}' % (self.recKey(col), col.get("colName"), col.get("visible", 'true')))
+        self.recordSetHeader.append('{ data: "%s", title: "%s", visible: %s}' % (self.recKey(col), col.get("colName"), col.get("visible", 'true')))
       self.recMap[self.recKey(col)] = col.get("colName")
     self.option('columns', "[ %s ]" % ",".join(self.recordSetHeader))
     self.withFooter, self.noPivot = False, True
