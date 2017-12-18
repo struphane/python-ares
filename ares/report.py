@@ -45,8 +45,8 @@ try:
   if config.ARES_MODE.upper() != 'LOCAL':
       from system.sqlite.db_config import setup_db_env
       setup_db_env.launch_db()
-except:
-  pass
+except Exception as e:
+  logging.debug(str(e), exc_info=True)
 
 AUTHORIZED_SOURCES = []
 report = Blueprint('ares', __name__, url_prefix='/reports')
@@ -514,7 +514,7 @@ def run_report(report_name, script_name):
     content = str(traceback.format_exc()).replace("(most recent call last):", "(most recent call last): <BR /><BR />").replace("File ", "<BR />File ")
     content = content.replace(", line ", "<BR />&nbsp;&nbsp;&nbsp;, line ")
   except Exception as e:
-    logging.debug(e)
+    logging.debug(e, exc_info=True)
     #TODO use the import factory to generate the below strings
     cssImport = ''''<link rel="stylesheet" href="/static/css/font-awesome.min.css" type="text/css">
                     <link rel="stylesheet" href="/static/css/bootstrap.min.css" type="text/css">
@@ -1283,7 +1283,7 @@ def editScript():
     for line in request.data.decode('utf-8').split('\n'):
       script.write('%s\n' % line)
   except Exception as e:
-    logging.debug(e)
+    logging.debug(e, exc_info=True)
   finally:
     script.close()
   return 'OK'

@@ -6,6 +6,7 @@ import re
 import sys
 import re
 import collections
+import logging
 from flask_login import current_user
 from flask import session
 from ares.Lib import AresSql
@@ -60,6 +61,7 @@ def call(aresObj):
       queryParams = {'report_name': aresObj.http['reportName'], 'file': aresObj.http['fileName'], 'type': aresObj.http['folder'], 'username': current_user.email , 'team_name': session['TEAM']}
       db.modify(LOG_DEPLOY % queryParams)
     except Exception as e:
+      logging.debug('Problem during the update %s'%e, exc_info=True)
       return 'Problem during the update'
 
     finally:
@@ -76,7 +78,8 @@ def call(aresObj):
       AresFileParser.saveFile(aresObj, aresObj.http['reportName'], recordSet, [col.get('key', regex.sub('', col['colName'])) for col in AresFileParser.FilePivot.cols],
                               AresFileParser.FilePivot.delimiter, aresObj.http['fileName'], 1, aresObj.http['folder'])
 
-    except:
+    except Exception as e:
+      logging.debug('Problem during the update %s' % e, exc_info=True)
       return 'Problem during the update'
 
   return 'File - %s - updated' % aresObj.http['fileName']

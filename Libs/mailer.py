@@ -40,6 +40,7 @@ import email.mime.multipart
 import email.mime.message
 import smtplib
 import sys
+import logging
 
 _DEBUG = False
 _PY3 = sys.version_info.major == 3
@@ -216,7 +217,7 @@ class SMTPServer(object):
 
       srv.login(user, password)
     except KeyError:
-      pass # No login information provided
+      logging.debug('No login information provided %s' % e, exc_info=True)
 
     self.server = srv
 

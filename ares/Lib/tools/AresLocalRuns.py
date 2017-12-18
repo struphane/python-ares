@@ -17,7 +17,7 @@ from __future__ import print_function
 import os
 import sys
 import time
-import traceback
+import logging
 
 from ares.Lib import Ares
 
@@ -53,13 +53,10 @@ def getReport(results, directory, folder, reports, scriptPath):
           results[reportModule.__name__].http['REPORT_NAME'] = report.replace(".py", "")
           reportModule.report(results[reportModule.__name__])
           print("  > Done in %s seconds !" % (time.time() - t0))
-        except:
-          print("Error with report %s" % report)
-          print(traceback.print_exc())
+        except Exception as e:
+          logging.exception("Error with report %s" % report)
       else:
-        print("Module ignore %s" % report)
-
-
+        logging.info("Module ignore %s" % report)
 
 if __name__ == '__main__':
   # Run the script locally
