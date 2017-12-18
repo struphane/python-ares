@@ -391,7 +391,8 @@ class Report(object):
   def xmultibar(self, singleSeries=None, multiSeries=None, headerBox=None, chartDesc=None, cssCls=None, cssAttr=None, inReport=True):
     return self.add(aresFactory['XNvD3MultiBars'](self, headerBox, singleSeries=singleSeries, multiSeries=multiSeries, chartDesc=chartDesc, cssCls=cssCls, cssAttr=cssAttr), sys._getframe().f_code.co_name, inReport)
   def xline(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3Line'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
-  def xwordcloud(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XWordCloud'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
+  def xwordcloud(self, singleSeries=None, multiSeries=None, headerBox=None, chartDesc=None, cssCls=None, cssAttr=None, inReport=True):
+    return self.add(aresFactory['XWordCloud'](self, headerBox, singleSeries=singleSeries, multiSeries=multiSeries, chartDesc=chartDesc, cssCls=cssCls, cssAttr=cssAttr), sys._getframe().f_code.co_name, inReport)
   def xsparklineplus(self, crossFilter, headerBox=None, cssCls=None, cssAttr=None, inReport=True): return self.add(aresFactory['XNvD3SparkLinePlus'](self, headerBox, crossFilter, cssCls, cssAttr), sys._getframe().f_code.co_name, inReport)
 
   # Chart section
