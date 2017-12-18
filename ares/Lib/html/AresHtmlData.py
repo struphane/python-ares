@@ -70,7 +70,7 @@ class CrossFilterGroup(object):
     """
     self.aresObj = aresObj
     self.links, self.filters = set(), set()
-    self.xFilter = filter
+    self.xFilter, self.dimDefined = filter, False
     if val is not None:
       self.htmlId = "%s_%s_%s" % (filter.htmlId, key, val)
     else:
@@ -79,27 +79,34 @@ class CrossFilterGroup(object):
       self.htmlId = "%s_%s" % (filter.htmlId, key)
     if grpName is None:
       grpName = self.htmlId
-    self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId, 'top': top, 'grpName': grpName, 'bottom': bottom}
+    self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId, 'top': top,
+                  'grpName': grpName, 'bottom': bottom, 'htmlDimId': '%s_dim' % self.htmlId}
 
-  def filter(self, col, htmlObj, val=None):
+  def filter(self, col, htmlObj=None, val=None):
     """
 
     .filter( function (d) { var val = %s; if (val == 'all') {return true} else {return d.key == val }; } )
     :return:
     """
     if col != self.jsVar['key'] :
-      raise Exception("%s column different from the one defined in the CrossFilter dimension %s" % (col, self.key))
-
-    self.filters.add(htmlObj)
-    if val is not None:
-      self.jsVar['filterVal'] = "'%s'" % val
-      self.jsVar['filter'] = ".filter( function (d) { var val = '%s'; if (val == 'all') { return true } else { return d == val } } )" % val
+      # TODO complete this part...
+      #
+      self.jsVar.update({'seriesKey': col, 'seriesVal': val})
+      self.jsVar['htmlDimId'] = '%s_%s_dim' % (self.htmlId, val)
+      self.dimDefined= True
+      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) { if(d['%(seriesKey)s'] == '%(seriesVal)s' ) { return d['%(key)s'] ;} } ) " % self.jsVar)
     else:
-      self.jsVar['filterVal'] = htmlObj.val
-      self.jsVar['filter'] = ".filter( function (d) { var val = %s; if (val == 'all') { return true } else { return d == val } } )" % htmlObj.val
+      if val is not None:
+        self.jsVar['filterVal'] = "'%s'" % val
+        self.jsVar['filter'] = ".filter( function (d) { var val = '%s'; if (val == 'all') { return true } else { return d == val } } )" % val
+      else:
+        self.filters.add(htmlObj)
+        self.jsVar['filterVal'] = htmlObj.val
+        self.jsVar['filter'] = ".filter( function (d) { var val = %s; if (val == 'all') { return true } else { return d == val } } )" % htmlObj.val
 
-    self.aresObj.jsGlobal.add("%(htmlId)s_dim = %(filterId)s.dimension(function(d) {  return d['%(key)s'] ; } ) " % self.jsVar)
-    self.jsVar['filterDef'] = "%(htmlId)s_dim%(filter)s" % self.jsVar
+      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) {  return d['%(key)s'] ; } ) " % self.jsVar)
+      self.jsVar['filterDef'] = "%(htmlDimId)s%(filter)s" % self.jsVar
+    return self
 
   def removeFilters(self):
     """ remove all the filters already attached to this crossfilter object and dimension
@@ -113,10 +120,10 @@ class CrossFilterGroup(object):
 
     :return:
     """
-    if 'filter' not in self.jsVar:
-      self.aresObj.jsGlobal.add("%(htmlId)s_dim = %(filterId)s.dimension(function(d) {  return d['%(key)s'] ; } )" % self.jsVar)
+    if 'filter' not in self.jsVar and not self.dimDefined :
+      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) {  return d['%(key)s'] ; } )" % self.jsVar)
 
-    return "%(htmlId)s_dim.group().reduceSum( function(d) { return +d['%(val)s'] ; } )" % self.jsVar
+    return "%(htmlDimId)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } )" % self.jsVar
 
   def val(self):
     """
@@ -124,10 +131,10 @@ class CrossFilterGroup(object):
     :return:
     """
     if self.jsVar['top'] is not None:
-      return "%(htmlId)s_dim.top(%(top)s)" %  self.jsVar
+      return "%(htmlDimId)s.top(%(top)s)" %  self.jsVar
 
     if self.jsVar['bottom'] is not None:
-      return "%(htmlId)s_dim.bottom(%(bottom)s)" %  self.jsVar
+      return "%(htmlDimId)s.bottom(%(bottom)s)" %  self.jsVar
 
   def data(self):
     """
