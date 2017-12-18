@@ -9,8 +9,8 @@ cssCls is also passed in the args
 """
 
 import json
+
 from ares.Lib import AresHtml
-from ares.Lib import AresJs
 from flask import render_template_string
 
 
@@ -42,7 +42,7 @@ class Download(AresHtml.Html):
   reqJs = ['jquery']
 
   def __init__(self, aresObj, vals, attrs, cssCls, cssAttr):
-    super(A, self).__init__(aresObj, vals,  cssCls, cssAttr)
+    super(Download, self).__init__(aresObj, vals,  cssCls, cssAttr)
     self.getData = attrs if attrs is not None else {} # Special attributes to add to the URL
     if not 'REPORT_NAME' in self.getData:
       self.getData['REPORT_NAME'] = self.aresObj.http['REPORT_NAME']
@@ -73,25 +73,6 @@ class Download(AresHtml.Html):
     self.get('click', url, data, '')
     #self.aresObj.jsOnLoadFnc.add(jsDef)
     return '<a href="#" %s>%s</a>' % (self.strAttr(), self.vals)
-
-
-class DownloadData(AresHtml.Html):
-  """
-  """
-  alias, cssCls = 'anchorFiles', ['btn', 'btn-success']
-  references = []
-  reqCss = ['bootstrap', 'font-awesome']
-  reqJs = []
-  file_location = 'data'
-
-  def __init__(self, aresObj, vals, fileName, cssCls=None, cssAttr=None):
-    super(DownloadData, self).__init__(aresObj, vals,  cssCls, cssAttr)
-    self.fileName = fileName
-
-  def __str__(self):
-    """ The HTLM object representation """
-    url = render_template_string('''{{ url_for(\'ares.downloadOutputs\', report_name=\'%s\', file_name=\'%s\', file_location=\'%s\') }}''' % (self.aresObj.reportName, self.fileName, self.file_location))
-    return '<a href="%s" %s>%s</a>' % (url, self.strAttr(), self.vals)
 
 
 class InternalLink(AresHtml.Html):
