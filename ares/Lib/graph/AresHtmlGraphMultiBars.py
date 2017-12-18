@@ -29,7 +29,7 @@ class XNvD3MultiBars(AresHtmlGraphSvg.XSvg):
   clickJsFnc = None
   multiSeries = True
 
-  def xtimstamps(self):
+  def xTimestamps(self):
     """
 
     :return:
