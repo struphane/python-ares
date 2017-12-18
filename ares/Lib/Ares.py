@@ -267,7 +267,7 @@ class Report(object):
   def addTo(self, container, htmlObj):
     """ """
     self.supp(htmlObj)
-    container.addVal(htmlObj)
+    container.addVal(None, htmlObj)
 
   # ---------------------------------------------------------------------------------------------------------
   # Section dedicated to map the functions call to the HTML Component
