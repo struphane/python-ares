@@ -274,7 +274,7 @@ class XSvg(AresHtml.Html):
     self.chartAttrs = dict(getattr(self, "_%s__chartStyle" % self.__class__.__name__, {}))
     self.chartProps = dict(getattr(self, "_%s__chartProp" % self.__class__.__name__, {}))
     super(XSvg, self).__init__(aresObj, None, cssCls, cssAttr) # Do not define a value
-    self.addChartAttr({'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(self.getColorRange()[1:])})
+    self.addChartAttr({'color': 'd3.scale.ordinal().range(%s).range()' % json.dumps(self.getColorRange()[::-1])})
     self.extKeys, self.dispatch, self.htmlContent, self.components = None, {}, [], []
     self.svgProp = dict([(key, val) for key, val in getattr(self, "_%s__svgProp" % self.__class__.__name__, {}).items()])
     self.headerBox = headerBox
@@ -438,6 +438,17 @@ class XSvg(AresHtml.Html):
     """
     self.addChartProp('xAxis', {'tickValues': [i for i in range(len(xValsList))]})
     self.addChartProp('xAxis', {'tickFormat': "function(d){ return %s[d] }" % json.dumps(xValsList)})
+
+  # --------------------------------------------------------------------------------------------------------------
+  #                       Functions to transform the X axis in a 2 dimension chart (Pie, Donut, Bar...)
+  # --------------------------------------------------------------------------------------------------------------
+  def keyTimestamps(self):
+    """ Change the key format to be a date from a python timestamp
+
+    :return:
+    """
+    self.delChartProp(['x'])
+    self.addChartAttr({'x': "function(d) { return d3.time.format('%x')(new Date(d.key)) ; }"})
 
   @property
   def jqId(self):
