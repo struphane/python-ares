@@ -40,6 +40,9 @@ from ares.Lib import AresHtml
 from Libs import OrderedSet
 from ares.Lib.html import AresHtmlData
 from ares.Lib.html import AresHtmlAlert
+from ares.Lib.html import AresHtmlText
+from ares.Lib.html import AresHtmlFiles
+
 
 def jsonDefault(obj):
   """ numpy.int64 is not JSON serializable, but users may use it in their report. """
@@ -286,6 +289,7 @@ class Report(object):
   def icon(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Icon'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def number(self, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Numeric'](self, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
   def wiki(self, dataSourceName, value, cssCls=None, cssAttr=None): return self.add(aresFactory['Wiki'](self, dataSourceName, value, cssCls, cssAttr), sys._getframe().f_code.co_name)
+  def textborder(self, value, title, cssCls=None, cssAttr=None): return self.add(AresHtmlText.TextWithBorder(self, value, title, cssCls, cssAttr), sys._getframe().f_code.co_name)
 
   #
   def newline(self, val=1, cssCls=None, cssAttr=None): return self.add(aresFactory['Newline'](self, val, cssCls, cssAttr), sys._getframe().f_code.co_name)
@@ -327,6 +331,9 @@ class Report(object):
   def data(self, vals): return self.add(AresHtmlData.HtmlData(self, vals), sys._getframe().f_code.co_name)
   def datadic(self, vals): return self.add(AresHtmlData.HtmlDataDic(self, vals), sys._getframe().f_code.co_name)
   def crossFilterData(self, vals, header): return self.add(AresHtmlData.HtmlDataCrossFilter(self, vals, header), sys._getframe().f_code.co_name, inReport=False)
+
+  # Files
+  def jsfile(self): return self.add(AresHtmlFiles.jsFile(self, None), sys._getframe().f_code.co_name)
 
   # Generic Action section
   def slider(self, value, title=None, cssCls=None, cssAttr=None): return self.add(aresFactory['Slider'](self, value, title, cssCls, cssAttr), sys._getframe().f_code.co_name)
