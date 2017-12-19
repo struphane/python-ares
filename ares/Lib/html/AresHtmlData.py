@@ -60,10 +60,10 @@ class HtmlDataDic(HtmlData):
 class CrossFilterGroup(object):
   """
 
-  #TODO add reduceCount function
   """
+  references = ['https://github.com/square/crossfilter/wiki/API-Reference']
 
-  def __init__(self, aresObj, filter, key, val, top=None, bottom=None, grpName=None):
+  def __init__(self, aresObj, filter, key, val, top=None, bottom=None, grpName=None, reduceFnc='reduceSum'):
     """
 
     :return:
@@ -80,7 +80,22 @@ class CrossFilterGroup(object):
     if grpName is None:
       grpName = self.htmlId
     self.jsVar = {'htmlId': self.htmlId, 'val': val, 'key': key, 'filterId': filter.htmlId, 'top': top,
-                  'grpName': grpName, 'bottom': bottom, 'htmlDimId': '%s_dim' % self.htmlId}
+                  'grpName': grpName, 'bottom': bottom, 'htmlDimId': '%s_dim' % self.htmlId,
+                  'filterFnc': "return d['%(key)s'] ;"}
+    if reduceFnc == 'reduceSum':
+      self.jsVar['reduceFnc'] = "reduceSum( function(d) { return +d['%s'] ; } )" % val # Default function the reduceSum
+    elif reduceFnc == 'reduceCount':
+      self.jsVar['reduceFnc'] = 'reduceCount()'
+    else:
+      raise Exception("Reduce Function not recognised by CrossFilter %s" % reduceFnc)
+
+  def reduceSum(self):
+    """ """
+    self.jsVar['reduceFnc'] = "reduceSum( function(d) { return +d['%(val)s'] ; } )" % self.jsVar
+
+  def reduceCount(self):
+    """ """
+    self.jsVar['reduceFnc'] = 'reduceCount()'
 
   def filter(self, col, htmlObj=None, val=None):
     """
@@ -89,12 +104,16 @@ class CrossFilterGroup(object):
     :return:
     """
     if col != self.jsVar['key'] :
-      # TODO complete this part...
-      #
+      # Section dedicated to filter on a sub array in the main recordSet
+      # Basically this is suited when the recordSet in in this structure and we need to get multiple series
+      # recordSet = { {'category': 'A', 'value': 10, 'date': 1}, {'category': 'A', 'value': 20, 'date': 2}
+      #               {'category': 'B', 'value': 30, 'date': 1}, {'category': 'B', 'value': 40, 'date': 2}
+      # ]
+      # And we need to get two series
+      # seriesA = [{'key': 1, value: 10}, {'key': 2, value: 20}] and SeriesB ...
       self.jsVar.update({'seriesKey': col, 'seriesVal': val})
       self.jsVar['htmlDimId'] = '%s_%s_dim' % (self.htmlId, val)
-      self.dimDefined= True
-      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) { if(d['%(seriesKey)s'] == '%(seriesVal)s' ) { return d['%(key)s'] ;} } ) " % self.jsVar)
+      self.jsVar['filterFnc'] = "if(d['%(seriesKey)s'] == '%(seriesVal)s' ) { return d['%(key)s'] ;}"
     else:
       if val is not None:
         self.jsVar['filterVal'] = "'%s'" % val
@@ -104,7 +123,7 @@ class CrossFilterGroup(object):
         self.jsVar['filterVal'] = htmlObj.val
         self.jsVar['filter'] = ".filter( function (d) { var val = %s; if (val == 'all') { return true } else { return d == val } } )" % htmlObj.val
 
-      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) {  return d['%(key)s'] ; } ) " % self.jsVar)
+      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) {  %(filterFnc)s } ) " % self.jsVar % self.jsVar)
       self.jsVar['filterDef'] = "%(htmlDimId)s%(filter)s" % self.jsVar
     return self
 
@@ -120,10 +139,10 @@ class CrossFilterGroup(object):
 
     :return:
     """
-    if 'filter' not in self.jsVar and not self.dimDefined :
-      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) {  return d['%(key)s'] ; } )" % self.jsVar)
+    if 'filter' not in self.jsVar:
+      self.aresObj.jsGlobal.add("%(htmlDimId)s = %(filterId)s.dimension(function(d) { %(filterFnc)s } )" % self.jsVar % self.jsVar)
 
-    return "%(htmlDimId)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } )" % self.jsVar
+    return "%(htmlDimId)s.group().%(reduceFnc)s" % self.jsVar
 
   def val(self):
     """
@@ -146,12 +165,12 @@ class CrossFilterGroup(object):
       filter = filterGrp[1]
       if col != self.jsVar['key']:
         self.jsVar['vars'].append(filter.removeFilters())
-        self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } ).top(Infinity)" % filter.jsVar)
+        self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().%(reduceFnc)s.top(Infinity)" % filter.jsVar)
         self.jsVar['vars'].append("%s_xdata = []" % filter.htmlId)
         self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {%(htmlId)s_xdata.push(p)} else { %(htmlId)s_xdata.push( {key: p.key, value: 0 }) ; } } )" % filter.jsVar)
     if 'filter' in self.jsVar:
       self.jsVar['vars'].append(self.removeFilters())
-      self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().reduceSum( function(d) { return +d['%(val)s'] ; } ).top(Infinity) ;" % self.jsVar)
+      self.jsVar['vars'].append("var x%(htmlId)s_data = %(filterDef)s.group().%(reduceFnc)s.top(Infinity) ;" % self.jsVar)
       self.jsVar['vars'].append("%s_xdata = []" % self.htmlId)
       self.jsVar['vars'].append("x%(htmlId)s_data.forEach( function(p, i) { if ( (p.key == %(filterVal)s) || (%(filterVal)s == 'all') ) {%(htmlId)s_xdata.push(p)} else { %(htmlId)s_xdata.push( {key: p.key, value: 0 }) ; } } );" % self.jsVar)
       return {'vars': ";".join(self.jsVar['vars']), 'data': '%s_xdata' % self.htmlId}
@@ -214,7 +233,7 @@ class HtmlDataCrossFilter(object):
     """ Property to get the HTML ID of a python HTML object """
     return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
-  def group(self, colGrp, valGrp, top='Infinity', grpName=None):
+  def group(self, colGrp, valGrp, top='Infinity', grpName=None, reduceFnc='reduceSum'):
     """ CrossFilter grouping function
 
     :param colGrp: The key in the recordset used as key to aggregate the data
@@ -223,7 +242,7 @@ class HtmlDataCrossFilter(object):
     """
     if grpName is None:
       grpName = 'Series %s per %s' % (colGrp, valGrp)
-    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp, top, grpName=grpName)
+    groupOjb = CrossFilterGroup(self.aresObj, self, colGrp, valGrp, top, grpName=grpName, reduceFnc=reduceFnc)
     self.grps[colGrp] = groupOjb # Store the different group attached to a crossFilter python wrapper object
     return groupOjb
 
